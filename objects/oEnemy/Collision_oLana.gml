@@ -1,0 +1,1 @@
+//NewEncounter([global.enemies.Bird, global.enemies.Bird], sBg)
