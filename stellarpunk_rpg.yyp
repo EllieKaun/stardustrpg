@@ -55,6 +55,7 @@
   "name":"stellarpunk_rpg",
   "resources":[
     {"id":{"name":"fnM3x6","path":"fonts/fnM3x6/fnM3x6.yy",},},
+    {"id":{"name":"Battle","path":"objects/Battle/Battle.yy",},},
     {"id":{"name":"Card","path":"objects/Card/Card.yy",},},
     {"id":{"name":"Deck","path":"objects/Deck/Deck.yy",},},
     {"id":{"name":"oBattle","path":"objects/oBattle/oBattle.yy",},},
@@ -80,6 +81,7 @@
     {"id":{"name":"init","path":"scripts/init/init.yy",},},
     {"id":{"name":"MenuFunctions","path":"scripts/MenuFunctions/MenuFunctions.yy",},},
     {"id":{"name":"scrBattleEnums","path":"scripts/scrBattleEnums/scrBattleEnums.yy",},},
+    {"id":{"name":"scrBattleInitializer","path":"scripts/scrBattleInitializer/scrBattleInitializer.yy",},},
     {"id":{"name":"sArrow","path":"sprites/sArrow/sArrow.yy",},},
     {"id":{"name":"sBg","path":"sprites/sBg/sBg.yy",},},
     {"id":{"name":"sBird","path":"sprites/sBird/sBird.yy",},},
