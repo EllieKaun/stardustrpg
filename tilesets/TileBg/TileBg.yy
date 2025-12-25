@@ -1,7 +1,12 @@
 {
   "$GMTileSet":"v1",
   "%Name":"TileBg",
-  "autoTileSets":[],
+  "autoTileSets":[
+    {"$GMAutoTileSet":"","%Name":"at_forest_1","closed_edge":false,"name":"at_forest_1","resourceType":"GMAutoTileSet","resourceVersion":"2.0","tiles":[12,30,31,3,28,11,10,2,29,9,13,4,21,20,22,9,],},
+    {"$GMAutoTileSet":"","%Name":"at_forest_2","closed_edge":false,"name":"at_forest_2","resourceType":"GMAutoTileSet","resourceVersion":"2.0","tiles":[48,66,67,39,64,47,46,38,65,45,49,40,57,56,58,45,],},
+    {"$GMAutoTileSet":"","%Name":"at_forest_3","closed_edge":false,"name":"at_forest_3","resourceType":"GMAutoTileSet","resourceVersion":"2.0","tiles":[84,102,103,75,100,83,82,74,101,81,85,76,93,92,94,81,],},
+    {"$GMAutoTileSet":"","%Name":"autotile_1","closed_edge":false,"name":"autotile_1","resourceType":"GMAutoTileSet","resourceVersion":"2.0","tiles":[15,34,35,6,32,14,10,5,33,9,16,7,24,23,25,9,],},
+  ],
   "macroPageTiles":{
     "SerialiseHeight":0,
     "SerialiseWidth":0,
@@ -34,5 +39,5 @@
   "tileWidth":8,
   "tilexoff":0,
   "tileyoff":0,
-  "tile_count":100,
+  "tile_count":108,
 }
