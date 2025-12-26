@@ -10,4 +10,4 @@ debuffs = []
 buggs = []
 deck = noone
 weaknesses = []
-resistense = 0 // 
+resistense = 0 

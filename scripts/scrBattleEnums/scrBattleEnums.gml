@@ -48,9 +48,20 @@ enum CardAbilityTypes {
     RemoveEffect,
     Revival,
     AttackWithMagicalEffect,
-    CopyNexPlayedCard
+    CopyNexPlayedCard,
     AddEnergyToPlayer,
     ShuffleDeck,
     FindWeakness,
     RemoveWeaknessForXTurns
+}
+
+enum BattleStates { 
+    Preparing, 
+    DeckPreparing, 
+    CharacterPreparing,
+    CharacterPlay, 
+    PlayProcess, 
+    PlayResult, 
+    AfterPlayChecks, 
+    BattleOver 
 }
