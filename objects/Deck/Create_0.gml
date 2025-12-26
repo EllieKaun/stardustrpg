@@ -1,0 +1,3 @@
+originalDeck = []
+shuffeledDeck = []
+cardsInHand = []

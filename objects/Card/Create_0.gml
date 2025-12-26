@@ -1,0 +1,10 @@
+damageType = noone
+targetType = noone
+cardAbilityType = noone
+physicalDamageEffectTypes = []
+magicalDamageEffectTypes = []
+energy = 0
+costMana = 0
+costHP = 0
+duration = 0 
+targetID = noone
