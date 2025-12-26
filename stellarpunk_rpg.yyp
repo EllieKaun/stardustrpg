@@ -2,7 +2,7 @@
   "$GMProject":"v1",
   "%Name":"stellarpunk_rpg",
   "AudioGroups":[
-    {"$GMAudioGroup":"","%Name":"audiogroup_default","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
+    {"$GMAudioGroup":"v1","%Name":"audiogroup_default","exportDir":"","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
   "configs":{
     "children":[],
@@ -48,7 +48,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.13.0.190",
+    "IDEVersion":"2024.14.2.213",
   },
   "name":"stellarpunk_rpg",
   "resources":[
@@ -87,6 +87,7 @@
     {"id":{"name":"sLanaBattleIdle","path":"sprites/sLanaBattleIdle/sLanaBattleIdle.yy",},},
     {"id":{"name":"sLanaKO","path":"sprites/sLanaKO/sLanaKO.yy",},},
     {"id":{"name":"sLanaWalk","path":"sprites/sLanaWalk/sLanaWalk.yy",},},
+    {"id":{"name":"sLayoutBg","path":"sprites/sLayoutBg/sLayoutBg.yy",},},
     {"id":{"name":"sMashroom","path":"sprites/sMashroom/sMashroom.yy",},},
     {"id":{"name":"sPointer","path":"sprites/sPointer/sPointer.yy",},},
     {"id":{"name":"sSlice","path":"sprites/sSlice/sSlice.yy",},},
