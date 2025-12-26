@@ -1,0 +1,13 @@
+hp = 0 
+maxHp = 0 
+mana = 0 
+maxMana = 0 
+intelligense = 0 
+strength = 0
+guts = 0
+aura = 0
+debuffs = []
+buggs = []
+deck = noone
+weaknesses = []
+resistense = 0 

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrBattleEnums",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrBattleEnums",
+  "parent":{
+    "name":"BattleDomain",
+    "path":"folders/BattleDomain.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
