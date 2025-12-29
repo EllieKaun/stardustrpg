@@ -40,6 +40,7 @@ for(var i = 0; i < maxCardsOnDeskNumber; i++) {
 	    cardWidth,
 	    cardHeight
     )
+    // Выделение
     if isSelected { 
         draw_line_width_colour(
             cardCurrentX - 1, 
@@ -85,4 +86,16 @@ for(var i = 0; i < maxCardsOnDeskNumber; i++) {
         )
     } 
     cardCurrentX += cardWidth + cardSpacing
+}
+
+/// draw heroes
+for (var i = 0; i < array_length(heroes); i++) {
+    var h = heroes[i];
+    draw_sprite(h.spr, 0, h.x, h.y);
+}
+
+/// draw enemies
+for (var i = 0; i < array_length(enemies); i++) {
+    var e = enemies[i];
+    draw_sprite(e.spr, 0, e.x, e.y);
 }
