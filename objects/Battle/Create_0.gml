@@ -15,7 +15,7 @@ enemies = [
     new Starrior("Bat", sBird, 6, 6),
 ]
 
-/// position heroes
+// Расчет позиций героев и врагов
 
 var screenWidth = camera_get_view_width(view_camera[0])
 var screenHeight = camera_get_view_height(view_camera[0])
@@ -26,19 +26,17 @@ if !fitSpace {
     spacingBetweenStarriors = ((screenWidth / 2) - maxEnemiesCount * 32) / maxEnemiesCount
 }
 var verticalSpacing = (screenHeight / 3 - 32 * 2) / 3
-var startX = screenWidth - spacingBetweenStarriors;
+var startX = screenWidth / 2 - spacingBetweenStarriors;
 var startY = screenHeight / 3
 for (var i = 0; i < array_length(heroes); i++) {
     heroes[i].x = startX;
     heroes[i].y = startY + (i mod 2 == 0 ? verticalSpacing : (screenHeight / 3) - verticalSpacing)
+    startX -= spacingBetweenStarriors + 16
 }
 
-/// position enemies (grid style)
-var cols = 3;
-var enemySpacingX = 40;
-var enemySpacingY = 26;
-
+startX = screenWidth / 2 + spacingBetweenStarriors
 for (var i = 0; i < array_length(enemies); i++) {
-    enemies[i].x = 200 + (i mod cols) * enemySpacingX;
-    enemies[i].y = 80  + (i div cols) * enemySpacingY;
+    enemies[i].x = startX;
+    enemies[i].y = startY + (i mod 2 == 0 ? verticalSpacing : (screenHeight / 3) - verticalSpacing)
+    startX += spacingBetweenStarriors + 16
 }
