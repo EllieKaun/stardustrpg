@@ -3,10 +3,10 @@ function generateLevel() {
 }
 
 function Starrior(name, spr, hp, maxhp) constructor {
-    name = name;
-    spr = spr;
-    hp = hp;
-    maxhp = maxhp;
-    x = 0;
-    y = 0;
+    self.name = name;
+    self.spr = spr;
+    self.hp = hp;
+    self.maxhp = maxhp;
+    self.x = 0;
+    self.y = 0;
 }

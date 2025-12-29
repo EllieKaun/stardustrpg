@@ -18,21 +18,19 @@ enemies = [
 /// position heroes
 
 var screenWidth = camera_get_view_width(view_camera[0])
-var screenHeight = camera_get_view_height(view_camera[0]) / 3
+var screenHeight = camera_get_view_height(view_camera[0])
 
 var totalSpace = maxEnemiesCount + maxEnemiesCount * spacingBetweenStarriors
 var fitSpace = totalSpace < screenWidth / 2 
 if !fitSpace {
     spacingBetweenStarriors = ((screenWidth / 2) - maxEnemiesCount * 32) / maxEnemiesCount
 }
-var verticalSpacing = (screenHeight - 32 * 2) / 2
+var verticalSpacing = (screenHeight / 3 - 32 * 2) / 3
 var startX = screenWidth - spacingBetweenStarriors;
-var startY = 120;
-var spacing = 30;
-
+var startY = screenHeight / 3
 for (var i = 0; i < array_length(heroes); i++) {
     heroes[i].x = startX;
-    heroes[i].y = startY + i * spacing;
+    heroes[i].y = startY + (i mod 2 == 0 ? verticalSpacing : (screenHeight / 3) - verticalSpacing)
 }
 
 /// position enemies (grid style)
