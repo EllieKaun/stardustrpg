@@ -1,3 +1,8 @@
+var space = keyboard_check_pressed(vk_space)
+if space {
+    selectNextCharacter()
+}
+
 var leftPressed = keyboard_check_pressed(vk_left)
 var rightPressed = keyboard_check_pressed(vk_right)
 var changeIndex = leftPressed - rightPressed

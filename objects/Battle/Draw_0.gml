@@ -29,7 +29,8 @@ draw_sprite_stretched(
 var cardCurrentX = cardDeskStartX + cardSpacing
 var cardY = cardDeskStartY + topSpacing 
 var selectedBorderWidth = 1
-for(var i = 0; i < maxCardsOnDeskNumber; i++) {
+if selectedCharacter != noone {
+for(var i = 0; i < min(array_length(selectedCharacter.deck), maxCardsOnDeskNumber); i++) {
     var isSelected = selectedCard == cards[i]
     var drawY = isSelected ? cardY - 2 : cardY
      draw_sprite_stretched(
@@ -86,6 +87,7 @@ for(var i = 0; i < maxCardsOnDeskNumber; i++) {
         )
     } 
     cardCurrentX += cardWidth + cardSpacing
+}
 }
 
 /// draw heroes
