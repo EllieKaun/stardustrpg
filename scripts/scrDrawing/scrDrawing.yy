@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"scrBattleEnums",
+  "%Name":"scrDrawing",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"scrBattleEnums",
+  "name":"scrDrawing",
   "parent":{
     "name":"Scripts",
     "path":"folders/BattleDomain/Scripts.yy",

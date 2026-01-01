@@ -11,6 +11,7 @@ var bottomSpacing = 3
 var cardSpacing = 6
 var cardHeight = cardDeskHeight - (topSpacing + bottomSpacing)
 var cardWidth = cardHeight * 2 / 3
+
 // Стол
 var cardDeskWidth = cardWidth * maxCardsOnDeskNumber + cardSpacing * (maxCardsOnDeskNumber + 1)
 
@@ -31,7 +32,7 @@ var cardY = cardDeskStartY + topSpacing
 var selectedBorderWidth = 1
 if selectedCharacter != noone {
 for(var i = 0; i < min(array_length(selectedCharacter.deck), maxCardsOnDeskNumber); i++) {
-    var isSelected = selectedCard == cards[i]
+    var isSelected = selectedCard == i
     var drawY = isSelected ? cardY - 2 : cardY
      draw_sprite_stretched(
 	    CardSprite,
@@ -41,44 +42,25 @@ for(var i = 0; i < min(array_length(selectedCharacter.deck), maxCardsOnDeskNumbe
 	    cardWidth,
 	    cardHeight
     )
+    drawFitTextInArea(
+        selectedCharacter.deck[i].name,
+        cardCurrentX + 2,
+        drawY + cardDeskHeight / 2,
+        cardDeskWidth - 4,
+        cardHeight / 4
+    )
     // Выделение
     if isSelected { 
-        draw_line_width_colour(
-            cardCurrentX - 1, 
-            drawY - selectedBorderWidth, 
-            cardCurrentX - 1 + cardWidth, 
-            drawY - selectedBorderWidth, 
-            selectedBorderWidth, 
-            c_yellow, 
-            c_yellow
+        // Рамка вокруг выбранной карты
+        drawBorderAroundCard(
+            cardCurrentX,
+            drawY,
+            selectedBorderWidth,
+            cardWidth,
+            cardHeight
         )
-         draw_line_width_colour(
-            cardCurrentX - selectedBorderWidth, 
-            drawY - 1, 
-            cardCurrentX - selectedBorderWidth , 
-            drawY + cardHeight - 1, 
-            selectedBorderWidth, 
-            c_yellow, 
-            c_yellow
-        )
-         draw_line_width_colour(
-            cardCurrentX + cardWidth - 1, 
-            drawY - 1, 
-            cardCurrentX + cardWidth - 1, 
-            drawY + cardHeight - 1, 
-            selectedBorderWidth , 
-            c_yellow, 
-            c_yellow
-        )
-        draw_line_width_colour(
-            cardCurrentX - 1, 
-            drawY + cardHeight - 1, 
-            cardCurrentX + cardWidth - 1, 
-            drawY + cardHeight -1  , 
-            selectedBorderWidth, 
-            c_yellow, 
-            c_yellow
-        )
+        
+        // Указатель на выбранную карту
         draw_sprite(
             sPointer,
             0,

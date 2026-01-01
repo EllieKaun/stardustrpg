@@ -9,6 +9,7 @@ function generateLevel(
         screenWidth,
         spacingBetweenStarriors
     )
+    battleState = BattleStates.CharacterPlay
 }
 
 function Starrior(name, spr, hp, maxhp, deck) constructor {
@@ -37,7 +38,10 @@ function selectNextCharacter() {
 
 function initStarriors() {
     heroes = [
-        new Starrior("Lana", sLana, 10, 10, [new Card("strong card", 3)]),
+        new Starrior("Lana", sLana, 10, 10, [new Card("strong card", 3), 
+        new Card("card", 3),
+        new Card("strong c", 3),
+        new Card("strong carddddddd", 3)]),
         new Starrior("Mage", sViv, 10, 10, [])
     ]
 

@@ -1,6 +1,6 @@
 {
   "$GMFont":"",
-  "%Name":"fnM3x6",
+  "%Name":"fnM3x6_12",
   "AntiAlias":1,
   "applyKerning":0,
   "ascender":12,
@@ -107,7 +107,7 @@
     "124":{"character":124,"h":14,"offset":0,"shift":2,"w":1,"x":7,"y":18,},
     "125":{"character":125,"h":14,"offset":0,"shift":4,"w":3,"x":2,"y":18,},
     "126":{"character":126,"h":14,"offset":0,"shift":4,"w":3,"x":95,"y":50,},
-    "9647":{"character":9647,"h":14,"offset":2,"shift":10,"w":6,"x":100,"y":50,},
+    "9647":{"character":9647,"h":14,"offset":3,"shift":16,"w":10,"x":100,"y":50,},
   },
   "hinting":0,
   "includeTTF":false,
@@ -117,7 +117,7 @@
   "last":0,
   "lineHeight":14,
   "maintainGms1Font":false,
-  "name":"fnM3x6",
+  "name":"fnM3x6_12",
   "parent":{
     "name":"Fonts",
     "path":"folders/Fonts.yy",
@@ -134,7 +134,10 @@
   "sdfSpread":8,
   "size":12.0,
   "styleName":"Medium",
-  "textureGroupId":null,
+  "textureGroupId":{
+    "name":"Default",
+    "path":"texturegroups/Default",
+  },
   "TTFName":"",
   "usesSDF":false,
 }
