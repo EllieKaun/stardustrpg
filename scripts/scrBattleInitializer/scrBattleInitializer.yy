@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrBattleInitializer",
   "parent":{
-    "name":"BattleDomain",
-    "path":"folders/BattleDomain.yy",
+    "name":"Scripts",
+    "path":"folders/BattleDomain/Scripts.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
