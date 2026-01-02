@@ -13,25 +13,13 @@ enum ProtectionTypes {
     Magical
 }
 
-enum MagicalDamageTypes {
-    Fire,
-    Ice,
-    Electricity,
-    Stars
+enum EffectTypes {
+	Damage
 }
 
-enum PhysicalDamageEffectTypes {
-    Bleeding,
-    Explosion,
-    ActionWeakening,
-    Vampirism,
-    Stun
-}
-
-enum MagicalDamageEffectTypes {
-    Burn,
-    Freezing,
-    Shock
+enum ActionType {
+	Instant,
+    EndOfTurn
 }
 
 enum CardAbilityTypes {
@@ -55,13 +43,21 @@ enum CardAbilityTypes {
     RemoveWeaknessForXTurns
 }
 
-enum BattleStates { 
-    Preparing, 
-    DeckPreparing, 
+enum BattleStates {
+ 
+    Preparing,
+ 
+    DeckPreparing,
+ 
     CharacterPreparing,
-    CharacterPlay, 
-    PlayProcess, 
-    PlayResult, 
-    AfterPlayChecks, 
-    BattleOver 
+    CharacterPlay,
+ 
+    PlayProcess,
+ 
+    PlayResult,
+ 
+    AfterPlayChecks,
+ 
+    BattleOver
+ 
 }
