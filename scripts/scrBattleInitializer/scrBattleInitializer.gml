@@ -14,16 +14,15 @@ function generateLevel(
     battleState = BattleStates.CharacterPlay
 }
 
-function Starrior(name, spr, hp, maxhp, deck, energy, maxEnergy) constructor {
-    self.name = name
-    self.spr = spr
-    self.hp = hp
-    self.maxhp = maxhp
-    self.deck = deck
-    self.energy = energy
-    self.maxEnergy = maxEnergy
-    self.x = 0
-    self.y = 0
+function createStarrior(name, spr, hp, maxhp, deck, energy, maxEnergy) {
+    var starrior = instance_create_depth(0, 0, depth - 1, Starrior)
+    starrior.hp = hp 
+    starrior.maxHp = maxhp
+    starrior.deck = new Deck(deck) 
+    starrior.sprite_index = spr
+    starrior.energy = energy 
+    starrior.maxEnergy = maxEnergy 
+    return starrior
 }
 
 function Card(name, cardBaseScr, cardBorderScr, target, effects) constructor {
@@ -34,34 +33,64 @@ function Card(name, cardBaseScr, cardBorderScr, target, effects) constructor {
     self.effects = effects
 }
 
+function Deck(originalDeck) constructor {
+    self.originalDeck = originalDeck
+    self.shuffeledDeck = []
+    self.cardsInHand = []
+}
+
+function shuffleDeckAndTake4(character) {
+    var originalDeck = character.getOriginalDeck()
+    var shuffeledDeck = array_shuffle(originalDeck)
+    var top4Cards = take4CardsFromDeckTop(shuffeledDeck, [])
+    character.deck.shuffeledDeck = shuffeledDeck
+    character.deck.cardsInHand = top4Cards
+
+}
+
+function take4CardsFromDeckTop(shuffledDeck, cardsInHand) {
+    var top4Cards = []
+    for(var i = array_length(cardsInHand); 
+        i < maxCardsOnDeskNumber && array_length(shuffledDeck) > 0; 
+        i++) {
+        array_push(top4Cards, array_shift(shuffledDeck))
+    }  
+    return top4Cards     
+}
+
 function selectNextCharacter() {
-    if selectedCharacter == noone {
-        selectedCharacter = heroes[0]
-        cards = selectedCharacter.deck
+    if array_length(playOrder) == 0 return
+    if selectedCharacterNumber == -1 {
+        selectedCharacterNumber = 0
     } else {
-        selectedCharacter = heroes[1]
+        selectedCharacterNumber = selectedCharacterNumber + 1 >= array_length(playOrder) 
+            ? 0 : selectedCharacterNumber + 1
+    }
+    resetSelectionToAll()
+    selectedCharacter = playOrder[selectedCharacterNumber]
+    selectedCharacter.isActive = true
+    cards = selectedCharacter.deck
+}
+
+function resetSelectionToAll() {
+    for (var i = 0; i < array_length(playOrder); i++) {
+        playOrder[i].isActive = false
     }
 }
 
 function initStarriors() {
     heroes = [
-        new Starrior("Lana",    
-            sprLanaBattleIdle, 
-            10, 
-            10, 
-            [createPhysicalDamageCardDefault() ],
-            1,
-            1),
-        new Starrior("Mage", sprVivBatlleIdle, 10, 10, [], 1, 1)
+        createLana(),
+        createViv()
     ]
 
-    enemies = [
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1)
-    ]
+    enemies = createEnemiesLevel1()
+    
+    array_copy(playOrder, array_length(playOrder), heroes, 0, array_length(heroes))
+    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies))
+    for(var i = 0; i < array_length(playOrder); i++) {
+        shuffleDeckAndTake4(playOrder[i])
+    }
 }
 
 

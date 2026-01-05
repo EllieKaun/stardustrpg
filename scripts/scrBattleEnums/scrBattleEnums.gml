@@ -17,7 +17,7 @@ enum EffectTypes {
 	Damage
 }
 
-enum ActionType {
+enum Timing {
 	Instant,
     EndOfTurn
 }
@@ -44,20 +44,19 @@ enum CardAbilityTypes {
 }
 
 enum BattleStates {
- 
     Preparing,
- 
     DeckPreparing,
- 
     CharacterPreparing,
     CharacterPlay,
- 
     PlayProcess,
- 
     PlayResult,
- 
     AfterPlayChecks,
- 
     BattleOver
- 
+}
+
+enum StarriorStates {
+	Idle,
+    Attack,
+    Cast,
+    KnockOut
 }

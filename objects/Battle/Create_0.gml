@@ -3,9 +3,13 @@ maxCardsOnDeskNumber = 4
 maxEnemiesCount = 5
 spacingBetweenStarriors = 16
 
+cards = []
 heroes = []
 enemies = []
+playOrder = []
 selectedCharacter = noone
+selectedCharacterNumber = -1
+
 battleState = BattleStates.Preparing
 
 // Расчет позиций героев и врагов
