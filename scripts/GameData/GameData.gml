@@ -1,6 +1,6 @@
 //action liibrary
 
-global.actionLibrary = {
+/*global.actionLibrary = {
 	attack: {
 		name: "attack",
 		description: "{0} attacks!",
@@ -22,11 +22,10 @@ enum MODE {
     NEVER = 0,
 	ALWAYS = 1,
 	VARIES = 2
-}
+}*/
 
 
 //Party data
-
 global.party = [
 	{
 		name: "Lana",
@@ -56,7 +55,7 @@ global.party = [
 
 
 //Enemies data
-global.enemies = {
+/*global.enemies = {
 	Bird: {
 		name: "Bird",
 		hp: 10,
@@ -107,4 +106,5 @@ global.enemies = {
 		actions: [global.actionLibrary.attack]
 	},
 
-}
+}*/
+

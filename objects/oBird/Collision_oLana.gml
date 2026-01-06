@@ -1,3 +1,3 @@
-event_inherited();
+//event_inherited();
 
-NewEncounter([global.enemies.Bird, global.enemies.Bird, global.enemies.Bird], sBg)
+//NewEncounter([global.enemies.Bird, global.enemies.Bird, global.enemies.Bird], sBg)
