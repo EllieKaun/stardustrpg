@@ -2,10 +2,6 @@
 if (triggered) exit;
 triggered = true;
 
-global.battleData = {
-    background : battle_bg,
-    enemies    : battle_enemies
-};
 
 
 global.returnRoom = room;
@@ -21,3 +17,4 @@ with (oTransition) {
     target_room = BattleRoom;
     state = "fade_out";
 }
+

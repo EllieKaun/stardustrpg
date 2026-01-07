@@ -2,11 +2,14 @@
 function playCard(card, caster, targets) {
     for(var i = 0; i < array_length(card.effects); i++) {
         var effect = card.effects[i]
-        switch (effect.type) {
-        	case EffectTypes.Damage: 
-                executeDamageEffect(effect, caster, targets)
+        switch (effect.timing) {
+            case Timing.Instant: 
+                executeEffect(effect, caster, targets)
             break    
-        }   
+            case Timing.EndOfTurn:
+                effectApplyStatus(effect, caster, targets);
+            break
+        }
     }
     selectedCharacter.energy -= 1 
     battleState = BattleStates.AfterPlayChecks
@@ -14,11 +17,35 @@ function playCard(card, caster, targets) {
 
 function afterPlayChecks() {
     if selectedCharacter.energy > 0 {
-        battleState = BattleStates.PlayProcess
+        battleState = BattleStates.CharacterPlay
     } else {
         selectNextCharacter()
-        battleState = BattleStates.PlayProcess
+        battleState = BattleStates.CharacterPlay
     }
+}
+
+function effectApplyStatus(
+    effect,
+    caster,
+    targets
+) {
+    
+}
+
+function executeEffect(
+    effect,
+    caster, 
+    targets
+) {
+    caster.pendingEffect = effect;
+    caster.pendingTargets = targets;
+    switch (effect.type) {
+        case EffectTypes.Damage: 
+            caster.changeActionState(StarriorStates.Attack, function() {
+                executeDamageEffect(other.pendingEffect, other, other.pendingTargets)
+            })
+        break   
+    }    
 }
 
 function executeDamageEffect(
@@ -59,7 +86,7 @@ function createPhysicalDamageCardDefault() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: random_range(1, 3),
-                actionType: ActionType.Instant
+                timing: Timing.Instant
             }
         ]
     )

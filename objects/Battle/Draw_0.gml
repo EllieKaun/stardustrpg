@@ -31,8 +31,8 @@ var cardCurrentX = cardDeskStartX + cardSpacing
 var cardY = cardDeskStartY + topSpacing 
 var selectedBorderWidth = 1
 if selectedCharacter != noone {
-for(var i = 0; i < min(array_length(selectedCharacter.deck), maxCardsOnDeskNumber); i++) {
-    var card = selectedCharacter.deck[i]
+for(var i = 0; i < min(array_length(selectedCharacter.getCardsInHand()), maxCardsOnDeskNumber); i++) {
+    var card = selectedCharacter.getCardsInHand()[i]
     var isSelected = selectedCard == i
     var drawY = isSelected ? cardY - 2 : cardY
     draw_sprite_stretched(
@@ -77,14 +77,14 @@ for(var i = 0; i < min(array_length(selectedCharacter.deck), maxCardsOnDeskNumbe
 /// draw heroes
 for (var i = 0; i < array_length(heroes); i++) {
     var h = heroes[i];
-    draw_sprite(h.spr, 0, h.x, h.y);
+  //  draw_sprite(h.spr, 0, h.x, h.y);
 }
 
 /// draw enemies
 for (var i = 0; i < array_length(enemies); i++) {
     var e = enemies[i];
-    draw_sprite(e.spr, 0, e.x, e.y);
+  //  draw_sprite(e.spr, 0, e.x, e.y);
     
-    var pc = (e.hp / e.maxhp) * 100;
+    var pc = (e.hp / e.maxHp) * 100;
     draw_healthbar(e.x - 16, e.y - 16 - 6, e.x + 16, e.y - 16 - 4, pc, c_black, c_red, c_lime, 0, true, true)
 }

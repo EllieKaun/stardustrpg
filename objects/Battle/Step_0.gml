@@ -23,7 +23,12 @@ switch (battleState) {
         }
         if (enterPressed) {
             battleState = BattleStates.PlayProcess
-            playCard(selectedCharacter.deck[selectedCard], selectedCharacter, enemies[0])
+            if (array_length(selectedCharacter.getCardsInHand()) > 0) { 
+                playCard(selectedCharacter.getCardsInHand()[selectedCard], selectedCharacter, enemies[0])
+            } else {
+                selectedCharacter.energy -= 1 
+                battleState = BattleStates.AfterPlayChecks
+            }
         }
     break
     case BattleStates.PlayProcess:
