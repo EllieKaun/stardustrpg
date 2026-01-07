@@ -9,6 +9,25 @@ switch (battleState) {
     case BattleStates.CharacterPreparing:
         
     break
+    case BattleStates.TargetSelection: 
+        var enterPressed = keyboard_check_pressed(vk_enter)
+        var leftPressed = keyboard_check_pressed(vk_left)
+        var rightPressed = keyboard_check_pressed(vk_right)
+        var changeIndex = leftPressed - rightPressed
+        if changeIndex != 0 { 
+            if changeIndex < 0 {
+                selectNextTarget()
+            } else {
+                selectPreviousTarget()
+            }
+        }
+        if (enterPressed) {
+            battleState = BattleStates.PlayProcess
+            unselectTargets()
+            var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
+            playCard(currentCard, selectedCharacter, selectedTarget)
+        }
+    break    
     case BattleStates.CharacterPlay:
         var enterPressed = keyboard_check_pressed(vk_enter)
         var leftPressed = keyboard_check_pressed(vk_left)
@@ -22,11 +41,18 @@ switch (battleState) {
             }
         }
         if (enterPressed) {
-            battleState = BattleStates.PlayProcess
             if (array_length(selectedCharacter.getCardsInHand()) > 0) { 
-                playCard(selectedCharacter.getCardsInHand()[selectedCard], selectedCharacter, enemies[0])
+                var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
+                if currentCard.target == TargetTypes.SingleTarget {
+                    battleState = BattleStates.TargetSelection
+                    initTargetSelection()
+                } else {
+                    battleState = BattleStates.PlayProcess
+               
+                    playCard(currentCard, selectedCharacter, enemies)
+                } 
             } else {
-                selectedCharacter.energy -= 1 
+                selectedCharacter.energy = 0
                 battleState = BattleStates.AfterPlayChecks
             }
         }

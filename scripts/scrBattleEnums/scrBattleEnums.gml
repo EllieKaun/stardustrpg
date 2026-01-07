@@ -1,3 +1,5 @@
+#macro ENEMYS_TURN 0 
+
 enum TargetTypes {
     SingleTarget,
     AllTargets
@@ -14,7 +16,8 @@ enum ProtectionTypes {
 }
 
 enum EffectTypes {
-	Damage
+	Damage,
+    Heal
 }
 
 enum Timing {
@@ -51,7 +54,9 @@ enum BattleStates {
     PlayProcess,
     PlayResult,
     AfterPlayChecks,
-    BattleOver
+    BattleOver,
+    TargetSelection,
+    EnemysTurn
 }
 
 enum StarriorStates {

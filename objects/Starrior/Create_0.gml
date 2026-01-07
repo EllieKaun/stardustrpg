@@ -1,5 +1,6 @@
 name = ""
 isActive = false 
+isTarget = false
 
 hp = 0 
 maxHp = 0 
@@ -23,8 +24,7 @@ deck = new Deck([])
 actionState = StarriorStates.Idle
 spriteActionIdle = sprLanaBattleIdle
 spriteActionAttack = sprLanaBattleIdle
-actionCallback = function() { }
-
+actionCallback = undefined
 function changeActionState(state, callback) {
     actionState = state
     actionCallback = callback
@@ -37,10 +37,14 @@ function changeActionState(state, callback) {
             sprite_index = spriteActionAttack
             image_index = 0; 
             image_speed = 1;
+        break   
+        case StarriorStates.Cast:
+            sprite_index = spriteActionAttack
+            image_index = 0; 
+            image_speed = 1;
         break      
     }
 }
-
 
 function getOriginalDeck() {
     return deck.originalDeck

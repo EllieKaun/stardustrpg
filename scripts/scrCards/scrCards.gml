@@ -12,17 +12,9 @@ function playCard(card, caster, targets) {
         }
     }
     selectedCharacter.energy -= 1 
-    battleState = BattleStates.AfterPlayChecks
+    removeCardFromHand(caster, card)
 }
 
-function afterPlayChecks() {
-    if selectedCharacter.energy > 0 {
-        battleState = BattleStates.CharacterPlay
-    } else {
-        selectNextCharacter()
-        battleState = BattleStates.CharacterPlay
-    }
-}
 
 function effectApplyStatus(
     effect,
@@ -37,13 +29,24 @@ function executeEffect(
     caster, 
     targets
 ) {
-    caster.pendingEffect = effect;
-    caster.pendingTargets = targets;
+    caster.pendingEffect = effect
+    caster.pendingTargets = targets
     switch (effect.type) {
         case EffectTypes.Damage: 
             caster.changeActionState(StarriorStates.Attack, function() {
                 executeDamageEffect(other.pendingEffect, other, other.pendingTargets)
+                selectedTargetNumber = -1
+                selectedTarget = noone
+                battleState = BattleStates.AfterPlayChecks
             })
+        break    
+        case EffectTypes.Heal: 
+            caster.changeActionState(StarriorStates.Cast, function() {
+                executeHealing(other.pendingEffect, other, other.pendingTargets)
+                selectedTargetNumber = -1
+                selectedTarget = noone
+                battleState = BattleStates.AfterPlayChecks
+            })    
         break   
     }    
 }
@@ -75,6 +78,15 @@ function executeDamageEffect(
     targets.hp = targets.hp - effect.value * valueModificator * resistence
 }
 
+function executeHealing(
+    effect,
+    caster,
+    targets
+) { 
+    targets.hp = targets.hp + effect.value
+}
+
+
 function createPhysicalDamageCardDefault() {
     return new Card(
         "Default attack",
@@ -85,6 +97,22 @@ function createPhysicalDamageCardDefault() {
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            }
+        ]
+    )
+}
+
+function createInstantHealCardDefault() {
+    return new Card(
+        "Default heal",
+        sprCardAttaclBase,
+        sprCommonBorder,
+        TargetTypes.SingleTarget,
+        [
+            {
+                type: EffectTypes.Heal,
                 value: random_range(1, 3),
                 timing: Timing.Instant
             }
