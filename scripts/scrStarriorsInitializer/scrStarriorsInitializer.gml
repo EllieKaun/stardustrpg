@@ -4,18 +4,19 @@ function createLana(){
             sprLanaBattleSpell,
             10, 
             10, 
-            [createPhysicalDamageCardDefault(),
+            [//createPhysicalDamageCardDefault(),
             createInstantHealCardDefault(),
-            createPhysicalDamageCardDefault(),
-            createPhysicalDamageCardDefault(),
-            createPhysicalDamageCardDefault()],
+           // createPhysicalDamageCardDefault(),
+            //createPhysicalDamageCardDefault(),
+            //createPhysicalDamageCardDefault()
+        ],
             1,
             1)
     return starrior
 }
 
 function createViv(){
-    return createStarrior("Viv", sprVivBatlleIdle, sprVivBattleAttack, 10, 10, [], 1, 1)
+    return createStarrior("Viv", sprVivBatlleIdle, sprVivBattleAttack, 5, 10, [], 1, 1)
 }
 
 function createEnemiesLevel1() {

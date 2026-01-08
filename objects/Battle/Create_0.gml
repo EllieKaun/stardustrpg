@@ -13,6 +13,7 @@ selectedCharacterNumber = -1
 
 selectedTarget = noone
 selectedTargetNumber = -1
+targetOptions = []
 
 battleState = BattleStates.Preparing
 

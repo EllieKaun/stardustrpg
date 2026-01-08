@@ -9,7 +9,7 @@ switch (battleState) {
     case BattleStates.CharacterPreparing:
         
     break
-    case BattleStates.TargetSelection: 
+    case BattleStates.EnemyTargetSelection: 
         var enterPressed = keyboard_check_pressed(vk_enter)
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
@@ -28,6 +28,25 @@ switch (battleState) {
             playCard(currentCard, selectedCharacter, selectedTarget)
         }
     break    
+    case BattleStates.AllyTargetSelection: 
+        var enterPressed = keyboard_check_pressed(vk_enter)
+        var leftPressed = keyboard_check_pressed(vk_left)
+        var rightPressed = keyboard_check_pressed(vk_right)
+        var changeIndex = leftPressed - rightPressed
+        if changeIndex != 0 { 
+            if changeIndex < 0 {
+                selectNextTarget()
+            } else {
+                selectPreviousTarget()
+            }
+        }
+        if (enterPressed) {
+            battleState = BattleStates.PlayProcess
+            unselectTargets()
+            var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
+            playCard(currentCard, selectedCharacter, selectedTarget)
+        }
+    break 
     case BattleStates.CharacterPlay:
         var enterPressed = keyboard_check_pressed(vk_enter)
         var leftPressed = keyboard_check_pressed(vk_left)
@@ -43,12 +62,14 @@ switch (battleState) {
         if (enterPressed) {
             if (array_length(selectedCharacter.getCardsInHand()) > 0) { 
                 var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
-                if currentCard.target == TargetTypes.SingleTarget {
-                    battleState = BattleStates.TargetSelection
-                    initTargetSelection()
+                if currentCard.target == TargetTypes.SingleEnemyTarget {
+                    battleState = BattleStates.EnemyTargetSelection
+                    initTargetSelection(enemies)
+                } else if currentCard.target == TargetTypes.SengleAllyTarget {
+                    battleState = BattleStates.AllyTargetSelection
+                    initTargetSelection(heroes)
                 } else {
                     battleState = BattleStates.PlayProcess
-               
                     playCard(currentCard, selectedCharacter, enemies)
                 } 
             } else {

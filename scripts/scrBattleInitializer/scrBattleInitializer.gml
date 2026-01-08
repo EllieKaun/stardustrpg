@@ -27,14 +27,6 @@ function createStarrior(name, spriteIdle, spriteAttack, hp, maxhp, deck, energy,
     return starrior
 }
 
-function Card(name, cardBaseScr, cardBorderScr, target, effects) constructor {
-    self.name = name
-    self.target = target
-    self.cardBaseScr = cardBaseScr
-    self.cardBorderScr = cardBorderScr
-    self.effects = effects
-}
-
 function initStarriors() {
     heroes = [
         createLana(),

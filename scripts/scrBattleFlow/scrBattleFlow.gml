@@ -70,40 +70,41 @@ function restoreSelection() {
     }
 }
 
-function initTargetSelection() {
+function initTargetSelection(targets) {
     unselectionToAll()
+    targetOptions = targets
     selectNextTarget()
 }
 
 function selectNextTarget() {
-    if array_length(enemies) == 0 return
+    if array_length(targetOptions) == 0 return
     if selectedTargetNumber == -1 {
         selectedTargetNumber = 0
     } else {
-        selectedTargetNumber = selectedTargetNumber + 1 >= array_length(enemies) 
+        selectedTargetNumber = selectedTargetNumber + 1 >= array_length(targetOptions) 
             ? 0 : selectedTargetNumber + 1
     }
     unselectTargets()
-    selectedTarget = enemies[selectedTargetNumber]
+    selectedTarget = targetOptions[selectedTargetNumber]
     selectedTarget.isTarget = true
 }
 
 
 function selectPreviousTarget() {
-    if array_length(enemies) == 0 return
+    if array_length(targetOptions) == 0 return
     if selectedTargetNumber == -1 {
-        selectedTargetNumber = array_length(enemies) - 1
+        selectedTargetNumber = array_length(targetOptions) - 1
     } else {
         selectedTargetNumber = selectedTargetNumber - 1 < 0
-            ? array_length(enemies) - 1 : selectedTargetNumber - 1
+            ? array_length(targetOptions) - 1 : selectedTargetNumber - 1
     }
     unselectTargets()
-    selectedTarget = enemies[selectedTargetNumber]
+    selectedTarget = targetOptions[selectedTargetNumber]
     selectedTarget.isTarget = true
 }
 
 function unselectTargets() {
-    for (var i = 0; i < array_length(enemies); i++) {
-        enemies[i].isTarget = false
+    for (var i = 0; i < array_length(targetOptions); i++) {
+        targetOptions[i].isTarget = false
     }
 }

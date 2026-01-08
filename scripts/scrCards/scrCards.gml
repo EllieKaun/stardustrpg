@@ -1,3 +1,10 @@
+function Card(name, cardBaseScr, cardBorderScr, target, effects) constructor {
+    self.name = name
+    self.target = target
+    self.cardBaseScr = cardBaseScr
+    self.cardBorderScr = cardBorderScr
+    self.effects = effects
+}
 
 function playCard(card, caster, targets) {
     for(var i = 0; i < array_length(card.effects); i++) {
@@ -92,7 +99,7 @@ function createPhysicalDamageCardDefault() {
         "Default attack",
         sprCardAttaclBase,
         sprCommonBorder,
-        TargetTypes.SingleTarget,
+        TargetTypes.SingleEnemyTarget,
         [
             {
                 type: EffectTypes.Damage,
@@ -109,7 +116,7 @@ function createInstantHealCardDefault() {
         "Default heal",
         sprCardAttaclBase,
         sprCommonBorder,
-        TargetTypes.SingleTarget,
+        TargetTypes.SengleAllyTarget,
         [
             {
                 type: EffectTypes.Heal,

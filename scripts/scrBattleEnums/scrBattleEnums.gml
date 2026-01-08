@@ -1,8 +1,9 @@
 #macro ENEMYS_TURN 0 
 
 enum TargetTypes {
-    SingleTarget,
-    AllTargets
+    SingleEnemyTarget,
+    AllTargets,
+    SengleAllyTarget
 }
 
 enum DamageTypes {
@@ -55,7 +56,8 @@ enum BattleStates {
     PlayResult,
     AfterPlayChecks,
     BattleOver,
-    TargetSelection,
+    EnemyTargetSelection,
+    AllyTargetSelection,
     EnemysTurn
 }
 
