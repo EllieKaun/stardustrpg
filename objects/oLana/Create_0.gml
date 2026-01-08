@@ -5,4 +5,4 @@ move_history = [];
 history_max = 48; // spacing between characters
 
 
-SpawnPartyFollowers(id);
+//SpawnPartyFollowers(id);
