@@ -106,7 +106,6 @@
     {"id":{"name":"scrCards","path":"scripts/scrCards/scrCards.yy",},},
     {"id":{"name":"scrDrawing","path":"scripts/scrDrawing/scrDrawing.yy",},},
     {"id":{"name":"scrStarriorsInitializer","path":"scripts/scrStarriorsInitializer/scrStarriorsInitializer.yy",},},
-    {"id":{"name":"TileDeepen","path":"scripts/TileDeepen/TileDeepen.yy",},},
     {"id":{"name":"battlescene","path":"sprites/battlescene/battlescene.yy",},},
     {"id":{"name":"CardSprite","path":"sprites/CardSprite/CardSprite.yy",},},
     {"id":{"name":"sArrow","path":"sprites/sArrow/sArrow.yy",},},

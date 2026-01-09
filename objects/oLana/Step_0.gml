@@ -1,4 +1,4 @@
-depth = room_height+1-y;
+
 
 var _inputH = keyboard_check(ord("D")) - keyboard_check(ord("A"));
 var _inputV = keyboard_check(ord("S")) - keyboard_check(ord("W"));
