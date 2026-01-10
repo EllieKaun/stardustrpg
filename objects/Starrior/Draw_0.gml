@@ -13,3 +13,7 @@ if isTarget {
 }
 
 drawHealthBar(bbox_left, bbox_top - 4, bbox_right - bbox_left, 4, hp, maxHp)
+
+for(var i = 0; i < array_length(effects); i++) {
+    draw_sprite(stunned, 0, bbox_right, bbox_top)
+}

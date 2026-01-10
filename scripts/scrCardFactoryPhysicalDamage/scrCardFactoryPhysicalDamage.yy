@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrCardFactoryPhysicalDamage",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrCardFactoryPhysicalDamage",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/BattleDomain/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

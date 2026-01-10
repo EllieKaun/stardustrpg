@@ -1,13 +1,11 @@
 var currentEnemy = selectedCharacter
 if currentEnemy == noone {
-    selectedCharacter.energy = 0
-    battleState = BattleStates.AfterPlayChecks
+    skipTurn()
     return
 }
 var cards = currentEnemy.getCardsInHand()
 if array_length(cards) == 0 {
-    selectedCharacter.energy = 0
-    battleState = BattleStates.AfterPlayChecks
+    skipTurn()
     return
 }
 var cardToPlay = cards[irandom(array_length(cards) - 1)]

@@ -2,8 +2,9 @@
 
 enum TargetTypes {
     SingleEnemyTarget,
-    AllTargets,
-    SengleAllyTarget
+    AllAllies,
+    SingleAllyTarget,
+    AllEnemies
 }
 
 enum DamageTypes {
@@ -18,12 +19,14 @@ enum ProtectionTypes {
 
 enum EffectTypes {
 	Damage,
-    Heal
+    Heal,
+    Stun
 }
 
 enum Timing {
 	Instant,
-    EndOfTurn
+    EndOfTurn,
+    Overtime,
 }
 
 enum CardAbilityTypes {

@@ -1,4 +1,6 @@
 function afterPlayChecks() {
+    // End Of Turn эффекты
+    executeEndOfTurn(selectedCharacter)
     // Проверка на поражение
     if checkIfAllDead(heroes) {
         
@@ -8,9 +10,16 @@ function afterPlayChecks() {
         
     }
     if selectedCharacter.energy > 0 {
+        // если сыграл карту, а энергия еще осталась, играем еще
+        show_debug_message("selectedCharacter.energy > 0 " + selectedCharacter.name)
         battleState = BattleStates.CharacterPlay
     } else {
         selectNextCharacter()
+        if checkIfHasEffectType(selectedCharacter, EffectTypes.Stun) {
+            executeStun(selectedCharacter)
+            skipTurn()
+            return
+        }
         if isEnemysTurn() {
             battleState = BattleStates.EnemysTurn
             alarm_set(ENEMYS_TURN, game_get_speed(gamespeed_fps) * 2)
@@ -19,6 +28,20 @@ function afterPlayChecks() {
         }
     }
     selectedTarget = noone
+}
+
+function checkIfHasEffectType(character, effectType) {
+    var effects = character.effects 
+    for(var i = 0; i < array_length(effects); i++) {
+        if effects[i].type == effectType return true
+    }
+    return false
+}
+
+function skipTurn() {
+    selectedCharacter.energy = 0
+    battleState = BattleStates.AfterPlayChecks
+    afterPlayChecks()
 }
 
 function removeCardFromHand(caster, card) {
@@ -53,6 +76,7 @@ function selectNextCharacter() {
     selectedCharacter = playOrder[selectedCharacterNumber]
     selectedCharacter.isActive = true
     cards = selectedCharacter.getCardsInHand()
+    show_debug_message("new selectNextCharacter " + selectedCharacter.name)
 }
 
 function unselectionToAll() {

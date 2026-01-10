@@ -65,16 +65,18 @@ switch (battleState) {
                 if currentCard.target == TargetTypes.SingleEnemyTarget {
                     battleState = BattleStates.EnemyTargetSelection
                     initTargetSelection(enemies)
-                } else if currentCard.target == TargetTypes.SengleAllyTarget {
+                } else if currentCard.target == TargetTypes.SingleAllyTarget {
                     battleState = BattleStates.AllyTargetSelection
                     initTargetSelection(heroes)
-                } else {
+                } else if currentCard.target == TargetTypes.AllEnemies {
                     battleState = BattleStates.PlayProcess
                     playCard(currentCard, selectedCharacter, enemies)
+                } else if currentCard.target == TargetTypes.AllAllies {
+                    battleState = BattleStates.PlayProcess
+                    playCard(currentCard, selectedCharacter, heroes)
                 } 
             } else {
-                selectedCharacter.energy = 0
-                battleState = BattleStates.AfterPlayChecks
+                skipTurn()
             }
         }
     break
@@ -84,7 +86,7 @@ switch (battleState) {
         
     break
     case BattleStates.AfterPlayChecks:
-        afterPlayChecks()
+        
     break
     case BattleStates.BattleOver:
         

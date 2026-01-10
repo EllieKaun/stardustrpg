@@ -16,6 +16,7 @@ function generateLevel(
 
 function createStarrior(name, spriteIdle, spriteAttack, hp, maxhp, deck, energy, maxEnergy) {
     var starrior = instance_create_depth(0, 0, depth - 1, Starrior)
+    starrior.name = name
     starrior.hp = hp 
     starrior.maxHp = maxhp
     starrior.deck = new Deck(deck) 

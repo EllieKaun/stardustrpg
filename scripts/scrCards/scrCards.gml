@@ -1,34 +1,71 @@
-function Card(name, cardBaseScr, cardBorderScr, target, effects) constructor {
+function Card(name, cardBaseScr, cardBorderScr, target, actionType, effects) constructor {
     self.name = name
     self.target = target
     self.cardBaseScr = cardBaseScr
     self.cardBorderScr = cardBorderScr
     self.effects = effects
+    self.actionType = actionType
 }
 
 function playCard(card, caster, targets) {
-    for(var i = 0; i < array_length(card.effects); i++) {
-        var effect = card.effects[i]
-        switch (effect.timing) {
-            case Timing.Instant: 
-                executeEffect(effect, caster, targets)
-            break    
-            case Timing.EndOfTurn:
-                effectApplyStatus(effect, caster, targets);
-            break
+    caster.pendingCard = card
+    caster.pendingTargets = targets 
+    caster.changeActionState(card.actionType, function() {
+        var card = other.pendingCard
+        var effects = card.effects
+        var targets = other.pendingTargets
+        var caster = other
+        for(var i = 0; i < array_length(effects); i++) {
+            var effect = effects[i]
+            switch (effect.timing) {
+                case Timing.Instant: 
+                    executeEffect(effect, caster, targets)
+                break    
+                case Timing.EndOfTurn:
+                    effectApplyStatus(effect, caster, targets);
+                break 
+                case Timing.Overtime:
+                    effectApplyStatus(effect, caster, targets);
+                break
+            }
         }
-    }
-    selectedCharacter.energy -= 1 
-    removeCardFromHand(caster, card)
+        selectedCharacter.energy -= 1 
+        removeCardFromHand(caster, card)
+        afterPlayChecks()
+    })
 }
 
+function executeEndOfTurn(character) {
+    var effects = character.effects
+    for(var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        if effect.timing == Timing.EndOfTurn {
+            switch (effect.type) {
+            	case EffectTypes.Damage:
+                    executeEndOFTurnDamage(character, effect, i)
+                break
+            }
+        }
+    }
+}
+
+function executeEndOFTurnDamage(character, effect, index) {
+    character.hp -= effect.value
+    effect.duration -= 1 
+    if effect.duration <= 0 {
+        array_delete(character.effects, index, 1)
+    }
+}
 
 function effectApplyStatus(
     effect,
     caster,
     targets
 ) {
-    
+    var prob = random(1)
+    if prob <= effect.chance {
+        array_push(targets.effects, effect)
+    }
 }
 
 function executeEffect(
@@ -36,26 +73,36 @@ function executeEffect(
     caster, 
     targets
 ) {
-    caster.pendingEffect = effect
-    caster.pendingTargets = targets
     switch (effect.type) {
         case EffectTypes.Damage: 
-            caster.changeActionState(StarriorStates.Attack, function() {
-                executeDamageEffect(other.pendingEffect, other, other.pendingTargets)
-                selectedTargetNumber = -1
-                selectedTarget = noone
-                battleState = BattleStates.AfterPlayChecks
-            })
+            executeDamageEffect(effect, other, targets)
+            selectedTargetNumber = -1
+            selectedTarget = noone
+            battleState = BattleStates.AfterPlayChecks
         break    
         case EffectTypes.Heal: 
-            caster.changeActionState(StarriorStates.Cast, function() {
-                executeHealing(other.pendingEffect, other, other.pendingTargets)
-                selectedTargetNumber = -1
-                selectedTarget = noone
-                battleState = BattleStates.AfterPlayChecks
-            })    
+            executeHealing(effect, other, targets)
+            selectedTargetNumber = -1
+            selectedTarget = noone
+            battleState = BattleStates.AfterPlayChecks  
         break   
     }    
+}
+
+function executeStun(
+    stunnedCharacter
+) {
+    var effects = stunnedCharacter.effects 
+    for(var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        if effect.type == EffectTypes.Stun {
+            effect.duration -= 1
+            if(effect.duration <= 0) {
+                array_delete(effects, i, 1)
+            }
+            return
+        }
+    }
 }
 
 function executeDamageEffect(
@@ -82,7 +129,14 @@ function executeDamageEffect(
             resistence = 0.7
         break
     }
-    targets.hp = targets.hp - effect.value * valueModificator * resistence
+    if (is_array(targets)) {
+        for(var i = 0; i < array_length(targets); i++) {
+            targets[i].hp -= effect.value * valueModificator * resistence
+        }
+    } else {
+         targets.hp = targets.hp - effect.value * valueModificator * resistence
+    }
+   
 }
 
 function executeHealing(
@@ -90,39 +144,11 @@ function executeHealing(
     caster,
     targets
 ) { 
-    targets.hp = targets.hp + effect.value
-}
-
-
-function createPhysicalDamageCardDefault() {
-    return new Card(
-        "Default attack",
-        sprCardAttaclBase,
-        sprCommonBorder,
-        TargetTypes.SingleEnemyTarget,
-        [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
-                timing: Timing.Instant
-            }
-        ]
-    )
-}
-
-function createInstantHealCardDefault() {
-    return new Card(
-        "Default heal",
-        sprCardAttaclBase,
-        sprCommonBorder,
-        TargetTypes.SengleAllyTarget,
-        [
-            {
-                type: EffectTypes.Heal,
-                value: random_range(1, 3),
-                timing: Timing.Instant
-            }
-        ]
-    )
+     if (is_array(targets)) {
+        for(var i = 0; i < array_length(targets); i++) {
+            targets[i].hp += effect.value
+        }
+    } else {
+        targets.hp = targets.hp + effect.value
+    }
 }

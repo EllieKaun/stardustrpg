@@ -2,10 +2,10 @@ function createLana(){
     var starrior = createStarrior("Lana",    
             sprLanaBattleIdle, 
             sprLanaBattleSpell,
-            10, 
+            5, 
             10, 
             [//createPhysicalDamageCardDefault(),
-            createInstantHealCardDefault(),
+            createInstantMultipleTargetsHealCard(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault()
@@ -21,10 +21,10 @@ function createViv(){
 
 function createEnemiesLevel1() {
     return [
-        createStarrior("Bird", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [createPhysicalDamageCardDefault()], 1, 1),
-        createStarrior("Bird", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [], 1, 1),
-        createStarrior("Bird", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [], 1, 1),
-        createStarrior("Bird", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [], 1, 1),
-        createStarrior("Bird", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [], 1, 1)
+        createStarrior("Bird1", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [createPhysicalDamageSingleTargetCard()], 1, 1),
+        createStarrior("Bird2", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [], 1, 1),
+        createStarrior("Bird3", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [], 1, 1),
+        createStarrior("Bird4", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [], 1, 1),
+        createStarrior("Bird5", sprCrackerNutIdle, sprCrackerNutIdle, 6, 6, [], 1, 1)
     ]
 }

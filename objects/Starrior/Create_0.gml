@@ -15,8 +15,7 @@ guts = 0
 aura = 0
 resistense = 0
 
-debuffs = []
-buggs = []
+effects = []
 weaknesses = []
 
 deck = new Deck([])
