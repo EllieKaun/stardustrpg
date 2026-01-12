@@ -1,10 +1,19 @@
-function Card(name, cardBaseScr, cardBorderScr, target, actionType, effects) constructor {
+function Card(name, 
+            target, 
+            actionType, 
+            effects, 
+            cardBaseSpr, 
+            cardIllustrationSpr, 
+            cardBorderSpr, 
+            cardTokenSpr) constructor {
     self.name = name
     self.target = target
-    self.cardBaseScr = cardBaseScr
-    self.cardBorderScr = cardBorderScr
     self.effects = effects
     self.actionType = actionType
+    self.cardBaseScr = cardBaseSpr
+    self.cardIllustrationSpr = cardIllustrationSpr
+    self.cardBorderSpr = cardBorderSpr
+    self.cardTokenSpr = cardTokenSpr
 }
 
 function playCard(card, caster, targets) {

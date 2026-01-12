@@ -1,8 +1,6 @@
 function createPhysicalDamageSingleTargetCard() {
     return new Card(
         "Default attack",
-        sprCardAttaclBase,
-        sprCommonBorder,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         [
@@ -12,15 +10,17 @@ function createPhysicalDamageSingleTargetCard() {
                 value: random_range(1, 3),
                 timing: Timing.Instant
             }
-        ]
+        ],
+        atcCard,
+        commonBorder,
+        magicBuff,
+        hpCostToken
     )
 }
 
 function createPhysicalDamageMultipleTargetCard() {
     return new Card(
         "Default attack",
-        sprCardAttaclBase,
-        sprCommonBorder,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         [
@@ -30,15 +30,17 @@ function createPhysicalDamageMultipleTargetCard() {
                 value: random_range(1, 3),
                 timing: Timing.Instant
             }
-        ]
+        ],
+        atcCard,
+        commonBorder,
+        magicBuff,
+        hpCostToken
     )
 }
 
 function createPhysicalDamageStunChanseSingleTargetCard() {
     return new Card(
         "Default attack",
-        sprCardAttaclBase,
-        sprCommonBorder,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         [
@@ -54,15 +56,17 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
                 timing: Timing.Overtime,
                 duration: 1
             }
-        ]
+        ],
+        atcCard,
+        commonBorder,
+        magicBuff,
+        hpCostToken
     )
 }
 
 function createPhysicalDamageBurnChanseSingleTargetCard() {
     return new Card(
         "Default attack",
-        sprCardAttaclBase,
-        sprCommonBorder,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         [
@@ -79,6 +83,10 @@ function createPhysicalDamageBurnChanseSingleTargetCard() {
                 value: 2,
                 duration: 1
             }
-        ]
+        ],
+        atcCard,
+        commonBorder,
+        magicBuff,
+        hpCostToken
     )
 }
