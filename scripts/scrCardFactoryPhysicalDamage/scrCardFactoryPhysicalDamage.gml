@@ -12,8 +12,8 @@ function createPhysicalDamageSingleTargetCard() {
             }
         ],
         atcCard,
-        commonBorder,
         magicBuff,
+        commonBorder,
         hpCostToken
     )
 }
@@ -32,8 +32,8 @@ function createPhysicalDamageMultipleTargetCard() {
             }
         ],
         atcCard,
-        commonBorder,
         magicBuff,
+        commonBorder,
         hpCostToken
     )
 }
@@ -58,8 +58,8 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
             }
         ],
         atcCard,
-        commonBorder,
         magicBuff,
+        commonBorder,
         hpCostToken
     )
 }
@@ -85,8 +85,8 @@ function createPhysicalDamageBurnChanseSingleTargetCard() {
             }
         ],
         atcCard,
-        commonBorder,
         magicBuff,
+        commonBorder,
         hpCostToken
     )
 }

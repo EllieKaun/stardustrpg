@@ -43,7 +43,7 @@ if selectedCharacter != noone  {
         var isSelected = selectedCard == i
         var drawY = isSelected ? cardY - 2 : cardY
         draw_sprite_stretched(
-    	    card.cardBaseScr,
+    	    card.cardBaseSpr,
     	    0,
     	    cardCurrentX,
     	    drawY,
@@ -51,7 +51,23 @@ if selectedCharacter != noone  {
     	    cardHeight
         )
         draw_sprite_stretched(
-    	    card.cardBorderScr,
+    	    card.cardIllustrationSpr,
+    	    0,
+    	    cardCurrentX,
+    	    drawY,
+    	    cardWidth,
+    	    cardHeight
+        )
+        draw_sprite_stretched(
+    	    card.cardBorderSpr,
+    	    0,
+    	    cardCurrentX,
+    	    drawY,
+    	    cardWidth,
+    	    cardHeight
+        )
+        draw_sprite_stretched(
+    	    card.cardTokenSpr,
     	    0,
     	    cardCurrentX,
     	    drawY,

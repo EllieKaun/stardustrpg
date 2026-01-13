@@ -10,7 +10,7 @@ function Card(name,
     self.target = target
     self.effects = effects
     self.actionType = actionType
-    self.cardBaseScr = cardBaseSpr
+    self.cardBaseSpr = cardBaseSpr
     self.cardIllustrationSpr = cardIllustrationSpr
     self.cardBorderSpr = cardBorderSpr
     self.cardTokenSpr = cardTokenSpr

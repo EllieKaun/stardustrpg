@@ -1,8 +1,6 @@
 function createInstantHealSingleTargetCard() {
     return new Card(
         "Default heal",
-        sprCardAttaclBase,
-        sprCommonBorder,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         [
@@ -11,15 +9,17 @@ function createInstantHealSingleTargetCard() {
                 value: random_range(1, 3),
                 timing: Timing.Instant
             }
-        ]
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
     )
 }
 
 function createInstantMultipleTargetsHealCard() {
     return new Card(
         "Default heal",
-        sprCardAttaclBase,
-        sprCommonBorder,
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         [
@@ -28,6 +28,10 @@ function createInstantMultipleTargetsHealCard() {
                 value: random_range(1, 3),
                 timing: Timing.Instant
             }
-        ]
+        ],
+        healCard,
+        hpHealGroup,
+        commonBorder,
+        mpCostToken
     )
 }
