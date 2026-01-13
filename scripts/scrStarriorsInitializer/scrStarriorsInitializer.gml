@@ -5,7 +5,7 @@ function createLana(){
             5, 
             10, 
             [//createPhysicalDamageCardDefault(),
-            createInstantMultipleTargetsHealCard(),
+            createCardBuffPhysicalDamageSingleTarget(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault()
@@ -16,7 +16,9 @@ function createLana(){
 }
 
 function createViv(){
-    return createStarrior("Viv", sprVivBatlleIdle, sprVivBattleAttack, 5, 10, [], 1, 1)
+    return createStarrior("Viv", sprVivBatlleIdle, sprVivBattleAttack, 5, 10, [
+        createPhysicalDamageSingleTargetCard()
+    ], 1, 1)
 }
 
 function createEnemiesLevel1() {

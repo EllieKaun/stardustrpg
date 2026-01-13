@@ -72,7 +72,7 @@ function effectApplyStatus(
     targets
 ) {
     var prob = random(1)
-    if prob <= effect.chance {
+    if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
         array_push(targets.effects, effect)
     }
 }
@@ -121,9 +121,11 @@ function executeDamageEffect(
 ) {
     var damageType = effect.damageType
     var valueModificator = 1
+    
+    var physicalDamageBuff = executeDamageBuff(caster, ModifiersToBuff.PhysicalDamage)
     switch (damageType) {
     	case DamageTypes.Physical: 
-            valueModificator = 1.5
+            valueModificator = 1.5 + physicalDamageBuff
         break
         case DamageTypes.Magical: 
             valueModificator = 1.5
@@ -146,6 +148,27 @@ function executeDamageEffect(
          targets.hp = targets.hp - effect.value * valueModificator * resistence
     }
    
+}
+
+function executeDamageBuff(
+    caster,
+    damageType
+) {
+    var effects = caster.effects
+    for(var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        if(effect.type == EffectTypes.Buff 
+            && (effect.buffType == ModifiersToBuff.PhysicalDamage 
+                || effect.buffType == ModifiersToBuff.AnyDamage)) {
+            var value = effect.value 
+            effect.duration -= 1 
+            if(effect.duration <= 0) {
+                array_delete(effects, i, 1)
+            }
+            return value 
+        }
+    }
+    return 0
 }
 
 function executeHealing(

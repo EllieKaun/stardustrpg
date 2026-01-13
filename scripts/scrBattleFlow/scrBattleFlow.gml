@@ -113,7 +113,6 @@ function selectNextTarget() {
     selectedTarget.isTarget = true
 }
 
-
 function selectPreviousTarget() {
     if array_length(targetOptions) == 0 return
     if selectedTargetNumber == -1 {

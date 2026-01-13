@@ -20,9 +20,14 @@ enum ProtectionTypes {
 enum EffectTypes {
 	Damage,
     Heal,
-    Stun
+    Stun,
+    Buff
 }
-
+enum ModifiersToBuff {
+    PhysicalDamage,
+    MagicalDamage,
+    AnyDamage
+}
 enum Timing {
 	Instant,
     EndOfTurn,
