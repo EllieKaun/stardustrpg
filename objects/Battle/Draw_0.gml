@@ -42,6 +42,8 @@ if selectedCharacter != noone  {
         var card = selectedCharacter.getCardsInHand()[i]
         var isSelected = selectedCard == i
         var drawY = isSelected ? cardY - 2 : cardY
+        
+        //Составляющие карты
         draw_sprite_stretched(
     	    card.cardBaseSpr,
     	    0,
@@ -74,6 +76,7 @@ if selectedCharacter != noone  {
     	    cardWidth,
     	    cardHeight
         )
+        
         // Выделение
         if isSelected { 
             // Рамка вокруг выбранной карты
