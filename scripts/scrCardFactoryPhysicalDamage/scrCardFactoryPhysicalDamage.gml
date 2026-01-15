@@ -54,7 +54,8 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
                 type: EffectTypes.Stun,
                 chance: 1.0,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                statusName: StatusNames.Stun
             }
         ],
         atcCard,
@@ -64,7 +65,7 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
     )
 }
 
-function createPhysicalDamageBurnChanseSingleTargetCard() {
+function createPhysicalDamageBleedingChanseSingleTargetCard() {
     return new Card(
         "Default attack",
         TargetTypes.SingleEnemyTarget,
@@ -81,7 +82,8 @@ function createPhysicalDamageBurnChanseSingleTargetCard() {
                 chance: 1.0,
                 timing: Timing.EndOfTurn,
                 value: 2,
-                duration: 1
+                duration: 1,
+                statusName: StatusNames.Bleeding
             }
         ],
         atcCard,

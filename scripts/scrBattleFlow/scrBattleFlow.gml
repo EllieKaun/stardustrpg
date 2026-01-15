@@ -1,6 +1,7 @@
 function afterPlayChecks() {
     // End Of Turn эффекты
     executeEndOfTurn(selectedCharacter)
+    selectedCard = 0
     // Проверка на поражение
     if checkIfAllDead(heroes) {
         

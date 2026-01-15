@@ -21,13 +21,24 @@ enum EffectTypes {
 	Damage,
     Heal,
     Stun,
-    Buff
+    Buff,
+    RemoveEffect
 }
+
+enum StatusNames {
+	Burn,
+    Shock,
+    Freeze,
+    Bleeding,
+    Stun
+}
+
 enum ModifiersToBuff {
     PhysicalDamage,
     MagicalDamage,
     AnyDamage
 }
+
 enum Timing {
 	Instant,
     EndOfTurn,

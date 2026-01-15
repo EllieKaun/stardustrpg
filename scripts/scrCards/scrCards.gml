@@ -94,7 +94,13 @@ function executeEffect(
             selectedTargetNumber = -1
             selectedTarget = noone
             battleState = BattleStates.AfterPlayChecks  
-        break   
+        break  
+        case EffectTypes.RemoveEffect: 
+            executeRemoveStatus(targets, effect.statusName)
+            selectedTargetNumber = -1
+            selectedTarget = noone
+            battleState = BattleStates.AfterPlayChecks
+        break     
     }    
 }
 
@@ -149,6 +155,17 @@ function executeDamageEffect(
     }
    
 }
+
+function executeRemoveStatus(target, status) {
+    var effects = target.effects
+    for(var i = 0; i < array_length(effects); i++) {
+        if effects[i].statusName = status {
+            array_delete(effects, i, 1)
+            return
+        }
+    }
+}
+
 
 function executeDamageBuff(
     caster,
