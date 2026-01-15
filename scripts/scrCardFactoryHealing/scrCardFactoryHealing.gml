@@ -36,6 +36,26 @@ function createInstantMultipleTargetsHealCard() {
     )
 }
 
+function createOvertimeHealSingleTargetCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.Heal,
+                value: random_range(1, 3),
+                timing: Timing.EndOfTurn,
+                duration: 1
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}
+
 function createRemoveStatusShockSingleTargetCard() {
     return new Card(
         "Default heal",

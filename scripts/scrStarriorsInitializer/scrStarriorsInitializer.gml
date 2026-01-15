@@ -5,7 +5,7 @@ function createLana(){
             5, 
             10, 
             [createPhysicalDamageSingleTargetCard(),
-            createRemoveStatusBleedingSingleTargetCard(),
+            createOvertimeHealSingleTargetCard(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault()

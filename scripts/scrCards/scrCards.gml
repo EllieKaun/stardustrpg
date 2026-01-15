@@ -53,6 +53,9 @@ function executeEndOfTurn(character) {
             	case EffectTypes.Damage:
                     executeEndOFTurnDamage(character, effect, i)
                 break
+                case EffectTypes.Heal:
+                    executeEndOFTurnHeal(character, effect, i)
+                break
             }
         }
     }
@@ -60,6 +63,14 @@ function executeEndOfTurn(character) {
 
 function executeEndOFTurnDamage(character, effect, index) {
     character.hp -= effect.value
+    effect.duration -= 1 
+    if effect.duration <= 0 {
+        array_delete(character.effects, index, 1)
+    }
+}
+
+function executeEndOFTurnHeal(character, effect, index) {
+    character.hp += effect.value
     effect.duration -= 1 
     if effect.duration <= 0 {
         array_delete(character.effects, index, 1)
