@@ -31,10 +31,10 @@ function playCard(card, caster, targets) {
                     executeEffect(effect, caster, targets)
                 break    
                 case Timing.EndOfTurn:
-                    effectApplyStatus(effect, caster, targets);
+                    effectApplyStatus(effect, caster, targets)
                 break 
                 case Timing.Overtime:
-                    effectApplyStatus(effect, caster, targets);
+                    effectApplyStatus(effect, caster, targets)
                 break
             }
         }
@@ -56,6 +56,9 @@ function executeEndOfTurn(character) {
                 case EffectTypes.Heal:
                     executeEndOFTurnHeal(character, effect, i)
                 break
+                case EffectTypes.ManaGain:
+                    executeEndOFTurnManaGain(character, effect, i)
+                break
             }
         }
     }
@@ -71,6 +74,14 @@ function executeEndOFTurnDamage(character, effect, index) {
 
 function executeEndOFTurnHeal(character, effect, index) {
     character.hp += effect.value
+    effect.duration -= 1 
+    if effect.duration <= 0 {
+        array_delete(character.effects, index, 1)
+    }
+}
+
+function executeEndOFTurnManaGain(character, effect, index) {
+    character.mana += effect.value
     effect.duration -= 1 
     if effect.duration <= 0 {
         array_delete(character.effects, index, 1)
@@ -102,6 +113,12 @@ function executeEffect(
         break    
         case EffectTypes.Heal: 
             executeHealing(effect, other, targets)
+            selectedTargetNumber = -1
+            selectedTarget = noone
+            battleState = BattleStates.AfterPlayChecks  
+        break  
+        case EffectTypes.ManaGain: 
+            executeManaGain(effect, other, targets)
             selectedTargetNumber = -1
             selectedTarget = noone
             battleState = BattleStates.AfterPlayChecks  
@@ -204,11 +221,25 @@ function executeHealing(
     caster,
     targets
 ) { 
-     if (is_array(targets)) {
+    if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
             targets[i].hp += effect.value
         }
     } else {
         targets.hp = targets.hp + effect.value
+    }
+}
+
+function executeManaGain(
+    effect,
+    caster,
+    targets
+) { 
+    if (is_array(targets)) {
+        for(var i = 0; i < array_length(targets); i++) {
+            targets[i].mana += effect.value
+        }
+    } else {
+        targets.mana = targets.mana + effect.value
     }
 }

@@ -151,7 +151,63 @@ function createRemoveStatusStunSingleTargetCard() {
     )
 }
 
+function createInstantManaGainSingleTargetCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.ManaGain,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}
 
+function createInstantMultipleTargetsManaGainCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.AllAllies,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.ManaGain,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            }
+        ],
+        healCard,
+        hpHealGroup,
+        commonBorder,
+        mpCostToken
+    )
+}
+
+function createOvertimeManaGainSingleTargetCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.ManaGain,
+                value: random_range(1, 3),
+                timing: Timing.EndOfTurn,
+                duration: 1
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}
 
 
 

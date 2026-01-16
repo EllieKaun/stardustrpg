@@ -14,11 +14,26 @@ function generateLevel(
     battleState = BattleStates.CharacterPlay
 }
 
-function createStarrior(name, spriteIdle, spriteAttack, hp, maxhp, deck, energy, maxEnergy) {
+function createStarrior(name, 
+spriteIdle, 
+spriteAttack, 
+hp, 
+maxHp, 
+mana,
+maxMana,
+energy, 
+maxEnergy,
+strength,
+intelligence,
+aura,
+guts,
+deck) {
     var starrior = instance_create_depth(0, 0, depth - 1, Starrior)
     starrior.name = name
     starrior.hp = hp 
-    starrior.maxHp = maxhp
+    starrior.maxHp = maxHp
+    starrior.mana = mana 
+    starrior.maxMana = maxMana
     starrior.deck = new Deck(deck) 
     starrior.energy = energy 
     starrior.maxEnergy = maxEnergy 

@@ -22,7 +22,8 @@ enum EffectTypes {
     Heal,
     Stun,
     Buff,
-    RemoveEffect
+    RemoveEffect,
+    ManaGain
 }
 
 enum StatusNames {
