@@ -51,6 +51,7 @@ function executeEndOfTurn(character) {
         if effect.timing == Timing.EndOfTurn {
             switch (effect.type) {
             	case EffectTypes.Damage:
+            
                     executeEndOFTurnDamage(character, effect, i)
                 break
                 case EffectTypes.Heal:
@@ -58,7 +59,7 @@ function executeEndOfTurn(character) {
                 break
                 case EffectTypes.ManaGain:
                     executeEndOFTurnManaGain(character, effect, i)
-                break
+                break 
             }
         }
     }

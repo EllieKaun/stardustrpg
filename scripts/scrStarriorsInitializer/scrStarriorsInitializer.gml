@@ -12,8 +12,9 @@ function createLana(){
             4,
             12,
             8,
-            [createPhysicalDamageSingleTargetCard(),
-            createOvertimeHealSingleTargetCard(),
+            [
+                createMagicalDamageBurnChanseSingleTargetCard()
+           // createOvertimeHealSingleTargetCard(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault()
