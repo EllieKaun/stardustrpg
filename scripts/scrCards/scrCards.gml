@@ -94,8 +94,17 @@ function effectApplyStatus(
     targets
 ) {
     var prob = random(1)
-    if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
-        array_push(targets.effects, effect)
+    
+    if (is_array(targets)) {
+        for(var i = 0; i < array_length(targets); i++) {
+            if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
+                array_push(targets[i].effects, effect)
+            }
+        }
+    } else {
+        if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
+            array_push(targets.effects, effect)
+        }
     }
 }
 
@@ -156,22 +165,25 @@ function executeDamageEffect(
     var damageType = effect.damageType
     var valueModificator = 1
     
-    var physicalDamageBuff = executeDamageBuff(caster, ModifiersToBuff.PhysicalDamage)
+    var physicalDamageBuff = executeBuff(caster, ModifiersToBuff.PhysicalDamage)
+    var magicalDamageBuff = executeBuff(caster, ModifiersToBuff.MagicalDamage)
     switch (damageType) {
     	case DamageTypes.Physical: 
             valueModificator = 1.5 + physicalDamageBuff
         break
         case DamageTypes.Magical: 
-            valueModificator = 1.5
+            valueModificator = 1.5 + magicalDamageBuff
         break
     }
-    var resistence = 1
+    
+    var physicalDamageProtection = executeBuff(caster, ModifiersToBuff.PhysicalDamage)
+    var magicalDamageProtection = executeBuff(caster, ModifiersToBuff.MagicalDamage)
     switch (damageType) {
     	case DamageTypes.Physical: 
-            resistence = 0.7
+            resistence = 1 - physicalDamageProtection
         break
         case DamageTypes.Magical: 
-            resistence = 0.7
+            resistence = 1 - magicalDamageProtection
         break
     }
     if (is_array(targets)) {
@@ -194,17 +206,14 @@ function executeRemoveStatus(target, status) {
     }
 }
 
-
-function executeDamageBuff(
+function executeBuff(
     caster,
-    damageType
+    buffType
 ) {
     var effects = caster.effects
     for(var i = 0; i < array_length(effects); i++) {
         var effect = effects[i]
-        if(effect.type == EffectTypes.Buff 
-            && (effect.buffType == ModifiersToBuff.PhysicalDamage 
-                || effect.buffType == ModifiersToBuff.AnyDamage)) {
+        if(effect.type == EffectTypes.Buff) {
             var value = effect.value 
             effect.duration -= 1 
             if(effect.duration <= 0) {

@@ -37,7 +37,10 @@ enum StatusNames {
 enum ModifiersToBuff {
     PhysicalDamage,
     MagicalDamage,
-    AnyDamage
+    AnyDamage,
+    PhysicalProtection,
+    MagicalProtection,
+    AnyProtection
 }
 
 enum Timing {
