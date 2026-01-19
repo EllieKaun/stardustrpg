@@ -31,7 +31,9 @@ enum StatusNames {
     Shock,
     Freeze,
     Bleeding,
-    Stun
+    Stun,
+    Bomb,
+    Vampirism
 }
 
 enum ModifiersToBuff {

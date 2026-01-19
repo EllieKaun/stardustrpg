@@ -1,6 +1,7 @@
+// Атака одного врага 
 function createPhysicalDamageSingleTargetCard() {
     return new Card(
-        "Default attack",
+        "PhysicalDamageSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         [
@@ -18,9 +19,10 @@ function createPhysicalDamageSingleTargetCard() {
     )
 }
 
+// Атака группы врагов
 function createPhysicalDamageMultipleTargetCard() {
     return new Card(
-        "Default attack",
+        "PhysicalDamageMultipleTargetCard",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         [
@@ -38,9 +40,10 @@ function createPhysicalDamageMultipleTargetCard() {
     )
 }
 
+// Атака с шансом оглушения одного врага - (враг не может действовать х ходов)
 function createPhysicalDamageStunChanseSingleTargetCard() {
     return new Card(
-        "Default attack",
+        "PhysicalDamageStunChanseSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         [
@@ -65,9 +68,38 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
     )
 }
 
+// Атака с шансом оглушения группы врагов - (враги не могут действовать х ходов)
+function createPhysicalDamageStunChanseMultipleTargetCard() {
+    return new Card(
+        "PhysicalDamageStunChanseMultipleTargetCard",
+        TargetTypes.AllEnemies,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Stun,
+                chance: 1.0,
+                timing: Timing.Overtime,
+                duration: 1,
+                statusName: StatusNames.Stun
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Атака с шансом кровотечения одного врага - (враг получает физический урон х ходов)
 function createPhysicalDamageBleedingChanseSingleTargetCard() {
     return new Card(
-        "Default attack",
+        "PhysicalDamageBleedingChanseSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         [
@@ -84,6 +116,115 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
                 value: 2,
                 duration: 1,
                 statusName: StatusNames.Bleeding
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Атака с шансом кровотечения группы врагов - (враги получают физический урон х ходов)
+function createPhysicalDamageBleedingChanseMultipleTargetCard() {
+    return new Card(
+        "PhysicalDamageBleedingChanseSingleTargetCard",
+        TargetTypes.AllEnemies,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Damage,
+                chance: 1.0,
+                timing: Timing.EndOfTurn,
+                value: 2,
+                duration: 1,
+                statusName: StatusNames.Bleeding
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Атака с шансом взрыва одного врага - (враг получает большой урон сразу)
+function createPhysicalDamageBombChanseSingleTargetCard() {
+    return new Card(
+        "PhysicalDamageBleedingChanseSingleTargetCard",
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                chance: 1.0,
+                timing: Timing.Instant,
+                value: 2,
+                statusName: StatusNames.Bomb
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Атака с шансом взрыва группы врагов - (враги получают большой урон сразу)
+function createPhysicalDamageBombChanseMultipleTargetCard() {
+    return new Card(
+        "PhysicalDamageBleedingChanseSingleTargetCard",
+        TargetTypes.AllEnemies,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                chance: 1.0,
+                timing: Timing.Instant,
+                value: 2,
+                statusName: StatusNames.Bomb
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Атака с шансом вампиризма одного врага - (нанесенный физ урон преобразуется в здоровье)
+function createPhysicalDamageVampirismChanseSingleTargetCard() {
+    return new Card(
+        "PhysicalDamageVampirismChanseSingleTargetCard",
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                value: random_range(10, 15),
+                timing: Timing.Instant,
+                statusName: StatusNames.Vampirism
             }
         ],
         atcCard,

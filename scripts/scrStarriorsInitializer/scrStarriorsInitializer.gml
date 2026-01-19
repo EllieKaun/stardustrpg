@@ -13,7 +13,7 @@ function createLana(){
             12,
             8,
             [
-                createMagicalDamageBurnChanseSingleTargetCard()
+                createCardBuffAnyDamageMultipleTarget()
            // createOvertimeHealSingleTargetCard(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),
@@ -61,7 +61,7 @@ function createEnemiesLevel1() {
             2,
             8,
             14,
-            [createPhysicalDamageBleedingChanseSingleTargetCard()]),
+            [createPhysicalDamageBombChanseMultipleTargetCard()]),
         createStarrior(
             "Bird1",
             sprCrackerNutIdle, 

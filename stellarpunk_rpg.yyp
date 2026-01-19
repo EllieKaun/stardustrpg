@@ -121,7 +121,6 @@
     {"id":{"name":"battlescene","path":"sprites/battlescene/battlescene.yy",},},
     {"id":{"name":"buffCard","path":"sprites/buffCard/buffCard.yy",},},
     {"id":{"name":"cardCopy","path":"sprites/cardCopy/cardCopy.yy",},},
-    {"id":{"name":"CardSprite","path":"sprites/CardSprite/CardSprite.yy",},},
     {"id":{"name":"commonBorder","path":"sprites/commonBorder/commonBorder.yy",},},
     {"id":{"name":"epicBorder","path":"sprites/epicBorder/epicBorder.yy",},},
     {"id":{"name":"healCard","path":"sprites/healCard/healCard.yy",},},

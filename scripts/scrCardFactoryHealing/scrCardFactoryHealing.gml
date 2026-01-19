@@ -1,3 +1,4 @@
+// Восстановление hp одному герою
 function createInstantHealSingleTargetCard() {
     return new Card(
         "Default heal",
@@ -17,6 +18,7 @@ function createInstantHealSingleTargetCard() {
     )
 }
 
+//  Восстановление hp группе героев
 function createInstantMultipleTargetsHealCard() {
     return new Card(
         "Default heal",
@@ -36,6 +38,7 @@ function createInstantMultipleTargetsHealCard() {
     )
 }
 
+// Постепенное восстановление hp одному герою
 function createOvertimeHealSingleTargetCard() {
     return new Card(
         "Default heal",
@@ -56,101 +59,9 @@ function createOvertimeHealSingleTargetCard() {
     )
 }
 
-function createRemoveStatusShockSingleTargetCard() {
-    return new Card(
-        "Default heal",
-        TargetTypes.SingleAllyTarget,
-        StarriorStates.Cast,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Shock,
-                timing: Timing.Instant
-            }
-        ],
-        healCard,
-        hpHealSolo,
-        commonBorder,
-        mpCostToken
-    )
-}
 
-function createRemoveStatusBurnSingleTargetCard() {
-    return new Card(
-        "Default heal",
-        TargetTypes.SingleAllyTarget,
-        StarriorStates.Cast,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Burn,
-                timing: Timing.Instant
-            }
-        ],
-        healCard,
-        hpHealSolo,
-        commonBorder,
-        mpCostToken
-    )
-}
 
-function createRemoveStatusFreezeSingleTargetCard() {
-    return new Card(
-        "Default heal",
-        TargetTypes.SingleAllyTarget,
-        StarriorStates.Cast,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Freeze,
-                timing: Timing.Instant
-            }
-        ],
-        healCard,
-        hpHealSolo,
-        commonBorder,
-        mpCostToken
-    )
-}
-
-function createRemoveStatusBleedingSingleTargetCard() {
-    return new Card(
-        "Default heal",
-        TargetTypes.SingleAllyTarget,
-        StarriorStates.Cast,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Bleeding,
-                timing: Timing.Instant
-            }
-        ],
-        healCard,
-        hpHealSolo,
-        commonBorder,
-        mpCostToken
-    )
-}
-
-function createRemoveStatusStunSingleTargetCard() {
-    return new Card(
-        "Default heal",
-        TargetTypes.SingleAllyTarget,
-        StarriorStates.Cast,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Stun,
-                timing: Timing.Instant
-            }
-        ],
-        healCard,
-        hpHealSolo,
-        commonBorder,
-        mpCostToken
-    )
-}
-
+// Восстановление mp одному герою
 function createInstantManaGainSingleTargetCard() {
     return new Card(
         "Default heal",
@@ -170,6 +81,7 @@ function createInstantManaGainSingleTargetCard() {
     )
 }
 
+// Восстановление mp группе героев
 function createInstantMultipleTargetsManaGainCard() {
     return new Card(
         "Default heal",
@@ -189,6 +101,7 @@ function createInstantMultipleTargetsManaGainCard() {
     )
 }
 
+// Постепенное восстановление mp одному герою
 function createOvertimeManaGainSingleTargetCard() {
     return new Card(
         "Default heal",
@@ -209,5 +122,102 @@ function createOvertimeManaGainSingleTargetCard() {
     )
 }
 
+// Снятие статуса шока одному герою - уникальная
+function createRemoveStatusShockSingleTargetCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.RemoveEffect,
+                statusName: StatusNames.Shock,
+                timing: Timing.Instant
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}
 
+// Снятие статуса поджога одному герою - уникальная
+function createRemoveStatusBurnSingleTargetCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.RemoveEffect,
+                statusName: StatusNames.Burn,
+                timing: Timing.Instant
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}
 
+// Снятие статуса заморозки одному герою - уникальная
+function createRemoveStatusFreezeSingleTargetCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.RemoveEffect,
+                statusName: StatusNames.Freeze,
+                timing: Timing.Instant
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}
+
+// Снятие статуса кровотечения одному герою - уникальная
+function createRemoveStatusBleedingSingleTargetCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.RemoveEffect,
+                statusName: StatusNames.Bleeding,
+                timing: Timing.Instant
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}
+
+// Снятие статуса оглушения одному герою - уникальная
+function createRemoveStatusStunSingleTargetCard() {
+    return new Card(
+        "Default heal",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.RemoveEffect,
+                statusName: StatusNames.Stun,
+                timing: Timing.Instant
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}

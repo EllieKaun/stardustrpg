@@ -51,7 +51,6 @@ function executeEndOfTurn(character) {
         if effect.timing == Timing.EndOfTurn {
             switch (effect.type) {
             	case EffectTypes.Damage:
-            
                     executeEndOFTurnDamage(character, effect, i)
                 break
                 case EffectTypes.Heal:
@@ -194,7 +193,7 @@ function executeDamageEffect(
     } else {
          targets.hp = targets.hp - effect.value * valueModificator * resistence
     }
-   
+    show_debug_message("executeDamageEffect")
 }
 
 function executeRemoveStatus(target, status) {

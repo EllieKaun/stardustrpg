@@ -1,3 +1,4 @@
+// Усиление физ урона героя
 function createCardBuffPhysicalDamageSingleTarget() {
     return new Card(
         "Buff physical damage single target",
@@ -19,6 +20,7 @@ function createCardBuffPhysicalDamageSingleTarget() {
     )
 }
 
+// Усиление маг урона героя
 function createCardBuffMagicalDamageSingleTarget() {
     return new Card(
         "Buff magical damage single target",
@@ -40,10 +42,11 @@ function createCardBuffMagicalDamageSingleTarget() {
     )
 }
 
-function createCardBuffAnyDamageSingleTarget() {
+// Усиление любого урона всем героям
+function createCardBuffAnyDamageMultipleTarget() {
     return new Card(
-        "Buff magical damage single target",
-        TargetTypes.SingleAllyTarget,
+        "Buff any damage multiple target",
+        TargetTypes.AllAllies,
         StarriorStates.Cast,
         [
             {
@@ -61,6 +64,7 @@ function createCardBuffAnyDamageSingleTarget() {
     )
 }
 
+// Усиление физ защиты героя
 function createCardBuffPhysicalProtectionSingleTarget() {
     return new Card(
         "Buff physical damage single target",
@@ -82,6 +86,7 @@ function createCardBuffPhysicalProtectionSingleTarget() {
     )
 }
 
+// Усиления маг защиты героя
 function createCardBuffMagicalProtectionSingleTarget() {
     return new Card(
         "Buff magical damage single target",
@@ -103,10 +108,11 @@ function createCardBuffMagicalProtectionSingleTarget() {
     )
 }
 
-function createCardBuffAnyProtectionSingleTarget() {
+// Усиление любой защиты всем героям
+function createCardBuffAnyProtectionMultipleTarget() {
     return new Card(
-        "Buff magical damage single target",
-        TargetTypes.SingleAllyTarget,
+        "Buff any protection multiple target",
+        TargetTypes.AllAllies,
         StarriorStates.Cast,
         [
             {
