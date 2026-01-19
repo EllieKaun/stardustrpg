@@ -176,8 +176,8 @@ function executeDamageEffect(
         break
     }
     
-    var physicalDamageProtection = executeBuff(caster, ModifiersToBuff.PhysicalDamage)
-    var magicalDamageProtection = executeBuff(caster, ModifiersToBuff.MagicalDamage)
+    var physicalDamageProtection = executeBuff(caster, ModifiersToBuff.PhysicalProtection)
+    var magicalDamageProtection = executeBuff(caster, ModifiersToBuff.MagicalProtection)
     switch (damageType) {
     	case DamageTypes.Physical: 
             resistence = 1 - physicalDamageProtection
@@ -186,12 +186,30 @@ function executeDamageEffect(
             resistence = 1 - magicalDamageProtection
         break
     }
+    var resultHP = effect.value * valueModificator * resistence
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
-            targets[i].hp -= effect.value * valueModificator * resistence
+            var target = targets[i]
+            target.hp -= resultHP
+            if variable_instance_exists(effect, "chance") 
+                && variable_instance_exists(effect, "statusName")  {
+                var prob = random(1)
+                if effect.statusName == StatusNames.Vampirism 
+                    && prob <= effect.chance {
+                    caster.hp += resultHP * 0.1
+                }
+            }
         }
     } else {
-         targets.hp = targets.hp - effect.value * valueModificator * resistence
+        targets.hp -= resultHP
+        if variable_instance_exists(effect, "chance") 
+                && variable_instance_exists(effect, "statusName")  {
+                var prob = random(1)
+            if effect.statusName == StatusNames.Vampirism 
+                && prob <= effect.chance {
+                caster.hp += resultHP * 0.5
+            }
+        }
     }
     show_debug_message("executeDamageEffect")
 }
