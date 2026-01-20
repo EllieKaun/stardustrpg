@@ -224,6 +224,30 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
                 damageType: DamageTypes.Physical,
                 value: random_range(10, 15),
                 timing: Timing.Instant,
+                chance: 1.0,
+                statusName: StatusNames.Vampirism
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Атака с шансом вампиризма группы врагов - (нанесенный физ урон преобразуется в здоровье)
+function createPhysicalDamageVampirismChanceMultipleTargetCard() {
+    return new Card(
+        "PhysicalDamageVampirismChanseMultipleTargetCard",
+        TargetTypes.AllEnemies,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                value: random_range(10, 15),
+                timing: Timing.Instant,
+                chance: 1.0,
                 statusName: StatusNames.Vampirism
             }
         ],

@@ -13,7 +13,7 @@ function createLana(){
             12,
             8,
             [
-                createPhysicalDamageVampirismChanseSingleTargetCard()
+                createPhysicalDamageVampirismChanceMultipleTargetCard()
            // createOvertimeHealSingleTargetCard(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),
