@@ -116,6 +116,7 @@
     {"id":{"name":"scrCards","path":"scripts/scrCards/scrCards.yy",},},
     {"id":{"name":"scrDeck","path":"scripts/scrDeck/scrDeck.yy",},},
     {"id":{"name":"scrDrawing","path":"scripts/scrDrawing/scrDrawing.yy",},},
+    {"id":{"name":"scrInfo","path":"scripts/scrInfo/scrInfo.yy",},},
     {"id":{"name":"scrStarriorsInitializer","path":"scripts/scrStarriorsInitializer/scrStarriorsInitializer.yy",},},
     {"id":{"name":"atcCard","path":"sprites/atcCard/atcCard.yy",},},
     {"id":{"name":"battlescene","path":"sprites/battlescene/battlescene.yy",},},
