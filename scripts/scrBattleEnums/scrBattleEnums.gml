@@ -23,7 +23,9 @@ enum EffectTypes {
     Stun,
     Buff,
     RemoveEffect,
-    ManaGain
+    ManaGain,
+    Weakening,
+    Debuff
 }
 
 enum StatusNames {
@@ -33,7 +35,8 @@ enum StatusNames {
     Bleeding,
     Stun,
     Bomb,
-    Vampirism
+    Vampirism,
+    Weakening
 }
 
 enum ModifiersToBuff {

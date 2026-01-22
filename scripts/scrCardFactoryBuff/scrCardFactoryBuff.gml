@@ -129,3 +129,91 @@ function createCardBuffAnyProtectionMultipleTarget() {
         hpCostToken
     )
 }
+
+// Снижение физ атаки врага
+function createCardDebuffPhysicalDamageSingleTarget() {
+    return new Card(
+        "Debuff physical damage single target",
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.Debuff,
+                debuffType: ModifiersToBuff.PhysicalDamage,
+                value: 1.5,
+                timing: Timing.Overtime,
+                duration: 1
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Снижение маг атаки врага 
+function createCardDebuffMagicalDamageSingleTarget() {
+    return new Card(
+        "Debuff magical damage single target",
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.Debuff,
+                debuffType: ModifiersToBuff.MagicalDamage,
+                value: 1.5,
+                timing: Timing.Overtime,
+                duration: 1
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Снижение физ защиты врага 
+function createCardDebuffPhysicalProtectionSingleTarget() {
+    return new Card(
+        "Buff physical damage single target",
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.Debuff,
+                buffType: ModifiersToBuff.PhysicalProtection,
+                value: 0.3,
+                timing: Timing.Overtime,
+                duration: 1
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Снижение маг защиты врага 
+function createCardDebuffMagicalProtectionSingleTarget() {
+    return new Card(
+        "Buff magical damage single target",
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        [
+            {
+                type: EffectTypes.Debuff,
+                buffType: ModifiersToBuff.MagicalProtection,
+                value: 0.3,
+                timing: Timing.Overtime,
+                duration: 1
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}

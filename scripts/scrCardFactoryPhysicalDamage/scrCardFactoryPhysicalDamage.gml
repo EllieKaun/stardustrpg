@@ -212,6 +212,63 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
     )
 }
 
+// Атака с шансом слабости одного врага
+function createPhysicalDamageWeakeningChanseSingleTargetCard() {
+    return new Card(
+        "PhysicalDamageWeakeningChanseSingleTargetCard",
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Weakening,
+                chance: 1.0,
+                timing: Timing.EndOfTurn,
+                value: 2,
+                duration: 1,
+                statusName: StatusNames.Weakening
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Атака с шансом слабости группы врагов
+function createPhysicalDamageWeakeningChanseSingleTargetCard() {
+    return new Card(
+        "PhysicalDamageWeakeningChanseSingleTargetCard",
+        TargetTypes.AllEnemies,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Physical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Weakening,
+                chance: 1.0,
+                timing: Timing.EndOfTurn,
+                duration: 1,
+                statusName: StatusNames.Weakening
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
 // Атака с шансом вампиризма одного врага - (нанесенный физ урон преобразуется в здоровье)
 function createPhysicalDamageVampirismChanseSingleTargetCard() {
     return new Card(
