@@ -163,16 +163,20 @@ function executeDamageEffect(
     targets
 ) {
     var damageType = effect.damageType
-    var valueModificator = 1
-    
+    var damagePercentModifier = 0
+    var protectionPercentModifier = 0
+    var damage = effect.value 
     var physicalDamageBuff = executeBuff(caster, ModifiersToBuff.PhysicalDamage)
     var magicalDamageBuff = executeBuff(caster, ModifiersToBuff.MagicalDamage)
     switch (damageType) {
     	case DamageTypes.Physical: 
-            valueModificator = 1.5 + physicalDamageBuff
+            damage *= caster.strength
+            damagePercentModifier += physicalDamageBuff
+            
         break
         case DamageTypes.Magical: 
-            valueModificator = 1.5 + magicalDamageBuff
+            damage *= caster.intelligence
+            damagePercentModifier = magicalDamageBuff
         break
     }
     
@@ -186,7 +190,11 @@ function executeDamageEffect(
             resistence = 1 - magicalDamageProtection
         break
     }
-    var resultHP = effect.value * valueModificator * resistence
+   
+    
+
+    
+    
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
             var target = targets[i]

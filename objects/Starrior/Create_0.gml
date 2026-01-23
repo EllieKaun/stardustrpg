@@ -56,3 +56,13 @@ function getCardsInHand() {
 function getShuffeledDeck() {
     return deck.shuffeledDeck
 }
+
+function hasWeakness(weaknessType) {
+    for(var i = 0; i < array_length(weaknesses); i++) {
+        var weakness = weaknesses[i]
+        if weakness == weaknessType {
+            return true
+        }
+    }
+    return false
+}
