@@ -66,3 +66,17 @@ function hasWeakness(weaknessType) {
     }
     return false
 }
+
+function applyDamage(value) {
+    hp -= value
+    var spawnX = irandom_range(bbox_left, bbox_right)
+    var spawnY = irandom_range(bbox_top, bbox_bottom)
+    drawDamageNumber(spawnX, spawnY, value, c_red)
+}
+
+function applyHeal(value) {
+    hp += value
+    var spawnX = irandom_range(bbox_left, bbox_right)
+    var spawnY = irandom_range(bbox_top, bbox_bottom)
+    drawDamageNumber(spawnX, spawnY, value, c_green)
+}

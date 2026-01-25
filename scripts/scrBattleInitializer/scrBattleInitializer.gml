@@ -44,6 +44,7 @@ deck) {
     starrior.intelligence = intelligence 
     starrior.aura = aura 
     starrior.guts = guts 
+    starrior.mask_index = spriteIdle
     return starrior
 }
 

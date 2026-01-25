@@ -95,3 +95,9 @@ function drawHealthBar(xx, yy, width, height, hp, maxHp) {
     
     draw_rectangle(inner_x1, inner_y1, inner_x2, inner_y2, false)
 }
+
+function drawDamageNumber(xx, yy, value, color) {
+    var instance = instance_create_depth(xx, yy, depth - 1, oDamageNumber)
+    instance.value = value
+    instance.color = color
+}

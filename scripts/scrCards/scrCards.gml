@@ -210,13 +210,13 @@ function executeDamageEffect(
     
     damage += damage * damagePercentModifier
     show_debug_message("damage " + string(damage) )
-    targets.hp -= damage
+    targets.applyDamage(damage)
     if variable_instance_exists(effect, "chance") 
        && variable_instance_exists(effect, "statusName") {
         var prob = random(1) 
         if effect.statusName == StatusNames.Vampirism 
            && prob <= effect.chance { 
-            caster.hp += damage * 0.5 
+            caster.applyHeal(damage * 0.2)
         }
     }
     show_debug_message("executeDamageEffect")

@@ -91,6 +91,7 @@
     {"id":{"name":"oBattleUnits","path":"objects/oBattleUnits/oBattleUnits.yy",},},
     {"id":{"name":"oBird","path":"objects/oBird/oBird.yy",},},
     {"id":{"name":"oCamera","path":"objects/oCamera/oCamera.yy",},},
+    {"id":{"name":"oDamageNumber","path":"objects/oDamageNumber/oDamageNumber.yy",},},
     {"id":{"name":"oEnemy","path":"objects/oEnemy/oEnemy.yy",},},
     {"id":{"name":"oLana","path":"objects/oLana/oLana.yy",},},
     {"id":{"name":"oMenu","path":"objects/oMenu/oMenu.yy",},},
