@@ -51,7 +51,14 @@ function createCardBuffAnyDamageMultipleTarget() {
         [
             {
                 type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.AnyDamage,
+                buffType: ModifiersToBuff.PhysicalDamage,
+                value: 1.5,
+                timing: Timing.Overtime,
+                duration: 1
+            },
+            {
+                type: EffectTypes.Buff,
+                buffType: ModifiersToBuff.MagicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
                 duration: 1
@@ -117,11 +124,19 @@ function createCardBuffAnyProtectionMultipleTarget() {
         [
             {
                 type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.AnyProtection,
+                buffType: ModifiersToBuff.PhysicalProtection,
+                value: 0.3,
+                timing: Timing.Overtime,
+                duration: 1
+            }, 
+            {
+                type: EffectTypes.Buff,
+                buffType: ModifiersToBuff.MagicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
                 duration: 1
             }
+            
         ],
         atcCard,
         magicBuff,

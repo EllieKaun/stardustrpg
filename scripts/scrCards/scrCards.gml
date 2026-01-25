@@ -115,7 +115,13 @@ function executeEffect(
 ) {
     switch (effect.type) {
         case EffectTypes.Damage: 
-            executeDamageEffect(effect, other, targets)
+            if is_array(targets) {
+                for(var i = 0; i < array_length(targets); i++) {
+                    executeDamageEffect(effect, other, targets[i])
+                }
+            } else {
+                executeDamageEffect(effect, other, targets)
+            }
             selectedTargetNumber = -1
             selectedTarget = noone
             battleState = BattleStates.AfterPlayChecks
@@ -141,22 +147,6 @@ function executeEffect(
     }    
 }
 
-function executeStun(
-    stunnedCharacter
-) {
-    var effects = stunnedCharacter.effects 
-    for(var i = 0; i < array_length(effects); i++) {
-        var effect = effects[i]
-        if effect.type == EffectTypes.Stun {
-            effect.duration -= 1
-            if(effect.duration <= 0) {
-                array_delete(effects, i, 1)
-            }
-            return
-        }
-    }
-}
-
 function executeDamageEffect(
     effect,
     caster,
@@ -164,59 +154,69 @@ function executeDamageEffect(
 ) {
     var damageType = effect.damageType
     var damagePercentModifier = 0
-    var protectionPercentModifier = 0
     var damage = effect.value 
-    var physicalDamageBuff = executeBuff(caster, ModifiersToBuff.PhysicalDamage)
-    var magicalDamageBuff = executeBuff(caster, ModifiersToBuff.MagicalDamage)
+    var physicalDamageBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.PhysicalDamage)
+    var magicalDamageBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.MagicalDamage)
+    var physicalDamageDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.PhysicalDamage)
+    var magicalDamageDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.MagicalDamage)
+    var physicalProtectionBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.PhysicalProtection)
+    var magicalProtectionBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.MagicalProtection)
+    var physicalProtectionDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.PhysicalProtection)
+    var magicalProtectionDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.MagicalProtection)
+    var doesCasterHaveWeakening = checkIfHasEffectType(caster, EffectTypes.Weakening)
+    var doesTargetHaveWeakening = checkIfHasEffectType(targets, EffectTypes.Weakening)
     switch (damageType) {
     	case DamageTypes.Physical: 
-            damage *= caster.strength
-            damagePercentModifier += physicalDamageBuff
-            
+            damage *= caster.strength 
+            damage -= targets.guts
+            if physicalDamageBuff != undefined {
+                damagePercentModifier += physicalDamageBuff
+            }
+            if physicalDamageDebuff != undefined {
+                damagePercentModifier -= physicalDamageBuff
+            }
+            if physicalProtectionBuff != undefined {
+                damagePercentModifier -= physicalProtectionBuff
+            }
+            if physicalProtectionDebuff != undefined {
+                damagePercentModifier += physicalProtectionDebuff
+            }
         break
         case DamageTypes.Magical: 
             damage *= caster.intelligence
-            damagePercentModifier = magicalDamageBuff
+            damage -= targets.aura
+            if magicalDamageBuff != undefined {
+                damagePercentModifier += magicalDamageBuff
+            }
+            if magicalDamageDebuff != undefined {
+                damagePercentModifier -= magicalDamageBuff
+            }
+            if magicalProtectionBuff != undefined {
+                damagePercentModifier -= magicalProtectionBuff
+            }
+            if magicalProtectionDebuff != undefined {
+                damagePercentModifier += magicalProtectionDebuff
+            }
         break
     }
     
-    var physicalDamageProtection = executeBuff(caster, ModifiersToBuff.PhysicalProtection)
-    var magicalDamageProtection = executeBuff(caster, ModifiersToBuff.MagicalProtection)
-    switch (damageType) {
-    	case DamageTypes.Physical: 
-            resistence = 1 - physicalDamageProtection
-        break
-        case DamageTypes.Magical: 
-            resistence = 1 - magicalDamageProtection
-        break
+    if doesCasterHaveWeakening {
+        damagePercentModifier -= 0.1
     }
-   
     
-
+    if doesTargetHaveWeakening {
+        damagePercentModifier += 0.1
+    }
     
-    
-    if (is_array(targets)) {
-        for(var i = 0; i < array_length(targets); i++) {
-            var target = targets[i]
-            target.hp -= resultHP
-            if variable_instance_exists(effect, "chance") 
-                && variable_instance_exists(effect, "statusName")  {
-                var prob = random(1)
-                if effect.statusName == StatusNames.Vampirism 
-                    && prob <= effect.chance {
-                    caster.hp += resultHP * 0.1
-                }
-            }
-        }
-    } else {
-        targets.hp -= resultHP
-        if variable_instance_exists(effect, "chance") 
-                && variable_instance_exists(effect, "statusName")  {
-                var prob = random(1)
-            if effect.statusName == StatusNames.Vampirism 
-                && prob <= effect.chance {
-                caster.hp += resultHP * 0.5
-            }
+    damage += damage * damagePercentModifier
+    show_debug_message("damage " + string(damage) )
+    targets.hp -= damage
+    if variable_instance_exists(effect, "chance") 
+       && variable_instance_exists(effect, "statusName") {
+        var prob = random(1) 
+        if effect.statusName == StatusNames.Vampirism 
+           && prob <= effect.chance { 
+            caster.hp += damage * 0.5 
         }
     }
     show_debug_message("executeDamageEffect")

@@ -40,6 +40,10 @@ deck) {
     starrior.spriteActionAttack = spriteAttack
     starrior.spriteActionIdle = spriteIdle
     starrior.sprite_index = spriteIdle
+    starrior.strength = strength 
+    starrior.intelligence = intelligence 
+    starrior.aura = aura 
+    starrior.guts = guts 
     return starrior
 }
 

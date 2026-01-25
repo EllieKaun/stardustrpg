@@ -242,7 +242,7 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
 }
 
 // Атака с шансом слабости группы врагов
-function createPhysicalDamageWeakeningChanseSingleTargetCard() {
+function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
     return new Card(
         "PhysicalDamageWeakeningChanseSingleTargetCard",
         TargetTypes.AllEnemies,

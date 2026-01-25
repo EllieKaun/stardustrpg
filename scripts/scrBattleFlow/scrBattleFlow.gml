@@ -1,6 +1,7 @@
 function afterPlayChecks() {
     // End Of Turn эффекты
     executeEndOfTurn(selectedCharacter)
+    updateOvertime(selectedCharacter)
     selectedCard = 0
     // Проверка на поражение
     if checkIfAllDead(heroes) {
@@ -17,7 +18,6 @@ function afterPlayChecks() {
     } else {
         selectNextCharacter()
         if checkIfHasEffectType(selectedCharacter, EffectTypes.Stun) {
-            executeStun(selectedCharacter)
             skipTurn()
             return
         }
@@ -37,6 +37,29 @@ function checkIfHasEffectType(character, effectType) {
         if effects[i].type == effectType return true
     }
     return false
+}
+
+function checkIfHasBuff(character, effectType, modifierToBuff) {
+    var effects = character.effects 
+    for(var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        if effect.type == effectType && effect.buffType == modifierToBuff return effect
+    }
+    return undefined
+}
+
+function updateOvertime(character) {
+    var effects = character.effects 
+    for(var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        if effect.timing == Timing.Overtime {
+            effect.duration -= 1
+            if(effect.duration <= 0) {
+                array_delete(effects, i, 1)
+            }
+            return
+        }
+    }
 }
 
 function skipTurn() {
