@@ -155,3 +155,60 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         hpCostToken
     )
 }
+// Атака льдом одного врага - (Имеет шанс заморозить врага. Замороженный враг получает повышенный физ урон х количество ходов)
+function createMagicalDamageFreezingChanceSingleTargetCard() {
+    return new Card(
+        "MagicalDamageFreezingChanceSingleTarget",
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Magical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Debuff,
+                buffType: ModifiersToBuff.PhysicalProtection,
+                chance: 1.0,
+                timing: Timing.Overtime,
+                duration: 1,
+                statusName: StatusNames.Freeze
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Атака льдом группы врагов - (Имеет шанс заморозить врагов. Замороженные враги получают повышенный физ урон х количество ходов)
+function createMagicalDamageFreezingChanceMultipleTargetCard() {
+    return new Card(
+        "MagicalDamageFreezingChanceMultipleTarget",
+        TargetTypes.AllEnemies,
+        StarriorStates.Attack,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Magical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Debuff,
+                buffType: ModifiersToBuff.PhysicalProtection,
+                chance: 1.0,
+                timing: Timing.Overtime,
+                duration: 1,
+                statusName: StatusNames.Freeze
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}

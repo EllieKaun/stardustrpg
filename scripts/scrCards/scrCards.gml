@@ -209,6 +209,7 @@ function executeDamageEffect(
     }
     
     damage += damage * damagePercentModifier
+    damage = max(damage, 0)
     show_debug_message("damage " + string(damage) )
     targets.applyDamage(damage)
     if variable_instance_exists(effect, "chance") 

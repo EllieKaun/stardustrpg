@@ -13,7 +13,9 @@ function createLana(){
             12,
             8,
             [
-                createPhysicalDamageVampirismChanceMultipleTargetCard()
+                createPhysicalDamageVampirismChanceMultipleTargetCard(),
+                createPhysicalDamageVampirismChanceMultipleTargetCard(),
+                createPhysicalDamageVampirismChanceMultipleTargetCard(),
            // createOvertimeHealSingleTargetCard(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),
@@ -40,7 +42,7 @@ function createViv(){
         14,
         [
         createPhysicalDamageSingleTargetCard(),
-        createRemoveStatusBleedingSingleTargetCard()
+        createPhysicalDamageVampirismChanceMultipleTargetCard()
         ]
     )
 }
@@ -61,7 +63,7 @@ function createEnemiesLevel1() {
             1,
             0,
             1,
-            [createPhysicalDamageBombChanseMultipleTargetCard()]),
+            [createPhysicalDamageWeakeningChanseSingleTargetCard()]),
         createStarrior(
             "Bird1",
             sprCrackerNutIdle, 
@@ -76,7 +78,7 @@ function createEnemiesLevel1() {
             2,
             8,
             14,
-            [createPhysicalDamageBleedingChanseSingleTargetCard()]), 
+            [createPhysicalDamageWeakeningChanseSingleTargetCard()]), 
         createStarrior(
             "Bird1",
             sprCrackerNutIdle, 
@@ -91,6 +93,6 @@ function createEnemiesLevel1() {
             2,
             8,
             14,
-            [createPhysicalDamageBleedingChanseSingleTargetCard()])
+            [createPhysicalDamageWeakeningChanseSingleTargetCard()])
     ]
 }

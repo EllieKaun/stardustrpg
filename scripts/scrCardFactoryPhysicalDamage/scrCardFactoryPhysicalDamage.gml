@@ -228,7 +228,7 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
             {
                 type: EffectTypes.Weakening,
                 chance: 1.0,
-                timing: Timing.EndOfTurn,
+                timing: Timing.Overtime,
                 value: 2,
                 duration: 1,
                 statusName: StatusNames.Weakening
