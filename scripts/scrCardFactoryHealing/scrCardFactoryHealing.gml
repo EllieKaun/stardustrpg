@@ -4,6 +4,7 @@ function createInstantHealSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Heal,
@@ -24,6 +25,7 @@ function createInstantMultipleTargetsHealCard() {
         "Default heal",
         TargetTypes.AllAllies,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Heal,
@@ -44,6 +46,7 @@ function createOvertimeHealSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Heal,
@@ -67,6 +70,7 @@ function createInstantManaGainSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -87,6 +91,7 @@ function createInstantMultipleTargetsManaGainCard() {
         "Default heal",
         TargetTypes.AllAllies,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -107,6 +112,7 @@ function createOvertimeManaGainSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -128,6 +134,7 @@ function createRemoveStatusShockSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -148,6 +155,7 @@ function createRemoveStatusBurnSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -168,6 +176,7 @@ function createRemoveStatusFreezeSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -188,6 +197,7 @@ function createRemoveStatusBleedingSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -208,6 +218,7 @@ function createRemoveStatusStunSingleTargetCard() {
         "Default heal",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.RemoveEffect,

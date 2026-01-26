@@ -4,6 +4,7 @@ function createCardBuffPhysicalDamageSingleTarget() {
         "Buff physical damage single target",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Buff,
@@ -26,6 +27,7 @@ function createCardBuffMagicalDamageSingleTarget() {
         "Buff magical damage single target",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Buff,
@@ -48,6 +50,7 @@ function createCardBuffAnyDamageMultipleTarget() {
         "Buff any damage multiple target",
         TargetTypes.AllAllies,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Buff,
@@ -77,6 +80,7 @@ function createCardBuffPhysicalProtectionSingleTarget() {
         "Buff physical damage single target",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Buff,
@@ -99,6 +103,7 @@ function createCardBuffMagicalProtectionSingleTarget() {
         "Buff magical damage single target",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Buff,
@@ -121,6 +126,7 @@ function createCardBuffAnyProtectionMultipleTarget() {
         "Buff any protection multiple target",
         TargetTypes.AllAllies,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Buff,
@@ -151,6 +157,7 @@ function createCardDebuffPhysicalDamageSingleTarget() {
         "Debuff physical damage single target",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Debuff,
@@ -173,6 +180,7 @@ function createCardDebuffMagicalDamageSingleTarget() {
         "Debuff magical damage single target",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Debuff,
@@ -195,6 +203,7 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
         "Buff physical damage single target",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Debuff,
@@ -217,6 +226,7 @@ function createCardDebuffMagicalProtectionSingleTarget() {
         "Buff magical damage single target",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Debuff,

@@ -4,6 +4,7 @@ function createPhysicalDamageSingleTargetCard() {
         "PhysicalDamageSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -25,6 +26,7 @@ function createPhysicalDamageMultipleTargetCard() {
         "PhysicalDamageMultipleTargetCard",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -46,6 +48,7 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
         "PhysicalDamageStunChanseSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -74,6 +77,7 @@ function createPhysicalDamageStunChanseMultipleTargetCard() {
         "PhysicalDamageStunChanseMultipleTargetCard",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -102,6 +106,7 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
         "PhysicalDamageBleedingChanseSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -131,6 +136,7 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
         "PhysicalDamageBleedingChanseSingleTargetCard",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -160,6 +166,7 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
         "PhysicalDamageBleedingChanseSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -189,6 +196,7 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
         "PhysicalDamageBleedingChanseSingleTargetCard",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -218,6 +226,7 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
         "PhysicalDamageWeakeningChanseSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -247,6 +256,7 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
         "PhysicalDamageWeakeningChanseSingleTargetCard",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -275,6 +285,7 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
         "PhysicalDamageVampirismChanseSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -298,6 +309,7 @@ function createPhysicalDamageVampirismChanceMultipleTargetCard() {
         "PhysicalDamageVampirismChanseMultipleTargetCard",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,

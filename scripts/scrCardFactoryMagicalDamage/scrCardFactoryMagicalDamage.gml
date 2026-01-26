@@ -4,6 +4,7 @@ function createMagicalDamageSingleTargetCard() {
         "MagicalDamageSingleTargetCard",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -25,6 +26,7 @@ function createMagicalDamageMultipleTargetCard() {
         "PhysicalDamageMultipleTargetCard",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -46,6 +48,7 @@ function createMagicalDamageStunChanseSingleTargetCard() {
         "MagicalDamageStunChanseSingleTarget",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -74,6 +77,7 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
         "MagicalDamageStunChanseSingleTarget",
         TargetTypes.AllEnemies,
         StarriorStates.Cast,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -102,6 +106,7 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
         "Default attack",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -132,6 +137,7 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         "Default attack",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -161,6 +167,7 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         "MagicalDamageFreezingChanceSingleTarget",
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
+        1,
         [
             {
                 type: EffectTypes.Damage,
@@ -190,6 +197,127 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         "MagicalDamageFreezingChanceMultipleTarget",
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
+        1,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Magical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Debuff,
+                buffType: ModifiersToBuff.PhysicalProtection,
+                chance: 1.0,
+                timing: Timing.Overtime,
+                duration: 1,
+                statusName: StatusNames.Freeze
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Копирует следующую использованную карту и добавляет в руку героя - уникальная
+function createCopyNextPlayedCardCard() {
+    return new Card(
+        "CopyNextPlayedCard",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        1,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Magical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Debuff,
+                buffType: ModifiersToBuff.PhysicalProtection,
+                chance: 1.0,
+                timing: Timing.Overtime,
+                duration: 1,
+                statusName: StatusNames.Freeze
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Дает дополнительный ход герою - уникальная
+function createAddEnergyCard() {
+    return new Card(
+        "AddEnergyCard",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        1,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Magical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Debuff,
+                buffType: ModifiersToBuff.PhysicalProtection,
+                chance: 1.0,
+                timing: Timing.Overtime,
+                duration: 1,
+                statusName: StatusNames.Freeze
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Перемешивает колоду без траты хода  - уникальная 
+function createShuffleDeckCard() {
+    return new Card(
+        "ShuffleDeckCard",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        0,
+        [
+            {
+                type: EffectTypes.Damage,
+                damageType: DamageTypes.Magical,
+                value: random_range(1, 3),
+                timing: Timing.Instant
+            },
+            {
+                type: EffectTypes.Debuff,
+                buffType: ModifiersToBuff.PhysicalProtection,
+                chance: 1.0,
+                timing: Timing.Overtime,
+                duration: 1,
+                statusName: StatusNames.Freeze
+            }
+        ],
+        atcCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Перемешивает колоду без траты хода  - уникальная 
+function createShuffleDeckCard() {
+    return new Card(
+        "ShuffleDeckCard",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        0,
         [
             {
                 type: EffectTypes.Damage,

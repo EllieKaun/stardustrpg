@@ -10,8 +10,8 @@ function createLana(){
             1,
             2,
             4,
-            12,
-            8,
+            3,
+            1,
             [
                 createPhysicalDamageVampirismChanceMultipleTargetCard(),
                 createPhysicalDamageVampirismChanceMultipleTargetCard(),
@@ -38,8 +38,8 @@ function createViv(){
         1,
         4,
         2,
-        8,
-        14,
+        1,
+        3,
         [
         createPhysicalDamageSingleTargetCard(),
         createPhysicalDamageVampirismChanceMultipleTargetCard()
@@ -50,7 +50,7 @@ function createViv(){
 function createEnemiesLevel1() {
     return [
         createStarrior(
-            "Bird1",
+            "Cracker1",
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
             76, 
@@ -65,7 +65,7 @@ function createEnemiesLevel1() {
             1,
             [createPhysicalDamageWeakeningChanseSingleTargetCard()]),
         createStarrior(
-            "Bird1",
+            "Cracker1",
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
             76, 
@@ -80,7 +80,7 @@ function createEnemiesLevel1() {
             14,
             [createPhysicalDamageWeakeningChanseSingleTargetCard()]), 
         createStarrior(
-            "Bird1",
+            "Cracker1",
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
             76, 

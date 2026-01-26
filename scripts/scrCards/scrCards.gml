@@ -1,6 +1,7 @@
 function Card(name, 
             target, 
             actionType, 
+            energy,
             effects, 
             cardBaseSpr, 
             cardIllustrationSpr, 
@@ -14,6 +15,7 @@ function Card(name,
     self.cardIllustrationSpr = cardIllustrationSpr
     self.cardBorderSpr = cardBorderSpr
     self.cardTokenSpr = cardTokenSpr
+    self.energy = energy
 }
 
 function playCard(card, caster, targets) {
@@ -38,7 +40,7 @@ function playCard(card, caster, targets) {
                 break
             }
         }
-        selectedCharacter.energy -= 1 
+        selectedCharacter.energy -= card.energy 
         removeCardFromHand(caster, card)
         afterPlayChecks()
     })
