@@ -25,7 +25,8 @@ enum EffectTypes {
     RemoveEffect,
     ManaGain,
     Weakening,
-    Debuff
+    Debuff,
+    CopyCard
 }
 
 enum StatusNames {
@@ -52,6 +53,7 @@ enum Timing {
 	Instant,
     EndOfTurn,
     Overtime,
+    OnActions
 }
 
 enum CardAbilityTypes {

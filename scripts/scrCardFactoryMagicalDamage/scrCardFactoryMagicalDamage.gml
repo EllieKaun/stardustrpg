@@ -230,18 +230,8 @@ function createCopyNextPlayedCardCard() {
         1,
         [
             {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: random_range(1, 3),
-                timing: Timing.Instant
-            },
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                chance: 1.0,
-                timing: Timing.Overtime,
-                duration: 1,
-                statusName: StatusNames.Freeze
+                type: EffectTypes.CopyCard,
+                timing: Timing.OnActions
             }
         ],
         atcCard,
@@ -264,14 +254,6 @@ function createAddEnergyCard() {
                 damageType: DamageTypes.Magical,
                 value: random_range(1, 3),
                 timing: Timing.Instant
-            },
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                chance: 1.0,
-                timing: Timing.Overtime,
-                duration: 1,
-                statusName: StatusNames.Freeze
             }
         ],
         atcCard,
