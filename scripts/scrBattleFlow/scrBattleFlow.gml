@@ -89,19 +89,30 @@ function isEnemysTurn() {
 }
 
 function selectNextCharacter() {
-    if array_length(playOrder) == 0 return
-    if selectedCharacterNumber == -1 {
-        selectedCharacterNumber = 0
-    } else {
-        selectedCharacterNumber = selectedCharacterNumber + 1 >= array_length(playOrder) 
-            ? 0 : selectedCharacterNumber + 1
+    var count = array_length(playOrder);
+    if (count == 0) return;
+    
+    var startIndex = (selectedCharacterNumber + 1) % count;
+    
+    for (var i = 0; i < count; i++) {
+        var currentIndex = (startIndex + i) % count;
+        var candidate = playOrder[currentIndex];
+        
+        if (!candidate.isKO()) {
+            unselectionToAll();
+            selectedCharacterNumber = currentIndex;
+            selectedCharacter = candidate;
+            selectedCharacter.isActive = true;
+            cards = selectedCharacter.getCardsInHand();
+            
+            show_debug_message("new selectNextCharacter " + selectedCharacter.name);
+            return;
+        }
     }
-    unselectionToAll()
-    selectedCharacter = playOrder[selectedCharacterNumber]
-    selectedCharacter.isActive = true
-    cards = selectedCharacter.getCardsInHand()
-    show_debug_message("new selectNextCharacter " + selectedCharacter.name)
+    
+    show_debug_message("No alive characters found");
 }
+
 
 function unselectionToAll() {
     for (var i = 0; i < array_length(playOrder); i++) {

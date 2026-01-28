@@ -227,7 +227,7 @@ function createCopyNextPlayedCardCard() {
         "CopyNextPlayedCard",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
-        1,
+        0,
         [
             {
                 type: EffectTypes.CopyCard,
@@ -247,7 +247,7 @@ function createAddEnergyCard() {
         "AddEnergyCard",
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
-        1,
+        0,
         [
             {
                 type: EffectTypes.AddEnergy,

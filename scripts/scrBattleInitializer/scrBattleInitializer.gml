@@ -17,6 +17,8 @@ function generateLevel(
 function createStarrior(name, 
 spriteIdle, 
 spriteAttack, 
+spriteCast,
+spriteKO,
 hp, 
 maxHp, 
 mana,
@@ -39,6 +41,8 @@ deck) {
     starrior.maxEnergy = maxEnergy 
     starrior.spriteActionAttack = spriteAttack
     starrior.spriteActionIdle = spriteIdle
+    starrior.spriteActionCast = spriteCast
+    starrior.spriteActionKO = spriteKO
     starrior.sprite_index = spriteIdle
     starrior.strength = strength 
     starrior.intelligence = intelligence 

@@ -23,7 +23,10 @@ deck = new Deck([])
 actionState = StarriorStates.Idle
 spriteActionIdle = sprLanaBattleIdle
 spriteActionAttack = sprLanaBattleIdle
+spriteActionCast = sprLanaBatlleCast
+spriteKO = sprLanaBattleKO
 actionCallback = undefined
+
 function changeActionState(state, callback) {
     actionState = state
     actionCallback = callback
@@ -38,6 +41,11 @@ function changeActionState(state, callback) {
             image_speed = 1;
         break   
         case StarriorStates.Cast:
+            sprite_index = spriteActionAttack
+            image_index = 0; 
+            image_speed = 1;
+        break 
+        case StarriorStates.KnockOut:
             sprite_index = spriteActionAttack
             image_index = 0; 
             image_speed = 1;
@@ -69,6 +77,9 @@ function hasWeakness(weaknessType) {
 
 function applyDamage(value) {
     hp -= value
+    if hp <= 0 {
+        changeActionState(StarriorStates.KnockOut, undefined)
+    }
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
     drawDamageNumber(spawnX, spawnY, value, c_red)
@@ -79,4 +90,8 @@ function applyHeal(value) {
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
     drawDamageNumber(spawnX, spawnY, value, c_green)
+}
+
+function isKO() {
+    return hp <= 0
 }
