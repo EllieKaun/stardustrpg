@@ -28,7 +28,7 @@ function playCard(card, caster, targets) {
     }
     
     removeCardFromHand(caster, card)
-    
+    show_debug_message("play card: " + card.name)
     caster.changeActionState(card.actionType, function() {
         var card = other.pendingCard
         var effects = card.effects
@@ -36,6 +36,7 @@ function playCard(card, caster, targets) {
         var caster = other
         for(var i = 0; i < array_length(effects); i++) {
             var effect = effects[i]
+            show_debug_message("processing effect type: " + string(effect.type))
             switch (effect.timing) {
                 case Timing.Instant: 
                     executeEffect(effect, caster, targets)
@@ -49,14 +50,14 @@ function playCard(card, caster, targets) {
                 case Timing.OnActions:
                     switch (effect.type) {
                     	case EffectTypes.AddEnergy:
-                            effectApplyStatus(effect, caster, targets)
+                            targets.energy += effect.value
                         break   
                         case EffectTypes.CopyCard:
                             effectApplyStatus(effect, caster, targets)
                         break
                         case EffectTypes.ShuffleDeck:
                             shuffleDeckAndTake4(selectedCharacter)
-                        break                    
+                        break                     
                     }
                     effectApplyStatus(effect, caster, targets)
                 break
@@ -92,7 +93,7 @@ function executeEndOfTurn(character) {
 }
 
 function executeEndOFTurnDamage(character, effect, index) {
-    character.hp -= effect.value
+    character.applyDamage(effect.value)
     effect.duration -= 1 
     if effect.duration <= 0 {
         array_delete(character.effects, index, 1)
@@ -100,7 +101,7 @@ function executeEndOFTurnDamage(character, effect, index) {
 }
 
 function executeEndOFTurnHeal(character, effect, index) {
-    character.hp += effect.value
+    character.applyHeal(effect.value)
     effect.duration -= 1 
     if effect.duration <= 0 {
         array_delete(character.effects, index, 1)

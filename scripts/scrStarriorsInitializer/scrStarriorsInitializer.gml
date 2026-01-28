@@ -2,6 +2,8 @@ function createLana(){
     var starrior = createStarrior("Lana",    
             sprLanaBattleIdle, 
             sprLanaBattleSpell,
+            sprLanaBatlleCast,
+            sprLanaBattleKO,
             30, 
             60, 
             70,
@@ -15,7 +17,8 @@ function createLana(){
             [
                 createPhysicalDamageVampirismChanceMultipleTargetCard(),
                 createPhysicalDamageVampirismChanceMultipleTargetCard(),
-                createPhysicalDamageVampirismChanceMultipleTargetCard()
+                createPhysicalDamageVampirismChanceMultipleTargetCard(),
+                createAddEnergyCard()
            // createOvertimeHealSingleTargetCard(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),
@@ -30,6 +33,8 @@ function createViv(){
         "Viv", 
         sprVivBatlleIdle,
         sprVivBattleAttack,
+        sprVivBattleAttack,
+        sprVivBattleKO,
         30, 
         76, 
         50,
@@ -53,6 +58,8 @@ function createEnemiesLevel1() {
             "Cracker1",
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
             76, 
             76, 
             -1,
@@ -67,7 +74,9 @@ function createEnemiesLevel1() {
         createStarrior(
             "Cracker1",
             sprCrackerNutIdle, 
+            sprCrackerNutIdle,
             sprCrackerNutIdle, 
+            sprCrackerNutIdle,  
             76, 
             76, 
             -1,
@@ -81,6 +90,8 @@ function createEnemiesLevel1() {
             [createPhysicalDamageWeakeningChanseSingleTargetCard()]), 
         createStarrior(
             "Cracker1",
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
             76, 

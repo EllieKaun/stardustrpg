@@ -92,6 +92,13 @@ function applyHeal(value) {
     drawDamageNumber(spawnX, spawnY, value, c_green)
 }
 
+function applyMana(value) {
+    mana += value
+    var spawnX = irandom_range(bbox_left, bbox_right)
+    var spawnY = irandom_range(bbox_top, bbox_bottom)
+    drawDamageNumber(spawnX, spawnY, value, c_blue)
+}
+
 function isKO() {
     return hp <= 0
 }
