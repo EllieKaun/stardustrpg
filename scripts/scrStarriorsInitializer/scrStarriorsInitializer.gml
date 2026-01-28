@@ -16,6 +16,7 @@ function createLana(){
                 createPhysicalDamageVampirismChanceMultipleTargetCard(),
                 createPhysicalDamageVampirismChanceMultipleTargetCard(),
                 createPhysicalDamageVampirismChanceMultipleTargetCard(),
+                createShuffleDeckCard()
            // createOvertimeHealSingleTargetCard(),
            // createPhysicalDamageCardDefault(),
             //createPhysicalDamageCardDefault(),

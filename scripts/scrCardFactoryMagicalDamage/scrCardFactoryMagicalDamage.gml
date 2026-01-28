@@ -250,10 +250,9 @@ function createAddEnergyCard() {
         1,
         [
             {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: random_range(1, 3),
-                timing: Timing.Instant
+                type: EffectTypes.AddEnergy,
+                value: 1,
+                timing: Timing.OnActions
             }
         ],
         atcCard,
@@ -272,48 +271,8 @@ function createShuffleDeckCard() {
         0,
         [
             {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: random_range(1, 3),
-                timing: Timing.Instant
-            },
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                chance: 1.0,
-                timing: Timing.Overtime,
-                duration: 1,
-                statusName: StatusNames.Freeze
-            }
-        ],
-        atcCard,
-        magicBuff,
-        commonBorder,
-        hpCostToken
-    )
-}
-
-// Перемешивает колоду без траты хода  - уникальная 
-function createShuffleDeckCard() {
-    return new Card(
-        "ShuffleDeckCard",
-        TargetTypes.SingleAllyTarget,
-        StarriorStates.Cast,
-        0,
-        [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: random_range(1, 3),
-                timing: Timing.Instant
-            },
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                chance: 1.0,
-                timing: Timing.Overtime,
-                duration: 1,
-                statusName: StatusNames.Freeze
+                type: EffectTypes.ShuffleDeck,
+                timing: Timing.OnActions
             }
         ],
         atcCard,

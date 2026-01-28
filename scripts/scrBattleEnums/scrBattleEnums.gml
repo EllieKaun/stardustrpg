@@ -26,7 +26,9 @@ enum EffectTypes {
     ManaGain,
     Weakening,
     Debuff,
-    CopyCard
+    CopyCard,
+    AddEnergy,
+    ShuffleDeck
 }
 
 enum StatusNames {

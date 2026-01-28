@@ -21,6 +21,14 @@ function Card(name,
 function playCard(card, caster, targets) {
     caster.pendingCard = card
     caster.pendingTargets = targets 
+    
+    if checkIfHasEffectType(selectedCharacter, EffectTypes.CopyCard) { 
+        copyNextCard = true
+        reduceOrRemoveEffectType(selectedCharacter, EffectTypes.CopyCard)
+    }
+    
+    removeCardFromHand(caster, card)
+    
     caster.changeActionState(card.actionType, function() {
         var card = other.pendingCard
         var effects = card.effects
@@ -38,10 +46,27 @@ function playCard(card, caster, targets) {
                 case Timing.Overtime:
                     effectApplyStatus(effect, caster, targets)
                 break
+                case Timing.OnActions:
+                    switch (effect.type) {
+                    	case EffectTypes.AddEnergy:
+                            effectApplyStatus(effect, caster, targets)
+                        break   
+                        case EffectTypes.CopyCard:
+                            effectApplyStatus(effect, caster, targets)
+                        break
+                        case EffectTypes.ShuffleDeck:
+                            shuffleDeckAndTake4(selectedCharacter)
+                        break                    
+                    }
+                    effectApplyStatus(effect, caster, targets)
+                break
             }
         }
         selectedCharacter.energy -= card.energy 
-        removeCardFromHand(caster, card)
+        if copyNextCard {
+            copyNextCard = false
+            array_push(selectedCharacter.deck.cardsInHand, card)
+        }
         afterPlayChecks()
     })
 }
@@ -234,6 +259,23 @@ function executeRemoveStatus(target, status) {
         }
     }
 }
+
+function reduceOrRemoveEffectType(target, effectType) {
+    var effects = target.effects
+    for(var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        if effect.type = effectType && variable_instance_exists(effect, "duration")  {
+            effect.duration -= 1
+            if effect.duration <= 0 { 
+                array_delete(effects, i, 1)
+                return
+            }
+        } else {
+            array_delete(effects, i, 1)
+            return
+        }
+    }
+} 
 
 function executeBuff(
     caster,
