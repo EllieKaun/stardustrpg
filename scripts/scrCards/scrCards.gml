@@ -57,7 +57,7 @@ function playCard(card, caster, targets) {
                         break
                         case EffectTypes.ShuffleDeck:
                             shuffleDeckAndTake4(selectedCharacter)
-                        break                     
+                        break                 
                     }
                     effectApplyStatus(effect, caster, targets)
                 break
@@ -171,7 +171,14 @@ function executeEffect(
             selectedTargetNumber = -1
             selectedTarget = noone
             battleState = BattleStates.AfterPlayChecks
-        break     
+        break   
+        case EffectTypes.Resurrection:
+            effect.value = targets.hpMax / 2
+            executeHealing(effect, other, targets)
+            selectedTargetNumber = -1
+            selectedTarget = noone
+            battleState = BattleStates.AfterPlayChecks
+        break  
     }    
 }
 
@@ -304,10 +311,10 @@ function executeHealing(
 ) { 
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
-            targets[i].hp += effect.value
+            targets[i].applyHeal(effect.value)
         }
     } else {
-        targets.hp = targets.hp + effect.value
+        targets.applyHeal(effect.value)
     }
 }
 
@@ -318,9 +325,9 @@ function executeManaGain(
 ) { 
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
-            targets[i].mana += effect.value
+            targets[i].applyMana(effect.value)
         }
     } else {
-        targets.mana = targets.mana + effect.value
+        targets.applyMana(effect.value)
     }
 }

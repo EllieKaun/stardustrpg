@@ -28,7 +28,8 @@ enum EffectTypes {
     Debuff,
     CopyCard,
     AddEnergy,
-    ShuffleDeck
+    ShuffleDeck,
+    Resurrection
 }
 
 enum StatusNames {

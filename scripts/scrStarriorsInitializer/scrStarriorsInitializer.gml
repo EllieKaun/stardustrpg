@@ -72,7 +72,7 @@ function createEnemiesLevel1() {
             1,
             [createPhysicalDamageWeakeningChanseSingleTargetCard()]),
         createStarrior(
-            "Cracker1",
+            "Cracker2",
             sprCrackerNutIdle, 
             sprCrackerNutIdle,
             sprCrackerNutIdle, 
@@ -89,7 +89,7 @@ function createEnemiesLevel1() {
             14,
             [createPhysicalDamageWeakeningChanseSingleTargetCard()]), 
         createStarrior(
-            "Cracker1",
+            "Cracker3",
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 

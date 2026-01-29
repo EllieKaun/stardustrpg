@@ -12,7 +12,11 @@ if isTarget {
     y)
 }
 if !isKO() {
-    drawHealthBar(bbox_left, bbox_top - 4, bbox_right - bbox_left, 4, hp, maxHp)
+    if maxMana <= 0 {
+        drawHealthBar(bbox_left, bbox_top - 4, bbox_right - bbox_left, 4, hp, maxHp)
+    } else {
+        drawHealthBarMana(bbox_left, bbox_top - 6, bbox_right - bbox_left, 6, hp, maxHp, mana, maxMana)
+    }
 }
 for(var i = 0; i < array_length(effects); i++) {
     draw_sprite(stunned, 0, bbox_right, bbox_top)

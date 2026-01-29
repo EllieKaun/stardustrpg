@@ -232,3 +232,23 @@ function createRemoveStatusStunSingleTargetCard() {
         mpCostToken
     )
 }
+
+// Воскрешение павшего союзника - уникальная
+function createResurrectionCard() {
+    return new Card(
+        "ResurrectionCard",
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        1,
+        [
+            {
+                type: EffectTypes.Resurrection,
+                timing: Timing.Instant
+            }
+        ],
+        healCard,
+        hpHealSolo,
+        commonBorder,
+        mpCostToken
+    )
+}
