@@ -31,6 +31,23 @@ enum EffectTypes {
     ShuffleDeck,
     Resurrection
 }
+function effectTypeToString(type) {
+    switch (type) {
+        case EffectTypes.Damage:        return "Damage";
+        case EffectTypes.Heal:          return "Heal";
+        case EffectTypes.Stun:          return "Stun";
+        case EffectTypes.Buff:          return "Buff";
+        case EffectTypes.RemoveEffect:  return "Remove Effect";
+        case EffectTypes.ManaGain:      return "Mana Gain";
+        case EffectTypes.Weakening:     return "Weakening";
+        case EffectTypes.Debuff:        return "Debuff";
+        case EffectTypes.CopyCard:      return "Copy Card";
+        case EffectTypes.AddEnergy:     return "Add Energy";
+        case EffectTypes.ShuffleDeck:   return "Shuffle Deck";
+        case EffectTypes.Resurrection:  return "Resurrection";
+        default:                        return "Unknown";
+    }
+}
 
 enum StatusNames {
 	Burn,

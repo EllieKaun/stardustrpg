@@ -36,7 +36,7 @@ function playCard(card, caster, targets) {
         var caster = other
         for(var i = 0; i < array_length(effects); i++) {
             var effect = effects[i]
-            show_debug_message("processing effect type: " + string(effect.type))
+            show_debug_message("processing effect type: " + string(effectTypeToString(effect.type)))
             switch (effect.timing) {
                 case Timing.Instant: 
                     executeEffect(effect, caster, targets)
