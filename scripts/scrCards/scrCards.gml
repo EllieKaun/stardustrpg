@@ -2,6 +2,8 @@ function Card(name,
             target, 
             actionType, 
             energy,
+            costType,
+            costValue,
             effects, 
             cardBaseSpr, 
             cardIllustrationSpr, 
@@ -16,12 +18,32 @@ function Card(name,
     self.cardBorderSpr = cardBorderSpr
     self.cardTokenSpr = cardTokenSpr
     self.energy = energy
+    self.costValue = costValue
+    self.costType = costType
+}
+
+function checkIfCanPlayCard(caster, card) {
+    if (card.costType == CostType.Mana) {
+        if (caster.maxMana <= 0) return true
+        return caster.mana >= card.costValue
+    } else {
+        return caster.hp >= card.costValue
+    }
+}
+
+function applyCost(caster, card) {
+    if (card.costType == CostType.Mana) {
+        if (caster.maxMana <= 0) return
+        caster.mana = caster.mana - card.costValue
+    } else {
+        caster.hp = caster.hp - card.costValue
+    }
 }
 
 function playCard(card, caster, targets) {
     caster.pendingCard = card
     caster.pendingTargets = targets 
-    
+    applyCost(caster, card)
     if checkIfHasEffectType(selectedCharacter, EffectTypes.CopyCard) { 
         copyNextCard = true
         reduceOrRemoveEffectType(selectedCharacter, EffectTypes.CopyCard)

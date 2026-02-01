@@ -5,6 +5,8 @@ function createCardBuffPhysicalDamageSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -28,6 +30,8 @@ function createCardBuffMagicalDamageSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -51,6 +55,8 @@ function createCardBuffAnyDamageMultipleTarget() {
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -81,6 +87,8 @@ function createCardBuffPhysicalProtectionSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -104,6 +112,8 @@ function createCardBuffMagicalProtectionSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -127,6 +137,8 @@ function createCardBuffAnyProtectionMultipleTarget() {
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -158,6 +170,8 @@ function createCardDebuffPhysicalDamageSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Debuff,
@@ -181,6 +195,8 @@ function createCardDebuffMagicalDamageSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Debuff,
@@ -204,6 +220,8 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Debuff,
@@ -227,6 +245,8 @@ function createCardDebuffMagicalProtectionSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Debuff,

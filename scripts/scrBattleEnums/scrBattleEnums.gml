@@ -31,6 +31,7 @@ enum EffectTypes {
     ShuffleDeck,
     Resurrection
 }
+
 function effectTypeToString(type) {
     switch (type) {
         case EffectTypes.Damage:        return "Damage";
@@ -76,27 +77,6 @@ enum Timing {
     OnActions
 }
 
-enum CardAbilityTypes {
-    Attack,
-    AttackWithPhysicalEffect,
-    BuffDamage,
-    BuffProtection,
-    DebuffDamage,
-    DebuffProtection,
-    CreateWeakness,
-    InstantHealHp,
-    OvertimeHealHp,
-    InstantManaGain,
-    RemoveEffect,
-    Revival,
-    AttackWithMagicalEffect,
-    CopyNexPlayedCard,
-    AddEnergyToPlayer,
-    ShuffleDeck,
-    FindWeakness,
-    RemoveWeaknessForXTurns
-}
-
 enum BattleStates {
     Preparing,
     DeckPreparing,
@@ -116,4 +96,9 @@ enum StarriorStates {
     Attack,
     Cast,
     KnockOut
+}
+
+enum CostType {
+    Mana,
+    Health
 }

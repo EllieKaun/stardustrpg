@@ -62,6 +62,8 @@ switch (battleState) {
         if (enterPressed) {
             if (array_length(selectedCharacter.getCardsInHand()) > 0) { 
                 var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
+                var check = checkIfCanPlayCard(selectedCharacter, currentCard)
+                if !check { return }
                 if currentCard.target == TargetTypes.SingleEnemyTarget {
                     battleState = BattleStates.EnemyTargetSelection
                     initTargetSelection(enemies)
