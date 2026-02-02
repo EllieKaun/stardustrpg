@@ -1,15 +1,15 @@
 function Card(name, 
+            rarity,
             target, 
             actionType, 
             energy,
-            costType,
-            costValue,
             effects, 
             cardBaseSpr, 
             cardIllustrationSpr, 
             cardBorderSpr, 
             cardTokenSpr) constructor {
     self.name = name
+    self.rarity = rarity
     self.target = target
     self.effects = effects
     self.actionType = actionType
@@ -18,8 +18,51 @@ function Card(name,
     self.cardBorderSpr = cardBorderSpr
     self.cardTokenSpr = cardTokenSpr
     self.energy = energy
-    self.costValue = costValue
-    self.costType = costType
+    self.costType = function() {
+        if actionType == StarriorStates.Attack {
+            return CostType.Health
+        } else {
+            return CostType.Mana
+        }
+    }
+    self.costValue = function() {
+        var effectsCount = array_length(effects)
+        if effectsCount == 0 { return 0 }
+            
+        var effect = effects[0]
+        if effect.type == EffectTypes.Damage && effect.damageType == DamageTypes.Physical {
+            if effectsCount > 1 {
+                return getCostByRarity(rarity, 4, 5, 6, 7)
+            } else {
+                return getCostByRarity(rarity, 2, 3, 4, 5)
+            }
+        } else if effect.type == EffectTypes.Damage && effect.damageType == DamageTypes.Magical {
+            return getCostByRarity(rarity, 3, 4, 5, 6)
+        } else if effect.type == EffectTypes.Heal && effect.timing == Timing.Instant {
+            return getCostByRarity(rarity, 3, 4, 5, 6)
+        } else if effect.type == EffectTypes.Heal && effect.timing == Timing.EndOfTurn {
+            return getCostByRarity(rarity, 2, 3, 4, 5)
+        } else {
+            return getCostByRarity(rarity, 3, 4, 5, 6)
+        }
+    }
+}
+
+function getCostByRarity(rarity, dafault, unusual, rare, epic) {
+    switch (rarity) {
+    	case CardsRarity.Default: 
+            return dafault
+        break    
+    	case CardsRarity.Unusual: 
+            return unusual            
+        break       
+    	case CardsRarity.Rare: 
+            return rare            
+        break       
+    	case CardsRarity.Epic: 
+            return epic            
+        break          
+    }
 }
 
 function checkIfCanPlayCard(caster, card) {

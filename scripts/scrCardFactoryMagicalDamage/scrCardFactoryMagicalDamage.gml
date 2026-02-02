@@ -2,6 +2,7 @@
 function createMagicalDamageSingleTargetCard() {
     return new Card(
         "MagicalDamageSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -24,6 +25,7 @@ function createMagicalDamageSingleTargetCard() {
 function createMagicalDamageMultipleTargetCard() {
     return new Card(
         "PhysicalDamageMultipleTargetCard",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,
@@ -46,6 +48,7 @@ function createMagicalDamageMultipleTargetCard() {
 function createMagicalDamageStunChanseSingleTargetCard() {
     return new Card(
         "MagicalDamageStunChanseSingleTarget",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
@@ -75,6 +78,7 @@ function createMagicalDamageStunChanseSingleTargetCard() {
 function createMagicalDamageStunChanseMultipleTargetsCard() {
     return new Card(
         "MagicalDamageStunChanseSingleTarget",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Cast,
         1,
@@ -104,6 +108,7 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
 function createMagicalDamageBurnChanseSingleTargetCard() {
     return new Card(
         "Default attack",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -135,6 +140,7 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
 function createMagicalDamageBurnChanseMultipleTargetCard() {
     return new Card(
         "Default attack",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,
@@ -165,6 +171,7 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
 function createMagicalDamageFreezingChanceSingleTargetCard() {
     return new Card(
         "MagicalDamageFreezingChanceSingleTarget",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -195,6 +202,7 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
 function createMagicalDamageFreezingChanceMultipleTargetCard() {
     return new Card(
         "MagicalDamageFreezingChanceMultipleTarget",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,
@@ -225,6 +233,7 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
 function createCopyNextPlayedCardCard() {
     return new Card(
         "CopyNextPlayedCard",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         0,
@@ -245,6 +254,7 @@ function createCopyNextPlayedCardCard() {
 function createAddEnergyCard() {
     return new Card(
         "AddEnergyCard",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         0,
@@ -266,6 +276,7 @@ function createAddEnergyCard() {
 function createShuffleDeckCard() {
     return new Card(
         "ShuffleDeckCard",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         0,

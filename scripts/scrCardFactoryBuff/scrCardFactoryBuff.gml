@@ -2,11 +2,10 @@
 function createCardBuffPhysicalDamageSingleTarget() {
     return new Card(
         "Buff physical damage single target",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -27,10 +26,9 @@ function createCardBuffPhysicalDamageSingleTarget() {
 function createCardBuffMagicalDamageSingleTarget() {
     return new Card(
         "Buff magical damage single target",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
-        1,
-        CostType.Mana,
         3,
         [
             {
@@ -52,11 +50,10 @@ function createCardBuffMagicalDamageSingleTarget() {
 function createCardBuffAnyDamageMultipleTarget() {
     return new Card(
         "Buff any damage multiple target",
+        CardsRarity.Default,
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -84,11 +81,10 @@ function createCardBuffAnyDamageMultipleTarget() {
 function createCardBuffPhysicalProtectionSingleTarget() {
     return new Card(
         "Buff physical damage single target",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -109,11 +105,10 @@ function createCardBuffPhysicalProtectionSingleTarget() {
 function createCardBuffMagicalProtectionSingleTarget() {
     return new Card(
         "Buff magical damage single target",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -134,11 +129,10 @@ function createCardBuffMagicalProtectionSingleTarget() {
 function createCardBuffAnyProtectionMultipleTarget() {
     return new Card(
         "Buff any protection multiple target",
+        CardsRarity.Default,
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Buff,
@@ -167,11 +161,10 @@ function createCardBuffAnyProtectionMultipleTarget() {
 function createCardDebuffPhysicalDamageSingleTarget() {
     return new Card(
         "Debuff physical damage single target",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Debuff,
@@ -192,11 +185,10 @@ function createCardDebuffPhysicalDamageSingleTarget() {
 function createCardDebuffMagicalDamageSingleTarget() {
     return new Card(
         "Debuff magical damage single target",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Debuff,
@@ -217,11 +209,10 @@ function createCardDebuffMagicalDamageSingleTarget() {
 function createCardDebuffPhysicalProtectionSingleTarget() {
     return new Card(
         "Buff physical damage single target",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Debuff,
@@ -242,11 +233,10 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
 function createCardDebuffMagicalProtectionSingleTarget() {
     return new Card(
         "Buff magical damage single target",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Debuff,

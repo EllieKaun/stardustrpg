@@ -2,6 +2,7 @@
 function createPhysicalDamageSingleTargetCard() {
     return new Card(
         "PhysicalDamageSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -24,6 +25,7 @@ function createPhysicalDamageSingleTargetCard() {
 function createPhysicalDamageMultipleTargetCard() {
     return new Card(
         "PhysicalDamageMultipleTargetCard",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,
@@ -46,6 +48,7 @@ function createPhysicalDamageMultipleTargetCard() {
 function createPhysicalDamageStunChanseSingleTargetCard() {
     return new Card(
         "PhysicalDamageStunChanseSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -75,6 +78,7 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
 function createPhysicalDamageStunChanseMultipleTargetCard() {
     return new Card(
         "PhysicalDamageStunChanseMultipleTargetCard",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,
@@ -104,6 +108,7 @@ function createPhysicalDamageStunChanseMultipleTargetCard() {
 function createPhysicalDamageBleedingChanseSingleTargetCard() {
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -134,6 +139,7 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
 function createPhysicalDamageBleedingChanseMultipleTargetCard() {
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,
@@ -164,6 +170,7 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
 function createPhysicalDamageBombChanseSingleTargetCard() {
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -194,6 +201,7 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
 function createPhysicalDamageBombChanseMultipleTargetCard() {
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,
@@ -224,6 +232,7 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
 function createPhysicalDamageWeakeningChanseSingleTargetCard() {
     return new Card(
         "PhysicalDamageWeakeningChanseSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -254,6 +263,7 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
 function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
     return new Card(
         "PhysicalDamageWeakeningChanseSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,
@@ -283,6 +293,7 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
 function createPhysicalDamageVampirismChanseSingleTargetCard() {
     return new Card(
         "PhysicalDamageVampirismChanseSingleTargetCard",
+        CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
@@ -307,6 +318,7 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
 function createPhysicalDamageVampirismChanceMultipleTargetCard() {
     return new Card(
         "PhysicalDamageVampirismChanseMultipleTargetCard",
+        CardsRarity.Default,
         TargetTypes.AllEnemies,
         StarriorStates.Attack,
         1,

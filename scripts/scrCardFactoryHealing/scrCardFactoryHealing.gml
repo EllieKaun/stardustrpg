@@ -2,6 +2,7 @@
 function createInstantHealSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -23,6 +24,7 @@ function createInstantHealSingleTargetCard() {
 function createInstantMultipleTargetsHealCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         1,
@@ -44,6 +46,7 @@ function createInstantMultipleTargetsHealCard() {
 function createOvertimeHealSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -68,6 +71,7 @@ function createOvertimeHealSingleTargetCard() {
 function createInstantManaGainSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -89,6 +93,7 @@ function createInstantManaGainSingleTargetCard() {
 function createInstantMultipleTargetsManaGainCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         1,
@@ -110,6 +115,7 @@ function createInstantMultipleTargetsManaGainCard() {
 function createOvertimeManaGainSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -132,6 +138,7 @@ function createOvertimeManaGainSingleTargetCard() {
 function createRemoveStatusShockSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -153,6 +160,7 @@ function createRemoveStatusShockSingleTargetCard() {
 function createRemoveStatusBurnSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -174,6 +182,7 @@ function createRemoveStatusBurnSingleTargetCard() {
 function createRemoveStatusFreezeSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -195,6 +204,7 @@ function createRemoveStatusFreezeSingleTargetCard() {
 function createRemoveStatusBleedingSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -216,6 +226,7 @@ function createRemoveStatusBleedingSingleTargetCard() {
 function createRemoveStatusStunSingleTargetCard() {
     return new Card(
         "Default heal",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -237,6 +248,7 @@ function createRemoveStatusStunSingleTargetCard() {
 function createResurrectionCard() {
     return new Card(
         "ResurrectionCard",
+        CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
