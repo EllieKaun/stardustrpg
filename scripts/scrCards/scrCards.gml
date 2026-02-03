@@ -247,6 +247,26 @@ function executeEffect(
     }    
 }
 
+function checkIfHasStrengths(target, effect) {
+    if variable_instance_exists(effect, "statusName") 
+        && array_contains(target.strengths, effect.statusName) {
+        return true
+    } else if array_contains(target.strengths, effect.type) {
+        return true
+    }
+    return false
+}
+
+function checkIfHasWeaknesses(target, effect) {
+    if variable_instance_exists(effect, "statusName") 
+        && array_contains(target.weaknesses, effect.statusName) {
+        return true
+    } else if array_contains(target.weaknesses, effect.type) {
+        return true
+    }
+    return false
+}
+
 function executeDamageEffect(
     effect,
     caster,
@@ -265,6 +285,8 @@ function executeDamageEffect(
     var magicalProtectionDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.MagicalProtection)
     var doesCasterHaveWeakening = checkIfHasEffectType(caster, EffectTypes.Weakening)
     var doesTargetHaveWeakening = checkIfHasEffectType(targets, EffectTypes.Weakening)
+    var doesHaveStrengths = checkIfHasStrengths(targets, effect)
+    var doesHaveWeaknesses = checkIfHasWeaknesses(targets, effect)
     switch (damageType) {
     	case DamageTypes.Physical: 
             damage *= caster.strength 
@@ -305,6 +327,14 @@ function executeDamageEffect(
     }
     
     if doesTargetHaveWeakening {
+        damagePercentModifier += 0.1
+    }
+    
+    if doesHaveStrengths {
+        damagePercentModifier -= 0.1
+    }
+    
+    if doesHaveWeaknesses {
         damagePercentModifier += 0.1
     }
     

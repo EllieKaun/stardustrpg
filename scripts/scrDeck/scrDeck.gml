@@ -10,7 +10,6 @@ function shuffleDeckAndTake4(character) {
     var top4Cards = take4CardsFromDeckTop(shuffeledDeck, [])
     character.deck.shuffeledDeck = shuffeledDeck
     character.deck.cardsInHand = top4Cards
-
 }
 
 function take4CardsFromDeckTop(shuffledDeck, cardsInHand) {

@@ -1,5 +1,6 @@
 // Атака одного врага 
 function createPhysicalDamageSingleTargetCard() {
+    
     return new Card(
         "PhysicalDamageSingleTargetCard",
         CardsRarity.Default,

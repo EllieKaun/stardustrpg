@@ -6,6 +6,8 @@ function createInstantHealSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.Heal,
@@ -28,6 +30,8 @@ function createInstantMultipleTargetsHealCard() {
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.Heal,
@@ -50,6 +54,8 @@ function createOvertimeHealSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.Heal,
@@ -75,6 +81,8 @@ function createInstantManaGainSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -97,6 +105,8 @@ function createInstantMultipleTargetsManaGainCard() {
         TargetTypes.AllAllies,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -119,6 +129,8 @@ function createOvertimeManaGainSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        3,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -142,6 +154,8 @@ function createRemoveStatusShockSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -164,6 +178,8 @@ function createRemoveStatusBurnSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -186,6 +202,8 @@ function createRemoveStatusFreezeSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -208,6 +226,8 @@ function createRemoveStatusBleedingSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -230,6 +250,8 @@ function createRemoveStatusStunSingleTargetCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -252,6 +274,8 @@ function createResurrectionCard() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
+        CostType.Mana,
+        4,
         [
             {
                 type: EffectTypes.Resurrection,

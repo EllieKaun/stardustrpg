@@ -6,6 +6,8 @@ function createMagicalDamageSingleTargetCard() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Attack,
         1,
+        CostType.Health,
+        3,
         [
             {
                 type: EffectTypes.Damage,

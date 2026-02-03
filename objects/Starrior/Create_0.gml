@@ -17,6 +17,7 @@ resistense = 0
 
 effects = []
 weaknesses = []
+strengths = []
 
 deck = new Deck([])
 
