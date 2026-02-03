@@ -14,8 +14,8 @@ function createMagicalDamageSingleTargetCard() {
                 timing: Timing.Instant
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        lightningSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -37,8 +37,8 @@ function createMagicalDamageMultipleTargetCard() {
                 timing: Timing.Instant
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        lightningGroup,
         commonBorder,
         hpCostToken
     )
@@ -67,8 +67,8 @@ function createMagicalDamageStunChanseSingleTargetCard() {
                 statusName: StatusNames.Stun
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        lightningSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -97,8 +97,8 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
                 statusName: StatusNames.Stun
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        lightningGroup,
         commonBorder,
         hpCostToken
     )
@@ -129,8 +129,8 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
                 statusName: StatusNames.Burn
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        fireballSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -161,8 +161,8 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
                 statusName: StatusNames.Burn
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        fireballGroup,
         commonBorder,
         hpCostToken
     )
@@ -191,8 +191,8 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
                 statusName: StatusNames.Freeze
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        lightningSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -222,8 +222,8 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
                 statusName: StatusNames.Freeze
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        lightningGroup,
         commonBorder,
         hpCostToken
     )
@@ -243,8 +243,8 @@ function createCopyNextPlayedCardCard() {
                 timing: Timing.OnActions
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        cardCopy,
         commonBorder,
         hpCostToken
     )
@@ -265,8 +265,8 @@ function createAddEnergyCard() {
                 timing: Timing.OnActions
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        cardCopy,
         commonBorder,
         hpCostToken
     )
@@ -286,8 +286,8 @@ function createShuffleDeckCard() {
                 timing: Timing.OnActions
             }
         ],
-        atcCard,
-        magicBuff,
+        mgcCard,
+        shuffle,
         commonBorder,
         hpCostToken
     )

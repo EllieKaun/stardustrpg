@@ -59,7 +59,7 @@ function createOvertimeHealSingleTargetCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        hpHealOT,
         commonBorder,
         mpCostToken
     )
@@ -83,7 +83,7 @@ function createInstantManaGainSingleTargetCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        mpHealSolo,
         commonBorder,
         mpCostToken
     )
@@ -105,7 +105,7 @@ function createInstantMultipleTargetsManaGainCard() {
             }
         ],
         healCard,
-        hpHealGroup,
+        mpHealGroup,
         commonBorder,
         mpCostToken
     )
@@ -128,7 +128,7 @@ function createOvertimeManaGainSingleTargetCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        mpHealOT,
         commonBorder,
         mpCostToken
     )
@@ -150,7 +150,7 @@ function createRemoveStatusShockSingleTargetCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        shockRemove,
         commonBorder,
         mpCostToken
     )
@@ -172,7 +172,7 @@ function createRemoveStatusBurnSingleTargetCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        burnRemove,
         commonBorder,
         mpCostToken
     )
@@ -194,7 +194,7 @@ function createRemoveStatusFreezeSingleTargetCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        freezeRemove,
         commonBorder,
         mpCostToken
     )
@@ -216,7 +216,7 @@ function createRemoveStatusBleedingSingleTargetCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        bleedRemove,
         commonBorder,
         mpCostToken
     )
@@ -238,7 +238,7 @@ function createRemoveStatusStunSingleTargetCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        stunRemove,
         commonBorder,
         mpCostToken
     )
@@ -259,7 +259,7 @@ function createResurrectionCard() {
             }
         ],
         healCard,
-        hpHealSolo,
+        bleedRemove,
         commonBorder,
         mpCostToken
     )

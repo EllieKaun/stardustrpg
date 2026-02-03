@@ -15,7 +15,7 @@ function createPhysicalDamageSingleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        bleedSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -38,7 +38,7 @@ function createPhysicalDamageMultipleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        bleedSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -68,7 +68,7 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        stunSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -98,7 +98,7 @@ function createPhysicalDamageStunChanseMultipleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        stunGroup,
         commonBorder,
         hpCostToken
     )
@@ -129,7 +129,7 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        bleedSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -160,7 +160,7 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        bleedGroup,
         commonBorder,
         hpCostToken
     )
@@ -191,7 +191,7 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        bombSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -222,7 +222,7 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        bombGroup,
         commonBorder,
         hpCostToken
     )
@@ -253,7 +253,7 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        bombSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -283,7 +283,7 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        bombGroup,
         commonBorder,
         hpCostToken
     )
@@ -308,7 +308,7 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        vampSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -333,7 +333,7 @@ function createPhysicalDamageVampirismChanceMultipleTargetCard() {
             }
         ],
         atcCard,
-        magicBuff,
+        vampGroup,
         commonBorder,
         hpCostToken
     )

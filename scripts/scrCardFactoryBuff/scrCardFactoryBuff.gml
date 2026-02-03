@@ -15,8 +15,8 @@ function createCardBuffPhysicalDamageSingleTarget() {
                 duration: 1
             }
         ],
-        atcCard,
-        magicBuff,
+        buffCard,
+        strBuff,
         commonBorder,
         hpCostToken
     )
@@ -39,7 +39,7 @@ function createCardBuffMagicalDamageSingleTarget() {
                 duration: 1
             }
         ],
-        atcCard,
+        buffCard,
         magicBuff,
         commonBorder,
         hpCostToken
@@ -70,8 +70,8 @@ function createCardBuffAnyDamageMultipleTarget() {
                 duration: 1
             }
         ],
-        atcCard,
-        magicBuff,
+        buffCard,
+        strAndMagicBuff,
         commonBorder,
         hpCostToken
     )
@@ -94,8 +94,8 @@ function createCardBuffPhysicalProtectionSingleTarget() {
                 duration: 1
             }
         ],
-        atcCard,
-        magicBuff,
+        buffCard,
+        defBuff,
         commonBorder,
         hpCostToken
     )
@@ -119,7 +119,7 @@ function createCardBuffMagicalProtectionSingleTarget() {
             }
         ],
         atcCard,
-        magicBuff,
+        defBuff,
         commonBorder,
         hpCostToken
     )
@@ -150,8 +150,8 @@ function createCardBuffAnyProtectionMultipleTarget() {
             }
             
         ],
-        atcCard,
-        magicBuff,
+        buffCard,
+        defAndMagicDefBuff,
         commonBorder,
         hpCostToken
     )
@@ -174,8 +174,8 @@ function createCardDebuffPhysicalDamageSingleTarget() {
                 duration: 1
             }
         ],
-        atcCard,
-        magicBuff,
+        buffCard,
+        strBuff,
         commonBorder,
         hpCostToken
     )
@@ -198,7 +198,7 @@ function createCardDebuffMagicalDamageSingleTarget() {
                 duration: 1
             }
         ],
-        atcCard,
+        buffCard,
         magicBuff,
         commonBorder,
         hpCostToken
@@ -222,8 +222,8 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
                 duration: 1
             }
         ],
-        atcCard,
-        magicBuff,
+        buffCard,
+        defBuff,
         commonBorder,
         hpCostToken
     )
@@ -246,8 +246,8 @@ function createCardDebuffMagicalProtectionSingleTarget() {
                 duration: 1
             }
         ],
-        atcCard,
-        magicBuff,
+        buffCard,
+        defBuff,
         commonBorder,
         hpCostToken
     )

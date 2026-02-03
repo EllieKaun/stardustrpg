@@ -66,20 +66,20 @@ function getCostByRarity(rarity, dafault, unusual, rare, epic) {
 }
 
 function checkIfCanPlayCard(caster, card) {
-    if (card.costType == CostType.Mana) {
+    if (card.costType() == CostType.Mana) {
         if (caster.maxMana <= 0) return true
-        return caster.mana >= card.costValue
+        return caster.mana >= card.costValue()
     } else {
-        return caster.hp >= card.costValue
+        return caster.hp >= card.costValue()
     }
 }
 
 function applyCost(caster, card) {
-    if (card.costType == CostType.Mana) {
+    if (card.costType() == CostType.Mana) {
         if (caster.maxMana <= 0) return
-        caster.mana = caster.mana - card.costValue
+        caster.mana = caster.mana - card.costValue()
     } else {
-        caster.hp = caster.hp - card.costValue
+        caster.hp = caster.hp - card.costValue()
     }
 }
 
