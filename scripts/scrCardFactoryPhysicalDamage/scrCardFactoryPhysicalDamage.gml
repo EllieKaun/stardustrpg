@@ -1,17 +1,18 @@
 // Атака одного врага 
 function createPhysicalDamageSingleTargetCard() {
-    
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.SingleEnemyTarget,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             }
         ],
@@ -24,17 +25,19 @@ function createPhysicalDamageSingleTargetCard() {
 
 // Атака группы врагов
 function createPhysicalDamageMultipleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageMultipleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.AllEnemies,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             }
         ],
@@ -47,17 +50,19 @@ function createPhysicalDamageMultipleTargetCard() {
 
 // Атака с шансом оглушения одного врага - (враг не может действовать х ходов)
 function createPhysicalDamageStunChanseSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageStunChanseSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.SingleEnemyTarget,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             },
             {
@@ -77,17 +82,19 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
 
 // Атака с шансом оглушения группы врагов - (враги не могут действовать х ходов)
 function createPhysicalDamageStunChanseMultipleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageStunChanseMultipleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.AllEnemies,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             },
             {
@@ -107,24 +114,26 @@ function createPhysicalDamageStunChanseMultipleTargetCard() {
 
 // Атака с шансом кровотечения одного врага - (враг получает физический урон х ходов)
 function createPhysicalDamageBleedingChanseSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.SingleEnemyTarget,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             },
             {
                 type: EffectTypes.Damage,
                 chance: 1.0,
                 timing: Timing.EndOfTurn,
-                value: 2,
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 duration: 1,
                 statusName: StatusNames.Bleeding
             }
@@ -138,24 +147,26 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
 
 // Атака с шансом кровотечения группы врагов - (враги получают физический урон х ходов)
 function createPhysicalDamageBleedingChanseMultipleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.AllEnemies,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             },
             {
                 type: EffectTypes.Damage,
                 chance: 1.0,
                 timing: Timing.EndOfTurn,
-                value: 2,
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 duration: 1,
                 statusName: StatusNames.Bleeding
             }
@@ -169,17 +180,19 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
 
 // Атака с шансом взрыва одного врага - (враг получает большой урон сразу)
 function createPhysicalDamageBombChanseSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.SingleEnemyTarget,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             },
             {
@@ -187,7 +200,7 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
                 damageType: DamageTypes.Physical,
                 chance: 1.0,
                 timing: Timing.Instant,
-                value: 2,
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 statusName: StatusNames.Bomb
             }
         ],
@@ -200,17 +213,19 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
 
 // Атака с шансом взрыва группы врагов - (враги получают большой урон сразу)
 function createPhysicalDamageBombChanseMultipleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.AllEnemies,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             },
             {
@@ -218,7 +233,7 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
                 damageType: DamageTypes.Physical,
                 chance: 1.0,
                 timing: Timing.Instant,
-                value: 2,
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 statusName: StatusNames.Bomb
             }
         ],
@@ -231,24 +246,25 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
 
 // Атака с шансом слабости одного врага
 function createPhysicalDamageWeakeningChanseSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageWeakeningChanseSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.SingleEnemyTarget,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             },
             {
                 type: EffectTypes.Weakening,
                 chance: 1.0,
                 timing: Timing.Overtime,
-                value: 2,
                 duration: 1,
                 statusName: StatusNames.Weakening
             }
@@ -262,17 +278,19 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
 
 // Атака с шансом слабости группы врагов
 function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageWeakeningChanseSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.AllEnemies,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(1, 3),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant
             },
             {
@@ -292,17 +310,19 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
 
 // Атака с шансом вампиризма одного врага - (нанесенный физ урон преобразуется в здоровье)
 function createPhysicalDamageVampirismChanseSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageVampirismChanseSingleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.SingleEnemyTarget,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(10, 15),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant,
                 chance: 1.0,
                 statusName: StatusNames.Vampirism
@@ -317,17 +337,19 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
 
 // Атака с шансом вампиризма группы врагов - (нанесенный физ урон преобразуется в здоровье)
 function createPhysicalDamageVampirismChanceMultipleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageVampirismChanseMultipleTargetCard",
-        CardsRarity.Default,
-        TargetTypes.AllEnemies,
+        rarity,
+        targetType,
         StarriorStates.Attack,
         1,
         [
             {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
-                value: random_range(10, 15),
+                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant,
                 chance: 1.0,
                 statusName: StatusNames.Vampirism

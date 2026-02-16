@@ -1,13 +1,13 @@
 // Восстановление hp одному герою
 function createInstantHealSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.Heal,
@@ -24,14 +24,14 @@ function createInstantHealSingleTargetCard() {
 
 //  Восстановление hp группе героев
 function createInstantMultipleTargetsHealCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.AllAllies
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.AllAllies,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.Heal,
@@ -48,14 +48,14 @@ function createInstantMultipleTargetsHealCard() {
 
 // Постепенное восстановление hp одному герою
 function createOvertimeHealSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.Heal,
@@ -75,14 +75,14 @@ function createOvertimeHealSingleTargetCard() {
 
 // Восстановление mp одному герою
 function createInstantManaGainSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -99,14 +99,14 @@ function createInstantManaGainSingleTargetCard() {
 
 // Восстановление mp группе героев
 function createInstantMultipleTargetsManaGainCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.AllAllies
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.AllAllies,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -123,14 +123,14 @@ function createInstantMultipleTargetsManaGainCard() {
 
 // Постепенное восстановление mp одному герою
 function createOvertimeManaGainSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        3,
         [
             {
                 type: EffectTypes.ManaGain,
@@ -148,14 +148,14 @@ function createOvertimeManaGainSingleTargetCard() {
 
 // Снятие статуса шока одному герою - уникальная
 function createRemoveStatusShockSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -172,14 +172,14 @@ function createRemoveStatusShockSingleTargetCard() {
 
 // Снятие статуса поджога одному герою - уникальная
 function createRemoveStatusBurnSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -196,14 +196,14 @@ function createRemoveStatusBurnSingleTargetCard() {
 
 // Снятие статуса заморозки одному герою - уникальная
 function createRemoveStatusFreezeSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -220,14 +220,14 @@ function createRemoveStatusFreezeSingleTargetCard() {
 
 // Снятие статуса кровотечения одному герою - уникальная
 function createRemoveStatusBleedingSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -244,14 +244,14 @@ function createRemoveStatusBleedingSingleTargetCard() {
 
 // Снятие статуса оглушения одному герою - уникальная
 function createRemoveStatusStunSingleTargetCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.RemoveEffect,
@@ -268,14 +268,14 @@ function createRemoveStatusStunSingleTargetCard() {
 
 // Воскрешение павшего союзника - уникальная
 function createResurrectionCard() {
+    var rarity = CardsRarity.Default  
+    var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "ResurrectionCard",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
+        rarity,
+        targetType,
         StarriorStates.Cast,
         1,
-        CostType.Mana,
-        4,
         [
             {
                 type: EffectTypes.Resurrection,

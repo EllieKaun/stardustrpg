@@ -65,6 +65,34 @@ function getCostByRarity(rarity, dafault, unusual, rare, epic) {
     }
 }
 
+function getDamageFuncOnRariryAndTarget(rarity, target) {
+    if rarity == CardsRarity.Default {
+        if target == TargetTypes.SingleEnemyTarget {
+            return function() { return irandom_range(1, 4) } 
+        } else {
+            return function() { return irandom_range(1, 2) } 
+        }
+    } else if rarity == CardsRarity.Unusual {
+        if target == TargetTypes.SingleEnemyTarget {
+            return function() { return irandom_range(1, 6) } 
+        } else {
+            return function() { return irandom_range(1, 4) } 
+        }
+    } else if rarity == CardsRarity.Rare {
+        if target == TargetTypes.SingleEnemyTarget {
+            return function() { return irandom_range(1, 8) } 
+        } else {
+            return function() { return irandom_range(1, 6) } 
+        }
+    } else if rarity == CardsRarity.Epic {
+        if target == TargetTypes.SingleEnemyTarget {
+            return function() { return irandom_range(1, 12) } 
+        } else {
+            return function() { return irandom_range(1, 8) } 
+        }
+    }
+}
+
 function checkIfCanPlayCard(caster, card) {
     if (card.costType() == CostType.Mana) {
         if (caster.maxMana <= 0) return true
@@ -274,7 +302,7 @@ function executeDamageEffect(
 ) {
     var damageType = effect.damageType
     var damagePercentModifier = 0
-    var damage = effect.value 
+    var damage = is_method(effect.value) ? effect.value() : effect.value 
     var physicalDamageBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.PhysicalDamage)
     var magicalDamageBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.MagicalDamage)
     var physicalDamageDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.PhysicalDamage)
