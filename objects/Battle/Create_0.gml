@@ -1,5 +1,7 @@
 selectedCard = 0 
 maxCardsOnDeskNumber = 4
+copyNextCard = false
+
 maxEnemiesCount = 5
 spacingBetweenStarriors = 16
 
@@ -9,6 +11,10 @@ enemies = []
 playOrder = []
 selectedCharacter = noone
 selectedCharacterNumber = -1
+
+selectedTarget = noone
+selectedTargetNumber = -1
+targetOptions = []
 
 battleState = BattleStates.Preparing
 

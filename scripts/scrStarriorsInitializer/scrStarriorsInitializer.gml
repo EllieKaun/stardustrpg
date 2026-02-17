@@ -1,30 +1,109 @@
 function createLana(){
     var starrior = createStarrior("Lana",    
             sprLanaBattleIdle, 
-            10, 
-            10, 
-            [createPhysicalDamageCardDefault(),
-            createPhysicalDamageCardDefault(),
-            createPhysicalDamageCardDefault(),
-            createPhysicalDamageCardDefault(),
-            createPhysicalDamageCardDefault()],
+            sprLanaBattleSpell,
+            sprLanaBatlleCast,
+            sprLanaBattleKO,
+            30, 
+            60, 
+            70,
+            70,
             1,
-            1)
-    starrior.spriteActionIdle = sprLanaBattleIdle
-    starrior.spriteActionAttack = sprLanaBattleSpell
+            1,
+            2,
+            4,
+            3,
+            1,
+            [
+                createPhysicalDamageVampirismChanceMultipleTargetCard(),
+                createPhysicalDamageVampirismChanceMultipleTargetCard(),
+                createPhysicalDamageVampirismChanceMultipleTargetCard(),
+                createAddEnergyCard()
+           // createOvertimeHealSingleTargetCard(),
+           // createPhysicalDamageCardDefault(),
+            //createPhysicalDamageCardDefault(),
+            //createPhysicalDamageCardDefault()
+        ])
     return starrior
 }
 
+
 function createViv(){
-    return createStarrior("Viv", sprVivBatlleIdle, 10, 10, [], 1, 1)
+    return createStarrior(
+        "Viv", 
+        sprVivBatlleIdle,
+        sprVivBattleAttack,
+        sprVivBattleAttack,
+        sprVivBattleKO,
+        30, 
+        76, 
+        50,
+        50,
+        1,
+        1,
+        4,
+        2,
+        1,
+        3,
+        [
+        createPhysicalDamageSingleTargetCard(),
+        createPhysicalDamageVampirismChanceMultipleTargetCard()
+        ]
+    )
 }
 
 function createEnemiesLevel1() {
     return [
-        createStarrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        createStarrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        createStarrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        createStarrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        createStarrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1)
+        createStarrior(
+            "Cracker1",
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
+            76, 
+            76, 
+            -1,
+            -1,
+            1,
+            1,
+            3,
+            1,
+            0,
+            1,
+            [createPhysicalDamageWeakeningChanseSingleTargetCard()]),
+        createStarrior(
+            "Cracker2",
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle,
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle,  
+            76, 
+            76, 
+            -1,
+            -1,
+            1,
+            1,
+            4,
+            2,
+            8,
+            14,
+            [createPhysicalDamageWeakeningChanseSingleTargetCard()]), 
+        createStarrior(
+            "Cracker3",
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
+            sprCrackerNutIdle, 
+            76, 
+            76, 
+            -1,
+            -1,
+            1,
+            1,
+            4,
+            2,
+            8,
+            14,
+            [createPhysicalDamageWeakeningChanseSingleTargetCard()])
     ]
 }

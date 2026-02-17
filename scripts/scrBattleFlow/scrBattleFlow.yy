@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrBattleFlow",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrBattleFlow",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/BattleDomain/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

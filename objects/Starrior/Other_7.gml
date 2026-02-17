@@ -1,9 +1,16 @@
 switch (actionState) {
 	case StarriorStates.Attack:
         if (!is_undefined(actionCallback)) {
-            actionCallback();
-            actionCallback = undefined;
+            actionCallback()
+            actionCallback = undefined
         }
         changeActionState(StarriorStates.Idle, undefined)
-    break      
+    break     
+	case StarriorStates.Cast:
+        if (!is_undefined(actionCallback)) {
+            actionCallback()
+            actionCallback = undefined
+        }
+        changeActionState(StarriorStates.Idle, undefined)
+    break       
 }
