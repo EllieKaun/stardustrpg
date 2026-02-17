@@ -1,3 +1,0 @@
-originalDeck = []
-shuffeledDeck = []
-cardsInHand = []

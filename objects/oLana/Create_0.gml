@@ -1,8 +1,2 @@
-spdWalk = 1;
-
-
-move_history = [];
-history_max = 48; // spacing between characters
-
-
-SpawnPartyFollowers(id);
+spdWalk = 0.7;
+last_v_dir = 1;

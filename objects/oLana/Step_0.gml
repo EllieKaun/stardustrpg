@@ -1,30 +1,39 @@
-var _inputH = keyboard_check(ord("D")) - keyboard_check(ord("A"));
-var _inputV =keyboard_check(ord("S")) - keyboard_check(ord("W"));
-var _inputD = point_direction(0, 0, _inputH, _inputV);
-var _inputM = point_distance(0, 0, _inputH, _inputV);
+// ───── INPUT ─────
+var h = keyboard_check(ord("D")) - keyboard_check(ord("A"));
+var v = keyboard_check(ord("S")) - keyboard_check(ord("W"));
 
+// ───── MOVEMENT VECTOR ─────
+var moving = (h != 0 || v != 0);
+var mx = h * spdWalk;
+var my = v * spdWalk;
 
-if(_inputM != 0){
-	direction = _inputD;
-	sprite_index = sLanaWalk;
-}else{
-	sprite_index = sLana
+// ───── REMEMBER LAST VERTICAL DIRECTION ─────
+if (v != 0)
+    last_v_dir = sign(v);
+
+// ───── ANIMATION ─────
+if (moving)
+{
+    if (v < 0)
+        sprite_index = sLanaBackwardsWalk;
+    else
+        sprite_index = sLanaWalk;
+}
+else
+{
+    if (last_v_dir < 0)
+        sprite_index = sLanaBackwards;
+    else
+        sprite_index = sLana;
 }
 
-if (_inputH != 0) {
-	image_xscale = sign(_inputH);
-}
+// ───── SPRITE FLIP ─────
+if (h != 0)
+    image_xscale = sign(h);
 
+// ───── COLLISION & MOVE ─────
+if (!place_meeting(x + mx, y, oWall))
+    x += mx;
 
-
-
-x += lengthdir_x(spdWalk*_inputM,_inputD);
-y += lengthdir_y(spdWalk*_inputM,_inputD);
-
-
-array_insert(move_history, 0, { x: x, y: y });
-
-if (array_length(move_history) > history_max) {
-	array_resize(move_history, history_max);
-}
-
+if (!place_meeting(x, y + my, oWall))
+    y += my;

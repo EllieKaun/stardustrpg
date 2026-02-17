@@ -14,56 +14,58 @@ function generateLevel(
     battleState = BattleStates.CharacterPlay
 }
 
-function Starrior(name, spr, hp, maxhp, deck, energy, maxEnergy) constructor {
-    self.name = name
-    self.spr = spr
-    self.hp = hp
-    self.maxhp = maxhp
-    self.deck = deck
-    self.energy = energy
-    self.maxEnergy = maxEnergy
-    self.x = 0
-    self.y = 0
-}
-
-function Card(name, cardBaseScr, cardBorderScr, target, effects) constructor {
-    self.name = name
-    self.target = target
-    self.cardBaseScr = cardBaseScr
-    self.cardBorderScr = cardBorderScr
-    self.effects = effects
-}
-
-function selectNextCharacter() {
-    if selectedCharacter == noone {
-        selectedCharacter = heroes[0]
-        cards = selectedCharacter.deck
-    } else {
-        selectedCharacter = heroes[1]
-    }
+function createStarrior(name, 
+spriteIdle, 
+spriteAttack, 
+spriteCast,
+spriteKO,
+hp, 
+maxHp, 
+mana,
+maxMana,
+energy, 
+maxEnergy,
+strength,
+intelligence,
+aura,
+guts,
+deck) {
+    var starrior = instance_create_depth(0, 0, depth - 1, Starrior)
+    starrior.name = name
+    starrior.hp = hp 
+    starrior.maxHp = maxHp
+    starrior.mana = mana 
+    starrior.maxMana = maxMana
+    starrior.deck = new Deck(deck) 
+    starrior.energy = energy 
+    starrior.maxEnergy = maxEnergy 
+    starrior.spriteActionAttack = spriteAttack
+    starrior.spriteActionIdle = spriteIdle
+    starrior.spriteActionCast = spriteCast
+    starrior.spriteActionKO = spriteKO
+    starrior.sprite_index = spriteIdle
+    starrior.strength = strength 
+    starrior.intelligence = intelligence 
+    starrior.aura = aura 
+    starrior.guts = guts 
+    starrior.mask_index = spriteIdle
+    return starrior
 }
 
 function initStarriors() {
     heroes = [
-        new Starrior("Lana",    
-            sprLanaBattleIdle, 
-            10, 
-            10, 
-            [createPhysicalDamageCardDefault() ],
-            1,
-            1),
-        new Starrior("Mage", sprVivBatlleIdle, 10, 10, [], 1, 1)
+        createLana(),
+        createViv()
     ]
 
-    enemies = [
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1),
-        new Starrior("Bird", sprCrackerNutIdle, 6, 6, [], 1, 1)
-    ]
+    enemies = createEnemiesLevel1()
+    
+    array_copy(playOrder, array_length(playOrder), heroes, 0, array_length(heroes))
+    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies))
+    for(var i = 0; i < array_length(playOrder); i++) {
+        shuffleDeckAndTake4(playOrder[i])
+    }
 }
-
 
 function initStarriorsPositions(
     starriorsZoneHeight,

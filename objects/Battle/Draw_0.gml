@@ -30,61 +30,73 @@ draw_sprite_stretched(
 var cardCurrentX = cardDeskStartX + cardSpacing
 var cardY = cardDeskStartY + topSpacing 
 var selectedBorderWidth = 1
-if selectedCharacter != noone {
-for(var i = 0; i < min(array_length(selectedCharacter.deck), maxCardsOnDeskNumber); i++) {
-    var card = selectedCharacter.deck[i]
-    var isSelected = selectedCard == i
-    var drawY = isSelected ? cardY - 2 : cardY
-    draw_sprite_stretched(
-	    card.cardBaseScr,
-	    0,
-	    cardCurrentX,
-	    drawY,
-	    cardWidth,
-	    cardHeight
-    )
-    draw_sprite_stretched(
-	    card.cardBorderScr,
-	    0,
-	    cardCurrentX,
-	    drawY,
-	    cardWidth,
-	    cardHeight
-    )
-    // Выделение
-    if isSelected { 
-        // Рамка вокруг выбранной карты
-        drawBorderAroundCard(
-            cardCurrentX,
-            drawY,
-            selectedBorderWidth,
-            cardWidth,
-            cardHeight
+if battleState == BattleStates.EnemysTurn {
+    drawFitTextInArea("Waiting...",
+    cardDeskStartX + spacingBetweenStarriors, 
+    cardDeskStartY, 
+    cardDeskWidth, 
+    cardDeskHeight)
+} else {
+if selectedCharacter != noone  {
+    for(var i = 0; i < min(array_length(selectedCharacter.getCardsInHand()), maxCardsOnDeskNumber); i++) {
+        var card = selectedCharacter.getCardsInHand()[i]
+        var isSelected = selectedCard == i
+        var drawY = isSelected ? cardY - 2 : cardY
+        
+        //Составляющие карты
+        draw_sprite_stretched(
+    	    card.cardBaseSpr,
+    	    0,
+    	    cardCurrentX,
+    	    drawY,
+    	    cardWidth,
+    	    cardHeight
+        )
+        draw_sprite_stretched(
+    	    card.cardIllustrationSpr,
+    	    0,
+    	    cardCurrentX,
+    	    drawY,
+    	    cardWidth,
+    	    cardHeight
+        )
+        draw_sprite_stretched(
+    	    card.cardBorderSpr,
+    	    0,
+    	    cardCurrentX,
+    	    drawY,
+    	    cardWidth,
+    	    cardHeight
+        )
+        draw_sprite_stretched(
+    	    card.cardTokenSpr,
+    	    0,
+    	    cardCurrentX,
+    	    drawY,
+    	    cardWidth,
+    	    cardHeight
         )
         
-        // Указатель на выбранную карту
-        draw_sprite(
-            sPointer,
-            0,
-            cardCurrentX,
-            drawY + cardHeight / 2
-        )
-    } 
-    cardCurrentX += cardWidth + cardSpacing
+        // Выделение
+        if isSelected { 
+            // Рамка вокруг выбранной карты
+            drawBorderAroundCard(
+                cardCurrentX,
+                drawY,
+                selectedBorderWidth,
+                cardWidth,
+                cardHeight
+            )
+            
+            // Указатель на выбранную карту
+            draw_sprite(
+                sPointer,
+                0,
+                cardCurrentX,
+                drawY + cardHeight / 2
+            )
+        } 
+        cardCurrentX += cardWidth + cardSpacing
+    }
 }
-}
-
-/// draw heroes
-for (var i = 0; i < array_length(heroes); i++) {
-    var h = heroes[i];
-    draw_sprite(h.spr, 0, h.x, h.y);
-}
-
-/// draw enemies
-for (var i = 0; i < array_length(enemies); i++) {
-    var e = enemies[i];
-    draw_sprite(e.spr, 0, e.x, e.y);
-    
-    var pc = (e.hp / e.maxhp) * 100;
-    draw_healthbar(e.x - 16, e.y - 16 - 6, e.x + 16, e.y - 16 - 4, pc, c_black, c_red, c_lime, 0, true, true)
 }
