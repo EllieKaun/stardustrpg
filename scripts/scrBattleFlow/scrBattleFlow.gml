@@ -131,7 +131,12 @@ function restoreSelection() {
 
 function initTargetSelection(targets) {
     unselectionToAll()
-    targetOptions = targets
+    var aliveTargets = []
+    for(var i = 0; i < array_length(targets); i++) {
+        if !targets[i].isKO() array_push(aliveTargets, targets[i])
+    }
+    targetOptions = aliveTargets
+    selectedTargetNumber = -1
     selectNextTarget()
 }
 
