@@ -25,7 +25,7 @@ actionState = StarriorStates.Idle
 spriteActionIdle = sprLanaBattleIdle
 spriteActionAttack = sprLanaBattleIdle
 spriteActionCast = sprLanaBatlleCast
-spriteKO = sprLanaBattleKO
+spriteActionKO = sprLanaBattleKO
 actionCallback = undefined
 
 function changeActionState(state, callback) {
@@ -47,9 +47,13 @@ function changeActionState(state, callback) {
             image_speed = 1;
         break 
         case StarriorStates.KnockOut:
-            sprite_index = spriteActionAttack
+            sprite_index = spriteActionKO
             image_index = 0; 
-            image_speed = 1;
+            if image_number > 1 {
+                image_speed = 1;
+            } else {
+                image_speed = 0;
+            }
         break      
     }
 }
@@ -78,7 +82,7 @@ function hasWeakness(weaknessType) {
 
 function applyDamage(value) {
     hp -= value
-    if hp <= 0 {
+    if hp <= 0 && actionState != StarriorStates.KnockOut {
         changeActionState(StarriorStates.KnockOut, undefined)
     }
     var spawnX = irandom_range(bbox_left, bbox_right)

@@ -238,10 +238,10 @@ function executeEffect(
         case EffectTypes.Damage: 
             if is_array(targets) {
                 for(var i = 0; i < array_length(targets); i++) {
-                    executeDamageEffect(effect, other, targets[i])
+                    if !targets[i].isKO() executeDamageEffect(effect, other, targets[i])
                 }
             } else {
-                executeDamageEffect(effect, other, targets)
+                if !targets.isKO() executeDamageEffect(effect, other, targets)
             }
             selectedTargetNumber = -1
             selectedTarget = noone
@@ -434,10 +434,10 @@ function executeHealing(
 ) { 
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
-            targets[i].applyHeal(effect.value)
+            if !targets[i].isKO() targets[i].applyHeal(effect.value)
         }
     } else {
-        targets.applyHeal(effect.value)
+        if !targets.isKO() targets.applyHeal(effect.value)
     }
 }
 
@@ -448,9 +448,9 @@ function executeManaGain(
 ) { 
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
-            targets[i].applyMana(effect.value)
+            if !targets[i].isKO() targets[i].applyMana(effect.value)
         }
     } else {
-        targets.applyMana(effect.value)
+        if !targets.isKO() targets.applyMana(effect.value)
     }
 }

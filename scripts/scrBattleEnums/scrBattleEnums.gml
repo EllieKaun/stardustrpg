@@ -95,7 +95,9 @@ enum BattleStates {
     BattleOver,
     EnemyTargetSelection,
     AllyTargetSelection,
-    EnemysTurn
+    EnemysTurn,
+    EnemyInfoSelection,
+    EnemyInfoDisplay
 }
 
 enum StarriorStates {
@@ -108,4 +110,9 @@ enum StarriorStates {
 enum CostType {
     Mana,
     Health
+}
+
+enum FocusArea {
+    Menu,
+    Deck
 }
