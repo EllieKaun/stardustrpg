@@ -36,7 +36,9 @@ enum EffectTypes {
     CopyCard,
     AddEnergy,
     ShuffleDeck,
-    Resurrection
+    Resurrection,
+    IgnoreWeakness,
+    CreateTemporaryWeakness
 }
 
 function effectTypeToString(type) {

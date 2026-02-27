@@ -314,3 +314,25 @@ function createShuffleDeckCard() {
         hpCostToken
     )
 }
+
+// Убирает слабость одного героя на х ходов - (Слабые места*)
+function createCardIgnoreWeaknessSingleTarget() {
+    return new Card(
+        "Ignore Weakness",
+        CardsRarity.Default,
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        1,
+        [
+            {
+                type: EffectTypes.IgnoreWeakness,
+                timing: Timing.Overtime,
+                duration: 2
+            }
+        ],
+        buffCard,
+        magicBuff,
+        commonBorder,
+        hpCostToken
+    )
+}

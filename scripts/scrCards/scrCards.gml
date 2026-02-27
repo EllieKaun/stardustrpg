@@ -286,11 +286,23 @@ function checkIfHasStrengths(target, effect) {
 }
 
 function checkIfHasWeaknesses(target, effect) {
+    if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) return false
     if variable_instance_exists(effect, "statusName") 
         && array_contains(target.weaknesses, effect.statusName) {
         return true
     } else if array_contains(target.weaknesses, effect.type) {
         return true
+    } else {
+        var effects = target.effects
+        for(var i = 0; i < array_length(effects); i++) {
+            var curFffect = effects[i]
+            if(curFffect.type == EffectTypes.CreateTemporaryWeakness 
+                && variable_instance_exists(effect, "weakness")) {
+                if curFffect.weakness == effect.type {
+                    return true
+                }
+            }
+        }
     }
     return false
 }

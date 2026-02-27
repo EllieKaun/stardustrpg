@@ -252,3 +252,49 @@ function createCardDebuffMagicalProtectionSingleTarget() {
         hpCostToken
     )
 }
+
+// Создание слабости у врага к маг урону - (Слабые места*)
+function createCardCreateTemporaryWeaknessMagicalDamageSingleTarget() {
+    return new Card(
+        "Create Temporary Weakness Magical Damage Card",
+        CardsRarity.Default,
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        1,
+        [
+            {
+                type: EffectTypes.CreateTemporaryWeakness,
+                weakness: ModifiersToBuff.MagicalDamage,
+                timing: Timing.Overtime,
+                duration: 1
+            }
+        ],
+        buffCard,
+        defBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Создание слабости у врага к физ урону - (Слабые места*)
+function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget() {
+    return new Card(
+        "Create Temporary Weakness Physical Damage Card",
+        CardsRarity.Default,
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        1,
+        [
+            {
+                type: EffectTypes.CreateTemporaryWeakness,
+                weakness: ModifiersToBuff.PhysicalDamage,
+                timing: Timing.Overtime,
+                duration: 1
+            }
+        ],
+        buffCard,
+        defBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
