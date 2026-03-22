@@ -209,22 +209,28 @@ function executeEndOFTurnManaGain(character, effect, index) {
     }
 }
 
-function effectApplyStatus(
-    effect,
-    caster,
-    targets
-) {
+function effectApplyStatus(effect, caster, targets) {
     var prob = random(1)
-    
+
+    var statusName = variable_instance_exists(effect, "statusName") 
+                     ? effect.statusName 
+                     : undefined
+
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
             if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
                 array_push(targets[i].effects, effect)
+                if variable_instance_exists(targets[i], "showEffectNotification") {
+                    targets[i].showEffectNotification(effect.type, statusName) 
+                }
             }
         }
     } else {
         if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
             array_push(targets.effects, effect)
+            if variable_instance_exists(targets, "showEffectNotification") {
+                targets.showEffectNotification(effect.type, statusName)
+            }
         }
     }
 }
