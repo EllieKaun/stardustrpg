@@ -13,7 +13,8 @@ function createPhysicalDamageSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: 
             }
         ],
         atcCard,

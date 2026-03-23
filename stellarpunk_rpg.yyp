@@ -84,6 +84,7 @@
     {"id":{"name":"oCamera","path":"objects/oCamera/oCamera.yy",},},
     {"id":{"name":"oCrakerNutSmall","path":"objects/oCrakerNutSmall/oCrakerNutSmall.yy",},},
     {"id":{"name":"oDamageNumber","path":"objects/oDamageNumber/oDamageNumber.yy",},},
+    {"id":{"name":"oEffectVisualizer","path":"objects/oEffectVisualizer/oEffectVisualizer.yy",},},
     {"id":{"name":"oEnemy","path":"objects/oEnemy/oEnemy.yy",},},
     {"id":{"name":"oFlowerSmall","path":"objects/oFlowerSmall/oFlowerSmall.yy",},},
     {"id":{"name":"oGameController","path":"objects/oGameController/oGameController.yy",},},

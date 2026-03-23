@@ -146,13 +146,12 @@ function playCard(card, caster, targets) {
                             targets.energy += effect.value
                         break   
                         case EffectTypes.CopyCard:
-                            effectApplyStatus(effect, caster, targets)
                         break
                         case EffectTypes.ShuffleDeck:
                             shuffleDeckAndTake4(selectedCharacter)
                         break                 
                     }
-                    effectApplyStatus(effect, caster, targets)
+                    targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
                 break
             }
         }
@@ -187,6 +186,7 @@ function executeEndOfTurn(character) {
 
 function executeEndOFTurnDamage(character, effect, index) {
     character.applyDamage(effect.value)
+    character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
     effect.duration -= 1 
     if effect.duration <= 0 {
         array_delete(character.effects, index, 1)
@@ -195,6 +195,7 @@ function executeEndOFTurnDamage(character, effect, index) {
 
 function executeEndOFTurnHeal(character, effect, index) {
     character.applyHeal(effect.value)
+    character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
     effect.duration -= 1 
     if effect.duration <= 0 {
         array_delete(character.effects, index, 1)
@@ -203,6 +204,7 @@ function executeEndOFTurnHeal(character, effect, index) {
 
 function executeEndOFTurnManaGain(character, effect, index) {
     character.mana += effect.value
+    character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
     effect.duration -= 1 
     if effect.duration <= 0 {
         array_delete(character.effects, index, 1)
@@ -221,7 +223,7 @@ function effectApplyStatus(effect, caster, targets) {
             if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
                 array_push(targets[i].effects, effect)
                 if variable_instance_exists(targets[i], "showEffectNotification") {
-                    targets[i].showEffectNotification(effect.type, statusName) 
+                    targets[i].showEffectNotification(effect, EffectVisualizerType.TimeBased, 2) 
                 }
             }
         }
@@ -229,7 +231,7 @@ function effectApplyStatus(effect, caster, targets) {
         if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
             array_push(targets.effects, effect)
             if variable_instance_exists(targets, "showEffectNotification") {
-                targets.showEffectNotification(effect.type, statusName)
+                targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 2) 
             }
         }
     }
@@ -388,6 +390,7 @@ function executeDamageEffect(
     damage = max(damage, 0)
     show_debug_message("damage " + string(damage) )
     targets.applyDamage(damage)
+    targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
     if variable_instance_exists(effect, "chance") 
        && variable_instance_exists(effect, "statusName") {
         var prob = random(1) 
@@ -402,7 +405,8 @@ function executeDamageEffect(
 function executeRemoveStatus(target, status) {
     var effects = target.effects
     for(var i = 0; i < array_length(effects); i++) {
-        if effects[i].statusName = status {
+        if effects[i].statusName == status {
+            target.showEffectNotification(effects[i], EffectVisualizerType.TimeBased, 2)
             array_delete(effects, i, 1)
             return
         }
@@ -445,30 +449,34 @@ function executeBuff(
     return 0
 }
 
-function executeHealing(
-    effect,
-    caster,
-    targets
-) { 
+function executeHealing(effect, caster, targets) { 
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
-            if !targets[i].isKO() targets[i].applyHeal(effect.value)
+            if !targets[i].isKO() {
+                targets[i].applyHeal(effect.value)
+                targets[i].showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
+            }
         }
     } else {
-        if !targets.isKO() targets.applyHeal(effect.value)
+        if !targets.isKO() {
+            targets.applyHeal(effect.value)
+            targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
+        }
     }
 }
 
-function executeManaGain(
-    effect,
-    caster,
-    targets
-) { 
+function executeManaGain(effect, caster, targets) { 
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
-            if !targets[i].isKO() targets[i].applyMana(effect.value)
+            if !targets[i].isKO() {
+                targets[i].applyMana(effect.value)
+                targets[i].showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
+            }
         }
     } else {
-        if !targets.isKO() targets.applyMana(effect.value)
+        if !targets.isKO() {
+            targets.applyMana(effect.value)
+            targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 2)
+        }
     }
 }

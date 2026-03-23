@@ -118,3 +118,8 @@ enum FocusArea {
     Menu,
     Deck
 }
+
+enum EffectVisualizerType {
+    AnimationEnd,
+    TimeBased
+}
