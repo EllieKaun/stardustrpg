@@ -13,7 +13,8 @@ function createMagicalDamageSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Magical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             }
         ],
         mgcCard,
@@ -38,7 +39,8 @@ function createMagicalDamageMultipleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Magical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             }
         ],
         mgcCard,
@@ -63,7 +65,8 @@ function createMagicalDamageStunChanseSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Magical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Stun,
@@ -127,7 +130,8 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Magical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Damage,
@@ -161,7 +165,8 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Magical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Damage,
@@ -194,7 +199,8 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Magical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Debuff,
@@ -227,7 +233,8 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Magical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Debuff,
@@ -258,7 +265,8 @@ function createCopyNextPlayedCardCard() {
         [
             {
                 type: EffectTypes.CopyCard,
-                timing: Timing.OnActions
+                timing: Timing.OnActions,
+                sprite: attackEffect
             }
         ],
         mgcCard,
@@ -282,7 +290,8 @@ function createAddEnergyCard() {
             {
                 type: EffectTypes.AddEnergy,
                 value: 1,
-                timing: Timing.OnActions
+                timing: Timing.OnActions,
+                sprite: attackEffect
             }
         ],
         mgcCard,
@@ -305,7 +314,8 @@ function createShuffleDeckCard() {
         [
             {
                 type: EffectTypes.ShuffleDeck,
-                timing: Timing.OnActions
+                timing: Timing.OnActions,
+                sprite: attackEffect
             }
         ],
         mgcCard,
@@ -327,7 +337,8 @@ function createCardIgnoreWeaknessSingleTarget() {
             {
                 type: EffectTypes.IgnoreWeakness,
                 timing: Timing.Overtime,
-                duration: 2
+                duration: 2,
+                sprite: attackEffect
             }
         ],
         buffCard,

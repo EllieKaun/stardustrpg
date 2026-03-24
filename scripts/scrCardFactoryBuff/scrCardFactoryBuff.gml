@@ -12,7 +12,8 @@ function createCardBuffPhysicalDamageSingleTarget() {
                 buffType: ModifiersToBuff.PhysicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         buffCard,
@@ -36,7 +37,8 @@ function createCardBuffMagicalDamageSingleTarget() {
                 buffType: ModifiersToBuff.MagicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         buffCard,
@@ -60,7 +62,8 @@ function createCardBuffAnyDamageMultipleTarget() {
                 buffType: ModifiersToBuff.PhysicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             },
             {
                 type: EffectTypes.Buff,
@@ -91,7 +94,8 @@ function createCardBuffPhysicalProtectionSingleTarget() {
                 buffType: ModifiersToBuff.PhysicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         buffCard,
@@ -115,7 +119,8 @@ function createCardBuffMagicalProtectionSingleTarget() {
                 buffType: ModifiersToBuff.MagicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         atcCard,
@@ -139,7 +144,8 @@ function createCardBuffAnyProtectionMultipleTarget() {
                 buffType: ModifiersToBuff.PhysicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }, 
             {
                 type: EffectTypes.Buff,
@@ -171,7 +177,8 @@ function createCardDebuffPhysicalDamageSingleTarget() {
                 debuffType: ModifiersToBuff.PhysicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: debuffEffect
             }
         ],
         buffCard,
@@ -195,7 +202,8 @@ function createCardDebuffMagicalDamageSingleTarget() {
                 debuffType: ModifiersToBuff.MagicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         buffCard,
@@ -219,7 +227,8 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
                 buffType: ModifiersToBuff.PhysicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: debuffEffect
             }
         ],
         buffCard,
@@ -243,7 +252,8 @@ function createCardDebuffMagicalProtectionSingleTarget() {
                 buffType: ModifiersToBuff.MagicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: debuffEffect
             }
         ],
         buffCard,
@@ -266,7 +276,8 @@ function createCardCreateTemporaryWeaknessMagicalDamageSingleTarget() {
                 type: EffectTypes.CreateTemporaryWeakness,
                 weakness: ModifiersToBuff.MagicalDamage,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: debuffEffect
             }
         ],
         buffCard,
@@ -289,7 +300,8 @@ function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget() {
                 type: EffectTypes.CreateTemporaryWeakness,
                 weakness: ModifiersToBuff.PhysicalDamage,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: debuffEffect
             }
         ],
         buffCard,
