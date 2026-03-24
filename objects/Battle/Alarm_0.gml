@@ -13,5 +13,7 @@ if array_length(cards) == 0 {
     }
 }
 var cardToPlay = cards[irandom(array_length(cards) - 1)]
-var target = heroes[irandom(array_length(heroes) - 1)]
+var filteredHeroes = filterNotKO(heroes)
+if array_length(filteredHeroes) == 0 { skipTurn() }
+var target = filteredHeroes[irandom(array_length(filteredHeroes) - 1)]
 playCard(cardToPlay, currentEnemy, target)

@@ -5,7 +5,7 @@ function afterPlayChecks() {
     selectedCard = 0
     // Проверка на поражение
     if checkIfAllDead(heroes) {
-        
+        room_goto(OverWorldRoom)
     }
     // Проверка на победу
     if checkIfAllDead(enemies) {
@@ -82,6 +82,7 @@ function checkIfAllDead(array) {
     for(var i = 0; i < array_length(array); i ++) {
         if array[i].hp > 0 return false
     }
+    return true
 }
 
 function isEnemysTurn() {
@@ -170,4 +171,12 @@ function unselectTargets() {
     for (var i = 0; i < array_length(targetOptions); i++) {
         targetOptions[i].isTarget = false
     }
+}
+
+function filterCriteria(element, index) {
+    return !element.isKO()
+}
+
+function filterNotKO(targets) {
+    return array_filter(targets, filterCriteria)
 }

@@ -113,9 +113,9 @@ function showEffectNotification(effect, dismissMode, duration) {
     var effectType = effect.type
     var statusName = variable_instance_exists(effect, "statusName") ? effect.statusName : undefined
     var spr = getEffectSprite(effectType, statusName)
-    
+    if !variable_instance_exists(effect, "sprite") { return }
     var inst = instance_create_depth(x, y, depth - 1, oEffectVisualizer)
-    inst.sprite_index = spr
+    inst.sprite_index = effect.sprite
     inst.image_speed = 1
     inst.image_index = 0
     inst.dismissMode = dismissMode
