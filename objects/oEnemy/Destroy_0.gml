@@ -1,0 +1,1 @@
+show_debug_message("----- Dstroyed EnemyObject at position " + string(x) + " " + string(y))

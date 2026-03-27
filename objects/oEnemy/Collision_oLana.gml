@@ -18,3 +18,9 @@ with (oTransition) {
     state = "fade_out";
 }
 
+
+if (!position_meeting(x, y, oLana)) {
+    if (point_distance(x, y, oLana.x, oLana.y) > oSpawnerManager.spawnDistance) {
+        instance_destroy();
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrDeckBuilderDrawing",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrDeckBuilderDrawing",
+  "parent":{
+    "name":"DeckBuilder",
+    "path":"folders/DeckBuilder.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
