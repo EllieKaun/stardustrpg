@@ -6,7 +6,6 @@ function ui_scaling_init() {
     global.BASE_H = 360;
     global.BASE_ASPECT = global.BASE_W / global.BASE_H;
     
-    surface_resize(application_surface, global.BASE_W, global.BASE_H);
     ui_scaling_refresh();
 }
 

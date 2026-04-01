@@ -1,6 +1,6 @@
 /// obj_card_menu — Create Event
-
-
+display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
+ui_scaling_init()
 // --- Build the chooseCardPanel (left side) ---
 // Dynamic slot count: 3 cols x 3 rows = 9 slots, some locked
 var _choose_slots = [];
@@ -20,8 +20,8 @@ for (var _i = 0; _i < 12; _i++) {
 choose_panel = new Panel({
     x: 8,
     y: 8,
-    w: 304,
-    h: 344,
+    w: camera_get_view_width(view_camera[0]) / 2 - 16,
+    h: camera_get_view_height(view_camera[0]) - 16,
     bg_sprite: sprCardDeskFull,            // <-- your panel background sprite
     slot_sprite_empty: sprCardAttaclBase,
     slot_sprite_locked: sprCardAttaclBase,
@@ -60,8 +60,8 @@ for (var _i = 0; _i < 16; _i++) {
 place_panel = new Panel({
     x: 320,
     y: 8,
-    w: 312,
-    h: 344,
+    w: camera_get_view_width(view_camera[0]) / 2 - 16,
+    h: camera_get_view_height(view_camera[0]) - 16,
     bg_sprite: sprCardDeskFull,
     slot_sprite_empty: sprCardAttaclBase,
     slot_sprite_locked: sprCardAttaclBase,
