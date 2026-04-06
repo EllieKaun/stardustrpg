@@ -58,7 +58,7 @@ for (var _i = 0; _i < 16; _i++) {
 }
 
 place_panel = new Panel({
-    x: 320,
+    x: 16 + camera_get_view_width(view_camera[0]) / 2 - 16,
     y: 8,
     w: camera_get_view_width(view_camera[0]) / 2 - 16,
     h: camera_get_view_height(view_camera[0]) - 16,
@@ -73,7 +73,8 @@ place_panel = new Panel({
         { name: "ATTACK", color: #CC4444 }
     ],
     cols: 4,
-    rows: 4,
+    rows: 3, 
+    visible_rows: 3, 
     tab_h: 20,
     padding: 8,
     slot_gap: 2,

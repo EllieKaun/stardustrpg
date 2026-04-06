@@ -86,24 +86,37 @@ function Panel(_config) constructor {
     on_tab_click  = _config[$ "on_tab_click"] ?? undefined;
     
     selected_slot = -1;
+    visible_rows = _config[$ "visible_rows"] ?? rows;  // how many rows to SHOW
+    scroll_row   = 0;                                    // first visible row (0-based)
+    total_rows   = ceil(array_length(slots) / cols);     // 
+    
+    static refresh_scroll = function() {
+        total_rows = ceil(array_length(slots) / cols);
+        scroll_row = clamp(scroll_row, 0, max(0, total_rows - visible_rows));
+    };
+    
+    
     
     /// @function get_slot_rect(index)
     /// @description Returns {sx, sy, sw, sh} for a slot by grid index
     static get_slot_rect = function(_index) {
         var _col = _index mod cols;
         var _row = _index div cols;
-        
-        // Grid area starts after padding + tab row
+    
+        // Offset by scroll
+        var _visible_row = _row - scroll_row;
+    
         var _grid_x = x + padding;
         var _grid_y = y + padding + tab_h;
         var _grid_w = w - padding * 2;
         var _grid_h = h - padding * 2 - tab_h;
-        
+    
+        // Size slots based on visible_rows, not total_rows
         var _sw = (_grid_w - (cols - 1) * slot_gap) / cols;
-        var _sh = (_grid_h - (rows - 1) * slot_gap) / rows;
+        var _sh = (_grid_h - (visible_rows - 1) * slot_gap) / visible_rows;
         var _sx = _grid_x + _col * (_sw + slot_gap);
-        var _sy = _grid_y + _row * (_sh + slot_gap);
-        
+        var _sy = _grid_y + _visible_row * (_sh + slot_gap);
+    
         return { sx: _sx, sy: _sy, sw: _sw, sh: _sh };
     };
     
@@ -189,44 +202,53 @@ function Panel(_config) constructor {
         }
         
         // --- Slots ---
-        var _count = min(array_length(slots), cols * rows);
-        for (var _i = 0; _i < _count; _i++) {
-            var _slot = slots[_i];
-            var _r = get_slot_rect(_i);
-            
-            switch (_slot.state) {
-                case "locked":
-                    if (slot_sprite_locked != undefined) {
-                        draw_sprite_stretched(slot_sprite_locked, 0,
-                            _r.sx, _r.sy, _r.sw, _r.sh);
-                    }
-                    break;
-                    
-                case "empty":
-                    if (slot_sprite_empty != undefined) {
-                        draw_sprite_stretched(slot_sprite_empty, 0,
-                            _r.sx, _r.sy, _r.sw, _r.sh);
-                    }
-                    break;
-                    
-                case "filled":
-                    // Draw empty slot as base, then card on top
-                    if (slot_sprite_empty != undefined) {
-                        draw_sprite_stretched(slot_sprite_empty, 0,
-                            _r.sx, _r.sy, _r.sw, _r.sh);
-                    }
-                    if (_slot.card != undefined) {
-                        draw_card(_slot.card, _r.sx, _r.sy, _r.sw, _r.sh);
-                    }
-                    break;
-            }
-            
-            // Selection highlight
-            if (_i == selected_slot && select_sprite != undefined) {
-                draw_sprite_stretched(select_sprite, 0,
-                    _r.sx - 1, _r.sy - 1, _r.sw + 2, _r.sh + 2);
-            }
+       // --- Slots (only visible rows) ---
+    var _first = scroll_row * cols;
+    var _last  = min(_first + visible_rows * cols, array_length(slots));
+    for (var _i = _first; _i < _last; _i++) {
+        var _slot = slots[_i];
+        var _r = get_slot_rect(_i);
+    
+        switch (_slot.state) {
+            case "locked":
+                if (slot_sprite_locked != undefined)
+                    draw_sprite_stretched(slot_sprite_locked, 0, _r.sx, _r.sy, _r.sw, _r.sh);
+                break;
+            case "empty":
+                if (slot_sprite_empty != undefined)
+                    draw_sprite_stretched(slot_sprite_empty, 0, _r.sx, _r.sy, _r.sw, _r.sh);
+                break;
+            case "filled":
+                if (slot_sprite_empty != undefined)
+                    draw_sprite_stretched(slot_sprite_empty, 0, _r.sx, _r.sy, _r.sw, _r.sh);
+                if (_slot.card != undefined)
+                    draw_card(_slot.card, _r.sx, _r.sy, _r.sw, _r.sh);
+                break;
         }
+    
+        // Selection highlight
+        if (_i == selected_slot && select_sprite != undefined) {
+            draw_sprite_stretched(select_sprite, 0,
+                _r.sx - 1, _r.sy - 1, _r.sw + 2, _r.sh + 2);
+        }
+    }
+    
+    // --- Optional: scroll indicator ---
+    if (total_rows > visible_rows) {
+        var _bar_x = x + w - padding;
+        var _bar_y = y + padding + tab_h;
+        var _bar_h = h - padding * 2 - tab_h;
+        var _thumb_h = _bar_h * (visible_rows / total_rows);
+        var _thumb_y = _bar_y + (_bar_h - _thumb_h) * (scroll_row / max(1, total_rows - visible_rows));
+    
+        draw_set_color(c_dkgray);
+        draw_set_alpha(0.4);
+        draw_rectangle(_bar_x, _bar_y, _bar_x + 4, _bar_y + _bar_h, false);
+        draw_set_color(c_white);
+        draw_set_alpha(0.8);
+        draw_rectangle(_bar_x, _thumb_y, _bar_x + 4, _thumb_y + _thumb_h, false);
+        draw_set_alpha(1.0);
+    }
     };
 }
 
