@@ -94,7 +94,11 @@ function Panel(_config) constructor {
         total_rows = ceil(array_length(slots) / cols);
         scroll_row = clamp(scroll_row, 0, max(0, total_rows - visible_rows));
     };
-    
+    cursor_col = 0;
+cursor_row = 0;
+focused    = false;
+
+on_panel_switch = _config[$ "on_panel_switch"] ?? undefined;
     
     
     /// @function get_slot_rect(index)
@@ -132,14 +136,14 @@ function Panel(_config) constructor {
         return { tx: _tx, ty: _ty, tw: _tw, th: tab_h };
     };
     
-    /// @function step()
-    /// @description Call in Step event — handles click detection
-    static step = function() {
-        if (!mouse_check_button_pressed(mb_left)) return;
-        
+ /// Inside Panel constructor, replace/extend the step function:
+
+static step = function() {
+    // --- Mouse input (unchanged) ---
+    if (mouse_check_button_pressed(mb_left)) {
         var _mx = ui_mouse_x();
         var _my = ui_mouse_y();
-        
+
         // Check tab clicks
         for (var _t = 0; _t < array_length(tabs); _t++) {
             var _tr = get_tab_rect(_t);
@@ -149,21 +153,106 @@ function Panel(_config) constructor {
                 return;
             }
         }
-        
+
         // Check slot clicks
-        var _count = min(array_length(slots), cols * rows);
-        for (var _i = 0; _i < _count; _i++) {
+        var _first = scroll_row * cols;
+        var _last  = min(_first + visible_rows * cols, array_length(slots));
+        for (var _i = _first; _i < _last; _i++) {
             var _r = get_slot_rect(_i);
             if (point_in_rectangle(_mx, _my, _r.sx, _r.sy, _r.sx + _r.sw, _r.sy + _r.sh)) {
                 var _slot = slots[_i];
                 if (_slot.state != "locked") {
                     selected_slot = _i;
+                    cursor_col = _i mod cols;
+                    cursor_row = _i div cols;
                     if (on_slot_click != undefined) on_slot_click(self, _i);
                 }
                 return;
             }
         }
-    };
+    }
+
+    // --- Keyboard / gamepad input ---
+    if (!focused) return;
+    step_keyboard();
+};
+
+/// @function step_keyboard()
+/// @description Handles arrow/WASD navigation within this panel
+static step_keyboard = function() {
+    var _moved = false;
+    var _dx = 0;
+    var _dy = 0;
+
+    // Movement
+    if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) {
+        _dy = -1; _moved = true;
+    }
+    if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) {
+        _dy = 1; _moved = true;
+    }
+    if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
+        _dx = -1; _moved = true;
+    }
+    if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
+        _dx = 1; _moved = true;
+    }
+
+    if (_moved) {
+        var _new_col = cursor_col + _dx;
+        var _new_row = cursor_row + _dy;
+
+        // --- Panel switch: if moving past left/right edge, signal parent ---
+        if (_new_col < 0) {
+            if (on_panel_switch != undefined) on_panel_switch(self, -1);
+            return;
+        }
+        if (_new_col >= cols) {
+            if (on_panel_switch != undefined) on_panel_switch(self, 1);
+            return;
+        }
+
+        // Clamp vertical
+        _new_row = clamp(_new_row, 0, total_rows - 1);
+
+        // Scroll if needed
+        if (_new_row < scroll_row) {
+            scroll_row = _new_row;
+        } else if (_new_row >= scroll_row + visible_rows) {
+            scroll_row = _new_row - visible_rows + 1;
+        }
+        refresh_scroll();
+
+        cursor_col = _new_col;
+        cursor_row = _new_row;
+
+        // Update selected_slot (skip locked via highlight only, still move cursor)
+        var _new_index = _new_row * cols + _new_col;
+        if (_new_index < array_length(slots)) {
+            selected_slot = _new_index;
+        }
+    }
+
+    // Confirm selection
+    if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) {
+        if (selected_slot >= 0 && selected_slot < array_length(slots)) {
+            var _slot = slots[selected_slot];
+            if (_slot.state != "locked") {
+                if (on_slot_click != undefined) on_slot_click(self, selected_slot);
+            }
+        }
+    }
+
+    // Tab switching with Q / E
+    if (keyboard_check_pressed(ord("Q"))) {
+        active_tab = max(0, active_tab - 1);
+        if (on_tab_click != undefined) on_tab_click(self, active_tab);
+    }
+    if (keyboard_check_pressed(ord("E"))) {
+        active_tab = min(array_length(tabs) - 1, active_tab + 1);
+        if (on_tab_click != undefined) on_tab_click(self, active_tab);
+    }
+};
     
     /// @function draw()
     /// @description Call in Draw GUI event
@@ -227,10 +316,14 @@ function Panel(_config) constructor {
         }
     
         // Selection highlight
-        if (_i == selected_slot && select_sprite != undefined) {
-            draw_sprite_stretched(select_sprite, 0,
-                _r.sx - 1, _r.sy - 1, _r.sw + 2, _r.sh + 2);
-        }
+    if (_i == selected_slot && select_sprite != undefined) {
+    // Pulse alpha when focused to show active panel
+    var _sel_alpha = focused ? (0.8 + 0.2 * dsin(current_time * 0.3)) : 0.5;
+    draw_set_alpha(_sel_alpha);
+    draw_sprite_stretched(select_sprite, 0,
+        _r.sx - 2, _r.sy - 2, _r.sw + 4, _r.sh + 4);
+    draw_set_alpha(1.0);
+}
     }
     
     // --- Optional: scroll indicator ---

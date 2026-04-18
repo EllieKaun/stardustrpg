@@ -1,18 +1,34 @@
 /// obj_card_menu — Create Event
-display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
-ui_scaling_init()
+display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]));
+ui_scaling_init();
+
+// Track which panel has focus: 0 = choose, 1 = place
+active_panel = 0;
+
+// --- Helper: panel switch callback ---
+panel_switch_callback = function(_panel, _dir) {
+    with (oDeckBuilder) {
+        if (_dir > 0 && active_panel == 0) {
+            choose_panel.focused = false;
+            place_panel.focused = true;
+            active_panel = 1;
+        } else if (_dir < 0 && active_panel == 1) {
+            place_panel.focused = false;
+            choose_panel.focused = true;
+            active_panel = 0;
+        }
+    }
+};
+
 // --- Build the chooseCardPanel (left side) ---
-// Dynamic slot count: 3 cols x 3 rows = 9 slots, some locked
 var _choose_slots = [];
 for (var _i = 0; _i < 12; _i++) {
     if (_i < 3) {
-        // First row: filled with cards
         array_push(_choose_slots, new Slot("filled", new Card(
             "Potion", "common", "self", "magic", 2, [],
-            sprCardAttaclBase, sprCardAttaclBase, sprCardAttaclBase, sprCardAttaclBase
+            atcCard, bleedGroup, epicBorder, hpCostToken
         )));
     } else {
-        // Remaining: locked
         array_push(_choose_slots, new Slot("locked"));
     }
 }
@@ -22,9 +38,9 @@ choose_panel = new Panel({
     y: 8,
     w: camera_get_view_width(view_camera[0]) / 2 - 16,
     h: camera_get_view_height(view_camera[0]) - 16,
-    bg_sprite: sprCardDeskFull,            // <-- your panel background sprite
-    slot_sprite_empty: sprCardAttaclBase,
-    slot_sprite_locked: sprCardAttaclBase,
+    bg_sprite: sprCardDeskFull,
+    slot_sprite_empty: EmptyCardPlace,
+    slot_sprite_locked: LockedCardPlace,
     select_sprite: sprCardAttaclBase,
     tabs: [
         { name: "LANA", color: #4488CC },
@@ -38,16 +54,14 @@ choose_panel = new Panel({
     slots: _choose_slots,
     on_slot_click: function(_panel, _index) {
         show_debug_message("Choose panel slot clicked: " + string(_index));
-        // Your logic: pick this card to place
     },
     on_tab_click: function(_panel, _tab_index) {
         show_debug_message("Tab switched: " + string(_tab_index));
-        // Your logic: swap slot contents to show different character's cards
-    }
+    },
+    on_panel_switch: panel_switch_callback
 });
 
-// --- Build the placeCardPanel (right side) ---
-// Fixed 4x4 = 16 slots, some empty, some locked
+// --- Build the placePanel (right side) ---
 var _place_slots = [];
 for (var _i = 0; _i < 16; _i++) {
     if (_i < 8) {
@@ -58,13 +72,13 @@ for (var _i = 0; _i < 16; _i++) {
 }
 
 place_panel = new Panel({
-    x: 16 + camera_get_view_width(view_camera[0]) / 2 - 16,
+    x: 8 + camera_get_view_width(view_camera[0]) / 2,
     y: 8,
     w: camera_get_view_width(view_camera[0]) / 2 - 16,
     h: camera_get_view_height(view_camera[0]) - 16,
     bg_sprite: sprCardDeskFull,
-    slot_sprite_empty: sprCardAttaclBase,
-    slot_sprite_locked: sprCardAttaclBase,
+    slot_sprite_empty: EmptyCardPlace,
+    slot_sprite_locked: LockedCardPlace,
     select_sprite: sprCardAttaclBase,
     tabs: [
         { name: "MAGIC",  color: #9944CC },
@@ -73,18 +87,21 @@ place_panel = new Panel({
         { name: "ATTACK", color: #CC4444 }
     ],
     cols: 4,
-    rows: 3, 
-    visible_rows: 3, 
+    rows: 3,
+    visible_rows: 3,
     tab_h: 20,
     padding: 8,
     slot_gap: 2,
     slots: _place_slots,
     on_slot_click: function(_panel, _index) {
         show_debug_message("Place panel slot clicked: " + string(_index));
-        // Your logic: place currently selected card here
     },
     on_tab_click: function(_panel, _tab_index) {
         show_debug_message("Category tab: " + string(_tab_index));
-        // Your logic: filter cards by type
-    }
+    },
+    on_panel_switch: panel_switch_callback
 });
+
+// Start with choose_panel focused
+choose_panel.focused = true;
+place_panel.focused  = false;
