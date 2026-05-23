@@ -1,3 +1,3 @@
 
-choose_panel.draw();
-place_panel.draw();
+choosePanel.draw();
+placePanel.draw();
