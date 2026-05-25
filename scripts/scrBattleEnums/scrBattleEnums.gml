@@ -123,3 +123,13 @@ enum EffectVisualizerType {
     AnimationEnd,
     TimeBased
 }
+
+enum CardCategory { Attack, Magic, Heal, Buff }
+
+function cardCategoryOf(_card) {
+    if (_card.cardBaseSpr == atcCard)  return CardCategory.Attack;
+    if (_card.cardBaseSpr == mgcCard)  return CardCategory.Magic;
+    if (_card.cardBaseSpr == healCard) return CardCategory.Heal;
+    if (_card.cardBaseSpr == buffCard) return CardCategory.Buff;
+    return CardCategory.Attack;
+}
