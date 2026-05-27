@@ -1,29 +1,30 @@
-/// scrPlayerData
-/// Collection of opened cards + per-character decks, saved to a JSON file.
-
 enum Characters { Lana, Viv }
 
 #macro PLAYER_SAVE_FILE "player_data.json"
 #macro DECK_DEFAULT_UNLOCKED 4
 #macro DECK_CAPACITY         12
 
+// Инициализация пользователя (каждый раз на старте)
 function playerDataInit() {
+    // global.playerData - свойство для хранения структуры пользователя для сохранения
     if (!playerDataLoad()) global.playerData = playerDataDefault();
 
-    // Empty collection == brand new player -> hand out starter cards.
+    // Если пусто, значит новая игра и иницилазируем базовые карты 
     if (array_length(variable_struct_get_names(global.playerData.collection)) == 0) {
         playerGrantStarterCards();
         playerDataSave();
     }
 }
 
+// Иницилазиация базовых карт 
 function playerGrantStarterCards() {
-    unlockCard("physicalDamageSingleTarget");   // one per category so all tabs have something
+    unlockCard("physicalDamageSingleTarget");   
     unlockCard("magicalDamageSingleTarget");
     unlockCard("instantHealSingleTarget");
     unlockCard("buffPhysicalDamageSingleTarget");
 }
 
+// Моковые данные о пользователе
 function playerDataDefault() {
     return {
         version: 1,
@@ -35,69 +36,78 @@ function playerDataDefault() {
     };
 }
 
+// Сохранить данные о пользователе на устройство
 function playerDataSave() {
-    var _str = json_stringify(global.playerData);
-    var _buf = buffer_create(string_byte_length(_str) + 1, buffer_fixed, 1);
-    buffer_write(_buf, buffer_string, _str);
-    buffer_save(_buf, PLAYER_SAVE_FILE);
-    buffer_delete(_buf);
+    var stringPlayerData = json_stringify(global.playerData);
+    var bufPlayerData = buffer_create(string_byte_length(stringPlayerData) + 1, buffer_fixed, 1);
+    buffer_write(bufPlayerData, buffer_string, stringPlayerData);
+    buffer_save(bufPlayerData, PLAYER_SAVE_FILE);
+    buffer_delete(bufPlayerData);
 }
 
+// Загрузить данные о пользователе с устройства
 function playerDataLoad() {
     if (!file_exists(PLAYER_SAVE_FILE)) return false;
     try {
-        var _buf = buffer_load(PLAYER_SAVE_FILE);
-        var _str = buffer_read(_buf, buffer_string);
-        buffer_delete(_buf);
-        global.playerData = json_parse(_str);
+        var bufPlayerData = buffer_load(PLAYER_SAVE_FILE);
+        var stringPlayerData = buffer_read(bufPlayerData, buffer_string);
+        buffer_delete(bufPlayerData);
+        global.playerData = json_parse(stringPlayerData);
         return true;
-    } catch (_e) {
-        show_debug_message("playerDataLoad failed: " + string(_e));
+    } catch (error) {
+        show_debug_message("playerDataLoad failed: " + string(error));
         return false;
     }
 }
 
-/// ---------- Keys / helpers ----------
+//// Вспомогательные методы для конвертации в удобный для экспорта вид
 
-function characterKey(_character) {
-    switch (_character) {
+// Мапим персонажей в строку
+function characterKey(character) {
+    switch (character) {
         case Characters.Lana: return "lana";
         case Characters.Viv:  return "viv";
         default:              return "lana";
     }
 }
 
-function collectionKey(_id, _rarity) {
-    return _id + "@" + string(_rarity);
+// Нужно мапить айди карты и редкость карты в одну строку, чтобы потом восстанавливать карты как структуры 
+// и не создавать дофига айдишек для каждой редкости
+function collectionKey(cardIdentifier, rarity) {
+    return cardIdentifier + "@" + string(rarity);
 }
 
-function deckOf(_character) {
-    return global.playerData.decks[$ characterKey(_character)];
+// Достать деку по персонажу
+function deckOf(character) {
+    return global.playerData.decks[$ characterKey(character)];
 }
 
-/// ---------- Collection (opened cards) ----------
+//// Работа с картами
 
-function unlockCard(_id, _rarity = CardsRarity.Default, _count = 1) {
-    if (!cardExists(_id)) { show_debug_message("unlockCard: unknown id " + string(_id)); return; }
-    if (!cardCanVaryRarity(_id)) _rarity = CardsRarity.Default;
+// Открыть карту для пользователя 
+function unlockCard(cardIdentifier, rarity = CardsRarity.Default, count = 1) {
+    if (!cardExists(cardIdentifier)) { show_debug_message("unlockCard: unknown id " + string(cardIdentifier)); return; }
+    if (!cardCanVaryRarity(cardIdentifier)) rarity = CardsRarity.Default;
 
-    var _key = collectionKey(_id, _rarity);
-    var _col = global.playerData.collection;
-    if (variable_struct_exists(_col, _key)) {
-        _col[$ _key].count += _count;
+    var keyOfCard = collectionKey(cardIdentifier, rarity);
+    var collection = global.playerData.collection;
+    if (variable_struct_exists(collection, keyOfCard)) {
+        collection[$ keyOfCard].count += count;
     } else {
-        _col[$ _key] = { id: _id, rarity: _rarity, count: _count };
+        collection[$ keyOfCard] = { id: cardIdentifier, rarity: rarity, count: count };
     }
 }
 
-function isCardOwned(_id, _rarity = CardsRarity.Default) {
-    return getOwnedCount(_id, _rarity) > 0;
+// Проверка, есть ли карта с ид
+function isCardOwned(cardIdentifier, rarity = CardsRarity.Default) {
+    return getOwnedCount(cardIdentifier, rarity) > 0;
 }
 
-function getOwnedCount(_id, _rarity = CardsRarity.Default) {
-    var _key = collectionKey(_id, _rarity);
-    var _col = global.playerData.collection;
-    return variable_struct_exists(_col, _key) ? _col[$ _key].count : 0;
+// Количество карт по ид
+function getOwnedCount(cardIdentifier, rarity = CardsRarity.Default) {
+    var keyOfCard = collectionKey(cardIdentifier, rarity);
+    var collection = global.playerData.collection;
+    return variable_struct_exists(collection, keyOfCard) ? collection[$ keyOfCard].count : 0;
 }
 
 /// Returns array of refs: [{ id, rarity, count }]

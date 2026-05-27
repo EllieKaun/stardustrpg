@@ -15,28 +15,28 @@ function cardRegistryInit() {
     };
 
     // ---- Physical attack ----
-    _reg("physicalDamageSingleTarget",            true, function(_r) { return createPhysicalDamageSingleTargetCard(_r); });
-    _reg("physicalDamageMultipleTarget",          true, function(_r) { return createPhysicalDamageMultipleTargetCard(_r); });
-    _reg("physicalDamageStunChanceSingleTarget",  true, function(_r) { return createPhysicalDamageStunChanseSingleTargetCard(_r); });
-    _reg("physicalDamageStunChanceMultiTarget",   true, function(_r) { return createPhysicalDamageStunChanseMultipleTargetCard(_r); });
-    _reg("physicalDamageBleedChanceSingleTarget", true, function(_r) { return createPhysicalDamageBleedingChanseSingleTargetCard(_r); });
-    _reg("physicalDamageBleedChanceMultiTarget",  true, function(_r) { return createPhysicalDamageBleedingChanseMultipleTargetCard(_r); });
-    _reg("physicalDamageBombChanceSingleTarget",  true, function(_r) { return createPhysicalDamageBombChanseSingleTargetCard(_r); });
-    _reg("physicalDamageBombChanceMultiTarget",   true, function(_r) { return createPhysicalDamageBombChanseMultipleTargetCard(_r); });
-    _reg("physicalDamageWeakenChanceSingleTarget",true, function(_r) { return createPhysicalDamageWeakeningChanseSingleTargetCard(_r); });
-    _reg("physicalDamageWeakenChanceMultiTarget", true, function(_r) { return createPhysicalDamageWeakeningChanseMultipleTargetCard(_r); });
-    _reg("physicalDamageVampChanceSingleTarget",  true, function(_r) { return createPhysicalDamageVampirismChanseSingleTargetCard(_r); });
-    _reg("physicalDamageVampChanceMultiTarget",   true, function(_r) { return createPhysicalDamageVampirismChanceMultipleTargetCard(_r); });
+    _reg("physicalDamageSingleTarget",            true, function(_r) { return createPhysicalDamageSingleTargetCard(); });
+    _reg("physicalDamageMultipleTarget",          true, function(_r) { return createPhysicalDamageMultipleTargetCard(); });
+    _reg("physicalDamageStunChanceSingleTarget",  true, function(_r) { return createPhysicalDamageStunChanseSingleTargetCard(); });
+    _reg("physicalDamageStunChanceMultiTarget",   true, function(_r) { return createPhysicalDamageStunChanseMultipleTargetCard()); });
+    _reg("physicalDamageBleedChanceSingleTarget", true, function(_r) { return createPhysicalDamageBleedingChanseSingleTargetCard(); });
+    _reg("physicalDamageBleedChanceMultiTarget",  true, function(_r) { return createPhysicalDamageBleedingChanseMultipleTargetCard(); });
+    _reg("physicalDamageBombChanceSingleTarget",  true, function(_r) { return createPhysicalDamageBombChanseSingleTargetCard()); });
+    _reg("physicalDamageBombChanceMultiTarget",   true, function(_r) { return createPhysicalDamageBombChanseMultipleTargetCard(); });
+    _reg("physicalDamageWeakenChanceSingleTarget",true, function(_r) { return createPhysicalDamageWeakeningChanseSingleTargetCard(); });
+    _reg("physicalDamageWeakenChanceMultiTarget", true, function(_r) { return createPhysicalDamageWeakeningChanseMultipleTargetCard(); });
+    _reg("physicalDamageVampChanceSingleTarget",  true, function(_r) { return createPhysicalDamageVampirismChanseSingleTargetCard(); });
+    _reg("physicalDamageVampChanceMultiTarget",   true, function(_r) { return createPhysicalDamageVampirismChanceMultipleTargetCard(); });
 
     // ---- Magical attack ----
-    _reg("magicalDamageSingleTarget",             true, function(_r) { return createMagicalDamageSingleTargetCard(_r); });
-    _reg("magicalDamageMultipleTarget",           true, function(_r) { return createMagicalDamageMultipleTargetCard(_r); });
-    _reg("magicalDamageStunChanceSingleTarget",   true, function(_r) { return createMagicalDamageStunChanseSingleTargetCard(_r); });
-    _reg("magicalDamageStunChanceMultiTarget",    true, function(_r) { return createMagicalDamageStunChanseMultipleTargetsCard(_r); });
-    _reg("magicalDamageBurnChanceSingleTarget",   true, function(_r) { return createMagicalDamageBurnChanseSingleTargetCard(_r); });
-    _reg("magicalDamageBurnChanceMultiTarget",    true, function(_r) { return createMagicalDamageBurnChanseMultipleTargetCard(_r); });
-    _reg("magicalDamageFreezeChanceSingleTarget", true, function(_r) { return createMagicalDamageFreezingChanceSingleTargetCard(_r); });
-    _reg("magicalDamageFreezeChanceMultiTarget",  true, function(_r) { return createMagicalDamageFreezingChanceMultipleTargetCard(_r); });
+    _reg("magicalDamageSingleTarget",             true, function(_r) { return createMagicalDamageSingleTargetCard(); });
+    _reg("magicalDamageMultipleTarget",           true, function(_r) { return createMagicalDamageMultipleTargetCard(); });
+    _reg("magicalDamageStunChanceSingleTarget",   true, function(_r) { return createMagicalDamageStunChanseSingleTargetCard(); });
+    _reg("magicalDamageStunChanceMultiTarget",    true, function(_r) { return createMagicalDamageStunChanseMultipleTargetsCard(); });
+    _reg("magicalDamageBurnChanceSingleTarget",   true, function(_r) { return createMagicalDamageBurnChanseSingleTargetCard(); });
+    _reg("magicalDamageBurnChanceMultiTarget",    true, function(_r) { return createMagicalDamageBurnChanseMultipleTargetCard(); });
+    _reg("magicalDamageFreezeChanceSingleTarget", true, function(_r) { return createMagicalDamageFreezingChanceSingleTargetCard(); });
+    _reg("magicalDamageFreezeChanceMultiTarget",  true, function(_r) { return createMagicalDamageFreezingChanceMultipleTargetCard(); });
 
     // ---- Buff / Debuff ----
     _reg("buffPhysicalDamageSingleTarget",        true, function(_r) { return createCardBuffPhysicalDamageSingleTarget(); });
