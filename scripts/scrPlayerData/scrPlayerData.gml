@@ -28,7 +28,7 @@ function playerGrantStarterCards() {
 function playerDataDefault() {
     return {
         version: 1,
-        collection: {},   // key "id@rarity" -> { id, rarity, count }
+        collection: {}, // key "id@rarity" -> { id, rarity, count }
         decks: {
             lana: { unlocked: DECK_DEFAULT_UNLOCKED, cards: [] },  // cards: [{slot,id,rarity}]
             viv:  { unlocked: DECK_DEFAULT_UNLOCKED, cards: [] }
@@ -110,121 +110,126 @@ function getOwnedCount(cardIdentifier, rarity = CardsRarity.Default) {
     return variable_struct_exists(collection, keyOfCard) ? collection[$ keyOfCard].count : 0;
 }
 
-/// Returns array of refs: [{ id, rarity, count }]
+// Массив ссылок на карты (разница в том, что тут не целые структуры картб, а ид) [{ id, rarity, count }]
 function getCollectionRefs() {
-    var _out  = [];
-    var _col  = global.playerData.collection;
-    var _keys = variable_struct_get_names(_col);
-    for (var i = 0; i < array_length(_keys); i++) array_push(_out, _col[$ _keys[i]]);
-    return _out;
+    var result  = [];
+    var collection  = global.playerData.collection;
+    var cardKeys = variable_struct_get_names(collection);
+    for (var i = 0; i < array_length(cardKeys); i++) array_push(result, collection[$ cardKeys[i]]);
+    return result;
 }
 
-/// Returns array of live Card structs (count copied onto each as ._owned).
+// Массив структур кард
 function getCollectionCards() {
-    var _refs = getCollectionRefs();
-    var _out  = [];
-    for (var i = 0; i < array_length(_refs); i++) {
-        var _c = cardFromRef(_refs[i]);
-        if (_c != undefined) { _c._owned = _refs[i].count; array_push(_out, _c); }
+    var references = getCollectionRefs();
+    var result  = [];
+    for (var i = 0; i < array_length(references); i++) {
+        var card = cardFromRef(references[i]);
+        if (card != undefined) { array_push(result, card); }
     }
-    return _out;
+    return result;
 }
 
-/// ---------- Decks (slot-based) ----------
+//// Работа с деками
 
-function countCardInDeck(_character, _id, _rarity) {
-    var _cards = deckOf(_character).cards;
-    var _n = 0;
-    for (var i = 0; i < array_length(_cards); i++)
-        if (_cards[i].id == _id && _cards[i].rarity == _rarity) _n++;
-    return _n;
+// Количество кард в деке персонажа
+function countCardInDeck(character, cardIdentifier, rarity) {
+    var cards = deckOf(character).cards;
+    var count = 0;
+    for (var i = 0; i < array_length(cards); i++)
+        if (cards[i].id == cardIdentifier && cards[i].rarity == rarity) count++;
+    return count;
 }
 
-function deckSlotRef(_character, _slot) {
-    var _cards = deckOf(_character).cards;
-    for (var i = 0; i < array_length(_cards); i++)
-        if (_cards[i].slot == _slot) return _cards[i];
+// Карта персонажа в слоте в деке персонажа, если есть 
+function deckSlotRef(character, slot) {
+    var cards = deckOf(character).cards;
+    for (var i = 0; i < array_length(cards); i++)
+        if (cards[i].slot == slot) return cards[i];
     return undefined;
 }
 
-function clearDeckSlot(_character, _slot) {
-    var _deck = deckOf(_character);
-    for (var i = 0; i < array_length(_deck.cards); i++) {
-        if (_deck.cards[i].slot == _slot) { array_delete(_deck.cards, i, 1); return; }
+// Очистить слот в деке персонажа
+function clearDeckSlot(character, slot) {
+    var deck = deckOf(character);
+    for (var i = 0; i < array_length(deck.cards); i++) {
+        if (deck.cards[i].slot == slot) { array_delete(deck.cards, i, 1); return; }
     }
 }
 
-/// Place a card into a deck slot. Returns true on success.
-function setDeckSlot(_character, _slot, _id, _rarity = CardsRarity.Default) {
-    if (!cardCanVaryRarity(_id)) _rarity = CardsRarity.Default;
+// Добавить карту в деку персонажа
+function setDeckSlot(character, slot, cardIdentifier, rarity = CardsRarity.Default) {
+    if (!cardCanVaryRarity(cardIdentifier)) rarity = CardsRarity.Default;
 
-    var _deck = deckOf(_character);
-    if (_slot < 0 || _slot >= _deck.unlocked)        return false;  // slot not unlocked
-    if (!isCardOwned(_id, _rarity))                  return false;  // don't own it
+    var deck = deckOf(character);
+    if (slot < 0 || slot >= deck.unlocked) return false;  
+    if (!isCardOwned(cardIdentifier, rarity)) return false; 
 
-    var _existing = deckSlotRef(_character, _slot);
-    var _alreadyHere = (_existing != undefined && _existing.id == _id && _existing.rarity == _rarity);
+    var existing = deckSlotRef(character, slot);
+    var alreadyHere = (existing != undefined && existing.id == cardIdentifier && existing.rarity == rarity);
 
-    // Can't use more copies than owned (existing card in THIS slot doesn't count against itself).
-    var _used = countCardInDeck(_character, _id, _rarity) - (_alreadyHere ? 1 : 0);
-    if (_used >= getOwnedCount(_id, _rarity))        return false;
+    if (alreadyHere) return false;
 
-    clearDeckSlot(_character, _slot);
-    array_push(_deck.cards, { slot: _slot, id: _id, rarity: _rarity });
+    clearDeckSlot(character, slot);
+    array_push(deck.cards, { slot: slot, id: cardIdentifier, rarity: rarity });
     return true;
 }
 
-function unlockDeckSlot(_character, _count = 1) {
-    var _deck = deckOf(_character);
-    _deck.unlocked = min(DECK_CAPACITY, _deck.unlocked + _count);
+// Разблокировать слот в деке персонажа
+function unlockDeckSlot(character, _count = 1) {
+    var deck = deckOf(character);
+    deck.unlocked = min(DECK_CAPACITY, deck.unlocked + _count);
 }
 
-function clearDeck(_character) {
-    deckOf(_character).cards = [];
+// Очистить деку персонажа 
+function clearDeck(character) {
+    deckOf(character).cards = [];
 }
 
-/// ---------- UI builders (return Slot[] for your Panel) ----------
+//// Работа с UI декбилдера
 
-/// Choose panel: one "filled" slot per owned card, padded with "locked" up to totalSlots.
-function buildCollectionSlots(_category = undefined, _cols = 4) {
-    var _all   = getCollectionCards();
-    var _cards = [];
-    for (var i = 0; i < array_length(_all); i++) {
-        if (_category == undefined || cardCategoryOf(_all[i]) == _category)
-            array_push(_cards, _all[i]);
+// Построение слотов для панели всех карт, заполненные картой + пустые
+function buildCollectionSlots(category = undefined, cols = 4) {
+    var collectionCards = getCollectionCards();
+    var cards = [];
+    for (var i = 0; i < array_length(collectionCards); i++) {
+        if (category == undefined || cardCategoryOf(collectionCards[i]) == category)
+            array_push(cards, collectionCards[i]);
     }
 
-    var _n     = array_length(_cards);
-    var _total = max(_cols, ceil(_n / _cols) * _cols);   // fill the row; at least one row
+    var count = array_length(cards);
+    var total = max(cols, ceil(count / cols) * cols); 
 
-    var _slots = [];
-    for (var i = 0; i < _total; i++) {
-        if (i < _n) array_push(_slots, new Slot("filled", _cards[i]));
-        else        array_push(_slots, new Slot("empty"));   // never "locked" here
+    var slots = [];
+    for (var i = 0; i < total; i++) {
+        if (i < count) array_push(slots, new Slot("filled", cards[i]));
+        else array_push(slots, new Slot("empty")); 
     }
-    return _slots;
+    return slots;
 }
 
-/// Place panel: deck slots — "filled"/"empty" while unlocked, "locked" beyond.
-function buildDeckSlots(_character, _total = DECK_CAPACITY) {
-    var _deck  = deckOf(_character);
-    var _slots = [];
-    for (var i = 0; i < _total; i++) {
-        if (i >= _deck.unlocked) { array_push(_slots, new Slot("locked")); continue; }
-        var _ref = deckSlotRef(_character, i);
-        if (_ref != undefined) array_push(_slots, new Slot("filled", cardBuildRef(_ref)));
-        else                   array_push(_slots, new Slot("empty"));
+// Построение слотов для панели деки персонажа, пустые, залоченные и заполненные картой.
+function buildDeckSlots(character, total = DECK_CAPACITY) {
+    var deck = deckOf(character);
+    var slots = [];
+    for (var i = 0; i < total; i++) {
+        if (i >= deck.unlocked) { array_push(slots, new Slot("locked")); continue; }
+        var ref = deckSlotRef(character, i);
+        if (ref != undefined) array_push(slots, new Slot("filled", cardBuildRef(ref)));
+        else array_push(slots, new Slot("empty"));
     }
-    return _slots;
+    return slots;
 }
 
-/// ---------- Dev helpers ----------
+//// Вспомогательные методы
 
-function unlockAllCards(_count = 9) {
-    var _keys = variable_struct_get_names(global.cardRegistry);
-    for (var i = 0; i < array_length(_keys); i++) unlockCard(_keys[i], CardsRarity.Default, _count);
+// Открыть количество карт
+function unlockAllCards(count = 9) {
+    var keys = variable_struct_get_names(global.cardRegistry);
+    for (var i = 0; i < array_length(keys); i++) unlockCard(keys[i], CardsRarity.Default, count);
 }
 
+// Ресет данных для теста
 function playerDataResetForTesting() {
     global.playerData = playerDataDefault();
     playerDataSave();
