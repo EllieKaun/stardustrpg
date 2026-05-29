@@ -1,47 +1,46 @@
-/// oDeckBuilder :: Create
-
+// Ресайз размера GUI под размер игры 
 display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]));
 
-var _camW = camera_get_view_width(view_camera[0]);
-var _camH = camera_get_view_height(view_camera[0]);
+var camW = camera_get_view_width(view_camera[0]);
+var camH = camera_get_view_height(view_camera[0]);
 
-var _margin   = 8;
-var _tabH     = 18;
-var _panelW   = (_camW - _margin * 2) / 2;   // two adjacent halves, no gap
-var _panelTop = _margin + _tabH;             // room ABOVE for the tab row
-var _panelH   = _camH - _panelTop - _margin;
+var margin = 8;
+var tabH = 18;
+var panelW = (camW - margin * 2) / 2; 
+var panelTop = margin + tabH;           
+var panelH = camH - panelTop - margin;
 
-activePanel = 0; // 0 = choose, 1 = place (independent of screen side)
+activePanel = 0; // 0 = коллекция всех карт, 1 = дека
 
-var _tabFonts = [fnM3x6_22, fnM3x6_14, fnM3x6_13, fnM3x6_12,
+var tabFonts = [fnM3x6_22, fnM3x6_14, fnM3x6_13, fnM3x6_12,
                  fnM3x6_11, fnM3x6_10, fnM3x6_9,  fnM3x6_8, fnM3x6_7];
 
-// Focus handoff: enter the target from the edge facing the source panel.
-switchFocusTo = function(_target, _row) {
+// Смена фокуса панели на определнную строку
+switchFocusTo = function(target, row) {
     with (oDeckBuilder) {
-        var _src = (_target.tag == "choose") ? placePanel : choosePanel;
-        choosePanel.focused = (_target.tag == "choose");
-        placePanel.focused  = (_target.tag == "place");
-        activePanel = (_target.tag == "choose") ? 0 : 1;
-        if (_target.x < _src.x) _target.enterFromRight(_row);
-        else                    _target.enterFromLeft(_row);
+        var src = (target.tag == Panels.Collection) ? deckPanel : collectionPanel;
+        collectionPanel.focused = (target.tag == Panels.Collection);
+        deckPanel.focused  = (target.tag == Panels.Deck);
+        activePanel = (target.tag == Panels.Collection) ? 0 : 1;
+        if (target.x < src.x) target.enterFromRight(row);
+        else target.enterFromLeft(row);
     }
 };
 
-// Edge-of-grid switch (left/right past the border).
-panelSwitchCallback = function(_panel, _dir) {
+// Смена фокуса панелей
+panelSwitchCallback = function(panel, direction) {
     with (oDeckBuilder) {
-        var _other = (_panel.tag == "choose") ? placePanel : choosePanel;
-        if ((_dir > 0 && _panel.x < _other.x) || (_dir < 0 && _panel.x > _other.x)) {
-            switchFocusTo(_other, _panel.cursorRow);
+        var otherPanel = (panel.tag == Panels.Collection) ? deckPanel : collectionPanel;
+        if ((direction > 0 && panel.x < otherPanel.x) || (direction < 0 && panel.x > otherPanel.x)) {
+            switchFocusTo(otherPanel, panel.cursorRow);
         }
     }
 };
 
-editingCharacter = Characters.Lana;   // which deck the place panel edits
+editingCharacter = Characters.Lana;   // Персонаж, чья дека отображается/редактируется
 
-var _categoryForTab = function(_t) {
-    switch (_t) {
+var categoryForTab = function(tab) { // Мап индекса таба фильтра в категорию карт
+    switch (tab) {
         case 0: return sprCardSelected.Magic;
         case 1: return CardCategory.Buff;
         case 2: return CardCategory.Heal;
@@ -50,70 +49,78 @@ var _categoryForTab = function(_t) {
     }
 };
 
-// ---- choosePanel (LEFT): the collection ----
-choosePanel = new Panel({
-    x: _margin, y: _panelTop, w: _panelW, h: _panelH,
+// Панель коллекции всех карт
+collectionPanel = new Panel({
+    x: margin, 
+    y: panelTop, 
+    w: panelW, 
+    h: panelH,
     bgSprite: sprCardDeskFull,
     slotSpriteEmpty: EmptyCardPlace,
     slotSpriteLocked: LockedCardPlace,
     selectSprite: sprCardSelected,
     pointerSprite: sPointer,
-    tabFonts: _tabFonts,
+    tabFonts: tabFonts,
     tabs: [
-        { name: "MAGIC",  color: #9944CC },
-        { name: "BUFF",   color: #CC44CC },
-        { name: "HEAL",   color: #44CC44 },
+        { name: "MAGIC", color: #9944CC },
+        { name: "BUFF", color: #CC44CC },
+        { name: "HEAL", color: #44CC44 },
         { name: "ATTACK", color: #CC4444 }
     ],
-    visibleRows: 3, tabH: _tabH, padding: 8,
-    slots: buildCollectionSlots(CardCategory.Magic),   // start on first tab
-    onTabClick: function(_panel, _tabIndex) {
+    visibleRows: 3, 
+    tabH: tabH, 
+    padding: 8,
+    slots: buildCollectionSlots(CardCategory.Magic),
+    onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
-            var _cat = _categoryForTab(_tabIndex);
-            _panel.slots    = buildCollectionSlots(_cat);
-            _panel.scrollRow = 0;
-            _panel.refreshScroll();
+            var category = categoryForTab(tabIndex);
+            panel.slots = buildCollectionSlots(category);
+            panel.scrollRow = 0;
+            panel.refreshScroll();
         }
     },
-    onSlotClick: function(_panel, _index) {
-        // Picked a card -> keep it highlighted, jump to the deck panel.
-        with (oDeckBuilder) switchFocusTo(placePanel, choosePanel.cursorRow);
+    onSlotClick: function(panel, slotIndex) {
+        with (oDeckBuilder) switchFocusTo(deckPanel, collectionPanel.cursorRow);
     },
     onPanelSwitch: panelSwitchCallback
 });
-choosePanel.tag = "choose";
+collectionPanel.tag = Panels.Collection;
 
-// ---- placePanel (RIGHT): the character's deck ----
-placePanel = new Panel({
-    x: _margin + _panelW, y: _panelTop, w: _panelW, h: _panelH,
+// Панель деки
+deckPanel = new Panel({
+    x: margin + panelW, 
+    y: panelTop, 
+    w: panelW, 
+    h: panelH,
     bgSprite: sprCardDeskFull,
     slotSpriteEmpty: EmptyCardPlace,
     slotSpriteLocked: LockedCardPlace,
     selectSprite: sprCardSelected,
     pointerSprite: sPointer,
-    tabFonts: _tabFonts,
+    tabFonts: tabFonts,
     tabs: [
         { name: "LANA", color: #4488CC },
-        { name: "VIV",  color: #44CC88 }
+        { name: "VIV", color: #44CC88 }
     ],
-    visibleRows: 3, tabH: _tabH, padding: 8,
+    visibleRows: 3, 
+    tabH: tabH, 
+    padding: 8,
     slots: buildDeckSlots(Characters.Lana),
-    onTabClick: function(_panel, _tabIndex) {
+    onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
-            editingCharacter = (_tabIndex == 0) ? Characters.Lana : Characters.Viv;
-            _panel.slots     = buildDeckSlots(editingCharacter);
-            _panel.scrollRow = 0;
-            _panel.refreshScroll();
+            editingCharacter = (tabIndex == 0) ? Characters.Lana : Characters.Viv;
+            panel.slots = buildDeckSlots(editingCharacter);
+            panel.scrollRow = 0;
+            panel.refreshScroll();
         }
     },
-    onSlotClick: function(_panel, _index) {
+    onSlotClick: function(panel, slotIndex) {
         with (oDeckBuilder) {
-            if (choosePanel.selectedSlot < 0) return;
-            var _src = choosePanel.slots[choosePanel.selectedSlot];
-            if (_src.state == "filled") {
-                // setDeckSlot rejects locked/out-of-range slots itself.
-                if (setDeckSlot(editingCharacter, _index, cardToRef(_src.card))) {
-                    _panel.slots = buildDeckSlots(editingCharacter);
+            if (collectionPanel.selectedSlot < 0) return;
+            var src = collectionPanel.slots[collectionPanel.selectedSlot];
+            if (src.state == "filled") {
+                if (setDeckSlot(editingCharacter, slotIndex, cardToRef(src.card))) {
+                    panel.slots = buildDeckSlots(editingCharacter);
                     playerDataSave();
                 }
             }
@@ -121,10 +128,10 @@ placePanel = new Panel({
     },
     onPanelSwitch: panelSwitchCallback
 });
-placePanel.tag = "place";
+deckPanel.tag = Panels.Deck;
 
-// Start focused on the collection.
-choosePanel.focused = true;
-placePanel.focused  = false;
-choosePanel.enterFromLeft(0);
+// Инициализация панелей
+collectionPanel.focused = true;
+deckPanel.focused = false;
+collectionPanel.enterFromLeft(0);
 activePanel = 0;

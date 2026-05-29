@@ -1,4 +1,2 @@
-/// obj_card_menu — Step Event
-
-choosePanel.step();
-placePanel.step();
+collectionPanel.step();
+deckPanel.step();

@@ -14,10 +14,10 @@ function cardRegistryInit() {
     registerCard("physicalDamageSingleTarget", true, function(_r) { return createPhysicalDamageSingleTargetCard(); });
     registerCard("physicalDamageMultipleTarget", true, function(_r) { return createPhysicalDamageMultipleTargetCard(); });
     registerCard("physicalDamageStunChanceSingleTarget", true, function(_r) { return createPhysicalDamageStunChanseSingleTargetCard(); });
-    registerCard("physicalDamageStunChanceMultiTarget", true, function(_r) { return createPhysicalDamageStunChanseMultipleTargetCard()); });
+    registerCard("physicalDamageStunChanceMultiTarget", true, function(_r) { return createPhysicalDamageStunChanseMultipleTargetCard(); });
     registerCard("physicalDamageBleedChanceSingleTarget", true, function(_r) { return createPhysicalDamageBleedingChanseSingleTargetCard(); });
     registerCard("physicalDamageBleedChanceMultiTarget", true, function(_r) { return createPhysicalDamageBleedingChanseMultipleTargetCard(); });
-    registerCard("physicalDamageBombChanceSingleTarget", true, function(_r) { return createPhysicalDamageBombChanseSingleTargetCard()); });
+    registerCard("physicalDamageBombChanceSingleTarget", true, function(_r) { return createPhysicalDamageBombChanseSingleTargetCard(); });
     registerCard("physicalDamageBombChanceMultiTarget", true, function(_r) { return createPhysicalDamageBombChanseMultipleTargetCard(); });
     registerCard("physicalDamageWeakenChanceSingleTarget", true, function(_r) { return createPhysicalDamageWeakeningChanseSingleTargetCard(); });
     registerCard("physicalDamageWeakenChanceMultiTarget", true, function(_r) { return createPhysicalDamageWeakeningChanseMultipleTargetCard(); });
@@ -83,7 +83,7 @@ function cardBuild(cardIdentifier, rarity = CardsRarity.Default) {
     }
     var cardDefinition = global.cardRegistry[$ cardIdentifier];
     var canVary = cardDefinition.canVaryRarity ? rarity : CardsRarity.Default;
-    var card = _def.build(canVary);
+    var card = cardDefinition.build(canVary);
     card.cardId = cardIdentifier;         
     return card;                 
 }

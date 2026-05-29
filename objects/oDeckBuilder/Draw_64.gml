@@ -1,3 +1,3 @@
 
-choosePanel.draw();
-placePanel.draw();
+collectionPanel.draw();
+deckPanel.draw();

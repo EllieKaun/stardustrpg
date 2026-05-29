@@ -1,115 +1,138 @@
-/// scrUiScaling
-/// UI scaling helpers + Panel / Slot deck-builder system (keyboard/gamepad only).
+enum Panels { Collection, Deck }
 
-
-
-/// @function Slot(state, card)
+// Конструктор слотаб, который используется для отрисовки в дек билдере
 function Slot(_state, _card = undefined) constructor {
-    state    = _state;       // "empty" | "locked" | "filled"
-    card     = _card;
+    state = _state;       // "empty" | "locked" | "filled"
+    card = _card;
     selected = false;
 }
 
-/// @function drawFitTextCentered(text, ax, ay, aw, ah, fonts)
-/// Picks the largest font from `fonts` that fits the area, then draws centered.
-/// `fonts` should be ordered largest -> smallest.
-function drawFitTextCentered(_text, _ax, _ay, _aw, _ah, _fonts = undefined) {
-    if (_fonts != undefined && array_length(_fonts) > 0) {
-        for (var i = 0; i < array_length(_fonts); i++) {
-            draw_set_font(_fonts[i]);
-            if (string_width(_text) <= _aw && string_height(_text) <= _ah) break;
+// Подобрать шрифт и отрисовать текст центрировано
+function drawFitTextCentered(text, areaX, areaY, areaW, areaH, fonts = undefined) {
+    if (fonts != undefined && array_length(fonts) > 0) {
+        for (var i = 0; i < array_length(fonts); i++) {
+            draw_set_font(fonts[i]);
+            if (string_width(text) <= areaW && string_height(text) <= areaH) break;
         }
     }
     draw_set_halign(fa_center);
     draw_set_valign(fa_middle);
-    draw_text(_ax + _aw / 2, _ay + _ah / 2, _text);
+    draw_text(areaX + areaW / 2, areaY + areaH / 2, text);
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
 }
 
-/// @function Panel(config)
-/// Config (camelCase): x, y, w, h, bgSprite, slotSpriteEmpty, slotSpriteLocked,
-///   selectSprite, pointerSprite, tabs[], tabFonts[], visibleRows, padding,
-///   tabH, tabGap, tabPadding, onSlotClick, onTabClick, onPanelSwitch
+// Конфигурация панели, которая отвечает за отрисовку в дек билдере
 function Panel(_config) constructor {
     x = _config[$ "x"] ?? 0;
     y = _config[$ "y"] ?? 0;
     w = _config[$ "w"] ?? 200;
     h = _config[$ "h"] ?? 200;
 
-    bgSprite         = _config[$ "bgSprite"];
-    slotSpriteEmpty  = _config[$ "slotSpriteEmpty"];
+    bgSprite = _config[$ "bgSprite"];
+    slotSpriteEmpty = _config[$ "slotSpriteEmpty"];
     slotSpriteLocked = _config[$ "slotSpriteLocked"];
-    selectSprite     = _config[$ "selectSprite"];
-    pointerSprite    = _config[$ "pointerSprite"];
+    selectSprite = _config[$ "selectSprite"];
+    pointerSprite = _config[$ "pointerSprite"];
 
-    tabs      = _config[$ "tabs"] ?? [];
-    tabFonts  = _config[$ "tabFonts"] ?? undefined;
+    tabs = _config[$ "tabs"] ?? [];
+    tabFonts = _config[$ "tabFonts"] ?? undefined;
     activeTab = 0;
 
-    cols = 4;            // ALWAYS 4 columns — only spacing adapts
-    cardRatio = 2 / 3;        // width / height
+    cols = 4;           
+    cardRatio = 2 / 3;     
     slots = _config[$ "slots"] ?? [];
     padding = _config[$ "padding"] ?? 8;
     tabH = _config[$ "tabH"] ?? 18;
     tabGap = _config[$ "tabGap"] ?? 2;
     tabPadding = _config[$ "tabPadding"] ?? 4;
 
-    onSlotClick   = _config[$ "onSlotClick"]   ?? undefined;
-    onTabClick    = _config[$ "onTabClick"]    ?? undefined;
+    onSlotClick = _config[$ "onSlotClick"] ?? undefined;
+    onTabClick = _config[$ "onTabClick"] ?? undefined;
     onPanelSwitch = _config[$ "onPanelSwitch"] ?? undefined;
 
     visibleRows = max(1, _config[$ "visibleRows"] ?? ceil(array_length(slots) / cols));
-    scrollRow   = 0;
-    totalRows   = ceil(array_length(slots) / cols);
+    scrollRow = 0;
+    totalRows = ceil(array_length(slots) / cols);
 
-    cursorCol       = 0;
-    cursorRow       = 0;
-    selectedSlot    = -1;
-    focused         = false;
-    onTabRow        = false;   // true => arrows control the tab row
-    justGainedFocus = false;   // swallow the keypress that handed us focus
-    tag             = "";
+    cursorCol = 0;
+    cursorRow = 0;
+    selectedSlot = -1;
+    focused = false;
+    onTabRow = false;
+    justGainedFocus = false;   
+    tag = "";
 
+    // Обновление слотов при скроле
     static refreshScroll = function() {
         totalRows = ceil(array_length(slots) / cols);
         scrollRow = clamp(scrollRow, 0, max(0, totalRows - visibleRows));
     };
 
-    /// Solve a uniform gap so four 2:3 cards fill the grid.
-    static computeLayout = function() {
+    // Адаптивный лэайут для того, чтобы влезало 4 карты в строку с соотношением 2/3
+   static computeLayout = function() {
+    
         var _gridX = x + padding;
         var _gridY = y + padding;
+    
         var _gridW = w - padding * 2;
         var _gridH = h - padding * 2;
-        var _rows  = max(1, visibleRows);
-
-        var _a     = (_rows + 1) / (cols + 1);
-        var _denom = (_rows / cardRatio) - (_a * cols);
-        var _cw;
-        if (abs(_denom) > 0.0001) _cw = (_gridH - _a * _gridW) / _denom;
-        else                      _cw = _gridW / cols;
-        if (_cw <= 0) _cw = min(_gridW / cols, (_gridH / _rows) * cardRatio);
-
-        var _ch  = _cw / cardRatio;
-        var _gap = (_gridW - _cw * cols) / (cols + 1);
-        if (_gap < 0) _gap = 0;
-
-        return { gridX: _gridX, gridY: _gridY, cw: _cw, ch: _ch, gap: _gap };
+    
+        var _rows = max(1, visibleRows);
+    
+        var _ratio = 2 / 3;
+    
+        var _minGap = 4;
+    
+        // Сколько места минимум займут gap
+        var _reservedW = _minGap * (cols + 1);
+        var _reservedH = _minGap * (_rows + 1);
+    
+        // Размер карты по ширине
+        var _cw = (_gridW - _reservedW) / cols;
+        var _ch = _cw / _ratio;
+    
+        // Если по высоте не влезает —
+        // пересчитываем от высоты
+        if (_ch * _rows > (_gridH - _reservedH)) {
+            _ch = (_gridH - _reservedH) / _rows;
+            _cw = _ch * _ratio;
+        }
+    
+        // Остаток пространства
+        var _freeW = _gridW - (_cw * cols);
+        var _freeH = _gridH - (_ch * _rows);
+    
+        // Промежутки между картами
+        var _gapX = max(_minGap, _freeW / (cols + 1));
+        var _gapY = max(_minGap, _freeH / (_rows + 1));
+    
+        return {
+            gridX : _gridX,
+            gridY : _gridY,
+    
+            cw : _cw,
+            ch : _ch,
+    
+            gapX : _gapX,
+            gapY : _gapY
+        };
     };
-
+    
+    // Данные о позиции и размере слота по индексу
     static getSlotRect = function(_index) {
         var _lay    = computeLayout();
         var _col    = _index mod cols;
         var _row    = _index div cols;
         var _visRow = _row - scrollRow;
-        var _sx = _lay.gridX + _lay.gap + _col    * (_lay.cw + _lay.gap);
-        var _sy = _lay.gridY + _lay.gap + _visRow * (_lay.ch + _lay.gap);
+        var _sx = _lay.gridX + _lay.gapX + _col    * (_lay.cw + _lay.gapX);
+        var _sy = _lay.gridY + _lay.gapY + _visRow * (_lay.ch + _lay.gapY);
         return { sx: _sx, sy: _sy, sw: _lay.cw, sh: _lay.ch };
     };
 
-    /// Tabs are divided evenly across the panel width, so they can never
-    /// extend past the panel. They sit ABOVE the background (ty = y - tabH).
+    // Вкладки сейчас равномерно распределены по ширине панели, поэтому они никогда 
+    // выходят за пределы панели. Они над бэком (ty = y - tabH).
+    // Данные о позиции и размере таба по индексу
     static getTabRect = function(_index) {
         var _n = array_length(tabs);
         if (_n == 0) return { tx: x, ty: y - tabH, tw: 0, th: tabH };
@@ -118,7 +141,9 @@ function Panel(_config) constructor {
         return { tx: _tx, ty: y - tabH, tw: _tw, th: tabH };
     };
 
-    // ----- Focus / selection helpers -----
+    //// Фокус и выделение
+    
+    // выделить текущий слот
     static selectAtCursor = function() {
         var _slotsInRow = array_length(slots) - cursorRow * cols;
         if (_slotsInRow <= 0) {
@@ -133,6 +158,7 @@ function Panel(_config) constructor {
         refreshScroll();
     };
 
+    // Вход в панель слева
     static enterFromLeft = function(_row) { 
         focused = true; 
         onTabRow = false;
@@ -142,6 +168,7 @@ function Panel(_config) constructor {
         justGainedFocus = true;
     };
 
+    // Вход в панель справа
     static enterFromRight = function(_row) {
         focused = true;   
         onTabRow = false;
@@ -151,12 +178,13 @@ function Panel(_config) constructor {
         justGainedFocus = true;
     };
 
-    // ----- Update -----
+    // Метод для обновления состояния панели в степе
     static step = function() {
         if (!focused) return;
         stepKeyboard();
     };
 
+    // Считывание и обновление данных с клавиатуры
     static stepKeyboard = function() {
         if (justGainedFocus) { justGainedFocus = false; return; }
 
@@ -231,7 +259,7 @@ function Panel(_config) constructor {
         }
     };
 
-    // ----- Draw (call in Draw GUI) -----
+    // Метод отрисовки панели (нужно вызывать в Draw GUI) 
     static draw = function() {
         var _oldFont = draw_get_font();
 
@@ -262,10 +290,10 @@ function Panel(_config) constructor {
         if (selectedSlot >= _first && selectedSlot < _last) {
             var _sr = getSlotRect(selectedSlot);
             if (selectSprite != undefined)
-                draw_sprite_stretched(selectSprite, 0, _sr.sx - 2, _sr.sy - 2, _sr.sw + 4, _sr.sh + 4);
+                draw_sprite_stretched(selectSprite, 0, _sr.sx - 1, _sr.sy - 1, _sr.sw + 2, _sr.sh + 2);
 
             if (pointerSprite != undefined && focused && !onTabRow) {
-                var _ph    = _sr.sh * 0.45;
+                var _ph    = _sr.sh * 0.5;
                 var _scale = _ph / sprite_get_height(pointerSprite);
                 var _px    = _sr.sx + _sr.sw * 0.10;
                 var _py    = _sr.sy + (_sr.sh - _ph) / 2;
@@ -320,24 +348,23 @@ function Panel(_config) constructor {
     };
 }
 
-/// @function drawCard(card, x, y, w, h)
-function drawCard(_card, _x, _y, _w, _h) {
-    if (_card.cardBaseSpr != undefined) draw_sprite_stretched(_card.cardBaseSpr, 0, _x, _y, _w, _h);
-    if (_card.cardIllustrationSpr != undefined) {
-        var _inset = _w * 0.1;
-        draw_sprite_stretched(_card.cardIllustrationSpr, 0, _x, _y, _w, _h);
-    }
-    if (_card.cardBorderSpr != undefined) draw_sprite_stretched(_card.cardBorderSpr, 0, _x, _y, _w, _h);
-    if (_card.cardTokenSpr != undefined) {
-        var _tokenSize = _w * 0.25;
-        draw_sprite_stretched(_card.cardTokenSpr, 0, _x, _y, _w, _h);
-    }
+// Безопасная отрссовка карты
+function drawCard(card, cardX, cardY, cardW, cardH) {
+    if (card.cardBaseSpr != undefined) 
+        draw_sprite_stretched(card.cardBaseSpr, 0, cardX, cardY, cardW, cardH);
+    if (card.cardIllustrationSpr != undefined) 
+        draw_sprite_stretched(card.cardIllustrationSpr, 0, cardX, cardY, cardW, cardH);
+    if (card.cardBorderSpr != undefined)
+         draw_sprite_stretched(card.cardBorderSpr, 0, cardX, cardY, cardW, cardH);
+    if (card.cardTokenSpr != undefined)
+        draw_sprite_stretched(card.cardTokenSpr, 0, cardX, cardY, cardW, cardH);
+    
     draw_set_color(c_white);
     draw_set_halign(fa_left);
- //   draw_text(_x + 3, _y + 3, string(_card.energy));
+ //   draw_text(cardX + 3, cardY + 3, string(_card.energy));
     draw_set_halign(fa_center);
     draw_set_valign(fa_bottom);
-   // draw_text(_x + _w / 2, _y + _h - 3, _card.name);
+   // draw_text(cardX + cardW / 2, cardY + cardH - 3, _card.name);
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
 }
