@@ -39,9 +39,9 @@ panelSwitchCallback = function(panel, direction) {
 
 editingCharacter = Characters.Lana;   // Персонаж, чья дека отображается/редактируется
 
-var categoryForTab = function(tab) { // Мап индекса таба фильтра в категорию карт
+categoryForTab = function(tab) { // Мап индекса таба фильтра в категорию карт
     switch (tab) {
-        case 0: return sprCardSelected.Magic;
+        case 0: return CardCategory.Magic;
         case 1: return CardCategory.Buff;
         case 2: return CardCategory.Heal;
         case 3: return CardCategory.Attack;
@@ -115,17 +115,22 @@ deckPanel = new Panel({
         }
     },
     onSlotClick: function(panel, slotIndex) {
-        with (oDeckBuilder) {
-            if (collectionPanel.selectedSlot < 0) return;
-            var src = collectionPanel.slots[collectionPanel.selectedSlot];
-            if (src.state == "filled") {
-                if (setDeckSlot(editingCharacter, slotIndex, cardToRef(src.card))) {
-                    panel.slots = buildDeckSlots(editingCharacter);
-                    playerDataSave();
-                }
-            }
+    with (oDeckBuilder) {
+        if (collectionPanel.selectedSlot < 0) return;
+        var src = collectionPanel.slots[collectionPanel.selectedSlot];
+        if (src.state != "filled" || src.ref == undefined) return;
+
+        if (setDeckSlot(editingCharacter, slotIndex, src.ref.id, src.ref.rarity)) {
+            panel.slots = buildDeckSlots(editingCharacter);
+            playerDataSave();
+        } else {
+            show_debug_message("setDeckSlot failed: id=" + string(src.ref.id)
+                + " rarity=" + string(src.ref.rarity)
+                + " slot=" + string(slotIndex)
+                + " unlocked=" + string(deckOf(editingCharacter).unlocked));
         }
-    },
+    }
+},
     onPanelSwitch: panelSwitchCallback
 });
 deckPanel.tag = Panels.Deck;

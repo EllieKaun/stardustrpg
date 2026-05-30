@@ -215,7 +215,7 @@ function buildDeckSlots(character, total = DECK_CAPACITY) {
     for (var i = 0; i < total; i++) {
         if (i >= deck.unlocked) { array_push(slots, new Slot("locked")); continue; }
         var ref = deckSlotRef(character, i);
-        if (ref != undefined) array_push(slots, new Slot("filled", cardBuildRef(ref)));
+        if (ref != undefined) array_push(slots, new Slot("filled", cardBuild(ref)));
         else array_push(slots, new Slot("empty"));
     }
     return slots;
