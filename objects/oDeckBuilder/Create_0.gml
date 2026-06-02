@@ -114,7 +114,7 @@ deckPanel = new Panel({
             panel.refreshScroll();
         }
     },
-    onSlotClick: function(panel, slotIndex) {
+  onSlotClick: function(panel, slotIndex) {
     with (oDeckBuilder) {
         if (collectionPanel.selectedSlot < 0) return;
         var src = collectionPanel.slots[collectionPanel.selectedSlot];

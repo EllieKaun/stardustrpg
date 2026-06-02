@@ -4,6 +4,7 @@ enum Panels { Collection, Deck }
 function Slot(_state, _card = undefined) constructor {
     state = _state;       // "empty" | "locked" | "filled"
     card = _card;
+    ref = undefined;  
     selected = false;
 }
 

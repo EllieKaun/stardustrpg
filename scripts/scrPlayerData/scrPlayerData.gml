@@ -190,20 +190,27 @@ function clearDeck(character) {
 
 // Построение слотов для панели всех карт, заполненные картой + пустые
 function buildCollectionSlots(category = undefined, cols = 4) {
-    var collectionCards = getCollectionCards();
-    var cards = [];
-    for (var i = 0; i < array_length(collectionCards); i++) {
-        if (category == undefined || cardCategoryOf(collectionCards[i]) == category)
-            array_push(cards, collectionCards[i]);
+    var refs = getCollectionRefs();
+    var entries = [];   // { card, ref }
+    for (var i = 0; i < array_length(refs); i++) {
+        var card = cardFromRef(refs[i]);
+        if (card == undefined) continue;
+        if (category == undefined || cardCategoryOf(card) == category)
+            array_push(entries, { card: card, ref: refs[i] });
     }
 
-    var count = array_length(cards);
-    var total = max(cols, ceil(count / cols) * cols); 
+    var count = array_length(entries);
+    var total = max(cols, ceil(count / cols) * cols);
 
     var slots = [];
     for (var i = 0; i < total; i++) {
-        if (i < count) array_push(slots, new Slot("filled", cards[i]));
-        else array_push(slots, new Slot("empty")); 
+        if (i < count) {
+            var slot = new Slot("filled", entries[i].card);
+            slot.ref = entries[i].ref;   // <-- carry the ref
+            array_push(slots, slot);
+        } else {
+            array_push(slots, new Slot("empty"));
+        }
     }
     return slots;
 }
@@ -215,7 +222,7 @@ function buildDeckSlots(character, total = DECK_CAPACITY) {
     for (var i = 0; i < total; i++) {
         if (i >= deck.unlocked) { array_push(slots, new Slot("locked")); continue; }
         var ref = deckSlotRef(character, i);
-        if (ref != undefined) array_push(slots, new Slot("filled", cardBuild(ref)));
+        if (ref != undefined) array_push(slots, new Slot("filled", cardFromRef(ref)));  // was cardBuild(ref)
         else array_push(slots, new Slot("empty"));
     }
     return slots;
