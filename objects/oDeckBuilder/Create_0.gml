@@ -140,3 +140,27 @@ collectionPanel.focused = true;
 deckPanel.focused = false;
 collectionPanel.enterFromLeft(0);
 activePanel = 0;
+
+open = false
+
+openBuilder = function() {
+    open = true
+    global.uiModal = true
+
+    collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab))
+    collectionPanel.scrollRow = 0
+    collectionPanel.refreshScroll()
+    deckPanel.slots = buildDeckSlots(editingCharacter)
+    deckPanel.scrollRow = 0
+    deckPanel.refreshScroll()
+
+    collectionPanel.focused = true
+    deckPanel.focused = false
+    collectionPanel.enterFromLeft(0)
+    activePanel = 0
+};
+
+closeBuilder = function() {
+    open = false
+    global.uiModal = false
+};

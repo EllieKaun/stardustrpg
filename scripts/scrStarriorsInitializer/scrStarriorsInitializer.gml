@@ -14,16 +14,8 @@ function createLana(){
             4,
             3,
             1,
-            [
-                createPhysicalDamageVampirismChanceMultipleTargetCard(),
-                createPhysicalDamageVampirismChanceMultipleTargetCard(),
-                createPhysicalDamageVampirismChanceMultipleTargetCard(),
-                createAddEnergyCard()
-           // createOvertimeHealSingleTargetCard(),
-           // createPhysicalDamageCardDefault(),
-            //createPhysicalDamageCardDefault(),
-            //createPhysicalDamageCardDefault()
-        ])
+            playerDeckFor(Characters.Lana) 
+    )
     return starrior
 }
 
@@ -45,10 +37,7 @@ function createViv(){
         2,
         1,
         3,
-        [
-        createPhysicalDamageSingleTargetCard(),
-        createPhysicalDamageVampirismChanceMultipleTargetCard()
-        ]
+        playerDeckFor(Characters.Viv) 
     )
 }
 

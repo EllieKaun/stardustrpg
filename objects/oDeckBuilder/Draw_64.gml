@@ -1,3 +1,4 @@
+if (!open) exit
 
-collectionPanel.draw();
-deckPanel.draw();
+collectionPanel.draw()
+deckPanel.draw()
