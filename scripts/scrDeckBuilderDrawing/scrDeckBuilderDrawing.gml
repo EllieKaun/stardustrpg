@@ -409,11 +409,13 @@ function Panel(_config) constructor {
             var barH   = h - padding * 2
             var thumbH = barH * (visibleRows / totalRows)
             var thumbY = barY + (barH - thumbH) * (scrollRow / max(1, totalRows - visibleRows))
-            draw_set_color(c_dkgray); draw_set_alpha(0.4)
+            draw_set_color(c_dkgray)
+            draw_set_alpha(0.4)
             draw_rectangle(barX, barY, barX + 4, barY + barH, false)
-            draw_set_color(c_white);  draw_set_alpha(0.8)
+            draw_set_color(c_white)
+            draw_set_alpha(0.8)
             draw_rectangle(barX, thumbY, barX + 4, thumbY + thumbH, false)
-            draw_set_alpha(1.0);
+            draw_set_alpha(1.0)
         }
 
         draw_set_color(c_white)
