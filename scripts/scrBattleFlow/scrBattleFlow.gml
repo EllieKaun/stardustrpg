@@ -9,7 +9,8 @@ function afterPlayChecks() {
     }
     // Проверка на победу
     if checkIfAllDead(enemies) {
-        
+        grantBattleRewards()
+        return
     }
     if selectedCharacter.energy > 0 {
         // если сыграл карту, а энергия еще осталась, играем еще

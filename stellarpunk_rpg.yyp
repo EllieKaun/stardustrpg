@@ -119,6 +119,7 @@
     {"id":{"name":"scrDrawing","path":"scripts/scrDrawing/scrDrawing.yy",},},
     {"id":{"name":"scrInfo","path":"scripts/scrInfo/scrInfo.yy",},},
     {"id":{"name":"scrPlayerData","path":"scripts/scrPlayerData/scrPlayerData.yy",},},
+    {"id":{"name":"scrRewards","path":"scripts/scrRewards/scrRewards.yy",},},
     {"id":{"name":"scrStarriorsInitializer","path":"scripts/scrStarriorsInitializer/scrStarriorsInitializer.yy",},},
     {"id":{"name":"atcCard","path":"sprites/atcCard/atcCard.yy",},},
     {"id":{"name":"attackEffect","path":"sprites/attackEffect/attackEffect.yy",},},

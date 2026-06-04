@@ -99,7 +99,8 @@ enum BattleStates {
     AllyTargetSelection,
     EnemysTurn,
     EnemyInfoSelection,
-    EnemyInfoDisplay
+    EnemyInfoDisplay,
+    Victory
 }
 
 enum StarriorStates {

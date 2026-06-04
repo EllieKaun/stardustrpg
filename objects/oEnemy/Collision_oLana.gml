@@ -1,26 +1,24 @@
 
-if (triggered) exit;
-triggered = true;
+if (triggered) exit
+triggered = true
+global.battleRewardPool = rewardFactory()
+global.returnRoom = room
+global.returnX = other.x
+global.returnY = other.y
 
 
-
-global.returnRoom = room;
-global.returnX = other.x;
-global.returnY = other.y;
-
-
-other.can_move = false;
+other.can_move = false
 
 //room_goto(BattleRoom);
 
 with (oTransition) {
-    target_room = BattleRoom;
-    state = "fade_out";
+    target_room = BattleRoom
+    state = "fade_out"
 }
 
 
 if (!position_meeting(x, y, oLana)) {
     if (point_distance(x, y, oLana.x, oLana.y) > oSpawnerManager.spawnDistance) {
-        instance_destroy();
+        instance_destroy()
     }
 }
