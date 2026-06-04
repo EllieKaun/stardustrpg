@@ -68,17 +68,17 @@ function initStarriors() {
 }
 
 function playerDeckFor(character) {
-    var saved = deckOf(character).cards;   
+    var saved = deckOf(character).cards
 
-    var sorted = array_create(array_length(saved));
-    array_copy(sorted, 0, saved, 0, array_length(saved));
-    array_sort(sorted, function(a, b) { return a.slot - b.slot; });
+    var sorted = array_create(array_length(saved))
+    array_copy(sorted, 0, saved, 0, array_length(saved))
+    array_sort(sorted, function(a, b) { return a.slot - b.slot; })
 
-    var deck = [];
+    var deck = []
     for (var i = 0; i < array_length(sorted); i++) {
-        array_push(deck, cardFromRef(sorted[i]));  
+        array_push(deck, cardFromRef(sorted[i]))
     }
-    return deck;
+    return deck
 }
 
 function initStarriorsPositions(

@@ -43,14 +43,14 @@ function rollRewardChoices(spec, count = 3) {
 // Награды после победы
 function grantBattleRewards() {
     var spec = global.battleRewardPool;
-    var choices = rollRewardChoices(spec, 3);
-    global.battleRewardChoices = choices;
+    var choices = rollRewardChoices(spec, 3)
+    global.battleRewardChoices = choices
 
     if (array_length(choices) > 0) {
-        var picked = choices[irandom(array_length(choices) - 1)];
-        unlockCard(picked.id, picked.rarity, 1);
-        playerDataSave();
+        var picked = choices[irandom(array_length(choices) - 1)]
+        unlockCard(picked.id, picked.rarity, 1)
+        playerDataSave()
     }
 
-    battleState = BattleStates.Victory;
+    battleState = BattleStates.Victory
 }
