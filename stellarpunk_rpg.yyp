@@ -173,6 +173,7 @@
     {"id":{"name":"selectionArrow","path":"sprites/selectionArrow/selectionArrow.yy",},},
     {"id":{"name":"sFlower","path":"sprites/sFlower/sFlower.yy",},},
     {"id":{"name":"sGreenForest","path":"sprites/sGreenForest/sGreenForest.yy",},},
+    {"id":{"name":"shadow","path":"sprites/shadow/shadow.yy",},},
     {"id":{"name":"shockRemove","path":"sprites/shockRemove/shockRemove.yy",},},
     {"id":{"name":"shuffle","path":"sprites/shuffle/shuffle.yy",},},
     {"id":{"name":"sLana","path":"sprites/sLana/sLana.yy",},},
