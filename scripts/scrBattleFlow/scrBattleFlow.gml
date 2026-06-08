@@ -5,7 +5,9 @@ function afterPlayChecks() {
     selectedCard = 0
     // Проверка на поражение
     if checkIfAllDead(heroes) {
-        room_goto(OverWorldRoom)
+        gameOverCursor = 0
+        battleState = BattleStates.GameOver
+        return
     }
     // Проверка на победу
     if checkIfAllDead(enemies) {
@@ -50,15 +52,11 @@ function checkIfHasBuff(character, effectType, modifierToBuff) {
 }
 
 function updateOvertime(character) {
-    var effects = character.effects 
-    for(var i = 0; i < array_length(effects); i++) {
-        var effect = effects[i]
-        if effect.timing == Timing.Overtime {
-            effect.duration -= 1
-            if(effect.duration <= 0) {
-                array_delete(effects, i, 1)
-            }
-            return
+    var effects = character.effects
+    for (var i = array_length(effects) - 1; i >= 0; i--) {
+        if (effects[i].timing == Timing.Overtime) {
+            effects[i].duration -= 1
+            if (effects[i].duration <= 0) array_delete(effects, i, 1)
         }
     }
 }
@@ -180,4 +178,18 @@ function filterCriteria(element, index) {
 
 function filterNotKO(targets) {
     return array_filter(targets, filterCriteria)
+}
+
+function returnToOverworld() {
+    with (oTransition) { 
+        target_room = global.returnRoom
+        state = "fade_out"
+    }
+}
+
+function retryBattle() {
+    with (oTransition) { 
+        target_room = BattleRoom
+        state = "fade_out"
+    }
 }

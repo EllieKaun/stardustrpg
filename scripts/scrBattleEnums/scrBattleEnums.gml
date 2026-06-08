@@ -100,7 +100,8 @@ enum BattleStates {
     EnemysTurn,
     EnemyInfoSelection,
     EnemyInfoDisplay,
-    Victory
+    Victory,
+    GameOver
 }
 
 enum StarriorStates {

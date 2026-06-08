@@ -52,16 +52,12 @@ function getCostByRarity(rarity, dafault, unusual, rare, epic) {
     switch (rarity) {
     	case CardsRarity.Default: 
             return dafault
-        break    
     	case CardsRarity.Unusual: 
-            return unusual            
-        break       
+            return unusual      
     	case CardsRarity.Rare: 
-            return rare            
-        break       
+            return rare 
     	case CardsRarity.Epic: 
-            return epic            
-        break          
+            return epic      
     }
 }
 
@@ -166,31 +162,30 @@ function playCard(card, caster, targets) {
 
 function executeEndOfTurn(character) {
     var effects = character.effects
-    for(var i = 0; i < array_length(effects); i++) {
+    for(var i = array_length(effects) - 1; i >= 0; i--) {
         var effect = effects[i]
-        if effect.timing == Timing.EndOfTurn {
-            switch (effect.type) {
-            	case EffectTypes.Damage:
-                    executeEndOFTurnDamage(character, effect, i)
+        if (effect.timing != Timing.EndOfTurn) continue 
+        switch (effect.type) {
+            case EffectTypes.Damage: 
+                executeEndOFTurnDamage(character, effect, i)
                 break
-                case EffectTypes.Heal:
-                    executeEndOFTurnHeal(character, effect, i)
+            case EffectTypes.Heal: 
+                executeEndOFTurnHeal(character, effect, i)
                 break
-                case EffectTypes.ManaGain:
-                    executeEndOFTurnManaGain(character, effect, i)
-                break 
-            }
+            case EffectTypes.ManaGain: 
+                executeEndOFTurnManaGain(character, effect, i)
+                break
         }
     }
 }
 
 function executeEndOFTurnDamage(character, effect, index) {
-    character.applyDamage(effect.value)
+    var raw = is_method(effect.value) ? effect.value() : effect.value
+    var dmg = mitigateDamage(character, effect, raw)
+    character.applyDamage(dmg)
     character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
-    effect.duration -= 1 
-    if effect.duration <= 0 {
-        array_delete(character.effects, index, 1)
-    }
+    effect.duration -= 1
+    if (effect.duration <= 0) array_delete(character.effects, index, 1)
 }
 
 function executeEndOFTurnHeal(character, effect, index) {
@@ -415,20 +410,19 @@ function executeRemoveStatus(target, status) {
 
 function reduceOrRemoveEffectType(target, effectType) {
     var effects = target.effects
-    for(var i = 0; i < array_length(effects); i++) {
+    for (var i = 0; i < array_length(effects); i++) {
         var effect = effects[i]
-        if effect.type = effectType && variable_instance_exists(effect, "duration")  {
-            effect.duration -= 1
-            if effect.duration <= 0 { 
+        if (effect.type == effectType) {
+            if (variable_instance_exists(effect, "duration")) {
+                effect.duration -= 1
+                if (effect.duration <= 0) array_delete(effects, i, 1)
+            } else {
                 array_delete(effects, i, 1)
-                return
             }
-        } else {
-            array_delete(effects, i, 1)
             return
         }
     }
-} 
+}
 
 function executeBuff(
     caster,
@@ -479,4 +473,40 @@ function executeManaGain(effect, caster, targets) {
             targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
         }
     }
+}
+
+// Помощь в расчете урона
+
+function getEffectDamageType(effect) {
+    return variable_instance_exists(effect, "damageType") ? effect.damageType : DamageTypes.Physical;
+}
+
+function mitigateDamage(target, effect, rawDamage) {
+    var damage = rawDamage
+    var modifier = 0
+    var damageType = getEffectDamageType(effect)
+
+    switch (damageType) {
+        case DamageTypes.Physical:
+            damage -= target.guts
+            var pProtBuff = checkIfHasBuff(target, EffectTypes.Buff,   ModifiersToBuff.PhysicalProtection)
+            var pProtDebuff = checkIfHasBuff(target, EffectTypes.Debuff, ModifiersToBuff.PhysicalProtection)
+            if (pProtBuff != undefined) modifier -= pProtBuff.value
+            if (pProtDebuff != undefined) modifier += pProtDebuff.value
+            break
+        case DamageTypes.Magical:
+            damage -= target.aura
+            var mProtBuff   = checkIfHasBuff(target, EffectTypes.Buff,   ModifiersToBuff.MagicalProtection)
+            var mProtDebuff = checkIfHasBuff(target, EffectTypes.Debuff, ModifiersToBuff.MagicalProtection)
+            if (mProtBuff   != undefined) modifier -= mProtBuff.value
+            if (mProtDebuff != undefined) modifier += mProtDebuff.value
+            break
+    }
+
+    if (checkIfHasEffectType(target, EffectTypes.Weakening)) modifier += 0.1
+    if (checkIfHasStrengths(target, effect)) modifier -= 0.1
+    if (checkIfHasWeaknesses(target, effect)) modifier += 0.1
+
+    damage += damage * modifier
+    return max(damage, 0)
 }

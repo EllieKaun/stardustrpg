@@ -44,13 +44,14 @@ function rollRewardChoices(spec, count = 3) {
 function grantBattleRewards() {
     var spec = global.battleRewardPool;
     var choices = rollRewardChoices(spec, 3)
-    global.battleRewardChoices = choices
+    rewardChoices = []
 
-    if (array_length(choices) > 0) {
-        var picked = choices[irandom(array_length(choices) - 1)]
-        unlockCard(picked.id, picked.rarity, 1)
-        playerDataSave()
+    for (var i = 0; i < array_length(choices); i++) {
+        var built = cardFromRef(choices[i])
+        built.cardRef = choices[i] // {id, rarity} 
+        array_push(rewardChoices, built)
     }
-
-    battleState = BattleStates.Victory
+    rewardCursor = 0
+    rewardSelected = false
+    battleState = BattleStates.Victory  
 }
