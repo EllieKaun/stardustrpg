@@ -1,4 +1,12 @@
 
+if (battleState == BattleStates.Victory)  { 
+    stepVictoryScreen()
+    exit
+}
+if (battleState == BattleStates.GameOver) { 
+    stepGameOverScreen() 
+    exit
+}
 switch (battleState) {
     case BattleStates.Preparing:
         

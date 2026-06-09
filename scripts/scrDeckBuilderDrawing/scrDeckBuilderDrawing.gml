@@ -181,7 +181,9 @@ function Panel(_config) constructor {
 
     // Метод для обновления состояния панели в степе
     static step = function() {
-        if (!focused) return
+        if (!focused) {
+            return
+        }
         stepKeyboard()
     }
 
@@ -189,7 +191,7 @@ function Panel(_config) constructor {
     static stepKeyboard = function() {
         if (justGainedFocus) { 
             justGainedFocus = false
-            return; 
+            return
         }
 
         var nTabs = array_length(tabs)

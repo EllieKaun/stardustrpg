@@ -3,7 +3,6 @@ display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_heig
 
 var camW = camera_get_view_width(view_camera[0])
 var camH = camera_get_view_height(view_camera[0])
-
 var margin = 8
 var tabH = 18
 var panelW = (camW - margin * 2) / 2;
@@ -21,7 +20,7 @@ switchFocusTo = function(target, row) {
         var src = (target.tag == Panels.Collection) ? deckPanel : collectionPanel
         collectionPanel.focused = (target.tag == Panels.Collection)
         deckPanel.focused  = (target.tag == Panels.Deck)
-        activePanel = (target.tag == Panels.Collection) ? 0 : 1
+        activePanel = (target.tag == Panels.Collection) ? Panels.Collection : Panels.Deck
         if (target.x < src.x) target.enterFromRight(row)
         else target.enterFromLeft(row)
     }
@@ -76,7 +75,10 @@ collectionPanel = new Panel({
             var category = categoryForTab(tabIndex)
             panel.slots = buildCollectionSlots(category)
             panel.scrollRow = 0
+            panel.cursorRow = 0
+            panel.cursorCol = 0
             panel.refreshScroll()
+            panel.selectAtCursor()
         }
     },
     onSlotClick: function(panel, slotIndex) {
@@ -111,23 +113,26 @@ deckPanel = new Panel({
             editingCharacter = (tabIndex == 0) ? Characters.Lana : Characters.Viv
             panel.slots = buildDeckSlots(editingCharacter)
             panel.scrollRow = 0
+            panel.cursorRow = 0
+            panel.cursorCol = 0
             panel.refreshScroll()
+            panel.selectAtCursor()
         }
     },
-  onSlotClick: function(panel, slotIndex) {
-    with (oDeckBuilder) {
-        if (collectionPanel.selectedSlot < 0) return
-        var src = collectionPanel.slots[collectionPanel.selectedSlot]
-        if (src.state != "filled" || src.ref == undefined) return
-
-        if (setDeckSlot(editingCharacter, slotIndex, src.ref.id, src.ref.rarity)) {
-            panel.slots = buildDeckSlots(editingCharacter)
-            playerDataSave()
-        } else {
-            show_debug_message("setDeckSlot failed: id=" + string(src.ref.id)
-                + " rarity=" + string(src.ref.rarity)
-                + " slot=" + string(slotIndex)
-                + " unlocked=" + string(deckOf(editingCharacter).unlocked))
+    onSlotClick: function(panel, slotIndex) {
+        with (oDeckBuilder) {
+            if (collectionPanel.selectedSlot < 0) return
+            var src = collectionPanel.slots[collectionPanel.selectedSlot]
+            if (src.state != "filled" || src.ref == undefined) return
+            
+            if (setDeckSlot(editingCharacter, slotIndex, src.ref.id, src.ref.rarity)) {
+                panel.slots = buildDeckSlots(editingCharacter)
+                playerDataSave()
+            } else {
+                show_debug_message("setDeckSlot failed: id=" + string(src.ref.id)
+                    + " rarity=" + string(src.ref.rarity)
+                    + " slot=" + string(slotIndex)
+                    + " unlocked=" + string(deckOf(editingCharacter).unlocked)) 
         }
     }
 },
@@ -139,14 +144,14 @@ deckPanel.tag = Panels.Deck
 collectionPanel.focused = true
 deckPanel.focused = false
 collectionPanel.enterFromLeft(0)
-activePanel = 0
+activePanel = Panels.Collection
 
 open = false
 
 openBuilder = function() {
     open = true
     global.uiModal = true
-
+display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
     collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab))
     collectionPanel.scrollRow = 0
     collectionPanel.refreshScroll()
@@ -157,7 +162,7 @@ openBuilder = function() {
     collectionPanel.focused = true
     deckPanel.focused = false
     collectionPanel.enterFromLeft(0)
-    activePanel = 0
+    activePanel = Panels.Collection
 }
 
 closeBuilder = function() {

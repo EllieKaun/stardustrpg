@@ -229,3 +229,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     // Pointer on Close Button
     draw_sprite(sPointer, 0, btnX - 12, btnY + btnHeight / 2)
 }
+
+
+if (battleState == BattleStates.Victory)  drawVictoryScreen();
+if (battleState == BattleStates.GameOver) drawGameOverScreen();
