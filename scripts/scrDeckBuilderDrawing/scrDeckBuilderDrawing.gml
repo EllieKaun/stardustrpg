@@ -309,10 +309,10 @@ function Panel(_config) constructor {
     static draw = function() {
         var oldFont = draw_get_font()
 
-        // Background
+        // Бёк
         if (bgSprite != undefined) draw_sprite_stretched(bgSprite, 0, x, y, w, h)
 
-        // Slots
+        // Слоты
         var first = scrollRow * cols
         var last  = min(first + visibleRows * cols, array_length(slots))
         for (var i = first; i < last; i++) {
@@ -377,7 +377,7 @@ function Panel(_config) constructor {
             }
         }
 
-        // Tabs (above the panel, fit text, never wider than the panel)
+        // Табы
         for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {
             var tab = tabs[tabIndex]
             var tabRow = getTabRect(tabIndex)
@@ -404,7 +404,7 @@ function Panel(_config) constructor {
             }
         }
 
-        // Scroll indicator
+        // Скролл индткатор
         if (totalRows > visibleRows) {
             var barX   = x + w - padding
             var barY   = y + padding

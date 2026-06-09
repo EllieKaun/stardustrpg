@@ -149,9 +149,9 @@ activePanel = Panels.Collection
 open = false
 
 openBuilder = function() {
+    display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
     open = true
     global.uiModal = true
-display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
     collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab))
     collectionPanel.scrollRow = 0
     collectionPanel.refreshScroll()

@@ -5,5 +5,5 @@ if (keyboard_check_pressed(vk_escape)) {
     exit
 }
 
-if (collectionPanel.focused)  collectionPanel.step()
-else if (deckPanel.focused)   deckPanel.step()
+if (collectionPanel.focused) collectionPanel.step()
+else if (deckPanel.focused) deckPanel.step()

@@ -1,3 +1,4 @@
+randomize()
 cardRegistryInit()
 playerDataInit()
 
