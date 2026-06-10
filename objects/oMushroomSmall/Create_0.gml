@@ -1,5 +1,5 @@
+// Inherit the parent event
 event_inherited();
-
 rewardFactory = function() {
     return {
         ids: [
@@ -11,4 +11,4 @@ rewardFactory = function() {
         rarities: [CardsRarity.Default, CardsRarity.Unusual, CardsRarity.Rare]
     }
 }
-encounterFactory = createCrackerNutEncounter
+encounterFactory = createMushroomEncounter

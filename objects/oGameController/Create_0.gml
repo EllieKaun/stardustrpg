@@ -7,3 +7,4 @@ if (!instance_exists(oTransition)) {
 }
 global.uiModal = false
 global.battleRewardPool = { ids: [], rarities: [CardsRarity.Default] }
+global.battleEncounter = createCrackerNutEncounter

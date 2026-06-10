@@ -42,8 +42,4 @@ if !fitSpace {
 }
 
 // генерация уровней
-generateLevel(
-    starriorsZoneHeight,
-    screenWidth,
-    spacingBetweenStarriors
-)
+generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleEncounter);

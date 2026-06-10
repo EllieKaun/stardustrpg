@@ -4,3 +4,4 @@ show_debug_message("----- Created EnemyObject at position " + string(x) + " " + 
 rewardFactory = function() {
     return []
 }
+encounterFactory = createMushroomEncounter

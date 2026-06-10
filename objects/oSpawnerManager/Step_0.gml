@@ -30,18 +30,18 @@ for (var attempt = 0; attempt < maxSpawnAttempts; attempt++) {
     var sy = seg.bbox_top  + random(seg.bbox_bottom - seg.bbox_top)
 
     if (!collision_point(sx, sy, oSpawner, false, true)) {
-        show_debug_message("POINT IS NOT IN SPAWNER " + string(sx) + " " + string(sy))
+        show_debug_message("CREATING ENEMY ERROR: POINT IS NOT IN SPAWNER ZONE" + string(sx) + " " + string(sy))
         continue
     }
     
     var dist = point_distance(px, py, sx, sy)
     if (dist > spawnDistance) {
-        show_debug_message("POINT IS NOT IN SPAWN DISTANCE")
+        show_debug_message("CREATING ENEMY ERROR: POINT IS NOT IN SPAWN DISTANCE")
         continue
     }
 
     if (dist < visionRadius) {
-        show_debug_message("POINT IS IN VISION")
+        show_debug_message("CREATING ENEMY ERROR: POINT IS IN VISION")
         continue
     }
 
@@ -57,11 +57,14 @@ for (var attempt = 0; attempt < maxSpawnAttempts; attempt++) {
     }
     
     if (tooClose) {
-        show_debug_message("POINT IS IN OTHER ENEMY DISTANCE")
+        show_debug_message("CREATING ENEMY ERROR: POINT IS IN OTHER ENEMY DISTANCE")
         continue
     }
 
-    var enemy = instance_create_layer(sx, sy, "Instances", oCrakerNutSmall)
+    var enemyTypes = [oCrakerNutSmall, oMushroomSmall]
+    var chosenType = enemyTypes[irandom(array_length(enemyTypes) - 1)]
+
+    var enemy = instance_create_layer(sx, sy, "Instances", chosenType)
     ds_list_add(enemyList, enemy)
     ds_list_destroy(spawners)
     exit
