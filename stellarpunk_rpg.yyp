@@ -123,6 +123,7 @@
     {"id":{"name":"scrPlayerData","path":"scripts/scrPlayerData/scrPlayerData.yy",},},
     {"id":{"name":"scrRewards","path":"scripts/scrRewards/scrRewards.yy",},},
     {"id":{"name":"scrStarriorsInitializer","path":"scripts/scrStarriorsInitializer/scrStarriorsInitializer.yy",},},
+    {"id":{"name":"sprSpawnerUtils","path":"scripts/sprSpawnerUtils/sprSpawnerUtils.yy",},},
     {"id":{"name":"atcCard","path":"sprites/atcCard/atcCard.yy",},},
     {"id":{"name":"attackEffect","path":"sprites/attackEffect/attackEffect.yy",},},
     {"id":{"name":"battlescene","path":"sprites/battlescene/battlescene.yy",},},
