@@ -11,6 +11,6 @@ global.battleEncounter = createCrackerNutEncounter
 global.zoneConfig = {
     cx: room_width / 2,
     cy: room_height / 2,
-    innerHalf:  120,
-    middleHalf: 240 
+    innerHalf:  240,
+    middleHalf: 480 
 }

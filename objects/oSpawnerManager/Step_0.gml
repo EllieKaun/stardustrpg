@@ -61,11 +61,16 @@ for (var attempt = 0; attempt < maxSpawnAttempts; attempt++) {
         continue
     }
 
-    var enemyTypes = [oCrakerNutSmall, oMushroomSmall]
-    var chosenType = enemyTypes[irandom(array_length(enemyTypes) - 1)]
-
+    var zone = zoneAt(sx, sy)
+    var section = sectionAt(sx, sy)
+    var types = enemyTypesForRegion(zone, section)
+    var chosenType = types[irandom(array_length(types) - 1)]
+    show_debug_message("CREATING ENEMY ZONE: " + string(zone)) 
+    show_debug_message("CREATING ENEMY SECTION: " + string(section))
+    show_debug_message("CREATING ENEMY MONSTER TYPE: " + string(chosenType))
     var enemy = instance_create_layer(sx, sy, "Instances", chosenType)
     ds_list_add(enemyList, enemy)
+     show_debug_message("CREATING ENEMY SUCCESS") 
     ds_list_destroy(spawners)
     exit
 }
