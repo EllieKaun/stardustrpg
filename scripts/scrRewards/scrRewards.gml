@@ -42,7 +42,7 @@ function rollRewardChoices(spec, count = 3) {
 
 // Награды после победы
 function grantBattleRewards() {
-    var spec = global.battleRewardPool;
+    var spec = rewardPoolForSection(global.battleSection);
     var choices = rollRewardChoices(spec, 3)
     rewardChoices = []
 

@@ -1,6 +1,8 @@
 
 if (triggered) exit
 triggered = true
+
+global.battleSection = spawnSection
 global.battleRewardPool = rewardFactory()
 global.battleEncounter  = encounterFactory;
 global.returnRoom = room

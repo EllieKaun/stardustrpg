@@ -96,3 +96,48 @@ function createEnemiesLevel1() {
             [createPhysicalDamageWeakeningChanseSingleTargetCard()])
     ]
 }
+
+
+function createCrackerNut() { 
+    return createStarrior("CrackerNut",
+        sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle, 
+        16, 16,  0, 0,  1, 1, /*str*/2, /*int*/0, /*aura*/0, /*guts*/0,
+        [
+            createPhysicalDamageSingleTargetCard(), 
+            createPhysicalDamageStunChanceSingleTargetCard(),
+            createBuffPhysicalDamageSingleTargetCard() 
+        ]);
+}
+
+function createLeaf() {
+    return createStarrior("Leaf",
+        sprLeafIdle, sprLeafIdle, sprLeafIdle, sprLeafIdle,
+        20, 20,  0, 0,  1, 1,  /*str*/1, /*int*/1, /*aura*/0, /*guts*/0,
+        [
+            createPhysicalDamageSingleTargetCard(), 
+            createPhysicalDamageWeaknessChanceSingleTargetCard(),
+            createInstantHealSingleTargetCard() 
+        ]);
+}
+
+function createMushroom() {
+    return createStarrior("Mushroom",
+        sprMushroom, sprMushroom, sprMushroom, sprMushroom,
+        12, 12,  0, 0,  1, 1,  /*str*/3, /*int*/0, /*aura*/0, /*guts*/0,
+        [
+            createPhysicalDamageSingleTargetCard(),
+            createPhysicalDamageVampirismChanceSingleTargetCard(),
+            createDebuffPhysicalProtectionSingleTargetCard() 
+        ]);
+}
+
+function createFlower() {
+    return createStarrior("Flower",
+        sprFlowerIdle, sprFlowerIdle, sprFlowerIdle, sprFlowerIdle,
+        12, 12,  0, 0,  1, 1,  /*str*/1, /*int*/3, /*aura*/0, /*guts*/0,
+        [
+            createPhysicalDamageSingleTargetCard(), 
+            createLightningDamageSingleTargetCard(),
+            createBuffMagicalDamageSingleTargetCard()
+        ]);
+}

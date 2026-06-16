@@ -1,9 +1,18 @@
-function generateLevel(zoneH, screenW, spacing, encounterFactory) {
-    initStarriorsFromFactory(encounterFactory);
+function generateLevel(zoneH, screenW, spacing, section) {
+    initStarriorsForSection(section);
     initStarriorsPositions(zoneH, screenW, spacing);
     selectNextCharacter();
     battleState = BattleStates.CharacterPlay;
 }
+
+function initStarriorsForSection(section) {
+    heroes  = [createLana(), createViv()]
+    enemies = createEncounterForSection(section)
+    array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes))
+    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies))
+    for (var i = 0; i < array_length(playOrder); i++) shuffleDeckAndTake4(playOrder[i])
+}
+
 
 function initStarriorsFromFactory(encounterFactory) {
     heroes = [createLana(), createViv()];

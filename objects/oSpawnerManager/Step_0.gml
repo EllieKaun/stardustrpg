@@ -69,8 +69,9 @@ for (var attempt = 0; attempt < maxSpawnAttempts; attempt++) {
     show_debug_message("CREATING ENEMY SECTION: " + string(section))
     show_debug_message("CREATING ENEMY MONSTER TYPE: " + string(chosenType))
     var enemy = instance_create_layer(sx, sy, "Instances", chosenType)
+    enemy.spawnSection = greenForestSection(sx, sy);
     ds_list_add(enemyList, enemy)
-     show_debug_message("CREATING ENEMY SUCCESS") 
+    show_debug_message("CREATING ENEMY SUCCESS") 
     ds_list_destroy(spawners)
     exit
 }
