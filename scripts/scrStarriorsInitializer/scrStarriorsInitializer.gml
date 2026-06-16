@@ -104,18 +104,18 @@ function createCrackerNut() {
         16, 16,  0, 0,  1, 1, /*str*/2, /*int*/0, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(), 
-            createPhysicalDamageStunChanceSingleTargetCard(),
-            createBuffPhysicalDamageSingleTargetCard() 
+            createPhysicalDamageStunChanseSingleTargetCard(),
+            createCardBuffPhysicalDamageSingleTarget() 
         ]);
 }
 
 function createLeaf() {
     return createStarrior("Leaf",
-        sprLeafIdle, sprLeafIdle, sprLeafIdle, sprLeafIdle,
+        HealLeaf, HealLeaf, HealLeaf, HealLeaf,
         20, 20,  0, 0,  1, 1,  /*str*/1, /*int*/1, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(), 
-            createPhysicalDamageWeaknessChanceSingleTargetCard(),
+            createPhysicalDamageWeakeningChanseSingleTargetCard(),
             createInstantHealSingleTargetCard() 
         ]);
 }
@@ -126,18 +126,18 @@ function createMushroom() {
         12, 12,  0, 0,  1, 1,  /*str*/3, /*int*/0, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
-            createPhysicalDamageVampirismChanceSingleTargetCard(),
-            createDebuffPhysicalProtectionSingleTargetCard() 
+            createPhysicalDamageVampirismChanseSingleTargetCard(),
+            createCardDebuffPhysicalProtectionSingleTarget() 
         ]);
 }
 
 function createFlower() {
     return createStarrior("Flower",
-        sprFlowerIdle, sprFlowerIdle, sprFlowerIdle, sprFlowerIdle,
+        PowerFlower, PowerFlower, PowerFlower, PowerFlower,
         12, 12,  0, 0,  1, 1,  /*str*/1, /*int*/3, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(), 
-            createLightningDamageSingleTargetCard(),
-            createBuffMagicalDamageSingleTargetCard()
+            createMagicalDamageSingleTargetCard(),
+            createCardBuffMagicalDamageSingleTarget()
         ]);
 }
