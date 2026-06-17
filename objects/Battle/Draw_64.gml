@@ -231,5 +231,5 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
 }
 
 
-if (battleState == BattleStates.Victory)  drawVictoryScreen();
-if (battleState == BattleStates.GameOver) drawGameOverScreen();
+if (battleState == BattleStates.Victory) drawVictoryScreen()
+if (battleState == BattleStates.GameOver) drawGameOverScreen()

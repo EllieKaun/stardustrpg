@@ -1,5 +1,5 @@
 enum Zone { Inner, Middle, Outer }
-enum Section { NE, NW, SW, SE }
+enum Section { TopRight, TopLeft, BottomLeft, BottomRight }
 
 function zoneAt(px, py) {
     var c = global.zoneConfig
@@ -13,8 +13,8 @@ function sectionAt(px, py) {
     var c  = global.zoneConfig
     var dx = px - c.cx
     var dy = py - c.cy
-    if (dy < 0) return (dx >= 0) ? Section.NE : Section.NW
-    else return (dx >= 0) ? Section.SE : Section.SW
+    if (dy < 0) return (dx >= 0) ? Section.TopRight : Section.TopLeft
+    else return (dx >= 0) ? Section.BottomRight : Section.BottomLeft
 }
 
 function enemyTypesForRegion(zone, section) {
@@ -87,56 +87,56 @@ function createEncounterForSection(section) {
 }
 
 function rewardPoolForSection(section) {
-    var rarities = [CardsRarity.Default, CardsRarity.Unusual]
+    var C = global.CardId;
+    var rarities = [CardsRarity.Default, CardsRarity.Unusual];
     var ids;
     switch (section) {
-        case 1: 
+        case 1:
             ids = [
-            "physicalDamageSingleTarget",            // атака одного врага  
-            "physicalDamageAllEnemies",              // атака группы
-            "physicalDamageWeaknessChanceSingleTarget", // шанс слабости
-            "fireDamageSingleTarget",                // атака огнём
-            "buffPhysicalDamageSingleTarget"         // усиление физ урона
-            ]
-            break
-        case 2: 
+                C.physicalDamageSingleTarget,            // атака одного врага
+                C.physicalDamageMultipleTarget,          // атака группы  
+                C.physicalDamageWeakenChanceSingleTarget,// шанс слабости     
+                C.magicalDamageBurnChanceSingleTarget,   // атака огнём     
+                C.buffPhysicalDamageSingleTarget         // усиление физ урона
+            ];
+        break;
+        case 2:
             ids = [
-            "physicalDamageBleedChanceSingleTarget", // шанс кровотечения
-            "buffPhysicalProtectionSingleTarget",    // усиление физ защиты
-            "debuffPhysicalDamageSingleTarget",      // снижение физ атаки
-            "instantManaSingleTarget",               // восстановление mp
-            "lightningDamageSingleTarget"            // атака молнией
-            ]
-            break
-        case 3: 
+                C.physicalDamageBleedChanceSingleTarget, // шанс кровотечения
+                C.buffPhysicalProtectionSingleTarget,    // усиление физ защиты
+                C.debuffPhysicalDamageSingleTarget,      // снижение физ атаки
+                C.instantManaGainSingleTarget,           // восстановление mp 
+                C.magicalDamageStunChanceSingleTarget    // атака молнией  
+            ];
+        break;
+        case 3:
             ids = [
-            "iceDamageSingleTarget",                 // атака льдом
-            "createMagicWeaknessSingleTarget",       // слабость к маг урону
-            "buffMagicalProtectionSingleTarget",     // усиление маг защиты
-            "debuffMagicalDamageSingleTarget",       // снижение маг атаки
-            "healAllAllies"                          // восстановление hp группе
-            ]
-            break
-        case 4: 
+                C.magicalDamageFreezeChanceSingleTarget, // атака льдом    
+                C.weaknessMagicalDamageSingleTarget,     // слабость к маг урону 
+                C.buffMagicalProtectionSingleTarget,     // усиление маг защиты
+                C.debuffMagicalDamageSingleTarget,       // снижение маг атаки
+                C.instantHealMultiTarget                 // восстановление 
+            ];
+        break;
+        case 4:
             ids = [
-            "starDamageSingleTarget",                // звёздная энергия
-            "lightningDamageAllEnemies",             // молния группе
-            "fireDamageAllEnemies",                  // огонь группе
-            "iceDamageAllEnemies",                   // лёд группе
-            "overTimeHealSingleTarget",              // постепенное hp
-            "overTimeManaSingleTarget"               // постепенное mp
-            ]
-            break
-        default: 
-            ids = ["physicalDamageSingleTarget"]
+                C.magicalDamageSingleTarget,             // звёздная энергия  
+                C.magicalDamageStunChanceMultiTarget,    // молния группе   
+                C.magicalDamageBurnChanceMultiTarget,    // огонь группе 
+                C.magicalDamageFreezeChanceMultiTarget,  // лёд группе    
+                C.overtimeHealSingleTarget,              // постепенное hp
+                C.overtimeManaGainSingleTarget           // постепенное mp 
+            ];
+        break;
+        default:
+            ids = [C.physicalDamageSingleTarget];
     }
-    return { ids: ids, rarities: rarities }
+    return { ids: ids, rarities: rarities };
 }
-
 function greenForestSection(px, py) {
     var c  = global.zoneConfig;
     var dx = px - c.cx;
     var dy = py - c.cy;               // y down → dy < 0 is "верх"
     if (dy < 0) return (dx < 0) ? 1 : 2;   // верх: лево=1, право=2
-    else        return (dx > 0) ? 3 : 4;   // низ:  право=3, лево=4
+    else return (dx > 0) ? 3 : 4;   // низ:  право=3, лево=4
 }

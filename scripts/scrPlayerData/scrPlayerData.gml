@@ -18,10 +18,11 @@ function playerDataInit() {
 
 // Иницилазиация базовых карт 
 function playerGrantStarterCards() {
-    unlockCard("physicalDamageSingleTarget")
-    unlockCard("magicalDamageSingleTarget")
-    unlockCard("instantHealSingleTarget")
-    unlockCard("buffPhysicalDamageSingleTarget")
+    var C = global.CardId;
+    unlockCard(C.physicalDamageSingleTarget);
+    unlockCard(C.magicalDamageSingleTarget);
+    unlockCard(C.instantHealSingleTarget);
+    unlockCard(C.buffPhysicalDamageSingleTarget);
 }
 
 // Моковые данные о пользователе
