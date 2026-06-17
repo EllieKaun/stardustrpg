@@ -58,6 +58,8 @@ deck) {
     starrior.aura = aura 
     starrior.guts = guts 
     starrior.mask_index = spriteIdle
+    starrior.isPuppet = false;
+    starrior.isEnemy  = false; 
     return starrior
 }
 

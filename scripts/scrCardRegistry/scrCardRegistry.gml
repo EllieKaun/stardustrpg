@@ -58,6 +58,12 @@ function cardIdsInit() {
         removeBleeding: "removeBleeding",
         removeStun: "removeStun",
         resurrection: "resurrection",
+        
+        // Куклы
+        summonAttackPuppet: "summonAttackPuppet",
+        summonMagicPuppet: "summonMagicPuppet",
+        summonHealPuppet: "summonHealPuppet",
+        summonBuffPuppet: "summonBuffPuppet"
     }
 }
 
@@ -126,6 +132,10 @@ function cardRegistryInit() {
     registerCard(C.removeBleeding, false, function(_r) { return createRemoveStatusBleedingSingleTargetCard() })
     registerCard(C.removeStun, false, function(_r) { return createRemoveStatusStunSingleTargetCard() })
     registerCard(C.resurrection, false, function(_r) { return createResurrectionCard() })
+    registerCard(C.summonAttackPuppet, false, function(_r){ return createSummonAttackPuppetCard() })
+    registerCard(C.summonMagicPuppet, false, function(_r){ return createSummonMagicPuppetCard() })
+    registerCard(C.summonHealPuppet, false, function(_r){ return createSummonHealPuppetCard() })
+    registerCard(C.summonBuffPuppet, false, function(_r){ return createSummonBuffPuppetCard() })
 }
 
 // Проверка существования карты по ид (чекает регистратор)

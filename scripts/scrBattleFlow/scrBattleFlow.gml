@@ -20,15 +20,18 @@ function afterPlayChecks() {
         battleState = BattleStates.CharacterPlay
     } else {
         selectNextCharacter()
-        if checkIfHasEffectType(selectedCharacter, EffectTypes.Stun) {
+        if (!selectedCharacter.isPuppet && checkIfHasEffectType(selectedCharacter, EffectTypes.Stun)) {
             skipTurn()
             return
         }
-        if isEnemysTurn() {
+        if (selectedCharacter.isPuppet) {
+            battleState = BattleStates.PuppetTurn
+            alarm_set(PUPPET_TURN, game_get_speed(gamespeed_fps) * 1)
+        } else if (isEnemysTurn()) {
             battleState = BattleStates.EnemysTurn
             alarm_set(ENEMYS_TURN, game_get_speed(gamespeed_fps) * 2)
         } else {
-            battleState = BattleStates.CharacterPlay            
+            battleState = BattleStates.CharacterPlay
         }
     }
     selectedTarget = noone

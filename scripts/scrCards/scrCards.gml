@@ -44,7 +44,7 @@ function Card(name,
             return getCostByRarity(rarity, 2, 3, 4, 5)
         } else {
             return getCostByRarity(rarity, 3, 4, 5, 6)
-        }
+        }   
     }
 }
 
@@ -145,7 +145,10 @@ function playCard(card, caster, targets) {
                         break
                         case EffectTypes.ShuffleDeck:
                             shuffleDeckAndTake4(selectedCharacter)
-                        break                 
+                        break    
+                        case EffectTypes.CreatePuppet:
+                            spawnPuppet(effect.puppetCategory, caster);
+                        break         
                     }
                     targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
                 break
@@ -269,6 +272,11 @@ function executeEffect(
             battleState = BattleStates.AfterPlayChecks
         break   
         case EffectTypes.Resurrection:
+            if (targets.isPuppet) { 
+                selectedTarget = noone
+                battleState = BattleStates.AfterPlayChecks
+                break
+            }
             effect.value = targets.hpMax / 2
             executeHealing(effect, other, targets)
             selectedTargetNumber = -1

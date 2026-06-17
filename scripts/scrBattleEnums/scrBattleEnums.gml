@@ -1,4 +1,6 @@
 #macro ENEMYS_TURN 0 
+#macro PUPPET_TURN 1
+#macro MAX_PUPPETS 3
 
 enum CardsRarity {
     Default,
@@ -11,7 +13,8 @@ enum TargetTypes {
     SingleEnemyTarget,
     AllAllies,
     SingleAllyTarget,
-    AllEnemies
+    AllEnemies,
+    Self
 }
 
 enum DamageTypes {
@@ -38,7 +41,8 @@ enum EffectTypes {
     ShuffleDeck,
     Resurrection,
     IgnoreWeakness,
-    CreateTemporaryWeakness
+    CreateTemporaryWeakness,
+    CreatePuppet
 }
 
 function effectTypeToString(type) {
@@ -54,7 +58,8 @@ function effectTypeToString(type) {
         case EffectTypes.CopyCard:      return "Copy Card"
         case EffectTypes.AddEnergy:     return "Add Energy"
         case EffectTypes.ShuffleDeck:   return "Shuffle Deck"
-        case EffectTypes.Resurrection:  return "Resurrection"
+        case EffectTypes.Resurrection:  return "Resurrection" 
+        case EffectTypes.CreatePuppet:  return "CreatePuppet"
         default:                        return "Unknown"
     }
 }
@@ -101,7 +106,8 @@ enum BattleStates {
     EnemyInfoSelection,
     EnemyInfoDisplay,
     Victory,
-    GameOver
+    GameOver,
+    PuppetTurn
 }
 
 enum StarriorStates {

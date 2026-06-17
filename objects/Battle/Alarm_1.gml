@@ -1,0 +1,1 @@
+runPuppetTurn(selectedCharacter);

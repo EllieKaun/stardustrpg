@@ -21,18 +21,18 @@ function enemyTypesForRegion(zone, section) {
     switch (zone) {
         case Zone.Outer:
             switch (section) {
-                case Section.NE: return [oCrakerNutSmall]
-                case Section.NW: return [oCrakerNutSmall]
-                case Section.SW: return [oCrakerNutSmall, oMushroomSmall]
-                case Section.SE: return [oMushroomSmall]
+                case Section.TopRight: return [oCrakerNutSmall]
+                case Section.TopLeft: return [oCrakerNutSmall]
+                case Section.BottomLeft: return [oCrakerNutSmall, oMushroomSmall]
+                case Section.BottomRight: return [oMushroomSmall]
             }
         break;
         case Zone.Middle:
             switch (section) {
-                case Section.NE: return [oMushroomSmall]
-                case Section.NW: return [oCrakerNutSmall, oMushroomSmall]
-                case Section.SW: return [oMushroomSmall]
-                case Section.SE: return [oCrakerNutSmall]
+                case Section.TopRight: return [oMushroomSmall]
+                case Section.TopLeft: return [oCrakerNutSmall, oMushroomSmall]
+                case Section.BottomLeft: return [oMushroomSmall]
+                case Section.BottomRight: return [oCrakerNutSmall]
             }
         break;
         case Zone.Inner: 

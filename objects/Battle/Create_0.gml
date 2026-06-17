@@ -40,6 +40,8 @@ var fitSpace = totalSpace < screenWidth / 2
 if !fitSpace {
     spacingBetweenStarriors = ((screenWidth / 2) - maxEnemiesCount * 16) / maxEnemiesCount
 }
-
+posZoneHeight = starriorsZoneHeight
+posScreenWidth = screenWidth
+posSpacing = spacingBetweenStarriors
 // генерация уровней
 generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleSection)
