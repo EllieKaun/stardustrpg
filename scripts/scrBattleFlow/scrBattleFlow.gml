@@ -18,7 +18,8 @@ function afterPlayChecks() {
         // если сыграл карту, а энергия еще осталась, играем еще
         show_debug_message("selectedCharacter.energy > 0 " + selectedCharacter.name)
         beginTurnFor(selectedCharacter)
-    } else {
+    } else { 
+        // иначе ходит следубщий по порядку
         selectNextCharacter()
         beginTurnFor(selectedCharacter)
     }
@@ -26,22 +27,23 @@ function afterPlayChecks() {
 }
 
 function beginTurnFor(character) {
-    if (!character.isPuppet && checkIfHasEffectType(character, EffectTypes.Stun)) { 
+    if (!character.isPuppet && checkIfHasEffectType(character, EffectTypes.Stun)) { // если стан - пропускаем ход
         skipTurn()
         return
     }
 
-    if (character.isPuppet) {
+    if (character.isPuppet) { // Ход куклы
         battleState = BattleStates.PuppetTurn
-        alarm_set(PUPPET_TURN, game_get_speed(gamespeed_fps) * 1)
-    } else if (character.isEnemy) {
+        alarm_set(PUPPET_TURN, game_get_speed(gamespeed_fps) * 2)
+    } else if (character.isEnemy) { // Ход врага
         battleState = BattleStates.EnemysTurn
         alarm_set(ENEMYS_TURN, game_get_speed(gamespeed_fps) * 2)
-    } else {
+    } else { // Ход героя
         battleState = BattleStates.CharacterPlay
     }
 }
 
+// Проверка: есть ли на персонаже наложенный эффект типа effectType
 function checkIfHasEffectType(character, effectType) {
     var effects = character.effects 
     for(var i = 0; i < array_length(effects); i++) {
@@ -50,6 +52,7 @@ function checkIfHasEffectType(character, effectType) {
     return false
 }
 
+// Проверка: есть ли на персонаже бафф определенного модификатор 
 function checkIfHasBuff(character, effectType, modifierToBuff) {
     var effects = character.effects 
     for(var i = 0; i < array_length(effects); i++) {
@@ -59,6 +62,7 @@ function checkIfHasBuff(character, effectType, modifierToBuff) {
     return undefined
 }
 
+// Обновление данных овертайм эффектов 
 function updateOvertime(character) {
     var effects = character.effects
     for (var i = array_length(effects) - 1; i >= 0; i--) {
@@ -69,12 +73,14 @@ function updateOvertime(character) {
     }
 }
 
+// Пропуск хода
 function skipTurn() {
     selectedCharacter.energy = 0
     battleState = BattleStates.AfterPlayChecks
     afterPlayChecks()
 }
 
+// Убрать карту из руки 
 function removeCardFromHand(caster, card) {
     var cardsInHand = caster.getCardsInHand()
     for(var i = 0; i < array_length(cardsInHand); i++) {
@@ -85,6 +91,7 @@ function removeCardFromHand(caster, card) {
     }
 }
 
+// Проверить, мертвы ли все в массиве
 function checkIfAllDead(array) {
     for(var i = 0; i < array_length(array); i ++) {
         if array[i].hp > 0 return false
@@ -92,42 +99,45 @@ function checkIfAllDead(array) {
     return true
 }
 
+// Проверка на ход противника
 function isEnemysTurn() {
     return array_contains(enemies, selectedCharacter)
 }
 
+// Выбор следующего персонажа
 function selectNextCharacter() {
-    var count = array_length(playOrder);
-    if (count == 0) return;
+    var count = array_length(playOrder)
+    if (count == 0) return; // если игроков нет - выход 
     
     var startIndex = (selectedCharacterNumber + 1) % count;
     
     for (var i = 0; i < count; i++) {
-        var currentIndex = (startIndex + i) % count;
-        var candidate = playOrder[currentIndex];
+        var currentIndex = (startIndex + i) % count
+        var candidate = playOrder[currentIndex]
         
-        if (!candidate.isKO()) {
-            unselectionToAll();
-            selectedCharacterNumber = currentIndex;
-            selectedCharacter = candidate;
-            selectedCharacter.isActive = true;
-            cards = selectedCharacter.getCardsInHand();
+        if (!candidate.isKO()) { // если персонаж не в ауте, выбираем
+            unselectionToAll()
+            selectedCharacterNumber = currentIndex
+            selectedCharacter = candidate
+            selectedCharacter.isActive = true
+            cards = selectedCharacter.getCardsInHand()
             
-            show_debug_message("new selectNextCharacter " + selectedCharacter.name);
-            return;
+            show_debug_message("new selectNextCharacter " + selectedCharacter.name)
+            return
         }
     }
     
-    show_debug_message("No alive characters found");
+    show_debug_message("No alive characters found")
 }
 
-
+// Снять активность с персонажей
 function unselectionToAll() {
     for (var i = 0; i < array_length(playOrder); i++) {
         playOrder[i].isActive = false
     }
 }
 
+// Восстановить всех игроков как активных
 function restoreSelection() {
     for (var i = 0; i < array_length(playOrder); i++) {
         if selectedCharacterNumber == i {
@@ -137,6 +147,7 @@ function restoreSelection() {
     }
 }
 
+// Инициализация выборки - отбор персонажей для выбора (исключение ko)
 function initTargetSelection(targets) {
     unselectionToAll()
     var aliveTargets = []
@@ -148,6 +159,7 @@ function initTargetSelection(targets) {
     selectNextTarget()
 }
 
+// Выбор целей для игровки
 function selectNextTarget() {
     if array_length(targetOptions) == 0 return
     if selectedTargetNumber == -1 {
@@ -161,6 +173,7 @@ function selectNextTarget() {
     selectedTarget.isTarget = true
 }
 
+// Выбор целей для игровки
 function selectPreviousTarget() {
     if array_length(targetOptions) == 0 return
     if selectedTargetNumber == -1 {
@@ -174,20 +187,24 @@ function selectPreviousTarget() {
     selectedTarget.isTarget = true
 }
 
+// Снять выбор целей
 function unselectTargets() {
     for (var i = 0; i < array_length(targetOptions); i++) {
         targetOptions[i].isTarget = false
     }
 }
 
+// Фильтр колбэк
 function filterCriteria(element, index) {
     return !element.isKO()
 }
 
+// Фильтрация целей не в ауте
 function filterNotKO(targets) {
     return array_filter(targets, filterCriteria)
 }
 
+// Возвращение в мир
 function returnToOverworld() {
     with (oTransition) { 
         target_room = global.returnRoom
@@ -195,6 +212,7 @@ function returnToOverworld() {
     }
 }
 
+// Начать заново
 function retryBattle() {
     with (oTransition) { 
         target_room = BattleRoom
