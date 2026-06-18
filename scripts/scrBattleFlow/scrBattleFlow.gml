@@ -17,24 +17,29 @@ function afterPlayChecks() {
     if selectedCharacter.energy > 0 {
         // если сыграл карту, а энергия еще осталась, играем еще
         show_debug_message("selectedCharacter.energy > 0 " + selectedCharacter.name)
-        battleState = BattleStates.CharacterPlay
+        beginTurnFor(selectedCharacter)
     } else {
         selectNextCharacter()
-        if (!selectedCharacter.isPuppet && checkIfHasEffectType(selectedCharacter, EffectTypes.Stun)) {
-            skipTurn()
-            return
-        }
-        if (selectedCharacter.isPuppet) {
-            battleState = BattleStates.PuppetTurn
-            alarm_set(PUPPET_TURN, game_get_speed(gamespeed_fps) * 1)
-        } else if (isEnemysTurn()) {
-            battleState = BattleStates.EnemysTurn
-            alarm_set(ENEMYS_TURN, game_get_speed(gamespeed_fps) * 2)
-        } else {
-            battleState = BattleStates.CharacterPlay
-        }
+        beginTurnFor(selectedCharacter)
     }
     selectedTarget = noone
+}
+
+function beginTurnFor(character) {
+    if (!character.isPuppet && checkIfHasEffectType(character, EffectTypes.Stun)) { 
+        skipTurn()
+        return
+    }
+
+    if (character.isPuppet) {
+        battleState = BattleStates.PuppetTurn
+        alarm_set(PUPPET_TURN, game_get_speed(gamespeed_fps) * 1)
+    } else if (character.isEnemy) {
+        battleState = BattleStates.EnemysTurn
+        alarm_set(ENEMYS_TURN, game_get_speed(gamespeed_fps) * 2)
+    } else {
+        battleState = BattleStates.CharacterPlay
+    }
 }
 
 function checkIfHasEffectType(character, effectType) {

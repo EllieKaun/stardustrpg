@@ -4,10 +4,15 @@ if (battleState == BattleStates.Victory)  {
     exit
 }
 if (battleState == BattleStates.GameOver) { 
-    stepGameOverScreen() 
-    exit
+    
 }
 switch (battleState) {
+    case BattleStates.Victory:
+        stepVictoryScreen() // Обработка действия на экране победы
+        exit
+    case BattleStates.GameOver: 
+        stepGameOverScreen() // Обработка действия на экране поражения
+        exit
     case BattleStates.Preparing:
         
     break
@@ -17,7 +22,7 @@ switch (battleState) {
     case BattleStates.CharacterPreparing:
         
     break
-    case BattleStates.EnemyTargetSelection: 
+    case BattleStates.EnemyTargetSelection: // Выбрать цель для карты: Противник
         var enterPressed = keyboard_check_pressed(vk_enter)
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
@@ -29,14 +34,14 @@ switch (battleState) {
                 selectPreviousTarget()
             }
         }
-        if (enterPressed) {
+        if (enterPressed) { // Когда выбрали - энтер и продолжаем игровой процесс
             battleState = BattleStates.PlayProcess
             unselectTargets()
             var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
             playCard(currentCard, selectedCharacter, selectedTarget)
         }
     break    
-    case BattleStates.AllyTargetSelection: 
+    case BattleStates.AllyTargetSelection: // Выбрать цель для карты: Союзник
         var enterPressed = keyboard_check_pressed(vk_enter)
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
@@ -48,22 +53,22 @@ switch (battleState) {
                 selectPreviousTarget()
             }
         }
-        if (enterPressed) {
+        if (enterPressed) { // Когда выбрали - энтер и продолжаем игровой процесс
             battleState = BattleStates.PlayProcess
             unselectTargets()
             var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
             playCard(currentCard, selectedCharacter, selectedTarget)
         }
     break 
-    case BattleStates.CharacterPlay:
+    case BattleStates.CharacterPlay: // Переключение стрелками между режимами: дека или меню, а также переключение между картами и опциями
         var enterPressed = keyboard_check_pressed(vk_enter)
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
         
-        if (focusArea == FocusArea.Deck) {
+        if (focusArea == FocusArea.Deck) { // Переключение стрелками в деке
             if (leftPressed) { 
                 if (selectedCard == 0) {
-                    focusArea = FocusArea.Menu
+                    focusArea = FocusArea.Menu // Переключение в меню
                     selectedMenuItem = 0
                 } else {
                     selectedCard--
@@ -74,7 +79,7 @@ switch (battleState) {
                     selectedCard++
                 }
             }
-        } else if (focusArea == FocusArea.Menu) {
+        } else if (focusArea == FocusArea.Menu) { // Переключение стрелками в меню
             var upPressed = keyboard_check_pressed(vk_up)
             var downPressed = keyboard_check_pressed(vk_down)
             
@@ -85,33 +90,33 @@ switch (battleState) {
                 selectedMenuItem = selectedMenuItem + 1 >= array_length(menuItems) ? 0 : selectedMenuItem + 1
             }
             if (rightPressed) {
-                focusArea = FocusArea.Deck
+                focusArea = FocusArea.Deck // Возвращение в деку
                 selectedCard = 0
             }
         }
-        if (enterPressed) {
-            if (focusArea == FocusArea.Menu) {
+        if (enterPressed) { // Выбор
+            if (focusArea == FocusArea.Menu) { // если меню
                 switch (menuItems[selectedMenuItem]) {
-                    case "Shuffle":
-                        shuffleDeckAndTake4(selectedCharacter)
+                    case "Shuffle": // Перемешать
+                        shuffleDeckAndTake4(selectedCharacter) 
                         skipTurn()
                     break
-                    case "Run":
+                    case "Run": // Сбежать
                         with (oTransition) {
                             target_room = global.returnRoom
                             state = "fade_out"
                         }
-                    break
+                    break // Информация о врагах
                     case "Info":
                         battleState = BattleStates.EnemyInfoSelection
                         initTargetSelection(enemies)
                     break
                 }
-            } else if (array_length(selectedCharacter.getCardsInHand()) > 0) { 
-                var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
-                var check = checkIfCanPlayCard(selectedCharacter, currentCard)
+            } else if (array_length(selectedCharacter.getCardsInHand()) > 0) {  // Если дека и есть карты в руке
+                var currentCard = selectedCharacter.getCardsInHand()[selectedCard] // Текущая карта
+                var check = checkIfCanPlayCard(selectedCharacter, currentCard) // Проверка условий, возможно ли сыграть карту
                 if !check { return }
-                if currentCard.target == TargetTypes.SingleEnemyTarget {
+                if currentCard.target == TargetTypes.SingleEnemyTarget { // Игровка карты в зависимости от типа карты
                     battleState = BattleStates.EnemyTargetSelection
                     initTargetSelection(enemies)
                 } else if currentCard.target == TargetTypes.SingleAllyTarget {
@@ -125,11 +130,11 @@ switch (battleState) {
                     playCard(currentCard, selectedCharacter, heroes)
                 } 
             } else {
-                skipTurn()
+                skipTurn() // Если нет карт - пропуск хода
             }
         }
     break
-    case BattleStates.EnemyInfoSelection:
+    case BattleStates.EnemyInfoSelection: // Менюшка выбора секции информации о враге
         var enterPressed = keyboard_check_pressed(vk_enter)
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
@@ -137,11 +142,10 @@ switch (battleState) {
         if (rightPressed) selectNextTarget()
         
         if (enterPressed) {
-            battleState = BattleStates.EnemyInfoDisplay
-            // Info display specific logic could go here if needed
+            battleState = BattleStates.EnemyInfoDisplay // Отображение конкретной информации
         }
     break
-    case BattleStates.EnemyInfoDisplay:
+    case BattleStates.EnemyInfoDisplay: // Менюшка информации о враге
         var enterPressed = keyboard_check_pressed(vk_enter)
         if (enterPressed) {
             battleState = BattleStates.CharacterPlay

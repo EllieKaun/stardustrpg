@@ -1,1 +1,1 @@
-runPuppetTurn(selectedCharacter);
+runPuppetTurn(selectedCharacter) // Ход куклы

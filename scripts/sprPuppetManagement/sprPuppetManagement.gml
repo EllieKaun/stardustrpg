@@ -32,11 +32,11 @@ function puppetDeckForCategory(category) {
 }
 
 function spawnPuppet(category, caster) {
-    var enemySide = array_contains(enemies, caster);   // caster's team decides the puppet's team
-    var team      = enemySide ? enemies : heroes;
-    if (countAlivePuppetsIn(team) >= MAX_PUPPETS) return;
+    var enemySide = caster.isEnemy   // caster's team decides the puppet's team
+    var team      = enemySide ? enemies : heroes
+    if (countAlivePuppetsIn(team) >= MAX_PUPPETS) return
 
-    var spr = puppetSpritesForCategory(category);
+    var spr = puppetSpritesForCategory(category)
     var p = createStarrior(
         "Puppet",
         spr.idle, spr.attack, spr.cast, spr.ko,
@@ -46,7 +46,7 @@ function spawnPuppet(category, caster) {
     p.isPuppet = true;
     p.isEnemy = enemySide;
     p.puppetCategory = category;
-
+    p.justSummoned   = true;     
     array_push(team, p);          // ← into heroes/enemies: targeting, draw, win/loss all just work
     array_push(playOrder, p);     // takes turns
     shuffleDeckAndTake4(p);
@@ -69,6 +69,11 @@ function aliveOf(arr) {
 }
 
 function runPuppetTurn(puppet) {
+    if (puppet.justSummoned) {        // ← first turn after being summoned: pass
+        puppet.justSummoned = false;
+        skipTurn();
+        return;
+    }
     var hand = puppet.getCardsInHand();
     var playable = [];
     for (var i = 0; i < array_length(hand); i++) {

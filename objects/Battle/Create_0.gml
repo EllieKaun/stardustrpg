@@ -43,5 +43,6 @@ if !fitSpace {
 posZoneHeight = starriorsZoneHeight
 posScreenWidth = screenWidth
 posSpacing = spacingBetweenStarriors
-// генерация уровней
+
+// генерация уровня
 generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleEncounter)

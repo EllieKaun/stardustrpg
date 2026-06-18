@@ -1,8 +1,8 @@
 function generateLevel(zoneH, screenW, spacing, encounter) {
-    initStarriors(encounter);
-    initStarriorsPositions(zoneH, screenW, spacing);
-    selectNextCharacter();
-    battleState = BattleStates.CharacterPlay;
+    initStarriorsFromEncounter(encounter)
+    initStarriorsPositions(zoneH, screenW, spacing)
+    selectNextCharacter()
+    battleState = BattleStates.CharacterPlay
 }
 
 function initStarriorsFromEncounter(encounter) {
@@ -14,6 +14,7 @@ function initStarriorsFromEncounter(encounter) {
     array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes));
     array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies));
     for (var i = 0; i < array_length(playOrder); i++) shuffleDeckAndTake4(playOrder[i]);
+    for (var i = 0; i < array_length(enemies); i++) enemies[i].isEnemy = true;
 }
 
 function initStarriorsForSection(section) {
@@ -89,6 +90,8 @@ function initStarriors() {
     for(var i = 0; i < array_length(playOrder); i++) {
         shuffleDeckAndTake4(playOrder[i])
     }
+    for (var i = 0; i < array_length(enemies); i++)
+        enemies[i].isEnemy = true
 }
 
 function playerDeckFor(character) {

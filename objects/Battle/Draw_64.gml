@@ -146,12 +146,12 @@ draw_sprite_stretched(
 var cardCurrentX = cardDeskStartX + cardSpacing
 var cardY = cardDeskStartY + topSpacing 
 var selectedBorderWidth = 1
-if (battleState == BattleStates.EnemysTurn) {
+if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn) {
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
     drawFitTextInArea("Waiting...",
-        cardDeskStartX + cardDeskWidth / 2, // Fixed centering
+        cardDeskStartX + cardDeskWidth / 2, 
         cardDeskStartY + cardDeskHeight / 2, 
         cardDeskWidth, 
         cardDeskHeight)
@@ -229,7 +229,6 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     // Pointer on Close Button
     draw_sprite(sPointer, 0, btnX - 12, btnY + btnHeight / 2)
 }
-
 
 if (battleState == BattleStates.Victory) drawVictoryScreen()
 if (battleState == BattleStates.GameOver) drawGameOverScreen()
