@@ -133,10 +133,32 @@ function rewardPoolForSection(section) {
     }
     return { ids: ids, rarities: rarities };
 }
+
 function greenForestSection(px, py) {
     var c  = global.zoneConfig;
     var dx = px - c.cx;
     var dy = py - c.cy;               // y down → dy < 0 is "верх"
     if (dy < 0) return (dx < 0) ? 1 : 2;   // верх: лево=1, право=2
     else return (dx > 0) ? 3 : 4;   // низ:  право=3, лево=4
+}
+
+function makeEncounter(enemyCreators, reward) {
+    return { enemyCreators: enemyCreators, reward: reward };  // creators: array of script refs
+}
+
+// random section fight — roll a composition, attach that section's reward pool
+function randomSectionEncounter(section) {
+    var comps = sectionCompositions(section);
+    var comp  = comps[irandom(array_length(comps) - 1)];   // [createNut, createLeaf, ...]
+    return makeEncounter(comp, rewardPoolForSection(section));
+}
+
+// fixed boss fight — explicit roster + explicit reward
+function puppetMasterEncounter() {
+    var C = global.CardId;
+    return makeEncounter(
+        [createPuppetMaster],                              // boss alone; it summons its own puppets
+        { ids: [C.summonAttackPuppet, C.buffMagicalDamageSingleTarget, C.magicalDamageStunChanceSingleTarget],
+          rarities: [CardsRarity.Rare, CardsRarity.Epic] }
+    );
 }

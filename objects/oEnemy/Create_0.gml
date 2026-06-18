@@ -1,7 +1,8 @@
 triggered = false
 my_spawner = noone
 show_debug_message("----- Created EnemyObject at position " + string(x) + " " + string(y))
-rewardFactory = function() {
-    return []
+spawnSection = 1
+// oEnemy (parent) Create
+getEncounter = function() {
+    return randomSectionEncounter(spawnSection)
 }
-encounterFactory = createMushroomEncounter

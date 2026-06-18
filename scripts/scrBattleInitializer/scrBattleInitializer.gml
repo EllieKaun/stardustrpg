@@ -1,8 +1,19 @@
-function generateLevel(zoneH, screenW, spacing, section) {
-    initStarriorsForSection(section);
+function generateLevel(zoneH, screenW, spacing, encounter) {
+    initStarriors(encounter);
     initStarriorsPositions(zoneH, screenW, spacing);
     selectNextCharacter();
     battleState = BattleStates.CharacterPlay;
+}
+
+function initStarriorsFromEncounter(encounter) {
+    heroes  = [createLana(), createViv()];
+    enemies = [];
+    var creators = encounter.enemyCreators;
+    for (var i = 0; i < array_length(creators); i++) array_push(enemies, creators[i]());
+
+    array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes));
+    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies));
+    for (var i = 0; i < array_length(playOrder); i++) shuffleDeckAndTake4(playOrder[i]);
 }
 
 function initStarriorsForSection(section) {
@@ -23,22 +34,24 @@ function initStarriorsFromFactory(encounterFactory) {
     for (var i = 0; i < array_length(playOrder); i++) shuffleDeckAndTake4(playOrder[i]);
 }
 
-function createStarrior(name, 
-spriteIdle, 
-spriteAttack, 
-spriteCast,
-spriteKO,
-hp, 
-maxHp, 
-mana,
-maxMana,
-energy, 
-maxEnergy,
-strength,
-intelligence,
-aura,
-guts,
-deck) {
+function createStarrior(
+    name, 
+    spriteIdle, 
+    spriteAttack, 
+    spriteCast,
+    spriteKO,
+    hp, 
+    maxHp, 
+    mana,
+    maxMana,
+    energy, 
+    maxEnergy,
+    strength,
+    intelligence,
+    aura,
+    guts,
+    deck
+) {
     var starrior = instance_create_depth(0, 0, depth - 1, Starrior)
     starrior.name = name
     starrior.hp = hp 

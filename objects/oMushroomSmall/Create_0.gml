@@ -1,14 +1,2 @@
 // Inherit the parent event
-event_inherited();
-rewardFactory = function() {
-    return {
-        ids: [
-            "physicalDamageSingleTarget",
-            "magicalDamageSingleTarget",
-            "instantHealSingleTarget",
-            "buffPhysicalDamageSingleTarget"
-        ],
-        rarities: [CardsRarity.Default, CardsRarity.Unusual, CardsRarity.Rare]
-    }
-}
-encounterFactory = createMushroomEncounter
+event_inherited()

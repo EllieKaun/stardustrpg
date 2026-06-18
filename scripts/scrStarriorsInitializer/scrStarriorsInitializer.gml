@@ -141,3 +141,13 @@ function createFlower() {
             createCardBuffMagicalDamageSingleTarget()
         ]);
 }
+function createPuppetMaster() {
+    return createStarrior("Puppet Master",
+        sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle,  // ← your sprites
+        40, 40,  0, 0,  2, 2,  /*str*/3, /*int*/4, /*aura*/2, /*guts*/2,
+        [
+            createMagicalDamageSingleTargetCard(),
+            createSummonAttackPuppetCard(),
+            createSummonHealPuppetCard()
+        ]);
+}

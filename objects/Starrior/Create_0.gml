@@ -112,7 +112,7 @@ function isKO() {
 function showEffectNotification(effect, dismissMode, duration) {
     var effectType = effect.type
     var statusName = variable_instance_exists(effect, "statusName") ? effect.statusName : undefined
-    var spr = getEffectSprite(effectType, statusName)
+    
     if !variable_instance_exists(effect, "sprite") { return }
     var inst = instance_create_depth(x, y, depth - 1, oEffectVisualizer)
     inst.sprite_index = effect.sprite
@@ -123,33 +123,5 @@ function showEffectNotification(effect, dismissMode, duration) {
     
     if (dismissMode == EffectVisualizerType.TimeBased) {
         inst.alarm[0] = duration * game_get_speed(gamespeed_fps)
-    }
-}
-
-function getEffectSprite(effectType, statusName) {
-    if !is_undefined(statusName) {
-        switch(statusName) {
-            case StatusNames.Burn: return removeBleedingEffect
-            case StatusNames.Shock: return removeBleedingEffect
-            case StatusNames.Freeze: return removeBleedingEffect
-            case StatusNames.Bleeding: return removeBleedingEffect
-            case StatusNames.Stun: return removeBleedingEffect
-            case StatusNames.Bomb: return removeBleedingEffect
-            case StatusNames.Vampirism: return removeBleedingEffect
-            case StatusNames.Weakening: return removeBleedingEffect
-        }
-    }
-    
-    switch(effectType) {
-        case EffectTypes.Damage: return removeBleedingEffect
-        case EffectTypes.Heal: return removeBleedingEffect
-        case EffectTypes.Buff: return removeBleedingEffect
-        case EffectTypes.Debuff: return removeBleedingEffect
-        case EffectTypes.ManaGain: return removeBleedingEffect
-        case EffectTypes.Weakening: return removeBleedingEffect
-        case EffectTypes.CopyCard: return removeBleedingEffect
-        case EffectTypes.AddEnergy: return removeBleedingEffect
-        case EffectTypes.ShuffleDeck: return removeBleedingEffect
-        default: return removeBleedingEffect
     }
 }

@@ -44,4 +44,4 @@ posZoneHeight = starriorsZoneHeight
 posScreenWidth = screenWidth
 posSpacing = spacingBetweenStarriors
 // генерация уровней
-generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleSection)
+generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleEncounter)
