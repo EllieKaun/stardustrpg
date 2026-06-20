@@ -39,21 +39,21 @@ function changeActionState(state, callback) {
         break 
         case StarriorStates.Attack:
             sprite_index = spriteActionAttack
-            image_index = 0; 
-            image_speed = 1;
+            image_index = 0
+            image_speed = 1
         break   
         case StarriorStates.Cast:
             sprite_index = spriteActionAttack
-            image_index = 0; 
-            image_speed = 1;
+            image_index = 0
+            image_speed = 1
         break 
         case StarriorStates.KnockOut:
             sprite_index = spriteActionKO
             image_index = 0; 
             if image_number > 1 {
-                image_speed = 1;
+                image_speed = 1
             } else {
-                image_speed = 0;
+                image_speed = 0
             }
         break      
     }

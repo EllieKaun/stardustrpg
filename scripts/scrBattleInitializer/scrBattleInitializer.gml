@@ -17,24 +17,6 @@ function initStarriorsFromEncounter(encounter) {
     for (var i = 0; i < array_length(enemies); i++) enemies[i].isEnemy = true;
 }
 
-function initStarriorsForSection(section) {
-    heroes  = [createLana(), createViv()]
-    enemies = createEncounterForSection(section)
-    array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes))
-    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies))
-    for (var i = 0; i < array_length(playOrder); i++) shuffleDeckAndTake4(playOrder[i])
-}
-
-
-function initStarriorsFromFactory(encounterFactory) {
-    heroes = [createLana(), createViv()];
-    enemies = (encounterFactory != undefined) ? encounterFactory() : createEnemiesLevel1();
-
-    array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes));
-    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies));
-    for (var i = 0; i < array_length(playOrder); i++) shuffleDeckAndTake4(playOrder[i]);
-}
-
 function createStarrior(
     name, 
     spriteIdle, 
@@ -75,23 +57,6 @@ function createStarrior(
     starrior.isPuppet = false;
     starrior.isEnemy  = false; 
     return starrior
-}
-
-function initStarriors() {
-    heroes = [
-        createLana(),
-        createViv()
-    ]
-
-    enemies = createEnemiesLevel1()
-    
-    array_copy(playOrder, array_length(playOrder), heroes, 0, array_length(heroes))
-    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies))
-    for(var i = 0; i < array_length(playOrder); i++) {
-        shuffleDeckAndTake4(playOrder[i])
-    }
-    for (var i = 0; i < array_length(enemies); i++)
-        enemies[i].isEnemy = true
 }
 
 function playerDeckFor(character) {

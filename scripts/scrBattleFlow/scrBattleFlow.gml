@@ -3,6 +3,14 @@ function afterPlayChecks() {
     executeEndOfTurn(selectedCharacter)
     updateOvertime(selectedCharacter)
     selectedCard = 0
+    removeDeadPuppets()
+      if (!instance_exists(selectedCharacter)) {
+        selectNextCharacter()
+        beginTurnFor(selectedCharacter)
+        selectedTarget = noone
+        return;
+    }
+    
     // Проверка на поражение
     if checkIfAllDead(heroes) {
         gameOverCursor = 0
@@ -218,4 +226,30 @@ function retryBattle() {
         target_room = BattleRoom
         state = "fade_out"
     }
+}
+
+// Удалить из массива
+function removeFromArray(arr, item) {
+    for (var i = array_length(arr) - 1; i >= 0; i--)
+        if (arr[i] == item) { 
+            array_delete(arr, i, 1)
+            return
+        }
+}
+
+// Удалить мертвых марионеток
+function removeDeadPuppets() {
+    for (var i = array_length(playOrder) - 1; i >= 0; i--) {
+        var c = playOrder[i]
+        if (c.isPuppet && c.isKO()) {
+            removeFromArray(heroes,  c)
+            removeFromArray(enemies, c)
+            array_delete(playOrder, i, 1)
+
+            if (i <= selectedCharacterNumber) selectedCharacterNumber--
+
+            instance_destroy(c)
+        }
+    }
+    initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)  
 }

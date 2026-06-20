@@ -1,11 +1,3 @@
-
-if (battleState == BattleStates.Victory)  { 
-    stepVictoryScreen()
-    exit
-}
-if (battleState == BattleStates.GameOver) { 
-    
-}
 switch (battleState) {
     case BattleStates.Victory:
         stepVictoryScreen() // Обработка действия на экране победы
