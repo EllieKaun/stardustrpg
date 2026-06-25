@@ -12,7 +12,8 @@ function createInstantHealSingleTargetCard() {
             {
                 type: EffectTypes.Heal,
                 value: random_range(1, 3),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: hphealEffect
             }
         ],
         healCard,
@@ -36,7 +37,8 @@ function createInstantMultipleTargetsHealCard() {
             {
                 type: EffectTypes.Heal,
                 value: random_range(1, 3),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: hphealEffect
             }
         ],
         healCard,
@@ -61,7 +63,8 @@ function createOvertimeHealSingleTargetCard() {
                 type: EffectTypes.Heal,
                 value: random_range(1, 3),
                 timing: Timing.EndOfTurn,
-                duration: 1
+                duration: 1,
+                sprite: hphealEffect
             }
         ],
         healCard,
@@ -87,7 +90,8 @@ function createInstantManaGainSingleTargetCard() {
             {
                 type: EffectTypes.ManaGain,
                 value: random_range(1, 3),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: mphealEffect
             }
         ],
         healCard,
@@ -111,7 +115,8 @@ function createInstantMultipleTargetsManaGainCard() {
             {
                 type: EffectTypes.ManaGain,
                 value: random_range(1, 3),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: mphealEffect
             }
         ],
         healCard,
@@ -136,7 +141,8 @@ function createOvertimeManaGainSingleTargetCard() {
                 type: EffectTypes.ManaGain,
                 value: random_range(1, 3),
                 timing: Timing.EndOfTurn,
-                duration: 1
+                duration: 1,
+                sprite: mphealEffect
             }
         ],
         healCard,
@@ -160,7 +166,8 @@ function createRemoveStatusShockSingleTargetCard() {
             {
                 type: EffectTypes.RemoveEffect,
                 statusName: StatusNames.Shock,
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: removeShockEffect
             }
         ],
         healCard,
@@ -184,7 +191,8 @@ function createRemoveStatusBurnSingleTargetCard() {
             {
                 type: EffectTypes.RemoveEffect,
                 statusName: StatusNames.Burn,
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: removeBurnEffect
             }
         ],
         healCard,
@@ -208,7 +216,8 @@ function createRemoveStatusFreezeSingleTargetCard() {
             {
                 type: EffectTypes.RemoveEffect,
                 statusName: StatusNames.Freeze,
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: removeFreezeEffect
             }
         ],
         healCard,
@@ -232,7 +241,8 @@ function createRemoveStatusBleedingSingleTargetCard() {
             {
                 type: EffectTypes.RemoveEffect,
                 statusName: StatusNames.Bleeding,
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: removeBleedingEffect
             }
         ],
         healCard,
@@ -256,7 +266,8 @@ function createRemoveStatusStunSingleTargetCard() {
             {
                 type: EffectTypes.RemoveEffect,
                 statusName: StatusNames.Stun,
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: removeStunEffect
             }
         ],
         healCard,
@@ -279,7 +290,8 @@ function createResurrectionCard() {
         [
             {
                 type: EffectTypes.Resurrection,
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: hphealEffect
             }
         ],
         healCard,

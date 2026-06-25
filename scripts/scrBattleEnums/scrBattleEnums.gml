@@ -1,4 +1,6 @@
 #macro ENEMYS_TURN 0 
+#macro PUPPET_TURN 1
+#macro MAX_PUPPETS 3
 
 enum CardsRarity {
     Default,
@@ -11,7 +13,8 @@ enum TargetTypes {
     SingleEnemyTarget,
     AllAllies,
     SingleAllyTarget,
-    AllEnemies
+    AllEnemies,
+    Self
 }
 
 enum DamageTypes {
@@ -36,7 +39,10 @@ enum EffectTypes {
     CopyCard,
     AddEnergy,
     ShuffleDeck,
-    Resurrection
+    Resurrection,
+    IgnoreWeakness,
+    CreateTemporaryWeakness,
+    CreatePuppet
 }
 
 function effectTypeToString(type) {
@@ -52,7 +58,8 @@ function effectTypeToString(type) {
         case EffectTypes.CopyCard:      return "Copy Card"
         case EffectTypes.AddEnergy:     return "Add Energy"
         case EffectTypes.ShuffleDeck:   return "Shuffle Deck"
-        case EffectTypes.Resurrection:  return "Resurrection"
+        case EffectTypes.Resurrection:  return "Resurrection" 
+        case EffectTypes.CreatePuppet:  return "CreatePuppet"
         default:                        return "Unknown"
     }
 }
@@ -97,7 +104,10 @@ enum BattleStates {
     AllyTargetSelection,
     EnemysTurn,
     EnemyInfoSelection,
-    EnemyInfoDisplay
+    EnemyInfoDisplay,
+    Victory,
+    GameOver,
+    PuppetTurn
 }
 
 enum StarriorStates {
@@ -115,4 +125,19 @@ enum CostType {
 enum FocusArea {
     Menu,
     Deck
+}
+
+enum EffectVisualizerType {
+    AnimationEnd,
+    TimeBased
+}
+
+enum CardCategory { Attack, Magic, Heal, Buff }
+
+function cardCategoryOf(_card) {
+    if (_card.cardBaseSpr == atcCard)  return CardCategory.Attack;
+    if (_card.cardBaseSpr == mgcCard)  return CardCategory.Magic;
+    if (_card.cardBaseSpr == healCard) return CardCategory.Heal;
+    if (_card.cardBaseSpr == buffCard) return CardCategory.Buff;
+    return CardCategory.Attack;
 }

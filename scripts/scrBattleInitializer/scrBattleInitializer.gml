@@ -1,35 +1,40 @@
-function generateLevel(
-    starriorsZoneHeight,
-    screenWidth,
-    spacingBetweenStarriors
-) {
-    initStarriors()
-    initStarriorsPositions(
-        starriorsZoneHeight,
-        screenWidth,
-        spacingBetweenStarriors
-    )
-    
+function generateLevel(zoneH, screenW, spacing, encounter) {
+    initStarriorsFromEncounter(encounter)
+    initStarriorsPositions(zoneH, screenW, spacing)
     selectNextCharacter()
     battleState = BattleStates.CharacterPlay
 }
 
-function createStarrior(name, 
-spriteIdle, 
-spriteAttack, 
-spriteCast,
-spriteKO,
-hp, 
-maxHp, 
-mana,
-maxMana,
-energy, 
-maxEnergy,
-strength,
-intelligence,
-aura,
-guts,
-deck) {
+function initStarriorsFromEncounter(encounter) {
+    heroes  = [createLana(), createViv()];
+    enemies = [];
+    var creators = encounter.enemyCreators;
+    for (var i = 0; i < array_length(creators); i++) array_push(enemies, creators[i]());
+
+    array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes));
+    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies));
+    for (var i = 0; i < array_length(playOrder); i++) shuffleDeckAndTake4(playOrder[i]);
+    for (var i = 0; i < array_length(enemies); i++) enemies[i].isEnemy = true;
+}
+
+function createStarrior(
+    name, 
+    spriteIdle, 
+    spriteAttack, 
+    spriteCast,
+    spriteKO,
+    hp, 
+    maxHp, 
+    mana,
+    maxMana,
+    energy, 
+    maxEnergy,
+    strength,
+    intelligence,
+    aura,
+    guts,
+    deck
+) {
     var starrior = instance_create_depth(0, 0, depth - 1, Starrior)
     starrior.name = name
     starrior.hp = hp 
@@ -49,22 +54,23 @@ deck) {
     starrior.aura = aura 
     starrior.guts = guts 
     starrior.mask_index = spriteIdle
+    starrior.isPuppet = false;
+    starrior.isEnemy  = false; 
     return starrior
 }
 
-function initStarriors() {
-    heroes = [
-        createLana(),
-        createViv()
-    ]
+function playerDeckFor(character) {
+    var saved = deckOf(character).cards
 
-    enemies = createEnemiesLevel1()
-    
-    array_copy(playOrder, array_length(playOrder), heroes, 0, array_length(heroes))
-    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies))
-    for(var i = 0; i < array_length(playOrder); i++) {
-        shuffleDeckAndTake4(playOrder[i])
+    var sorted = array_create(array_length(saved))
+    array_copy(sorted, 0, saved, 0, array_length(saved))
+    array_sort(sorted, function(a, b) { return a.slot - b.slot; })
+
+    var deck = []
+    for (var i = 0; i < array_length(sorted); i++) {
+        array_push(deck, cardFromRef(sorted[i]))
     }
+    return deck
 }
 
 function initStarriorsPositions(

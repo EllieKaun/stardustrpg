@@ -13,7 +13,8 @@ function createPhysicalDamageSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             }
         ],
         atcCard,
@@ -38,7 +39,8 @@ function createPhysicalDamageMultipleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             }
         ],
         atcCard,
@@ -63,7 +65,8 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Stun,
@@ -95,7 +98,8 @@ function createPhysicalDamageStunChanseMultipleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Stun,
@@ -127,7 +131,8 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Damage,
@@ -160,7 +165,8 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Damage,
@@ -193,7 +199,8 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Damage,
@@ -226,7 +233,8 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Damage,
@@ -259,7 +267,8 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Weakening,
@@ -291,7 +300,8 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
                 type: EffectTypes.Damage,
                 damageType: DamageTypes.Physical,
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
+                timing: Timing.Instant,
+                sprite: attackEffect
             },
             {
                 type: EffectTypes.Weakening,
@@ -325,7 +335,8 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant,
                 chance: 1.0,
-                statusName: StatusNames.Vampirism
+                statusName: StatusNames.Vampirism,
+                sprite: attackEffect
             }
         ],
         atcCard,
@@ -352,7 +363,8 @@ function createPhysicalDamageVampirismChanceMultipleTargetCard() {
                 value: getDamageFuncOnRariryAndTarget(rarity, targetType),
                 timing: Timing.Instant,
                 chance: 1.0,
-                statusName: StatusNames.Vampirism
+                statusName: StatusNames.Vampirism,
+                sprite: attackEffect
             }
         ],
         atcCard,

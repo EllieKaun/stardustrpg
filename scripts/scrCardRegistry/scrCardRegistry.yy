@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrCardRegistry",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrCardRegistry",
+  "parent":{
+    "name":"Data",
+    "path":"folders/Data.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

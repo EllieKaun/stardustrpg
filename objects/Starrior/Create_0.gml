@@ -9,15 +9,17 @@ maxMana = 0
 energy = 0
 maxEnergy = 0
 
-intelligense = 0 
+intelligence = 0
 strength = 0
 guts = 0
 aura = 0
 resistense = 0
-
+isEnemy = false
+isPuppet = false
 effects = []
 weaknesses = []
 strengths = []
+effectNotifications = []
 
 deck = new Deck([])
 
@@ -38,21 +40,21 @@ function changeActionState(state, callback) {
         break 
         case StarriorStates.Attack:
             sprite_index = spriteActionAttack
-            image_index = 0; 
-            image_speed = 1;
+            image_index = 0
+            image_speed = 1
         break   
         case StarriorStates.Cast:
             sprite_index = spriteActionAttack
-            image_index = 0; 
-            image_speed = 1;
+            image_index = 0
+            image_speed = 1
         break 
         case StarriorStates.KnockOut:
             sprite_index = spriteActionKO
             image_index = 0; 
             if image_number > 1 {
-                image_speed = 1;
+                image_speed = 1
             } else {
-                image_speed = 0;
+                image_speed = 0
             }
         break      
     }
@@ -106,4 +108,21 @@ function applyMana(value) {
 
 function isKO() {
     return hp <= 0
+}
+
+function showEffectNotification(effect, dismissMode, duration) {
+    var effectType = effect.type
+    var statusName = variable_instance_exists(effect, "statusName") ? effect.statusName : undefined
+    
+    if !variable_instance_exists(effect, "sprite") { return }
+    var inst = instance_create_depth(x, y, depth - 1, oEffectVisualizer)
+    inst.sprite_index = effect.sprite
+    inst.image_speed = 1
+    inst.image_index = 0
+    inst.dismissMode = dismissMode
+    inst.target = id
+    
+    if (dismissMode == EffectVisualizerType.TimeBased) {
+        inst.alarm[0] = duration * game_get_speed(gamespeed_fps)
+    }
 }

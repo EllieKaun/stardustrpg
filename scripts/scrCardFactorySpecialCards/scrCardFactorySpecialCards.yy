@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrCardFactorySpecialCards",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrCardFactorySpecialCards",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/BattleDomain/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

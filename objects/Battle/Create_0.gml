@@ -24,6 +24,13 @@ targetOptions = []
 
 battleState = BattleStates.Preparing
 
+// ДЛЯ ХРАНЕНИЯ ДАННЫХ В КОНЦЕ ИГРЫ
+rewardChoices  = [] // Победные карты
+rewardCursor   = 0 // Выбранная победная карта
+rewardSelected = false // Выбрана ли награда
+gameOverCursor = 0 // 0 = Retry, 1 = Exit
+
+
 // Расчет позиций героев и врагов
 var screenWidth = camera_get_view_width(view_camera[0])
 var screenHeight = camera_get_view_height(view_camera[0])
@@ -33,10 +40,9 @@ var fitSpace = totalSpace < screenWidth / 2
 if !fitSpace {
     spacingBetweenStarriors = ((screenWidth / 2) - maxEnemiesCount * 16) / maxEnemiesCount
 }
+posZoneHeight = starriorsZoneHeight
+posScreenWidth = screenWidth
+posSpacing = spacingBetweenStarriors
 
-// генерация уровней
-generateLevel(
-    starriorsZoneHeight,
-    screenWidth,
-    spacingBetweenStarriors
-)
+// генерация уровня
+generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleEncounter)

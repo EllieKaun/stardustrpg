@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"sprSpawnerUtils",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"sprSpawnerUtils",
+  "parent":{
+    "name":"Spawner",
+    "path":"folders/Overworld/Spawner.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

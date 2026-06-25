@@ -12,7 +12,8 @@ function createCardBuffPhysicalDamageSingleTarget() {
                 buffType: ModifiersToBuff.PhysicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 4,
+                sprite: buffEffect
             }
         ],
         buffCard,
@@ -36,7 +37,8 @@ function createCardBuffMagicalDamageSingleTarget() {
                 buffType: ModifiersToBuff.MagicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         buffCard,
@@ -60,7 +62,8 @@ function createCardBuffAnyDamageMultipleTarget() {
                 buffType: ModifiersToBuff.PhysicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             },
             {
                 type: EffectTypes.Buff,
@@ -91,7 +94,8 @@ function createCardBuffPhysicalProtectionSingleTarget() {
                 buffType: ModifiersToBuff.PhysicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         buffCard,
@@ -115,7 +119,8 @@ function createCardBuffMagicalProtectionSingleTarget() {
                 buffType: ModifiersToBuff.MagicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         atcCard,
@@ -139,7 +144,8 @@ function createCardBuffAnyProtectionMultipleTarget() {
                 buffType: ModifiersToBuff.PhysicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }, 
             {
                 type: EffectTypes.Buff,
@@ -168,10 +174,11 @@ function createCardDebuffPhysicalDamageSingleTarget() {
         [
             {
                 type: EffectTypes.Debuff,
-                debuffType: ModifiersToBuff.PhysicalDamage,
+                buffType: ModifiersToBuff.PhysicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: debuffEffect
             }
         ],
         buffCard,
@@ -192,10 +199,11 @@ function createCardDebuffMagicalDamageSingleTarget() {
         [
             {
                 type: EffectTypes.Debuff,
-                debuffType: ModifiersToBuff.MagicalDamage,
+                buffType: ModifiersToBuff.MagicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: buffEffect
             }
         ],
         buffCard,
@@ -219,7 +227,8 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
                 buffType: ModifiersToBuff.PhysicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: debuffEffect
             }
         ],
         buffCard,
@@ -243,7 +252,56 @@ function createCardDebuffMagicalProtectionSingleTarget() {
                 buffType: ModifiersToBuff.MagicalProtection,
                 value: 0.3,
                 timing: Timing.Overtime,
-                duration: 1
+                duration: 1,
+                sprite: debuffEffect
+            }
+        ],
+        buffCard,
+        defBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Создание слабости у врага к маг урону - (Слабые места*)
+function createCardCreateTemporaryWeaknessMagicalDamageSingleTarget() {
+    return new Card(
+        "Create Temporary Weakness Magical Damage Card",
+        CardsRarity.Default,
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        1,
+        [
+            {
+                type: EffectTypes.CreateTemporaryWeakness,
+                weakness: ModifiersToBuff.MagicalDamage,
+                timing: Timing.Overtime,
+                duration: 1,
+                sprite: debuffEffect
+            }
+        ],
+        buffCard,
+        defBuff,
+        commonBorder,
+        hpCostToken
+    )
+}
+
+// Создание слабости у врага к физ урону - (Слабые места*)
+function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget() {
+    return new Card(
+        "Create Temporary Weakness Physical Damage Card",
+        CardsRarity.Default,
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        1,
+        [
+            {
+                type: EffectTypes.CreateTemporaryWeakness,
+                weakness: ModifiersToBuff.PhysicalDamage,
+                timing: Timing.Overtime,
+                duration: 1,
+                sprite: debuffEffect
             }
         ],
         buffCard,

@@ -14,16 +14,8 @@ function createLana(){
             4,
             3,
             1,
-            [
-                createPhysicalDamageVampirismChanceMultipleTargetCard(),
-                createPhysicalDamageVampirismChanceMultipleTargetCard(),
-                createPhysicalDamageVampirismChanceMultipleTargetCard(),
-                createAddEnergyCard()
-           // createOvertimeHealSingleTargetCard(),
-           // createPhysicalDamageCardDefault(),
-            //createPhysicalDamageCardDefault(),
-            //createPhysicalDamageCardDefault()
-        ])
+            playerDeckFor(Characters.Lana) 
+    )
     return starrior
 }
 
@@ -45,10 +37,7 @@ function createViv(){
         2,
         1,
         3,
-        [
-        createPhysicalDamageSingleTargetCard(),
-        createPhysicalDamageVampirismChanceMultipleTargetCard()
-        ]
+        playerDeckFor(Characters.Viv) 
     )
 }
 
@@ -60,13 +49,13 @@ function createEnemiesLevel1() {
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
-            10, 
+            1, 
             10, 
             -1,
             -1,
             1,
             1,
-            10,
+            1,
             0,
             0,
             0,
@@ -77,13 +66,13 @@ function createEnemiesLevel1() {
             sprCrackerNutIdle,
             sprCrackerNutIdle, 
             sprCrackerNutIdle,  
-            76, 
-            76, 
+            1, 
+            10, 
             -1,
             -1,
             1,
             1,
-            10,
+            1,
             0,
             0,
             0,
@@ -94,16 +83,18 @@ function createEnemiesLevel1() {
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
             sprCrackerNutIdle, 
-            76, 
-            76, 
+            1, 
+            10, 
             -1,
             -1,
             1,
             1,
-            10,
+            1,
             0,
             0,
             0,
             [createPhysicalDamageWeakeningChanseSingleTargetCard()])
     ]
 }
+
+
