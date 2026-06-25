@@ -12,7 +12,7 @@ function createCardBuffPhysicalDamageSingleTarget() {
                 buffType: ModifiersToBuff.PhysicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
-                duration: 1,
+                duration: 4,
                 sprite: buffEffect
             }
         ],

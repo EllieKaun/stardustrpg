@@ -137,3 +137,26 @@ function drawDamageNumber(xx, yy, value, color) {
     instance.value = value
     instance.color = color
 }
+
+function statusIconFor(effect) {
+    if (variable_instance_exists(effect, "statusName")) {
+        switch (effect.statusName) {
+            case StatusNames.Stun: return StunIcon
+            case StatusNames.Burn: return BurnIcon
+            case StatusNames.Bleeding: return BleedIcon
+            case StatusNames.Freeze: return FreezeIcon
+            case StatusNames.Shock: return ShockIcon
+        }
+    }
+    if (effect.type == EffectTypes.Buff || effect.type == EffectTypes.Debuff) {
+        var isBuff = (effect.type == EffectTypes.Buff)
+        if (variable_instance_exists(effect, "buffType")) {
+            switch (effect.buffType) {
+                case ModifiersToBuff.PhysicalDamage: return isBuff ? StrBuff104 : StrDebuff
+                case ModifiersToBuff.MagicalDamage: return isBuff ? MagicBuff107 : MagicDebuff
+                case ModifiersToBuff.PhysicalProtection: return isBuff ? GutsBuff : GutsDebuff
+            }
+        }
+    }
+    return noone
+}

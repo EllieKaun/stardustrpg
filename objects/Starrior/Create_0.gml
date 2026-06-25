@@ -14,7 +14,8 @@ strength = 0
 guts = 0
 aura = 0
 resistense = 0
-
+isEnemy = false
+isPuppet = false
 effects = []
 weaknesses = []
 strengths = []

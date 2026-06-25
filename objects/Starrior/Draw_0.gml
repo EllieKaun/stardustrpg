@@ -18,6 +18,36 @@ if !isKO() {
         drawHealthBarMana(bbox_left, bbox_top - 6, bbox_right - bbox_left, 6, hp, maxHp, mana, maxMana)
     }
 }
-for(var i = 0; i < array_length(effects); i++) {
-    draw_sprite(stunned, 0, bbox_right, bbox_top)
+
+
+// Рисование наложенных эффектов/cтатусов 
+
+var statusIcons = []
+var seenIcons   = {}
+for (var i = 0; i < array_length(effects); i++) { // ищем иконки
+    var icon = statusIconFor(effects[i])
+    if (icon == noone) continue;
+
+    var key = string(icon)
+    if (variable_struct_exists(seenIcons, key)) continue
+    seenIcons[$ key] = true
+
+    array_push(statusIcons, icon)
+    if (array_length(statusIcons) >= 3) break
+}
+
+var n = array_length(statusIcons);
+if (n > 0) {
+    var iconSize = 12;        // tune to your icon sprites
+    var iconGap  = 2;
+
+    var barTop   = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6);
+    var rowY     = barTop - iconSize - 2;
+
+    var startX = bbox_left;    // ← start at the left edge, grow rightward
+
+    for (var i = 0; i < n; i++) {
+        var ix = startX + i * (iconSize + iconGap);
+        draw_sprite_stretched(statusIcons[i], 0, ix, rowY, iconSize, iconSize);
+    }
 }
