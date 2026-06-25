@@ -209,27 +209,67 @@ function executeEndOFTurnManaGain(character, effect, index) {
     }
 }
 
+// Поверхностная копия эффекта. Нужна, чтобы у каждой цели был свой
+// экземпляр (своя duration), а не общая ссылка на эффект карты.
+function cloneEffect(effect) {
+    var copy = {}
+    var names = variable_struct_get_names(effect)
+    for (var i = 0; i < array_length(names); i++) {
+        variable_struct_set(copy, names[i], variable_struct_get(effect, names[i]))
+    }
+    return copy
+}
+
+// Поле эффекта или undefined, если его нет (для structs работает так же)
+function effectField(effect, fieldName) {
+    return variable_instance_exists(effect, fieldName)
+        ? variable_struct_get(effect, fieldName)
+        : undefined
+}
+
+// Считаем эффекты "одинаковыми", если совпадает тип и уточняющие признаки:
+// статус (Burn/Freeze...), модификатор баффа/дебаффа, цель временной слабости.
+function effectsMatch(a, b) {
+    if (a.type != b.type) return false
+    if (effectField(a, "statusName") != effectField(b, "statusName")) return false
+    if (effectField(a, "buffType")   != effectField(b, "buffType"))   return false
+    if (effectField(a, "weakness")   != effectField(b, "weakness"))   return false
+    return true
+}
+
+// Если такой же эффект уже наложен — обновляем длительность вместо дубликата.
+function refreshOrPushEffect(target, effect) {
+    var effects = target.effects
+    for (var i = 0; i < array_length(effects); i++) {
+        if (effectsMatch(effects[i], effect)) {
+            if (variable_instance_exists(effect, "duration")) {
+                effects[i].duration = effect.duration
+            }
+            return effects[i]
+        }
+    }
+    var applied = cloneEffect(effect)
+    array_push(effects, applied)
+    return applied
+}
+
 function effectApplyStatus(effect, caster, targets) {
     var prob = random(1)
-
-    var statusName = variable_instance_exists(effect, "statusName") 
-                     ? effect.statusName 
-                     : undefined
 
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
             if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
-                array_push(targets[i].effects, effect)
+                var applied = refreshOrPushEffect(targets[i], effect)
                 if variable_instance_exists(targets[i], "showEffectNotification") {
-                    targets[i].showEffectNotification(effect, EffectVisualizerType.TimeBased, 1) 
+                    targets[i].showEffectNotification(applied, EffectVisualizerType.TimeBased, 1)
                 }
             }
         }
     } else {
         if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
-            array_push(targets.effects, effect)
+            var applied = refreshOrPushEffect(targets, effect)
             if variable_instance_exists(targets, "showEffectNotification") {
-                targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1) 
+                targets.showEffectNotification(applied, EffectVisualizerType.TimeBased, 1)
             }
         }
     }
@@ -324,73 +364,36 @@ function executeDamageEffect(
     targets
 ) {
     var damageType = effect.damageType
-    var damagePercentModifier = 0
-    var damage = is_method(effect.value) ? effect.value() : effect.value 
-    var physicalDamageBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.PhysicalDamage)
-    var magicalDamageBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.MagicalDamage)
-    var physicalDamageDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.PhysicalDamage)
-    var magicalDamageDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.MagicalDamage)
-    var physicalProtectionBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.PhysicalProtection)
-    var magicalProtectionBuff = checkIfHasBuff(caster, EffectTypes.Buff, ModifiersToBuff.MagicalProtection)
-    var physicalProtectionDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.PhysicalProtection)
-    var magicalProtectionDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.MagicalProtection)
-    var doesCasterHaveWeakening = checkIfHasEffectType(caster, EffectTypes.Weakening)
-    var doesTargetHaveWeakening = checkIfHasEffectType(targets, EffectTypes.Weakening)
-    var doesHaveStrengths = checkIfHasStrengths(targets, effect)
-    var doesHaveWeaknesses = checkIfHasWeaknesses(targets, effect)
+    var damage = is_method(effect.value) ? effect.value() : effect.value
+
+    // Базовый урон с учетом характеристики кастера
     switch (damageType) {
-    	case DamageTypes.Physical: 
-            damage *= caster.strength 
-            damage -= targets.guts
-            if physicalDamageBuff != undefined {
-                damagePercentModifier += physicalDamageBuff
-            }
-            if physicalDamageDebuff != undefined {
-                damagePercentModifier -= physicalDamageBuff
-            }
-            if physicalProtectionBuff != undefined {
-                damagePercentModifier -= physicalProtectionBuff
-            }
-            if physicalProtectionDebuff != undefined {
-                damagePercentModifier += physicalProtectionDebuff
-            }
-        break
-        case DamageTypes.Magical: 
-            damage *= caster.intelligence
-            damage -= targets.aura
-            if magicalDamageBuff != undefined {
-                damagePercentModifier += magicalDamageBuff
-            }
-            if magicalDamageDebuff != undefined {
-                damagePercentModifier -= magicalDamageBuff
-            }
-            if magicalProtectionBuff != undefined {
-                damagePercentModifier -= magicalProtectionBuff
-            }
-            if magicalProtectionDebuff != undefined {
-                damagePercentModifier += magicalProtectionDebuff
-            }
-        break
+        case DamageTypes.Physical: damage *= caster.strength;     break
+        case DamageTypes.Magical:  damage *= caster.intelligence; break
     }
-    
-    if doesCasterHaveWeakening {
-        damagePercentModifier -= 0.1
+
+    // Модификаторы ИСХОДЯЩЕГО урона кастера: баффы/дебаффы атаки — множители
+    // (бафф value=1.5 => x1.5, дебафф value=1.5 => /1.5).
+    var outMult = 1
+    if (damageType == DamageTypes.Physical) {
+        var pdBuff   = checkIfHasBuff(caster, EffectTypes.Buff,   ModifiersToBuff.PhysicalDamage)
+        var pdDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.PhysicalDamage)
+        if (pdBuff   != undefined && pdBuff.value   != 0) outMult *= pdBuff.value
+        if (pdDebuff != undefined && pdDebuff.value != 0) outMult /= pdDebuff.value
+    } else {
+        var mdBuff   = checkIfHasBuff(caster, EffectTypes.Buff,   ModifiersToBuff.MagicalDamage)
+        var mdDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.MagicalDamage)
+        if (mdBuff   != undefined && mdBuff.value   != 0) outMult *= mdBuff.value
+        if (mdDebuff != undefined && mdDebuff.value != 0) outMult /= mdDebuff.value
     }
-    
-    if doesTargetHaveWeakening {
-        damagePercentModifier += 0.1
-    }
-    
-    if doesHaveStrengths {
-        damagePercentModifier -= 0.1
-    }
-    
-    if doesHaveWeaknesses {
-        damagePercentModifier += 0.1
-    }
-    
-    damage += damage * damagePercentModifier
-    damage = max(damage, 0)
+    if (checkIfHasEffectType(caster, EffectTypes.Weakening)) outMult *= 0.9
+
+    damage *= outMult
+
+    // Митигация на стороне ЦЕЛИ: защита (баффы/дебаффы), броня, слабости/сопротивления.
+    // Та же функция используется и для End Of Turn урона, поэтому логика едина.
+    damage = mitigateDamage(targets, effect, damage)
+
     show_debug_message("damage " + string(damage) )
     targets.applyDamage(damage)
     targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)

@@ -174,7 +174,7 @@ function createCardDebuffPhysicalDamageSingleTarget() {
         [
             {
                 type: EffectTypes.Debuff,
-                debuffType: ModifiersToBuff.PhysicalDamage,
+                buffType: ModifiersToBuff.PhysicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
                 duration: 1,
@@ -199,7 +199,7 @@ function createCardDebuffMagicalDamageSingleTarget() {
         [
             {
                 type: EffectTypes.Debuff,
-                debuffType: ModifiersToBuff.MagicalDamage,
+                buffType: ModifiersToBuff.MagicalDamage,
                 value: 1.5,
                 timing: Timing.Overtime,
                 duration: 1,

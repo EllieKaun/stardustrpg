@@ -36,18 +36,18 @@ for (var i = 0; i < array_length(effects); i++) { // ищем иконки
     if (array_length(statusIcons) >= 3) break
 }
 
-var n = array_length(statusIcons);
+var n = array_length(statusIcons)
 if (n > 0) {
-    var iconSize = 12;        // tune to your icon sprites
-    var iconGap  = 2;
+    var iconSize = 12
+    var iconGap  = 2
 
-    var barTop   = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6);
-    var rowY     = barTop - iconSize - 2;
+    var barTop = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6)
+    var rowY = barTop - iconSize - 2
 
-    var startX = bbox_left;    // ← start at the left edge, grow rightward
+    var startX = bbox_left
 
     for (var i = 0; i < n; i++) {
-        var ix = startX + i * (iconSize + iconGap);
-        draw_sprite_stretched(statusIcons[i], 0, ix, rowY, iconSize, iconSize);
+        var ix = startX + i * (iconSize + iconGap)
+        draw_sprite_stretched(statusIcons[i], 0, ix, rowY, iconSize, iconSize)
     }
 }

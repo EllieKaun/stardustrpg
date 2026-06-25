@@ -9,7 +9,7 @@ maxMana = 0
 energy = 0
 maxEnergy = 0
 
-intelligense = 0 
+intelligence = 0
 strength = 0
 guts = 0
 aura = 0
