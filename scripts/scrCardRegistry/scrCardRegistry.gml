@@ -63,7 +63,8 @@ function cardIdsInit() {
         summonAttackPuppet: "summonAttackPuppet",
         summonMagicPuppet: "summonMagicPuppet",
         summonHealPuppet: "summonHealPuppet",
-        summonBuffPuppet: "summonBuffPuppet"
+        summonBuffPuppet: "summonBuffPuppet",
+        bossClone: "bossClone"
     }
 }
 
@@ -136,6 +137,7 @@ function cardRegistryInit() {
     registerCard(C.summonMagicPuppet, false, function(_r){ return createSummonMagicPuppetCard() })
     registerCard(C.summonHealPuppet, false, function(_r){ return createSummonHealPuppetCard() })
     registerCard(C.summonBuffPuppet, false, function(_r){ return createSummonBuffPuppetCard() })
+    registerCard(C.bossClone, false, function(_r){ return createBossCloneCard() })
 }
 
 // Проверка существования карты по ид (чекает регистратор)

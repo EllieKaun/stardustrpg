@@ -124,6 +124,7 @@
     {"id":{"name":"scrCreateEnemyStarriorFactory","path":"scripts/scrCreateEnemyStarriorFactory/scrCreateEnemyStarriorFactory.yy",},},
     {"id":{"name":"scrDeck","path":"scripts/scrDeck/scrDeck.yy",},},
     {"id":{"name":"scrDeckBuilderDrawing","path":"scripts/scrDeckBuilderDrawing/scrDeckBuilderDrawing.yy",},},
+    {"id":{"name":"scrEffectSystem","path":"scripts/scrEffectSystem/scrEffectSystem.yy",},},
     {"id":{"name":"scrDrawing","path":"scripts/scrDrawing/scrDrawing.yy",},},
     {"id":{"name":"scrGameOver","path":"scripts/scrGameOver/scrGameOver.yy",},},
     {"id":{"name":"scrInfo","path":"scripts/scrInfo/scrInfo.yy",},},

@@ -30,17 +30,20 @@ function Card(name,
         if effectsCount == 0 { return 0 }
             
         var effect = effects[0]
-        if effect.type == EffectTypes.Damage && effect.damageType == DamageTypes.Physical {
+        // У эффекта может не быть type (kind-only эффекты вроде BossClone) —
+        // тогда уходим в ветку по умолчанию.
+        var effectType = variable_struct_exists(effect, "type") ? effect.type : undefined
+        if effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Physical {
             if effectsCount > 1 {
                 return getCostByRarity(rarity, 4, 5, 6, 7)
             } else {
                 return getCostByRarity(rarity, 2, 3, 4, 5)
             }
-        } else if effect.type == EffectTypes.Damage && effect.damageType == DamageTypes.Magical {
+        } else if effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Magical {
             return getCostByRarity(rarity, 3, 4, 5, 6)
-        } else if effect.type == EffectTypes.Heal && effect.timing == Timing.Instant {
+        } else if effectType == EffectTypes.Heal && effect.timing == Timing.Instant {
             return getCostByRarity(rarity, 3, 4, 5, 6)
-        } else if effect.type == EffectTypes.Heal && effect.timing == Timing.EndOfTurn {
+        } else if effectType == EffectTypes.Heal && effect.timing == Timing.EndOfTurn {
             return getCostByRarity(rarity, 2, 3, 4, 5)
         } else {
             return getCostByRarity(rarity, 3, 4, 5, 6)
@@ -125,7 +128,7 @@ function playCard(card, caster, targets) {
         var caster = other
         for(var i = 0; i < array_length(effects); i++) {
             var effect = effects[i]
-            show_debug_message("processing effect type: " + string(effectTypeToString(effect.type)))
+            show_debug_message("processing effect: " + (variable_struct_exists(effect, "kind") ? string(effect.kind) : effectTypeToString(effect.type)))
             switch (effect.timing) {
                 case Timing.Instant: 
                     executeEffect(effect, caster, targets)
@@ -137,19 +140,7 @@ function playCard(card, caster, targets) {
                     effectApplyStatus(effect, caster, targets)
                 break
                 case Timing.OnActions:
-                    switch (effect.type) {
-                    	case EffectTypes.AddEnergy:
-                            targets.energy += effect.value
-                        break   
-                        case EffectTypes.CopyCard:
-                        break
-                        case EffectTypes.ShuffleDeck:
-                            shuffleDeckAndTake4(selectedCharacter)
-                        break    
-                        case EffectTypes.CreatePuppet:
-                            spawnPuppet(effect.puppetCategory, caster);
-                        break         
-                    }
+                    runOnPlay(effect, caster, targets)
                     targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
                 break
             }
@@ -163,49 +154,23 @@ function playCard(card, caster, targets) {
     })
 }
 
+// Конец хода: обобщённый проход. Для каждого EndOfTurn-эффекта вызываем
+// onEndOfTurn его обработчика, показываем нотификацию и тикаем длительность.
+// Никакого switch по типу — поведение задано в реестре (scrEffectSystem).
 function executeEndOfTurn(character) {
     var effects = character.effects
     for(var i = array_length(effects) - 1; i >= 0; i--) {
         var effect = effects[i]
-        if (effect.timing != Timing.EndOfTurn) continue 
-        switch (effect.type) {
-            case EffectTypes.Damage: 
-                executeEndOFTurnDamage(character, effect, i)
-                break
-            case EffectTypes.Heal: 
-                executeEndOFTurnHeal(character, effect, i)
-                break
-            case EffectTypes.ManaGain: 
-                executeEndOFTurnManaGain(character, effect, i)
-                break
+        if (effect.timing != Timing.EndOfTurn) continue
+        var h = effectHandler(effect)
+        if (effectHasHook(h, "onEndOfTurn")) {
+            h.onEndOfTurn(effect, character)
+            character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
+            if (variable_instance_exists(effect, "duration")) {
+                effect.duration -= 1
+                if (effect.duration <= 0) array_delete(effects, i, 1)
+            }
         }
-    }
-}
-
-function executeEndOFTurnDamage(character, effect, index) {
-    var raw = is_method(effect.value) ? effect.value() : effect.value
-    var dmg = mitigateDamage(character, effect, raw)
-    character.applyDamage(dmg)
-    character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
-    effect.duration -= 1
-    if (effect.duration <= 0) array_delete(character.effects, index, 1)
-}
-
-function executeEndOFTurnHeal(character, effect, index) {
-    character.applyHeal(effect.value)
-    character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
-    effect.duration -= 1 
-    if effect.duration <= 0 {
-        array_delete(character.effects, index, 1)
-    }
-}
-
-function executeEndOFTurnManaGain(character, effect, index) {
-    character.mana += effect.value
-    character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
-    effect.duration -= 1 
-    if effect.duration <= 0 {
-        array_delete(character.effects, index, 1)
     }
 }
 
@@ -230,7 +195,7 @@ function effectField(effect, fieldName) {
 // Считаем эффекты "одинаковыми", если совпадает тип и уточняющие признаки:
 // статус (Burn/Freeze...), модификатор баффа/дебаффа, цель временной слабости.
 function effectsMatch(a, b) {
-    if (a.type != b.type) return false
+    if (effectField(a, "type") != effectField(b, "type")) return false
     if (effectField(a, "statusName") != effectField(b, "statusName")) return false
     if (effectField(a, "buffType")   != effectField(b, "buffType"))   return false
     if (effectField(a, "weakness")   != effectField(b, "weakness"))   return false
@@ -260,6 +225,7 @@ function effectApplyStatus(effect, caster, targets) {
         for(var i = 0; i < array_length(targets); i++) {
             if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
                 var applied = refreshOrPushEffect(targets[i], effect)
+                runOnApply(applied, caster, targets[i])
                 if variable_instance_exists(targets[i], "showEffectNotification") {
                     targets[i].showEffectNotification(applied, EffectVisualizerType.TimeBased, 1)
                 }
@@ -268,6 +234,7 @@ function effectApplyStatus(effect, caster, targets) {
     } else {
         if !variable_instance_exists(effect, "chance") || prob <= effect.chance {
             var applied = refreshOrPushEffect(targets, effect)
+            runOnApply(applied, caster, targets)
             if variable_instance_exists(targets, "showEffectNotification") {
                 targets.showEffectNotification(applied, EffectVisualizerType.TimeBased, 1)
             }
@@ -275,55 +242,13 @@ function effectApplyStatus(effect, caster, targets) {
     }
 }
 
-function executeEffect(
-    effect,
-    caster, 
-    targets
-) {
-    switch (effect.type) {
-        case EffectTypes.Damage: 
-            if is_array(targets) {
-                for(var i = 0; i < array_length(targets); i++) {
-                    if !targets[i].isKO() executeDamageEffect(effect, other, targets[i])
-                }
-            } else {
-                if !targets.isKO() executeDamageEffect(effect, other, targets)
-            }
-            selectedTargetNumber = -1
-            selectedTarget = noone
-            battleState = BattleStates.AfterPlayChecks
-        break    
-        case EffectTypes.Heal: 
-            executeHealing(effect, other, targets)
-            selectedTargetNumber = -1
-            selectedTarget = noone
-            battleState = BattleStates.AfterPlayChecks  
-        break  
-        case EffectTypes.ManaGain: 
-            executeManaGain(effect, other, targets)
-            selectedTargetNumber = -1
-            selectedTarget = noone
-            battleState = BattleStates.AfterPlayChecks  
-        break  
-        case EffectTypes.RemoveEffect: 
-            executeRemoveStatus(targets, effect.statusName)
-            selectedTargetNumber = -1
-            selectedTarget = noone
-            battleState = BattleStates.AfterPlayChecks
-        break   
-        case EffectTypes.Resurrection:
-            if (targets.isPuppet) { 
-                selectedTarget = noone
-                battleState = BattleStates.AfterPlayChecks
-                break
-            }
-            effect.value = targets.hpMax / 2
-            executeHealing(effect, other, targets)
-            selectedTargetNumber = -1
-            selectedTarget = noone
-            battleState = BattleStates.AfterPlayChecks
-        break  
-    }    
+// Мгновенный эффект: вызываем onInstant обработчика и сбрасываем выбор цели.
+// Поведение каждого типа задано в реестре (scrEffectSystem), без switch.
+function executeEffect(effect, caster, targets) {
+    runInstant(effect, caster, targets)
+    selectedTargetNumber = -1
+    selectedTarget = noone
+    battleState = BattleStates.AfterPlayChecks
 }
 
 function checkIfHasStrengths(target, effect) {

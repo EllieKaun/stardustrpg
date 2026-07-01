@@ -49,6 +49,6 @@ function createPuppetMaster() {
         [
             createMagicalDamageSingleTargetCard(),
             createSummonAttackPuppetCard(),
-            createSummonHealPuppetCard()
+            createSummonHealPuppetCard(),
         ])
 }

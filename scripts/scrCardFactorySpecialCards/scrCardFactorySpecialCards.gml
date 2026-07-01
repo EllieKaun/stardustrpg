@@ -5,7 +5,7 @@ function createSummonPuppetCard(category, name) {
         TargetTypes.Self, 
         StarriorStates.Cast,
         1,
-        [ { type: EffectTypes.CreatePuppet, timing: Timing.OnActions, puppetCategory: category } ],
+        [ CreatePuppetEffect(category) ],
         mgcCard,
         lightningSingleTarget,
         commonBorder,
@@ -29,6 +29,22 @@ function createSummonHealPuppetCard() {
 }
 
 // Марионетка баффа
-function createSummonBuffPuppetCard() { 
-    return createSummonPuppetCard(CardCategory.Buff, "Buff Puppet") 
+function createSummonBuffPuppetCard() {
+    return createSummonPuppetCard(CardCategory.Buff, "Buff Puppet")
+}
+
+// Эксклюзивная карта босса: клонирует себя во все свободные слоты команды.
+// Вся логика — в обработчике "BossClone" реестра (scrEffectSystem).
+function createBossCloneCard() {
+    return new Card(
+        "Mirror Legion", CardsRarity.Epic,
+        TargetTypes.Self,
+        StarriorStates.Cast,
+        1,
+        [ BossClone(5) ],
+        mgcCard,
+        lightningSingleTarget,
+        commonBorder,
+        hpCostToken
+    )
 }

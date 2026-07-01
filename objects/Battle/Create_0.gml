@@ -30,6 +30,9 @@ rewardCursor   = 0 // Выбранная победная карта
 rewardSelected = false // Выбрана ли награда
 gameOverCursor = 0 // 0 = Retry, 1 = Exit
 
+// Реестр эффектов (data-driven система эффектов, см. scrEffectSystem)
+initEffectRegistry()
+
 
 // Расчет позиций героев и врагов
 var screenWidth = camera_get_view_width(view_camera[0])
