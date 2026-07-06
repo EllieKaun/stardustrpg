@@ -1,2 +1,5 @@
-spdWalk = 0.7
-last_v_dir = 1
+event_inherited();
+sprIdle = sLana 
+sprWalk = sLanaWalk
+sprBackIdle = sLanaBackwards
+sprBackWalk = sLanaBackwardsWalk
