@@ -143,37 +143,71 @@ draw_sprite_stretched(
 )
 
 // Рисуем карты
-var cardCurrentX = cardDeskStartX + cardSpacing
-var cardY = cardDeskStartY + topSpacing 
+var cardY = cardDeskStartY + topSpacing
 var selectedBorderWidth = 1
+
 if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn) {
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
     drawFitTextInArea("Waiting...",
-        cardDeskStartX + cardDeskWidth / 2, 
-        cardDeskStartY + cardDeskHeight / 2, 
-        cardDeskWidth, 
+        cardDeskStartX + cardDeskWidth / 2,
+        cardDeskStartY + cardDeskHeight / 2,
+        cardDeskWidth,
         cardDeskHeight)
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
 } else {
-    if selectedCharacter != noone  {
-        for(var i = 0; i < min(array_length(selectedCharacter.getCardsInHand()), maxCardsOnDeskNumber); i++) {
-            var card = selectedCharacter.getCardsInHand()[i]
-            var isSelected = selectedCard == i
-            var drawY = isSelected ? cardY - 2 : cardY
-            
-            draw_sprite_stretched(card.cardBaseSpr, 0, cardCurrentX, drawY, cardWidth, cardHeight)
-            draw_sprite_stretched(card.cardIllustrationSpr, 0, cardCurrentX, drawY, cardWidth, cardHeight)
-            draw_sprite_stretched(card.cardBorderSpr, 0, cardCurrentX, drawY, cardWidth, cardHeight)
-            draw_sprite_stretched(card.cardTokenSpr, 0, cardCurrentX, drawY, cardWidth, cardHeight)
-            
-            if (isSelected && focusArea == FocusArea.Deck) { 
-                drawBorderAroundCard(cardCurrentX, drawY, selectedBorderWidth, cardWidth, cardHeight)
-                draw_sprite(sPointer, 0, cardCurrentX, drawY + cardHeight / 2)
-            } 
-            cardCurrentX += cardWidth + cardSpacing
+    if (selectedCharacter != noone) {
+        var hand = selectedCharacter.getCardsInHand()
+        var n    = min(array_length(hand), maxCardsOnDeskNumber)
+
+        // card size: clamp to desk with padding
+        var vPad      = 8
+        var drawCardH = cardDeskHeight - vPad * 2
+        var drawCardW = drawCardH * 2 / 3
+
+        var handCenterX = cardDeskStartX + cardDeskWidth / 2
+        var handCenterY = cardDeskStartY + cardDeskHeight / 2   // desk vertical middle
+        var spread      = min(drawCardW * 0.8, (cardDeskWidth - drawCardW) / max(1, n))
+        var mid         = (n - 1) / 2
+
+        var arcLift = 2
+        var arcTilt = 5    // fan rotation — raise for more tilt, 0 for a flat row
+
+        // two passes: non-selected first, selected last so it draws on top
+        for (var pass = 0; pass < 2; pass++) {
+            for (var i = 0; i < n; i++) {
+                var isSelected = (selectedCard == i)
+                if ((pass == 0) == isSelected) continue   // pass 0 = others, pass 1 = selected
+
+                var card = hand[i]
+                var off  = i - mid
+
+                // compute transform, THEN apply selected overrides, THEN derive scale
+                var cx    = handCenterX + off * spread
+                var cy    = handCenterY - abs(off) * arcLift
+                var angle = -off * arcTilt
+                var scale = 1
+
+                if (isSelected) { cy -= 6; scale = 1.12; angle = 0; }
+
+                // Middle-Centre origin → draw at CENTER (cx/cy), pass real angle
+                var sx = (drawCardW / sprite_get_width(card.cardBaseSpr))  * scale
+                var sy = (drawCardH / sprite_get_height(card.cardBaseSpr)) * scale
+
+                draw_sprite_ext(card.cardBaseSpr,         0, cx, cy, sx, sy, angle, c_white, 1)
+                draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
+                draw_sprite_ext(card.cardBorderSpr,       0, cx, cy, sx, sy, angle, c_white, 1)
+                draw_sprite_ext(card.cardTokenSpr,        0, cx, cy, sx, sy, angle, c_white, 1)
+
+                if (isSelected && focusArea == FocusArea.Deck) {
+                    var bw = drawCardW * scale
+                    var bh = drawCardH * scale
+                    drawBorderAroundCard(cx - bw / 2, cy - bh / 2, selectedBorderWidth, bw, bh)
+                    draw_sprite(sPointer, 0, cx - bw / 2, cy)
+                }
+            }
         }
     }
 }

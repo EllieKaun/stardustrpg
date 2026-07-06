@@ -142,3 +142,47 @@ function drawDamageNumber(xx, yy, value, color) {
 function statusIconFor(effect) {
     return effectIcon(effect)
 }
+
+/////////////////////////////////////////
+// returns {x, y, angle, scale} for card i of n, centered under the screen
+function handCardTransform(i, n, hoveredIndex) {
+    // tunables
+    var spread  = 40;   // px between card centers
+    var arcLift = 3;    // px each card dips toward the ends
+    var arcTilt = 4;    // degrees rotation per step from center
+
+    var mid = (n - 1) / 2;
+    var off = i - mid;              // signed distance from the middle card
+
+    var baseX = display_get_gui_width() / 2;
+    var baseY = display_get_gui_height() - 70;
+
+    var t = {
+        x:     baseX + off * spread,
+        y:     baseY + abs(off) * arcLift,   // ends dip down → arc
+        angle: -off * arcTilt,               // fan rotation
+        scale: 1
+    };
+
+    // hovered/selected card overrides: lift, straighten, enlarge
+    if (i == hoveredIndex) {
+        t.y     -= 20;
+        t.angle  = 0;
+        t.scale  = 1.25;
+    }
+
+    return t;
+}
+
+function drawCardTransformed(card, cx, cy, w, h, angle, scale, alpha = 1) {
+    // sprite scale factors: sprite native size → target w/h, then * scale
+    var sx = (w / sprite_get_width(card.cardBaseSpr))  * scale;
+    var sy = (h / sprite_get_height(card.cardBaseSpr)) * scale;
+    draw_sprite_ext(card.cardBaseSpr,         0, cx, cy, sx, sy, angle, c_white, alpha);
+    draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, alpha);
+    draw_sprite_ext(card.cardBorderSpr,       0, cx, cy, sx, sy, angle, c_white, alpha);
+    draw_sprite_ext(card.cardTokenSpr,        0, cx, cy, sx, sy, angle, c_white, alpha);
+}
+
+
+

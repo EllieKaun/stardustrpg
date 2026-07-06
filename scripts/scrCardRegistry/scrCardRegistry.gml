@@ -2,18 +2,18 @@
 function cardIdsInit() {
     global.CardId = {
         // Физические
-        physicalDamageSingleTarget:           "physicalDamageSingleTarget",
-        physicalDamageMultipleTarget:         "physicalDamageMultipleTarget",
+        physicalDamageSingleTarget: "physicalDamageSingleTarget",
+        physicalDamageMultipleTarget: "physicalDamageMultipleTarget",
         physicalDamageStunChanceSingleTarget: "physicalDamageStunChanceSingleTarget",
-        physicalDamageStunChanceMultiTarget:  "physicalDamageStunChanceMultiTarget",
+        physicalDamageStunChanceMultiTarget: "physicalDamageStunChanceMultiTarget",
         physicalDamageBleedChanceSingleTarget:"physicalDamageBleedChanceSingleTarget",
         physicalDamageBleedChanceMultiTarget: "physicalDamageBleedChanceMultiTarget",
         physicalDamageBombChanceSingleTarget: "physicalDamageBombChanceSingleTarget",
-        physicalDamageBombChanceMultiTarget:  "physicalDamageBombChanceMultiTarget",
+        physicalDamageBombChanceMultiTarget: "physicalDamageBombChanceMultiTarget",
         physicalDamageWeakenChanceSingleTarget:"physicalDamageWeakenChanceSingleTarget",
         physicalDamageWeakenChanceMultiTarget:"physicalDamageWeakenChanceMultiTarget",
         physicalDamageVampChanceSingleTarget: "physicalDamageVampChanceSingleTarget",
-        physicalDamageVampChanceMultiTarget:  "physicalDamageVampChanceMultiTarget",
+        physicalDamageVampChanceMultiTarget: "physicalDamageVampChanceMultiTarget",
 
         // Магические
         magicalDamageSingleTarget: "magicalDamageSingleTarget",
