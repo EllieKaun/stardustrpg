@@ -1,7 +1,7 @@
 {
   "$GMFont":"",
   "%Name":"fnM3x6_10",
-  "AntiAlias":1,
+  "AntiAlias":0,
   "applyKerning":0,
   "ascender":14,
   "ascenderOffset":0,
