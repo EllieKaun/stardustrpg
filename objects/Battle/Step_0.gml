@@ -1,3 +1,5 @@
+updateCardAnims() // двигаем/чистим летящие карты в любом состоянии (звёзды догорают)
+
 switch (battleState) {
     case BattleStates.Victory:
         stepVictoryScreen() // Обработка действия на экране победы
@@ -30,7 +32,7 @@ switch (battleState) {
             battleState = BattleStates.PlayProcess
             unselectTargets()
             var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
-            playCard(currentCard, selectedCharacter, selectedTarget)
+            playCardAnimated(currentCard, selectedCharacter, selectedTarget)
         }
     break    
     case BattleStates.AllyTargetSelection: // Выбрать цель для карты: Союзник
@@ -49,7 +51,7 @@ switch (battleState) {
             battleState = BattleStates.PlayProcess
             unselectTargets()
             var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
-            playCard(currentCard, selectedCharacter, selectedTarget)
+            playCardAnimated(currentCard, selectedCharacter, selectedTarget)
         }
     break 
     case BattleStates.CharacterPlay: // Переключение стрелками между режимами: дека или меню, а также переключение между картами и опциями
@@ -115,12 +117,10 @@ switch (battleState) {
                     battleState = BattleStates.AllyTargetSelection
                     initTargetSelection(heroes)
                 } else if currentCard.target == TargetTypes.AllEnemies {
-                    battleState = BattleStates.PlayProcess
-                    playCard(currentCard, selectedCharacter, enemies)
+                    playCardAnimated(currentCard, selectedCharacter, enemies)
                 } else if currentCard.target == TargetTypes.AllAllies {
-                    battleState = BattleStates.PlayProcess
-                    playCard(currentCard, selectedCharacter, heroes)
-                } 
+                    playCardAnimated(currentCard, selectedCharacter, heroes)
+                }
             } else {
                 skipTurn() // Если нет карт - пропуск хода
             }
@@ -146,6 +146,8 @@ switch (battleState) {
         }
     break
     case BattleStates.PlayProcess:
+    break
+    case BattleStates.CardAnimating: // Карта летит — ввод заблокирован (анимация двигается сверху)
     break
     case BattleStates.PlayResult:
         

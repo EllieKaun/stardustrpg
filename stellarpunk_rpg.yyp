@@ -67,7 +67,9 @@
     {"$GMFolder":"","%Name":"UI","folderPath":"folders/Sprites/UI.yy","name":"UI","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Tileset","folderPath":"folders/Tileset.yy","name":"Tileset","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
-  "ForcedPrefabProjectReferences":[],
+  "ForcedPrefabProjectReferences":[
+    {"link":"io.gamemaker.sdfshaders-1.0.0","name":"io.gamemaker.sdfshaders-1.0.0","path":"io.gamemaker.sdfshaders-1.0.0.yyp",},
+  ],
   "IncludedFiles":[
     {"$GMIncludedFile":"","%Name":"m3x6.ttf","CopyToMask":-1,"filePath":"datafiles","name":"m3x6.ttf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
@@ -117,6 +119,7 @@
     {"id":{"name":"scrBattleEnums","path":"scripts/scrBattleEnums/scrBattleEnums.yy",},},
     {"id":{"name":"scrBattleFlow","path":"scripts/scrBattleFlow/scrBattleFlow.yy",},},
     {"id":{"name":"scrBattleInitializer","path":"scripts/scrBattleInitializer/scrBattleInitializer.yy",},},
+    {"id":{"name":"scrCardAnimation","path":"scripts/scrCardAnimation/scrCardAnimation.yy",},},
     {"id":{"name":"scrCardFactoryBuff","path":"scripts/scrCardFactoryBuff/scrCardFactoryBuff.yy",},},
     {"id":{"name":"scrCardFactoryHealing","path":"scripts/scrCardFactoryHealing/scrCardFactoryHealing.yy",},},
     {"id":{"name":"scrCardFactoryMagicalDamage","path":"scripts/scrCardFactoryMagicalDamage/scrCardFactoryMagicalDamage.yy",},},

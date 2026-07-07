@@ -182,6 +182,7 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                 if ((pass == 0) == isSelected) continue   // pass 0 = others, pass 1 = selected
 
                 var card = hand[i]
+                if (animatingCard != noone && card == animatingCard) continue // летит — не рисуем в руке
                 var off  = i - mid
 
                 // compute transform, THEN apply selected overrides, THEN derive scale
@@ -266,3 +267,8 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
 
 if (battleState == BattleStates.Victory) drawVictoryScreen()
 if (battleState == BattleStates.GameOver) drawGameOverScreen()
+
+// Летящие карты — поверх всего интерфейса
+for (var i = 0; i < array_length(activeCardAnims); i++) {
+    activeCardAnims[i].draw()
+}

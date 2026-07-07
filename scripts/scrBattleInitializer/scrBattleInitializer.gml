@@ -79,18 +79,26 @@ function initStarriorsPositions(
     spacingBetweenStarriors,
 ) {
     var verticalSpacing = (starriorsZoneHeight - 16 * 2) / 2
-    var startX = screenWidth / 2 - spacingBetweenStarriors;
     var startY = starriorsZoneHeight
-    for (var i = 0; i < array_length(heroes); i++) {
-        heroes[i].x = startX;
+    var step   = spacingBetweenStarriors + 16          // шаг между бойцами (как раньше)
+
+    var halfW          = screenWidth / 2
+    var heroesCenterX  = halfW * 0.5                    // центр ЛЕВОЙ половины
+    var enemiesCenterX = halfW + halfW * 0.5           // центр ПРАВОЙ половины
+
+    // Герои — по центру левой половины
+    var heroCount  = array_length(heroes)
+    var heroStartX = heroesCenterX - (heroCount - 1) * step / 2   // центрируем группу
+    for (var i = 0; i < heroCount; i++) {
+        heroes[i].x = heroStartX + i * step
         heroes[i].y = startY + (i mod 2 == 0 ? verticalSpacing : starriorsZoneHeight - verticalSpacing)
-        startX -= spacingBetweenStarriors + 16
     }
 
-    startX = screenWidth / 2 + spacingBetweenStarriors
-    for (var i = 0; i < array_length(enemies); i++) {
-        enemies[i].x = startX;
+    // Враги — по центру правой половины
+    var enemyCount  = array_length(enemies)
+    var enemyStartX = enemiesCenterX - (enemyCount - 1) * step / 2
+    for (var i = 0; i < enemyCount; i++) {
+        enemies[i].x = enemyStartX + i * step
         enemies[i].y = startY + (i mod 2 == 0 ? verticalSpacing : starriorsZoneHeight - verticalSpacing)
-        startX += spacingBetweenStarriors + 16
     }
 }

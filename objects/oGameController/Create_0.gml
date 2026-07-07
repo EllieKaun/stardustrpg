@@ -5,6 +5,7 @@ playerDataInit() // инициализация данных пользовате
 if (!instance_exists(oTransition)) {
     instance_create_layer(0, 0, "Instances", oTransition)
 }
+
 partyMembers = [oLana, oViv]
 selectedIndex = 0;
 selected_character = partyMembers[0]
