@@ -9,6 +9,9 @@ boxFont = fnM3x6_14
 nameFont = fnM3x6_14
 portraitSize = 96
 
+// Начать диалог
+// Нужно передать список диалоговых строк из структуры
+// Можно передать колбэк, который сработает по завершении диалога
 startDialog = function(_lines, _onComplete = undefined) {
     if (array_length(_lines) == 0) {
         return
@@ -22,20 +25,24 @@ startDialog = function(_lines, _onComplete = undefined) {
     runLineEnter()
 }
 
+// Перейти к следующей линии на ентер
 runLineEnter = function() {
     var line = lines[lineIndex]
     if (variable_struct_exists(ln, "onEnter") && line.onEnter != undefined) 
         line.onEnter()
 }
 
+// Доступ к тексту линии
 currentText = function() { 
     return lines[lineIndex].text 
 }
 
+// Проверка, показался ли весь текст
 fullyRevealed = function() {
     return floor(charProgress) >= string_length(currentText())
 }
 
+// Прогресс появления текста
 advance = function() {
     if (!fullyRevealed()) { 
         charProgress = string_length(currentText())
@@ -50,6 +57,7 @@ advance = function() {
     }
 }
 
+// Закончить диалог
 endDialog = function() {
     active = false
     global.uiModal = false

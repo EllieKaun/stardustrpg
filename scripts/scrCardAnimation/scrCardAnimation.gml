@@ -6,7 +6,7 @@
 //  частицы (particles)
 //
 //  Пример кастомизации:
-//    var c = defaultCardAnimConfig();
+//    var c = defaultCardAnimConfig()
 //    c.path = pathLine // лететь по прямой
 //    c.fade = fadeShrink // не гаснуть, а ужиматься
 //    c.dur  = 60 // помедленнее
@@ -28,14 +28,6 @@ function pathArc(from, to, p, opts) { // дуга вверх
 
 function pathLine(from, to, p, opts) { // по прямой
     return { x: lerp(from.x, to.x, p), y: lerp(from.y, to.y, p) }
-}
-
-function pathSwoop(from, to, p, opts) { // S-подобная дуга
-    var cx = to.x + (to.x - from.x) * 0.4
-    var cy = min(from.y, to.y) - opts.arcHeight * 0.6
-    var ax = lerp(from.x, cx, p), ay = lerp(from.y, cy, p)
-    var bx = lerp(cx, to.x, p),   by = lerp(cy, to.y, p)
-    return { x: lerp(ax, bx, p), y: lerp(ay, by, p) }
 }
 
 // ------------------------------------------------------------
@@ -75,9 +67,10 @@ function defaultCardAnimConfig() {
         arcHeight: 120,
         ease: easeOutQuad,
         fade: fadeTail,
-        particles: defaultCardParticleConfig()
+        particles: damageCardParticleConfig()
     }
 }
+
 function defaultCardParticleConfig() {
     return {
         rate: 4, // сколько звёзд за кадр
@@ -95,6 +88,29 @@ function defaultCardParticleConfig() {
         draw: drawStarSparkle // как рисовать одну частицу
     }
 }
+
+function damageCardParticleConfig() {
+    return {
+        rate: 2, // сколько звёзд за кадр
+        spawnUntil: 0.9, // прекратить спавн после этой доли пути
+        posSpread: 0.4, // разброс появления (доля размера карты)
+        backBias: 0.30, // скорость назад по движению (эффект следа)
+        velJitter: 0.7, // случайная добавка к скорости
+        lifeMin: 16, 
+        lifeMax: 60,
+        sizeMin: 5,  
+        sizeMax: 10,
+        rotSpeed: 3, // макс. скорость вращения
+        gravity: 0.2,
+        color: make_color_rgb(247, 80, 36), // тёплый золотой
+        draw: drawRectSparkle // как рисовать одну частицу
+    }
+}
+
+
+
+
+
 
 // ------------------------------------------------------------
 //  Анимация одной карты
@@ -215,6 +231,51 @@ function drawStarSparkle(cx, cy, outer, rot, alpha, col) {
     draw_set_color(c_white)
 }
 
+// Квадрат. outer — радиус до угла 
+function drawRectSparkle(cx, cy, outer, rot, alpha, col) {
+    if (outer <= 0) return
+    draw_set_color(col)
+    draw_set_alpha(alpha)
+    draw_primitive_begin(pr_trianglefan)
+    draw_vertex(cx, cy) // центр веера
+    for (var a = 45; a <= 405; a += 90) { // 4 угла (+замыкание)
+        draw_vertex(cx + lengthdir_x(outer, a + rot), cy + lengthdir_y(outer, a + rot))
+    }
+    draw_primitive_end()
+    draw_set_alpha(1)
+    draw_set_color(c_white)
+}
+
+// Равносторонний треугольник. outer — радиус от центра до вершины
+function drawTriangleSparkle(cx, cy, outer, rot, alpha, col) {
+    if (outer <= 0) return
+    draw_set_color(col)
+    draw_set_alpha(alpha)
+    draw_primitive_begin(pr_trianglelist)
+    for (var a = -90; a < 270; a += 120) { // 3 вершины через 120°
+        draw_vertex(cx + lengthdir_x(outer, a + rot), cy + lengthdir_y(outer, a + rot))
+    }
+    draw_primitive_end()
+    draw_set_alpha(1)
+    draw_set_color(c_white)
+}
+
+// Круг. outer — радиус
+function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
+    if (outer <= 0) return
+    draw_set_color(col)
+    draw_set_alpha(alpha)
+    draw_primitive_begin(pr_trianglefan)
+    draw_vertex(cx, cy) // центр
+    for (var a = 0; a <= 360; a += 30) { // 12 сегментов
+        draw_vertex(cx + lengthdir_x(outer, a), cy + lengthdir_y(outer, a))
+    }
+    draw_primitive_end()
+    draw_set_alpha(1)
+    draw_set_color(c_white)
+}
+
+
 // ------------------------------------------------------------
 //  Геометрия стола карт — та же математика, что в Draw_64, но доступная
 //  из Step/скриптов
@@ -260,11 +321,10 @@ function selectedCardTransform() {
     }
 }
 
-// Запускает анимацию выбранной карты
-// Вызывать из ввода игрока (self это Battle)
+// Запускает анимацию выбранной карты перед тем как начать фактическое разыгрывание
 function playCardAnimated(card, caster, targets, cfg) {
-    if (cfg == undefined) cfg = defaultCardAnimConfig();
-    var tr = selectedCardTransform()
+    if (cfg == undefined) cfg = defaultCardAnimConfig()
+    var transform = selectedCardTransform()
 
     animPendingCard = card
     animPendingCaster = caster
@@ -272,9 +332,18 @@ function playCardAnimated(card, caster, targets, cfg) {
     animatingCard = card
     battleState = BattleStates.CardAnimating
 
-    var anim = new CardPlayAnim(card, tr.x, tr.y, tr.angle, tr.w, tr.h, function() {
-        playCard(animPendingCard, animPendingCaster, animPendingTargets)
-    }, cfg)
+    var anim = new CardPlayAnim(
+        card, 
+        transform.x, 
+        transform.y, 
+        transform.angle, 
+        transform.w, 
+        transform.h, 
+        function() {
+            playCard(animPendingCard, animPendingCaster, animPendingTargets)
+        }, 
+        cfg
+    )
     array_push(activeCardAnims, anim)
 }
 

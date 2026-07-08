@@ -1,6 +1,7 @@
 randomize()
+initEffectRegistry() // регистрация эффектов
 cardIdsInit() // инициализация карт ид
-cardRegistryInit() // регистация карт 
+cardRegistryInit() // регистация карт  
 playerDataInit() // инициализация данных пользователя
 if (!instance_exists(oTransition)) {
     instance_create_layer(0, 0, "Instances", oTransition)

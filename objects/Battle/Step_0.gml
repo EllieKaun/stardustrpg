@@ -1,4 +1,4 @@
-updateCardAnims() // двигаем/чистим летящие карты в любом состоянии (звёзды догорают)
+updateCardAnims() // двигаем/чистим летящие карты в любом состоянии 
 
 switch (battleState) {
     case BattleStates.Victory:
@@ -147,7 +147,7 @@ switch (battleState) {
     break
     case BattleStates.PlayProcess:
     break
-    case BattleStates.CardAnimating: // Карта летит — ввод заблокирован (анимация двигается сверху)
+    case BattleStates.CardAnimating: // Карта летит и ввод заблокирован
     break
     case BattleStates.PlayResult:
         
