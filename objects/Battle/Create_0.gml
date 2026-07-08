@@ -4,9 +4,16 @@ menuItems = ["Shuffle", "Info", "Run"]
 
 // Synchronize GUI size with camera view to prevent UI jumping
 display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
-selectedCard = 0 
+selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false
+
+// Анимация розыгрыша карты (см. scrCardAnimation)
+activeCardAnims = []
+animatingCard = noone // карта, которая сейчас летит (прячем её в руке)
+animPendingCard = noone
+animPendingCaster = noone
+animPendingTargets = noone
 
 maxEnemiesCount = 5
 spacingBetweenStarriors = 16
@@ -29,7 +36,6 @@ rewardChoices  = [] // Победные карты
 rewardCursor   = 0 // Выбранная победная карта
 rewardSelected = false // Выбрана ли награда
 gameOverCursor = 0 // 0 = Retry, 1 = Exit
-
 
 // Расчет позиций героев и врагов
 var screenWidth = camera_get_view_width(view_camera[0])

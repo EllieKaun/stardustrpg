@@ -1,6 +1,6 @@
 // Атака звездной энергией одного врага
 function createMagicalDamageSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "MagicalDamageSingleTargetCard",
@@ -8,15 +8,7 @@ function createMagicalDamageSingleTargetCard() {
         targetType,
         StarriorStates.Attack,
         1,
-        [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant,
-                sprite: attackEffect
-            }
-        ],
+        [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)) ],
         mgcCard,
         lightningSingleTarget,
         commonBorder,
@@ -26,7 +18,7 @@ function createMagicalDamageSingleTargetCard() {
 
 // Атака звездной энергией группы врагов
 function createMagicalDamageMultipleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageMultipleTargetCard",
@@ -34,15 +26,7 @@ function createMagicalDamageMultipleTargetCard() {
         targetType,
         StarriorStates.Attack,
         1,
-        [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant,
-                sprite: attackEffect
-            }
-        ],
+        [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)) ],
         mgcCard,
         lightningGroup,
         commonBorder,
@@ -52,7 +36,7 @@ function createMagicalDamageMultipleTargetCard() {
 
 // Атака молнией одного врага - (Имеет шанс шокировать врага. Враг не можетдействовать х ходов)
 function createMagicalDamageStunChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "MagicalDamageStunChanseSingleTarget",
@@ -61,20 +45,8 @@ function createMagicalDamageStunChanseSingleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant,
-                sprite: attackEffect
-            },
-            {
-                type: EffectTypes.Stun,
-                chance: 1.0,
-                timing: Timing.Overtime,
-                duration: 1,
-                statusName: StatusNames.Stun
-            }
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            StunEffect(1, 1.0)
         ],
         mgcCard,
         lightningSingleTarget,
@@ -85,7 +57,7 @@ function createMagicalDamageStunChanseSingleTargetCard() {
 
 // Атака молнией группы врагов - (Имеет шанс шокировать врагов. Враги не могут действовать х ходов)
 function createMagicalDamageStunChanseMultipleTargetsCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "MagicalDamageStunChanseSingleTarget",
@@ -94,19 +66,8 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
         StarriorStates.Cast,
         1,
         [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant
-            },
-            {
-                type: EffectTypes.Stun,
-                chance: 1.0,
-                timing: Timing.Overtime,
-                duration: 1,
-                statusName: StatusNames.Stun
-            }
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            StunEffect(1, 1.0)
         ],
         mgcCard,
         lightningGroup,
@@ -117,7 +78,7 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
 
 // Атака огнем одного врага - (Имеет шанс поджечь врага. Враг получает магический урон х ходов)
 function createMagicalDamageBurnChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "Default attack",
@@ -126,22 +87,8 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
         StarriorStates.Attack,
         1,
         [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant,
-                sprite: attackEffect
-            },
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                chance: 1.0,
-                timing: Timing.EndOfTurn,
-                value: 2,
-                duration: 1,
-                statusName: StatusNames.Burn
-            }
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            Burn(2, 1, 1.0)
         ],
         mgcCard,
         fireballSingleTarget,
@@ -152,7 +99,7 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
 
 // Атака огнем группы врагов - (Имеет шанс поджечь врагов. Враги получают магический урон х ходов)
 function createMagicalDamageBurnChanseMultipleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "Default attack",
@@ -161,22 +108,8 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         StarriorStates.Attack,
         1,
         [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant,
-                sprite: attackEffect
-            },
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                chance: 1.0,
-                timing: Timing.EndOfTurn,
-                value: 2,
-                duration: 1,
-                statusName: StatusNames.Burn
-            }
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            Burn(2, 1, 1.0)
         ],
         mgcCard,
         fireballGroup,
@@ -186,7 +119,7 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
 }
 // Атака льдом одного врага - (Имеет шанс заморозить врага. Замороженный враг получает повышенный физ урон х количество ходов)
 function createMagicalDamageFreezingChanceSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "MagicalDamageFreezingChanceSingleTarget",
@@ -195,21 +128,8 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         StarriorStates.Attack,
         1,
         [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant,
-                sprite: attackEffect
-            },
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                chance: 1.0,
-                timing: Timing.Overtime,
-                duration: 1,
-                statusName: StatusNames.Freeze
-            }
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            FreezeEffect(1, 1.0)
         ],
         mgcCard,
         lightningSingleTarget,
@@ -220,7 +140,7 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
 
 // Атака льдом группы врагов - (Имеет шанс заморозить врагов. Замороженные враги получают повышенный физ урон х количество ходов)
 function createMagicalDamageFreezingChanceMultipleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "MagicalDamageFreezingChanceMultipleTarget",
@@ -229,21 +149,8 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         StarriorStates.Attack,
         1,
         [
-            {
-                type: EffectTypes.Damage,
-                damageType: DamageTypes.Magical,
-                value: getDamageFuncOnRariryAndTarget(rarity, targetType),
-                timing: Timing.Instant,
-                sprite: attackEffect
-            },
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                chance: 1.0,
-                timing: Timing.Overtime,
-                duration: 1,
-                statusName: StatusNames.Freeze
-            }
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            FreezeEffect(1, 1.0)
         ],
         mgcCard,
         lightningGroup,
@@ -254,7 +161,7 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
 
 // Копирует следующую использованную карту и добавляет в руку героя - уникальная
 function createCopyNextPlayedCardCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "CopyNextPlayedCard",
@@ -262,13 +169,7 @@ function createCopyNextPlayedCardCard() {
         targetType,
         StarriorStates.Cast,
         0,
-        [
-            {
-                type: EffectTypes.CopyCard,
-                timing: Timing.OnActions,
-                sprite: attackEffect
-            }
-        ],
+        [ CopyCardEffect() ],
         mgcCard,
         cardCopy,
         commonBorder,
@@ -278,7 +179,7 @@ function createCopyNextPlayedCardCard() {
 
 // Дает дополнительный ход герою - уникальная
 function createAddEnergyCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "AddEnergyCard",
@@ -286,14 +187,7 @@ function createAddEnergyCard() {
         targetType,
         StarriorStates.Cast,
         0,
-        [
-            {
-                type: EffectTypes.AddEnergy,
-                value: 1,
-                timing: Timing.OnActions,
-                sprite: attackEffect
-            }
-        ],
+        [ AddEnergyEffect(1) ],
         mgcCard,
         cardCopy,
         commonBorder,
@@ -301,9 +195,9 @@ function createAddEnergyCard() {
     )
 }
 
-// Перемешивает колоду без траты хода  - уникальная 
+// Перемешивает колоду без траты хода  - уникальная
 function createShuffleDeckCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "ShuffleDeckCard",
@@ -311,13 +205,7 @@ function createShuffleDeckCard() {
         targetType,
         StarriorStates.Cast,
         0,
-        [
-            {
-                type: EffectTypes.ShuffleDeck,
-                timing: Timing.OnActions,
-                sprite: attackEffect
-            }
-        ],
+        [ ShuffleDeckEffect() ],
         mgcCard,
         shuffle,
         commonBorder,
@@ -333,14 +221,7 @@ function createCardIgnoreWeaknessSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.IgnoreWeakness,
-                timing: Timing.Overtime,
-                duration: 2,
-                sprite: attackEffect
-            }
-        ],
+        [ IgnoreWeaknessEffect(2) ],
         buffCard,
         magicBuff,
         commonBorder,

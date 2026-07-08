@@ -1,6 +1,6 @@
 // Восстановление hp одному герою
 function createInstantHealSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -8,14 +8,7 @@ function createInstantHealSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Heal,
-                value: random_range(1, 3),
-                timing: Timing.Instant,
-                sprite: hphealEffect
-            }
-        ],
+        [ HealEffect(random_range(1, 3)) ],
         healCard,
         hpHealSolo,
         commonBorder,
@@ -25,7 +18,7 @@ function createInstantHealSingleTargetCard() {
 
 //  Восстановление hp группе героев
 function createInstantMultipleTargetsHealCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllAllies
     return new Card(
         "Default heal",
@@ -33,14 +26,7 @@ function createInstantMultipleTargetsHealCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Heal,
-                value: random_range(1, 3),
-                timing: Timing.Instant,
-                sprite: hphealEffect
-            }
-        ],
+        [ HealEffect(random_range(1, 3)) ],
         healCard,
         hpHealGroup,
         commonBorder,
@@ -50,7 +36,7 @@ function createInstantMultipleTargetsHealCard() {
 
 // Постепенное восстановление hp одному герою
 function createOvertimeHealSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -58,15 +44,7 @@ function createOvertimeHealSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Heal,
-                value: random_range(1, 3),
-                timing: Timing.EndOfTurn,
-                duration: 1,
-                sprite: hphealEffect
-            }
-        ],
+        [ HealOverTimeEffect(random_range(1, 3), 1) ],
         healCard,
         hpHealOT,
         commonBorder,
@@ -78,7 +56,7 @@ function createOvertimeHealSingleTargetCard() {
 
 // Восстановление mp одному герою
 function createInstantManaGainSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -86,14 +64,7 @@ function createInstantManaGainSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.ManaGain,
-                value: random_range(1, 3),
-                timing: Timing.Instant,
-                sprite: mphealEffect
-            }
-        ],
+        [ ManaGainEffect(random_range(1, 3)) ],
         healCard,
         mpHealSolo,
         commonBorder,
@@ -103,7 +74,7 @@ function createInstantManaGainSingleTargetCard() {
 
 // Восстановление mp группе героев
 function createInstantMultipleTargetsManaGainCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllAllies
     return new Card(
         "Default heal",
@@ -111,14 +82,7 @@ function createInstantMultipleTargetsManaGainCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.ManaGain,
-                value: random_range(1, 3),
-                timing: Timing.Instant,
-                sprite: mphealEffect
-            }
-        ],
+        [ ManaGainEffect(random_range(1, 3)) ],
         healCard,
         mpHealGroup,
         commonBorder,
@@ -128,7 +92,7 @@ function createInstantMultipleTargetsManaGainCard() {
 
 // Постепенное восстановление mp одному герою
 function createOvertimeManaGainSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -136,15 +100,7 @@ function createOvertimeManaGainSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.ManaGain,
-                value: random_range(1, 3),
-                timing: Timing.EndOfTurn,
-                duration: 1,
-                sprite: mphealEffect
-            }
-        ],
+        [ ManaGainOverTimeEffect(random_range(1, 3), 1) ],
         healCard,
         mpHealOT,
         commonBorder,
@@ -154,7 +110,7 @@ function createOvertimeManaGainSingleTargetCard() {
 
 // Снятие статуса шока одному герою - уникальная
 function createRemoveStatusShockSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -162,14 +118,7 @@ function createRemoveStatusShockSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Shock,
-                timing: Timing.Instant,
-                sprite: removeShockEffect
-            }
-        ],
+        [ RemoveStatusEffect(StatusNames.Shock, removeShockEffect) ],
         healCard,
         shockRemove,
         commonBorder,
@@ -179,7 +128,7 @@ function createRemoveStatusShockSingleTargetCard() {
 
 // Снятие статуса поджога одному герою - уникальная
 function createRemoveStatusBurnSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -187,14 +136,7 @@ function createRemoveStatusBurnSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Burn,
-                timing: Timing.Instant,
-                sprite: removeBurnEffect
-            }
-        ],
+        [ RemoveStatusEffect(StatusNames.Burn, removeBurnEffect) ],
         healCard,
         burnRemove,
         commonBorder,
@@ -204,7 +146,7 @@ function createRemoveStatusBurnSingleTargetCard() {
 
 // Снятие статуса заморозки одному герою - уникальная
 function createRemoveStatusFreezeSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -212,14 +154,7 @@ function createRemoveStatusFreezeSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Freeze,
-                timing: Timing.Instant,
-                sprite: removeFreezeEffect
-            }
-        ],
+        [ RemoveStatusEffect(StatusNames.Freeze, removeFreezeEffect) ],
         healCard,
         freezeRemove,
         commonBorder,
@@ -229,7 +164,7 @@ function createRemoveStatusFreezeSingleTargetCard() {
 
 // Снятие статуса кровотечения одному герою - уникальная
 function createRemoveStatusBleedingSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -237,14 +172,7 @@ function createRemoveStatusBleedingSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Bleeding,
-                timing: Timing.Instant,
-                sprite: removeBleedingEffect
-            }
-        ],
+        [ RemoveStatusEffect(StatusNames.Bleeding, removeBleedingEffect) ],
         healCard,
         bleedRemove,
         commonBorder,
@@ -254,7 +182,7 @@ function createRemoveStatusBleedingSingleTargetCard() {
 
 // Снятие статуса оглушения одному герою - уникальная
 function createRemoveStatusStunSingleTargetCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Default heal",
@@ -262,14 +190,7 @@ function createRemoveStatusStunSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.RemoveEffect,
-                statusName: StatusNames.Stun,
-                timing: Timing.Instant,
-                sprite: removeStunEffect
-            }
-        ],
+        [ RemoveStatusEffect(StatusNames.Stun, removeStunEffect) ],
         healCard,
         stunRemove,
         commonBorder,
@@ -279,7 +200,7 @@ function createRemoveStatusStunSingleTargetCard() {
 
 // Воскрешение павшего союзника - уникальная
 function createResurrectionCard() {
-    var rarity = CardsRarity.Default  
+    var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "ResurrectionCard",
@@ -287,13 +208,7 @@ function createResurrectionCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Resurrection,
-                timing: Timing.Instant,
-                sprite: hphealEffect
-            }
-        ],
+        [ ResurrectionEffect(hphealEffect) ],
         healCard,
         bleedRemove,
         commonBorder,

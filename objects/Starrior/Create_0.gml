@@ -111,9 +111,7 @@ function isKO() {
 }
 
 function showEffectNotification(effect, dismissMode, duration) {
-    var effectType = effect.type
-    var statusName = variable_instance_exists(effect, "statusName") ? effect.statusName : undefined
-    
+    // kind-only эффекты (например BossClone) не имеют sprite — просто выходим.
     if !variable_instance_exists(effect, "sprite") { return }
     var inst = instance_create_depth(x, y, depth - 1, oEffectVisualizer)
     inst.sprite_index = effect.sprite

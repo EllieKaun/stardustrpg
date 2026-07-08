@@ -6,16 +6,7 @@ function createCardBuffPhysicalDamageSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.PhysicalDamage,
-                value: 1.5,
-                timing: Timing.Overtime,
-                duration: 4,
-                sprite: buffEffect
-            }
-        ],
+        [ BuffEffect(ModifiersToBuff.PhysicalDamage, 1.5, 4) ],
         buffCard,
         strBuff,
         commonBorder,
@@ -31,16 +22,7 @@ function createCardBuffMagicalDamageSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         3,
-        [
-            {
-                type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.MagicalDamage,
-                value: 1.5,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: buffEffect
-            }
-        ],
+        [ BuffEffect(ModifiersToBuff.MagicalDamage, 1.5, 1) ],
         buffCard,
         magicBuff,
         commonBorder,
@@ -57,21 +39,8 @@ function createCardBuffAnyDamageMultipleTarget() {
         StarriorStates.Cast,
         1,
         [
-            {
-                type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.PhysicalDamage,
-                value: 1.5,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: buffEffect
-            },
-            {
-                type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.MagicalDamage,
-                value: 1.5,
-                timing: Timing.Overtime,
-                duration: 1
-            }
+            BuffEffect(ModifiersToBuff.PhysicalDamage, 1.5, 1),
+            BuffEffect(ModifiersToBuff.MagicalDamage, 1.5, 1)
         ],
         buffCard,
         strAndMagicBuff,
@@ -88,16 +57,7 @@ function createCardBuffPhysicalProtectionSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                value: 0.3,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: buffEffect
-            }
-        ],
+        [ BuffEffect(ModifiersToBuff.PhysicalProtection, 0.3, 1) ],
         buffCard,
         defBuff,
         commonBorder,
@@ -113,16 +73,7 @@ function createCardBuffMagicalProtectionSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.MagicalProtection,
-                value: 0.3,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: buffEffect
-            }
-        ],
+        [ BuffEffect(ModifiersToBuff.MagicalProtection, 0.3, 1) ],
         atcCard,
         defBuff,
         commonBorder,
@@ -139,22 +90,8 @@ function createCardBuffAnyProtectionMultipleTarget() {
         StarriorStates.Cast,
         1,
         [
-            {
-                type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                value: 0.3,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: buffEffect
-            }, 
-            {
-                type: EffectTypes.Buff,
-                buffType: ModifiersToBuff.MagicalProtection,
-                value: 0.3,
-                timing: Timing.Overtime,
-                duration: 1
-            }
-            
+            BuffEffect(ModifiersToBuff.PhysicalProtection, 0.3, 1),
+            BuffEffect(ModifiersToBuff.MagicalProtection, 0.3, 1)
         ],
         buffCard,
         defAndMagicDefBuff,
@@ -171,16 +108,7 @@ function createCardDebuffPhysicalDamageSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.PhysicalDamage,
-                value: 1.5,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: debuffEffect
-            }
-        ],
+        [ DebuffEffect(ModifiersToBuff.PhysicalDamage, 1.5, 1) ],
         buffCard,
         strBuff,
         commonBorder,
@@ -188,7 +116,7 @@ function createCardDebuffPhysicalDamageSingleTarget() {
     )
 }
 
-// Снижение маг атаки врага 
+// Снижение маг атаки врага
 function createCardDebuffMagicalDamageSingleTarget() {
     return new Card(
         "Debuff magical damage single target",
@@ -196,16 +124,7 @@ function createCardDebuffMagicalDamageSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.MagicalDamage,
-                value: 1.5,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: buffEffect
-            }
-        ],
+        [ DebuffEffect(ModifiersToBuff.MagicalDamage, 1.5, 1) ],
         buffCard,
         magicBuff,
         commonBorder,
@@ -213,7 +132,7 @@ function createCardDebuffMagicalDamageSingleTarget() {
     )
 }
 
-// Снижение физ защиты врага 
+// Снижение физ защиты врага
 function createCardDebuffPhysicalProtectionSingleTarget() {
     return new Card(
         "Buff physical damage single target",
@@ -221,16 +140,7 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.PhysicalProtection,
-                value: 0.3,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: debuffEffect
-            }
-        ],
+        [ DebuffEffect(ModifiersToBuff.PhysicalProtection, 0.3, 1) ],
         buffCard,
         defBuff,
         commonBorder,
@@ -238,7 +148,7 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
     )
 }
 
-// Снижение маг защиты врага 
+// Снижение маг защиты врага
 function createCardDebuffMagicalProtectionSingleTarget() {
     return new Card(
         "Buff magical damage single target",
@@ -246,16 +156,7 @@ function createCardDebuffMagicalProtectionSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.Debuff,
-                buffType: ModifiersToBuff.MagicalProtection,
-                value: 0.3,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: debuffEffect
-            }
-        ],
+        [ DebuffEffect(ModifiersToBuff.MagicalProtection, 0.3, 1) ],
         buffCard,
         defBuff,
         commonBorder,
@@ -271,15 +172,7 @@ function createCardCreateTemporaryWeaknessMagicalDamageSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.CreateTemporaryWeakness,
-                weakness: ModifiersToBuff.MagicalDamage,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: debuffEffect
-            }
-        ],
+        [ TemporaryWeaknessEffect(ModifiersToBuff.MagicalDamage, 1) ],
         buffCard,
         defBuff,
         commonBorder,
@@ -295,15 +188,7 @@ function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [
-            {
-                type: EffectTypes.CreateTemporaryWeakness,
-                weakness: ModifiersToBuff.PhysicalDamage,
-                timing: Timing.Overtime,
-                duration: 1,
-                sprite: debuffEffect
-            }
-        ],
+        [ TemporaryWeaknessEffect(ModifiersToBuff.PhysicalDamage, 1) ],
         buffCard,
         defBuff,
         commonBorder,

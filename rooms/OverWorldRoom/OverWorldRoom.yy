@@ -47,6 +47,8 @@
     {"name":"inst_210C0FB","path":"rooms/OverWorldRoom/OverWorldRoom.yy",},
     {"name":"inst_564F72AB","path":"rooms/OverWorldRoom/OverWorldRoom.yy",},
     {"name":"inst_486077F4","path":"rooms/OverWorldRoom/OverWorldRoom.yy",},
+    {"name":"inst_7E4AAD6B","path":"rooms/OverWorldRoom/OverWorldRoom.yy",},
+    {"name":"inst_C260C1C","path":"rooms/OverWorldRoom/OverWorldRoom.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -1081,6 +1083,8 @@
         {"$GMRInstance":"v4","%Name":"inst_6E44B634","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_6E44B634","objectId":{"name":"oWall","path":"objects/oWall/oWall.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.59375,"scaleY":1.875,"x":120.0,"y":187.0,},
         {"$GMRInstance":"v4","%Name":"inst_564F72AB","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_564F72AB","objectId":{"name":"oDeckBuilder","path":"objects/oDeckBuilder/oDeckBuilder.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":343.0,"y":452.0,},
         {"$GMRInstance":"v4","%Name":"inst_486077F4","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_486077F4","objectId":{"name":"oPuppetMaster","path":"objects/oPuppetMaster/oPuppetMaster.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":64.0,"y":128.0,},
+        {"$GMRInstance":"v4","%Name":"inst_7E4AAD6B","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_7E4AAD6B","objectId":{"name":"oDialogManager","path":"objects/oDialogManager/oDialogManager.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":64.0,"y":64.0,},
+        {"$GMRInstance":"v4","%Name":"inst_C260C1C","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_C260C1C","objectId":{"name":"oViv","path":"objects/oViv/oViv.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":96.0,"y":96.0,},
       ],"layers":[],"name":"Instances","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRTileLayer":"","%Name":"Tiles_Forest_1","depth":400,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"name":"Tiles_Forest_1","properties":[],"resourceType":"GMRTileLayer","resourceVersion":"2.0","tiles":{"SerialiseHeight":200,"SerialiseWidth":200,"TileCompressedData":[
           21,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,-179,-2147483648,
