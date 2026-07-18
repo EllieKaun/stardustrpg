@@ -58,11 +58,11 @@ function fadeShrink(p, anim) {                  // вместо гаснуть �
 function defaultCardAnimConfig() {
     return {
         dur: 40,
-        toX: undefined, // undefined => центр GUI
+        toX: undefined, // undefined - центр GUI
         toY: undefined,
         toAngle: 0,
         scaleFrom: 1.12,
-        scaleTo:1.12, // без раздувания
+        scaleTo:1.12, 
         path: pathArc,
         arcHeight: 120,
         ease: easeOutQuad,
@@ -102,7 +102,7 @@ function damageCardParticleConfig() {
         sizeMax: 10,
         rotSpeed: 3, // макс. скорость вращения
         gravity: 0.2,
-        color: make_color_rgb(247, 80, 36), // тёплый золотой
+        color: make_color_rgb(247, 80, 36), // красный
         draw: drawRectSparkle // как рисовать одну частицу
     }
 }
@@ -233,7 +233,9 @@ function drawStarSparkle(cx, cy, outer, rot, alpha, col) {
 
 // Квадрат. outer — радиус до угла 
 function drawRectSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) return
+    if (outer <= 0) {
+        return
+    }
     draw_set_color(col)
     draw_set_alpha(alpha)
     draw_primitive_begin(pr_trianglefan)
@@ -262,7 +264,9 @@ function drawTriangleSparkle(cx, cy, outer, rot, alpha, col) {
 
 // Круг. outer — радиус
 function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) return
+    if (outer <= 0) {
+        return
+    }
     draw_set_color(col)
     draw_set_alpha(alpha)
     draw_primitive_begin(pr_trianglefan)
@@ -271,8 +275,6 @@ function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
         draw_vertex(cx + lengthdir_x(outer, a), cy + lengthdir_y(outer, a))
     }
     draw_primitive_end()
-    draw_set_alpha(1)
-    draw_set_color(c_white)
 }
 
 
