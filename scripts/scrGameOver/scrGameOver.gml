@@ -36,8 +36,9 @@ function stepGameOverScreen() {
 
 // Отобразить победный скрин
 function drawVictoryScreen() {
-    var sw = display_get_gui_width()
-    var sh = display_get_gui_height()
+    // base coords — this draws under the battle UI scale matrix (see Battle Draw GUI)
+    var sw = guiBaseWidth()
+    var sh = guiBaseHeight()
 
     // Затемнение
     draw_set_color(c_black); draw_set_alpha(0.5)
@@ -160,8 +161,9 @@ function drawRewardDescription(card, px, py, pw, ph) {
 
 // Рисование экрана поражения
 function drawGameOverScreen() {
-    var sw = display_get_gui_width()
-    var sh = display_get_gui_height()
+    // base coords — this draws under the battle UI scale matrix (see Battle Draw GUI)
+    var sw = guiBaseWidth()
+    var sh = guiBaseHeight()
 
     draw_set_color(c_black) 
     draw_set_alpha(0.6)

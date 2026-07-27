@@ -43,6 +43,135 @@ function drawBorderAroundCard(
     )
 }
 
+// --- Battle high-res GUI helpers ---------------------------------------------
+// The battle draws its UI in the "logical" base resolution (global.guiBaseW/H)
+// and scales it up into a higher-resolution GUI buffer with a world matrix.
+// These return that base size, falling back to the raw GUI size outside battle.
+function guiBaseWidth()  { return variable_global_exists("guiBaseW") ? global.guiBaseW : display_get_gui_width()  }
+function guiBaseHeight() { return variable_global_exists("guiBaseH") ? global.guiBaseH : display_get_gui_height() }
+
+/// @desc Turn an internal card id ("PhysicalDamageSingleTargetCard") into a
+///       human label ("Physical Damage Single Target"). Display-only.
+function prettifyCardName(nm) {
+    nm = string(nm)
+    var len = string_length(nm)
+    if (len > 4 && string_copy(nm, len - 3, 4) == "Card") {
+        nm = string_copy(nm, 1, len - 4)
+        len -= 4
+    }
+    var out = ""
+    for (var i = 1; i <= len; i++) {
+        var ch = string_char_at(nm, i)
+        if (i > 1) {
+            var prev     = string_char_at(nm, i - 1)
+            var chUpper  = (ch != string_lower(ch))      // uppercase letter
+            var prevLow  = (prev != string_upper(prev))  // lowercase letter
+            if (chUpper && prevLow) out += " "
+        }
+        out += ch
+    }
+    return out
+}
+
+/// @desc Card's headline numbers for the compact on-card display.
+///       { kind:"dmg"|"heal"|"none", minNum, maxNum, effectName, costType, costValue }
+function cardDisplayStats(card) {
+    var st = {
+        kind: "none", minNum: 1, maxNum: 0, effectName: "",
+        costType: card.costType(), costValue: card.costValue()
+    }
+    var isAll = (card.target == TargetTypes.AllEnemies || card.target == TargetTypes.AllAllies)
+
+    for (var i = 0; i < array_length(card.effects); i++) {
+        var e = card.effects[i]
+        if (e.type == EffectTypes.Damage || e.type == EffectTypes.Heal) {
+            st.kind = (e.type == EffectTypes.Damage) ? "dmg" : "heal"
+            switch (card.rarity) {
+                case CardsRarity.Default: st.maxNum = isAll ? 2 : 4;  break
+                case CardsRarity.Unusual: st.maxNum = isAll ? 4 : 6;  break
+                case CardsRarity.Rare:    st.maxNum = isAll ? 6 : 8;  break
+                case CardsRarity.Epic:    st.maxNum = isAll ? 8 : 12; break
+            }
+            return st
+        }
+    }
+    // no damage/heal — surface the first other effect's short name instead
+    for (var i = 0; i < array_length(card.effects); i++) {
+        var e = card.effects[i]
+        if (e.type != EffectTypes.Damage && e.type != EffectTypes.Heal) {
+            st.effectName = effectTypeToString(e.type)
+            break
+        }
+    }
+    return st
+}
+
+/// @desc Map a card-local point (lx right, ly down; origin = card centre) to
+///       screen space for a card drawn with draw_sprite_ext(angle).
+function cardLocalToScreen(cx, cy, lx, ly, angle) {
+    return {
+        x: cx + lx * dcos(angle) + ly * dsin(angle),
+        y: cy - lx * dsin(angle) + ly * dcos(angle)
+    }
+}
+
+/// @desc Draw short text at a card-local point, integer-scaled (stays crisp with
+///       a nearest-filtered pixel font) with a clean one-pixel drop shadow.
+function drawCardStatText(cx, cy, lx, ly, angle, txt, col, scale) {
+    if (txt == "") return
+    var p  = cardLocalToScreen(cx, cy, lx, ly, angle)
+    var sh = max(1, scale)   // shadow = one scaled pixel, down-right
+    draw_text_transformed_colour(p.x + sh, p.y + sh, txt, scale, scale, angle, c_black, c_black, c_black, c_black, 0.6)
+    draw_text_transformed_colour(p.x,      p.y,      txt, scale, scale, angle, col, col, col, col, 1)
+}
+
+/// @desc Pick an integer scale so `fnM3x6_22` text is ~targetH tall but never
+///       wider than maxW. Integer scaling keeps the pixel font crisp.
+function cardStatScale(txt, targetH, maxW) {
+    draw_set_font(fnM3x6_22)
+    var fh = string_height("0")
+    var sc = max(1, round(targetH / fh))
+    while (sc > 1 && string_width(txt) * sc > maxW) sc -= 1
+    return sc
+}
+
+/// @desc Compact stats drawn over the card at full GUI resolution:
+///       a big value in the name box + the cost number on the cost token.
+///       x,y = card centre; w,h = drawn card size (screen px).
+function drawCardStats(x, y, w, h, angle, card) {
+    var st = cardDisplayStats(card)
+
+    var colDmg  = make_color_rgb(222, 64,  52)
+    var colHeal = make_color_rgb(74,  194, 96)
+    var colEff  = make_color_rgb(240, 214, 120)
+
+    // ---- main value (or effect name), big & centred in the name box ----
+    var mainTxt = "", mainCol = c_white
+    switch (st.kind) {
+        case "dmg":  mainTxt = string(st.minNum) + "-" + string(st.maxNum); mainCol = colDmg;  break
+        case "heal": mainTxt = string(st.minNum) + "-" + string(st.maxNum); mainCol = colHeal; break
+        default:     mainTxt = st.effectName;                                mainCol = colEff;  break
+    }
+
+    draw_set_halign(fa_center)
+    draw_set_valign(fa_middle)
+
+    var mainScale = cardStatScale(mainTxt, h * 0.22, w * 0.80)
+    draw_set_font(fnM3x6_22)
+    drawCardStatText(x, y, 0, h * 0.34, angle, mainTxt, mainCol, mainScale)
+
+    // ---- cost: bare number on the cost token (heart), top-right ----
+    // token bbox (32x48 sprite): heart centre ≈ (25.5, 5); card origin = centre
+    // (16, 24) → local offset ≈ (+0.30*w, -0.40*h).
+    var costScale = cardStatScale(string(st.costValue), h * 0.14, w * 0.24)
+    draw_set_font(fnM3x6_22)
+    drawCardStatText(x, y, w * 0.30, -h * 0.40, angle, string(st.costValue), c_white, costScale)
+
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+    draw_set_color(c_white)
+}
+
 function drawFitTextInArea(
     text,
     areaX,

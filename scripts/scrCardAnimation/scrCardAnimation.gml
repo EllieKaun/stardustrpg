@@ -125,8 +125,8 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
     self.fromPt = { x: fromX, y: fromY }
     self.fromAngle = fromAngle
     self.toPt = {
-        x: (cfg.toX == undefined) ? display_get_gui_width() * 0.5 : cfg.toX,
-        y: (cfg.toY == undefined) ? display_get_gui_height() * 0.5 : cfg.toY
+        x: (cfg.toX == undefined) ? guiBaseWidth() * 0.5 : cfg.toX,
+        y: (cfg.toY == undefined) ? guiBaseHeight() * 0.5 : cfg.toY
     }
 
     self.t = 0
@@ -283,8 +283,9 @@ function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
 //  из Step/скриптов
 // ------------------------------------------------------------
 function cardDeskGeometry() {
-    var screenWidth = display_get_gui_width()
-    var screenHeight = display_get_gui_height()
+    // base coords — battle draws under a scale matrix (see Battle Draw GUI)
+    var screenWidth = guiBaseWidth()
+    var screenHeight = guiBaseHeight()
 
     var deskH = screenHeight / 3
     var cardSpacing = 6;

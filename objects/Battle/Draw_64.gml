@@ -1,9 +1,19 @@
-// Set GUI size to match camera view for consistent coordinates if not already set
-var screenWidth = display_get_gui_width()
-var screenHeight = display_get_gui_height()
+// Keep the GUI buffer matched to the window so overlaid text stays pixel-crisp
+// (a GUI larger than the window gets downscaled and looks ragged).
+if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
+    display_set_gui_size(max(window_get_width(), guiBaseWidth()), max(window_get_height(), guiBaseHeight()))
 
-// If GUI is not scaled to view, we might need to adjust or force it
-// display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
+// Draw the whole battle UI in the base (low-res) coordinate space, then scale it
+// up into the high-res GUI buffer with a world matrix. This keeps every element
+// pixel-identical to before, while letting us render the card stats at full
+// GUI resolution on top (see the stats pass below) so they stay crisp.
+var screenWidth  = guiBaseWidth()
+var screenHeight = guiBaseHeight()
+var uiScale      = display_get_gui_width() / screenWidth
+
+var _matIdentity = matrix_get(matrix_world)
+var _matScale    = matrix_build(0, 0, 0, 0, 0, 0, uiScale, uiScale, 1)
+matrix_set(matrix_world, _matScale)
 
 var cardDeskHeight = screenHeight / 3
 var topSpacing = 3 + 2
@@ -84,7 +94,7 @@ if (focusArea == FocusArea.Deck && selectedCharacter != noone && battleState != 
 		var infoLineH = 12
 		
 		// Название и Тип
-		draw_text(infoX, infoY, string(card.name))
+		draw_text(infoX, infoY, prettifyCardName(card.name))
 		draw_text(infoX, infoY + infoLineH, "Type: " + (card.actionType == StarriorStates.Attack ? "Attack" : "Cast"))
 		
 		var currentY = infoY + infoLineH * 2
@@ -202,6 +212,16 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                 draw_sprite_ext(card.cardBorderSpr,       0, cx, cy, sx, sy, angle, c_white, 1)
                 draw_sprite_ext(card.cardTokenSpr,        0, cx, cy, sx, sy, angle, c_white, 1)
 
+                // stats at full GUI resolution, drawn right on top of THIS card
+                // (identity matrix) so back cards' text never covers front cards.
+                matrix_set(matrix_world, _matIdentity)
+                drawCardStats(
+                    cx * uiScale, cy * uiScale,
+                    drawCardW * scale * uiScale, drawCardH * scale * uiScale,
+                    angle, card
+                )
+                matrix_set(matrix_world, _matScale)
+
                 if (isSelected && focusArea == FocusArea.Deck) {
                     var bw = drawCardW * scale
                     var bh = drawCardH * scale
@@ -272,3 +292,6 @@ if (battleState == BattleStates.GameOver) drawGameOverScreen()
 for (var i = 0; i < array_length(activeCardAnims); i++) {
     activeCardAnims[i].draw()
 }
+
+// Restore the world matrix so later events / instances draw normally.
+matrix_set(matrix_world, _matIdentity)
