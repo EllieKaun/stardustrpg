@@ -44,6 +44,7 @@ categoryForTab = function(tab) { // Мап индекса таба фильтр�
         case 1: return CardCategory.Buff
         case 2: return CardCategory.Heal
         case 3: return CardCategory.Attack
+        case 4: return CardCategory.Special
         default: return undefined
     }
 }
@@ -64,7 +65,8 @@ collectionPanel = new Panel({
         { name: "MAGIC", color: #9944CC },
         { name: "BUFF", color: #CC44CC },
         { name: "HEAL", color: #44CC44 },
-        { name: "ATTACK", color: #CC4444 }
+        { name: "ATTACK", color: #CC4444 },
+        { name: "SPECIAL", color: c_white, textColor: c_black }
     ],
     visibleRows: 3, 
     tabH: tabH, 

@@ -133,9 +133,16 @@ enum EffectVisualizerType {
     TimeBased
 }
 
-enum CardCategory { Attack, Magic, Heal, Buff }
+enum CardCategory { Attack, Magic, Heal, Buff, Special }
 
+// Категория карты — данные реестра (см. cardRegistryInit). Спрайт больше не
+// определяет категорию, поэтому «особые» карты можно свободно раскидывать.
 function cardCategoryOf(_card) {
+    if (is_struct(_card) && variable_struct_exists(_card, "cardId") && cardExists(_card.cardId)) {
+        var def = global.cardRegistry[$ _card.cardId]
+        if (variable_struct_exists(def, "category")) return def.category
+    }
+    // Запасной вариант по спрайту (для карт, построенных вне реестра)
     if (_card.cardBaseSpr == atcCard) return CardCategory.Attack
     if (_card.cardBaseSpr == mgcCard) return CardCategory.Magic
     if (_card.cardBaseSpr == healCard) return CardCategory.Heal

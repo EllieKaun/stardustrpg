@@ -392,7 +392,7 @@ function Panel(_config) constructor {
                 draw_set_alpha(1.0)
             }
 
-            draw_set_color(c_white)
+            draw_set_color(tab[$ "textColor"] ?? c_white)
             drawFitTextCentered(tab.name,
                 tabRow.tx + tabPadding, tabRow.ty + 1,
                 tabRow.tw - tabPadding * 2, tabRow.th - 2,

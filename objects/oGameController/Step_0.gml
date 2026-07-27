@@ -1,3 +1,8 @@
+// F11 — borderless на весь экран ↔ окно
+if (keyboard_check_pressed(vk_f11)) {
+    setDisplayMode(!global.displayFullscreen)
+}
+
 if (keyboard_check_pressed(vk_tab) && !global.uiModal) {
     oDeckBuilder.openBuilder()
 //    say([
