@@ -50,6 +50,16 @@ function drawBorderAroundCard(
 function guiBaseWidth()  { return variable_global_exists("guiBaseW") ? global.guiBaseW : display_get_gui_width()  }
 function guiBaseHeight() { return variable_global_exists("guiBaseH") ? global.guiBaseH : display_get_gui_height() }
 
+/// @desc Попадание точки в повёрнутый прямоугольник (центр cx,cy; размер w,h;
+///       угол angle — та же конвенция, что у draw_sprite_ext). Для хит-теста карт.
+function pointInRotatedRect(px, py, cx, cy, w, h, angle) {
+    var c = dcos(angle), s = dsin(angle)
+    var dx = px - cx, dy = py - cy
+    var lx = c * dx - s * dy    // точка в локальных координатах карты
+    var ly = s * dx + c * dy
+    return (abs(lx) <= w * 0.5 && abs(ly) <= h * 0.5)
+}
+
 /// @desc Turn an internal card id ("PhysicalDamageSingleTargetCard") into a
 ///       human label ("Physical Damage Single Target"). Display-only.
 function prettifyCardName(nm) {
@@ -115,24 +125,42 @@ function cardLocalToScreen(cx, cy, lx, ly, angle) {
     }
 }
 
-/// @desc Draw short text at a card-local point, integer-scaled (stays crisp with
-///       a nearest-filtered pixel font) with a clean one-pixel drop shadow.
+/// @desc Единый шрифт UI. Если ассет `fnUI` (TTF) есть — берём его (чёткий при
+///       любом размере, плавно масштабируется). Иначе откат на пиксельный m3x6.
+function uiFont() {
+    var f = asset_get_index("fnUI")   // -1 если ассет ещё не создан
+    return (f >= 0 && font_exists(f)) ? f : fnM3x6_22
+}
+
+/// @desc Масштаб текущего шрифта, чтобы строка была ~targetH пикселей в высоту,
+///       но не шире maxW. Для TTF — дробный (плавно). Для пиксельного отката —
+///       округляем до целого, чтобы шрифт не рвался.
+function uiTextScale(txt, targetH, maxW) {
+    var fh = string_height("0")
+    var sc = targetH / max(1, fh)
+    var tw = string_width(txt) * sc
+    if (tw > maxW) sc *= maxW / max(1, tw)
+    if (asset_get_index("fnUI") < 0) sc = max(1, floor(sc))  // пиксельный откат — целый масштаб
+    return sc
+}
+
+/// @desc Рисует строку шрифтом uiFont() высотой ~pxH пикселей, сохраняя текущие
+///       halign/valign/color. Возвращает применённый масштаб (нужен для ширины).
+function drawUiText(xx, yy, str, pxH) {
+    draw_set_font(uiFont())
+    var sc = uiTextScale(str, pxH, 1000000)
+    draw_text_transformed(xx, yy, str, sc, sc, 0)
+    return sc
+}
+
+/// @desc Draw short text at a card-local point with a clean one-pixel drop
+///       shadow, rotated to the card angle. Uses the current font & given scale.
 function drawCardStatText(cx, cy, lx, ly, angle, txt, col, scale) {
     if (txt == "") return
     var p  = cardLocalToScreen(cx, cy, lx, ly, angle)
-    var sh = max(1, scale)   // shadow = one scaled pixel, down-right
+    var sh = max(1, scale)   // shadow offset
     draw_text_transformed_colour(p.x + sh, p.y + sh, txt, scale, scale, angle, c_black, c_black, c_black, c_black, 0.6)
     draw_text_transformed_colour(p.x,      p.y,      txt, scale, scale, angle, col, col, col, col, 1)
-}
-
-/// @desc Pick an integer scale so `fnM3x6_22` text is ~targetH tall but never
-///       wider than maxW. Integer scaling keeps the pixel font crisp.
-function cardStatScale(txt, targetH, maxW) {
-    draw_set_font(fnM3x6_22)
-    var fh = string_height("0")
-    var sc = max(1, round(targetH / fh))
-    while (sc > 1 && string_width(txt) * sc > maxW) sc -= 1
-    return sc
 }
 
 /// @desc Compact stats drawn over the card at full GUI resolution:
@@ -153,19 +181,23 @@ function drawCardStats(x, y, w, h, angle, card) {
         default:     mainTxt = st.effectName;                                mainCol = colEff;  break
     }
 
+    // Смещения в долях размера карты (лёгкая подстройка центровки — крути тут):
+    var valueLx =  0.00   // значение: гориз. (0 = центр карты)
+    var valueLy =  0.31   // значение: вертик. (центр белого поля имени)
+    var costLx  =  0.32   // стоимость: гориз. (центр сердечка-токена)
+    var costLy  = -0.40   // стоимость: вертик. (центр сердечка-токена)
+
+    draw_set_font(uiFont())
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
 
-    var mainScale = cardStatScale(mainTxt, h * 0.22, w * 0.80)
-    draw_set_font(fnM3x6_22)
-    drawCardStatText(x, y, 0, h * 0.34, angle, mainTxt, mainCol, mainScale)
+    // значение (урон/лечение) — по центру поля имени
+    drawCardStatText(x, y, valueLx * w, valueLy * h, angle, mainTxt, mainCol,
+        uiTextScale(mainTxt, h * 0.22, w * 0.80))
 
-    // ---- cost: bare number on the cost token (heart), top-right ----
-    // token bbox (32x48 sprite): heart centre ≈ (25.5, 5); card origin = centre
-    // (16, 24) → local offset ≈ (+0.30*w, -0.40*h).
-    var costScale = cardStatScale(string(st.costValue), h * 0.14, w * 0.24)
-    draw_set_font(fnM3x6_22)
-    drawCardStatText(x, y, w * 0.30, -h * 0.40, angle, string(st.costValue), c_white, costScale)
+    // стоимость — цифрой на сердечке-токене (верх-право)
+    drawCardStatText(x, y, costLx * w, costLy * h, angle, string(st.costValue), c_white,
+        uiTextScale(string(st.costValue), h * 0.16, w * 0.24))
 
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)

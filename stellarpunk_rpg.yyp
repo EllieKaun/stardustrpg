@@ -91,6 +91,7 @@
     {"id":{"name":"fnM3x6_7","path":"fonts/fnM3x6_7/fnM3x6_7.yy",},},
     {"id":{"name":"fnM3x6_8","path":"fonts/fnM3x6_8/fnM3x6_8.yy",},},
     {"id":{"name":"fnM3x6_9","path":"fonts/fnM3x6_9/fnM3x6_9.yy",},},
+    {"id":{"name":"fnUI","path":"fonts/fnUI/fnUI.yy",},},
     {"id":{"name":"Battle","path":"objects/Battle/Battle.yy",},},
     {"id":{"name":"Card","path":"objects/Card/Card.yy",},},
     {"id":{"name":"oCamera","path":"objects/oCamera/oCamera.yy",},},

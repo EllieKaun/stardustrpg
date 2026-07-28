@@ -9,5 +9,8 @@ if (a > 0) {
 
 if (!open) exit
 
+// Панели свёрстаны прямо в координатах GUI (окна) — рисуем как есть, без матрицы.
+// Текст вкладок чёткий сам по себе (нативное разрешение GUI, шрифт fnUI).
+layoutPanels()
 collectionPanel.draw()
 deckPanel.draw()

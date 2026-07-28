@@ -125,8 +125,8 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
     self.fromPt = { x: fromX, y: fromY }
     self.fromAngle = fromAngle
     self.toPt = {
-        x: (cfg.toX == undefined) ? guiBaseWidth() * 0.5 : cfg.toX,
-        y: (cfg.toY == undefined) ? guiBaseHeight() * 0.5 : cfg.toY
+        x: (cfg.toX == undefined) ? display_get_gui_width() * 0.5 : cfg.toX,
+        y: (cfg.toY == undefined) ? display_get_gui_height() * 0.5 : cfg.toY
     }
 
     self.t = 0
@@ -142,6 +142,8 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
     self.alpha = 1
 
     static update = function() {
+        // множитель дизайн→окно: масштабирует абсолютные размеры/скорости частиц
+        var uiS = display_get_gui_width() / guiBaseWidth()
         if (!done) {
             var px = x, py = y // позиция до шага (для следа)
             t = min(t + 1, dur)
@@ -161,11 +163,11 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
                     var s = {
                         x: x + random_range(-cardW * pcfg.posSpread, cardW * pcfg.posSpread),
                         y: y + random_range(-cardH * pcfg.posSpread, cardH * pcfg.posSpread),
-                        vx: (px - x) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter),
-                        vy: (py - y) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter),
+                        vx: (px - x) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter) * uiS,
+                        vy: (py - y) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter) * uiS,
                         life: irandom_range(pcfg.lifeMin, pcfg.lifeMax),
                         maxlife: 1,
-                        size: random_range(pcfg.sizeMin, pcfg.sizeMax),
+                        size: random_range(pcfg.sizeMin, pcfg.sizeMax) * uiS,
                         rot: random(360),
                         rotSpeed: random_range(-pcfg.rotSpeed, pcfg.rotSpeed)
                     };
@@ -186,7 +188,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
         // частицы живут и после приземления карты
         for (var i = array_length(particles) - 1; i >= 0; i--) {
             var s = particles[i]
-            s.x += s.vx; s.y += s.vy; s.vy += pcfg.gravity
+            s.x += s.vx; s.y += s.vy; s.vy += pcfg.gravity * uiS
             s.rot += s.rotSpeed
             s.life -= 1
             if (s.life <= 0) array_delete(particles, i, 1)
@@ -283,19 +285,20 @@ function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
 //  из Step/скриптов
 // ------------------------------------------------------------
 function cardDeskGeometry() {
-    // base coords — battle draws under a scale matrix (see Battle Draw GUI)
-    var screenWidth = guiBaseWidth()
-    var screenHeight = guiBaseHeight()
+    // координаты GUI/окна — та же геометрия, что в Battle Draw GUI (без матрицы)
+    var screenWidth = display_get_gui_width()
+    var screenHeight = display_get_gui_height()
+    var s = screenWidth / guiBaseWidth()
 
     var deskH = screenHeight / 3
-    var cardSpacing = 6;
-    var cardH = deskH - (5 + 3)
+    var cardSpacing = 6 * s
+    var cardH = deskH - (5 + 3) * s
     var cardW = cardH * 2 / 3
     var deskW = cardW * maxCardsOnDeskNumber + cardSpacing * (maxCardsOnDeskNumber + 1)
     var startX = (screenWidth - deskW) / 2
     var startY = screenHeight - deskH
 
-    var vPad = 8
+    var vPad = 8 * s
     var drawCardH = deskH - vPad * 2
     var drawCardW = drawCardH * 2 / 3
 
@@ -309,15 +312,16 @@ function cardDeskGeometry() {
 
 function selectedCardTransform() {
     var g = cardDeskGeometry()
+    var s = display_get_gui_width() / guiBaseWidth()
     var hand = selectedCharacter.getCardsInHand()
     var n = min(array_length(hand), maxCardsOnDeskNumber)
     var spread = min(g.drawCardW * 0.8, (g.deskW - g.drawCardW) / max(1, n))
     var mid  = (n - 1) / 2
     var off  = selectedCard - mid
-    var arcLift = 2
+    var arcLift = 2 * s
     return {
         x: g.handCenterX + off * spread,
-        y: g.handCenterY - abs(off) * arcLift - 6,
+        y: g.handCenterY - abs(off) * arcLift - 6 * s,
         angle: 0,
         w: g.drawCardW,
         h: g.drawCardH

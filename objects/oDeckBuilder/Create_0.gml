@@ -1,13 +1,10 @@
-// Ресайз размера GUI под размер игры 
-display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
-
-var camW = camera_get_view_width(view_camera[0])
-var camH = camera_get_view_height(view_camera[0])
-var margin = 8
-var tabH = 18
-var panelW = (camW - margin * 2) / 2;
-var panelTop = margin + tabH       
-var panelH = camH - panelTop - margin
+// dbBaseW/dbBaseH — эталонный размер дизайна (камера игры). Весь UI декбилдера
+// верстается ПРЯМО в координатах GUI (окна): один множитель s = guiW/dbBaseW
+// применяется к константам дизайна в layoutPanels() — без матрицы, одно
+// пространство координат. Пока билдер закрыт, GUI = базовому; при открытии = окну.
+dbBaseW = camera_get_view_width(view_camera[0])
+dbBaseH = camera_get_view_height(view_camera[0])
+display_set_gui_size(dbBaseW, dbBaseH)
 
 activePanel = 0; // 0 = коллекция всех карт, 1 = дека
 
@@ -49,12 +46,9 @@ categoryForTab = function(tab) { // Мап индекса таба фильтр�
     }
 }
 
-// Панель коллекции всех карт
+// Панель коллекции всех карт (геометрия задаётся в layoutPanels())
 collectionPanel = new Panel({
-    x: margin, 
-    y: panelTop, 
-    w: panelW, 
-    h: panelH,
+    x: 0, y: 0, w: 0, h: 0,
     bgSprite: sprCardDeskFull,
     slotSpriteEmpty: EmptyCardPlace,
     slotSpriteLocked: LockedCardPlace,
@@ -68,9 +62,7 @@ collectionPanel = new Panel({
         { name: "ATTACK", color: #CC4444 },
         { name: "SPECIAL", color: c_white, textColor: c_black }
     ],
-    visibleRows: 3, 
-    tabH: tabH, 
-    padding: 8,
+    visibleRows: 3,
     slots: buildCollectionSlots(CardCategory.Magic),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
@@ -90,12 +82,9 @@ collectionPanel = new Panel({
 })
 collectionPanel.tag = Panels.Collection
 
-// Панель деки
+// Панель деки (геометрия задаётся в layoutPanels())
 deckPanel = new Panel({
-    x: margin + panelW, 
-    y: panelTop, 
-    w: panelW, 
-    h: panelH,
+    x: 0, y: 0, w: 0, h: 0,
     bgSprite: sprCardDeskFull,
     slotSpriteEmpty: EmptyCardPlace,
     slotSpriteLocked: LockedCardPlace,
@@ -106,9 +95,7 @@ deckPanel = new Panel({
         { name: "LANA", color: #4488CC },
         { name: "VIV", color: #44CC88 }
     ],
-    visibleRows: 3, 
-    tabH: tabH, 
-    padding: 8,
+    visibleRows: 3,
     slots: buildDeckSlots(Characters.Lana),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
@@ -142,6 +129,40 @@ deckPanel = new Panel({
 })
 deckPanel.tag = Panels.Deck
 
+// Сфокусировать конкретную панель (используется мышью)
+focusPanel = function(panel) {
+    collectionPanel.focused = (panel == collectionPanel)
+    deckPanel.focused = (panel == deckPanel)
+    activePanel = (panel == collectionPanel) ? Panels.Collection : Panels.Deck
+}
+
+// Верстает обе панели ПРЯМО в координатах GUI (окна). s — тот же множитель,
+// что раньше давала матрица (guiW/dbBaseW), но теперь применяется к константам
+// дизайна один раз здесь. Вызывается каждый кадр (в т.ч. переживает ресайз окна).
+layoutPanels = function() {
+    var s = display_get_gui_width() / dbBaseW
+    var mg  = 8  * s   // внешний отступ
+    var tH  = 18 * s   // высота вкладок
+    var pw  = (dbBaseW * s - mg * 2) / 2
+    var top = mg + tH
+    var ph  = dbBaseH * s - top - mg
+
+    var panels = [collectionPanel, deckPanel]
+    for (var i = 0; i < 2; i++) {
+        var p = panels[i]
+        p.x = mg + i * pw
+        p.y = top
+        p.w = pw
+        p.h = ph
+        p.padding    = 8 * s
+        p.tabH       = tH
+        p.tabGap     = 2 * s
+        p.tabPadding = 4 * s
+        p.uiScale    = s   // для спрайтов фикс. размера (указатель)
+    }
+}
+layoutPanels()
+
 // Инициализация панелей
 collectionPanel.focused = true
 deckPanel.focused = false
@@ -151,7 +172,9 @@ activePanel = Panels.Collection
 open = false
 
 openBuilder = function() {
-    display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
+    // поднимаем GUI до размера окна и пересчитываем вёрстку в оконных координатах
+    display_set_gui_size(max(window_get_width(), dbBaseW), max(window_get_height(), dbBaseH))
+    layoutPanels()
     open = true
     global.uiModal = true
     collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab))
@@ -170,4 +193,6 @@ openBuilder = function() {
 closeBuilder = function() {
     open = false
     global.uiModal = false
+    // возвращаем GUI к базовому разрешению, чтобы не ломать UI оверворлда
+    display_set_gui_size(dbBaseW, dbBaseH)
 }

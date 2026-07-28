@@ -202,6 +202,24 @@ function unselectTargets() {
     }
 }
 
+// Навести цель мышью: если под курсором (мировые координаты) есть цель из
+// targetOptions — выбрать её. Возвращает true, если цель под курсором найдена.
+function selectTargetAtMouse() {
+    for (var i = 0; i < array_length(targetOptions); i++) {
+        var t = targetOptions[i]
+        if (instance_exists(t) && position_meeting(mouse_x, mouse_y, t)) {
+            if (selectedTarget != t) {
+                unselectTargets()
+                selectedTargetNumber = i
+                selectedTarget = t
+                selectedTarget.isTarget = true
+            }
+            return true
+        }
+    }
+    return false
+}
+
 // Фильтр колбэк
 function filterCriteria(element, index) {
     return !element.isKO()

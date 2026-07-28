@@ -14,6 +14,13 @@ selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false
 
+// Хит-боксы для управления мышью (заполняются в Draw GUI, читаются в Step)
+cardHitRects  = []
+menuHitRects  = []
+infoCloseRect = undefined
+mouseLastX    = -1   // для детекта движения мыши (чтобы не перебивать клавиатуру в покое)
+mouseLastY    = -1
+
 // Анимация розыгрыша карты (см. scrCardAnimation)
 activeCardAnims = []
 animatingCard = noone // карта, которая сейчас летит (прячем её в руке)

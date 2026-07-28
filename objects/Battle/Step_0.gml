@@ -1,4 +1,57 @@
-updateCardAnims() // двигаем/чистим летящие карты в любом состоянии 
+updateCardAnims() // двигаем/чистим летящие карты в любом состоянии
+
+// ---- Управление мышью (в дополнение к клавиатуре) ---------------------------
+// UI боя рисуется прямо в координатах GUI (окна), поэтому мышь берём как есть.
+// Хит-боксы карт/меню тоже в оконных координатах. Враги — мировые объекты.
+var mbx = device_mouse_x_to_gui(0)
+var mby = device_mouse_y_to_gui(0)
+var mouseMoved = (mbx != mouseLastX || mby != mouseLastY)
+mouseLastX = mbx
+mouseLastY = mby
+var mClick = mouse_check_button_pressed(mb_left)
+var mouseConfirm = false
+
+switch (battleState) {
+    case BattleStates.CharacterPlay:
+        // карты в руке — сверху вниз по z (последняя нарисованная — верхняя)
+        var hoveredCard = -1
+        for (var i = array_length(cardHitRects) - 1; i >= 0; i--) {
+            var r = cardHitRects[i]
+            if (pointInRotatedRect(mbx, mby, r.x, r.y, r.w, r.h, r.angle)) {
+                hoveredCard = r.index
+                break
+            }
+        }
+        if (hoveredCard >= 0) {
+            if (mouseMoved) { focusArea = FocusArea.Deck; selectedCard = hoveredCard }
+            if (mClick)     { focusArea = FocusArea.Deck; selectedCard = hoveredCard; mouseConfirm = true }
+        } else {
+            for (var i = 0; i < array_length(menuHitRects); i++) {
+                var r = menuHitRects[i]
+                if (pointInRect(mbx, mby, r.x, r.y, r.w, r.h)) {
+                    if (mouseMoved) { focusArea = FocusArea.Menu; selectedMenuItem = r.index }
+                    if (mClick)     { focusArea = FocusArea.Menu; selectedMenuItem = r.index; mouseConfirm = true }
+                    break
+                }
+            }
+        }
+    break
+
+    case BattleStates.EnemyTargetSelection:
+    case BattleStates.AllyTargetSelection:
+    case BattleStates.EnemyInfoSelection:
+        if (mouseMoved || mClick) {
+            var overTarget = selectTargetAtMouse()
+            if (mClick && overTarget) mouseConfirm = true
+        }
+    break
+
+    case BattleStates.EnemyInfoDisplay:
+        if (mClick && infoCloseRect != undefined
+            && pointInRect(mbx, mby, infoCloseRect.x, infoCloseRect.y, infoCloseRect.w, infoCloseRect.h))
+            mouseConfirm = true
+    break
+}
 
 switch (battleState) {
     case BattleStates.Victory:
@@ -17,7 +70,7 @@ switch (battleState) {
         
     break
     case BattleStates.EnemyTargetSelection: // Выбрать цель для карты: Противник
-        var enterPressed = keyboard_check_pressed(vk_enter)
+        var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
         var changeIndex = leftPressed - rightPressed
@@ -36,7 +89,7 @@ switch (battleState) {
         }
     break    
     case BattleStates.AllyTargetSelection: // Выбрать цель для карты: Союзник
-        var enterPressed = keyboard_check_pressed(vk_enter)
+        var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
         var changeIndex = leftPressed - rightPressed
@@ -55,7 +108,7 @@ switch (battleState) {
         }
     break 
     case BattleStates.CharacterPlay: // Переключение стрелками между режимами: дека или меню, а также переключение между картами и опциями
-        var enterPressed = keyboard_check_pressed(vk_enter)
+        var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
         
@@ -127,7 +180,7 @@ switch (battleState) {
         }
     break
     case BattleStates.EnemyInfoSelection: // Менюшка выбора секции информации о враге
-        var enterPressed = keyboard_check_pressed(vk_enter)
+        var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
         if (leftPressed) selectPreviousTarget()
@@ -138,7 +191,7 @@ switch (battleState) {
         }
     break
     case BattleStates.EnemyInfoDisplay: // Менюшка информации о враге
-        var enterPressed = keyboard_check_pressed(vk_enter)
+        var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         if (enterPressed) {
             battleState = BattleStates.CharacterPlay
             unselectTargets()
