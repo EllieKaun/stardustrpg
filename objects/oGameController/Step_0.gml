@@ -3,11 +3,15 @@ if (keyboard_check_pressed(vk_f11)) {
     setDisplayMode(!global.displayFullscreen)
 }
 
-// Esc — пауза с полной заморозкой мира. Не открываем поверх другой модалки
-// (деккбилдер/диалог ставят global.uiModal) и если пауза уже открыта.
-if (keyboard_check_pressed(vk_escape) && !global.uiModal && !instance_exists(oPauseMenu)) {
-    instance_create_layer(0, 0, "Instances", oPauseMenu)
-    exit
+// Esc — переключатель паузы (единственный обработчик, чтобы не было гонки
+// открыл/закрыл на одном нажатии). Открываем только если нет другой модалки
+// (деккбилдер/диалог ставят global.uiModal).
+if (keyboard_check_pressed(vk_escape)) {
+    if (instance_exists(oPauseMenu)) {
+        with (oPauseMenu) close()
+    } else if (!global.uiModal) {
+        instance_create_layer(0, 0, "Instances", oPauseMenu)
+    }
 }
 
 if (keyboard_check_pressed(vk_tab) && !global.uiModal) {

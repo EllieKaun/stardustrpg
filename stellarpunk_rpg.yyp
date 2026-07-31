@@ -110,6 +110,7 @@
     {"id":{"name":"oMainMenu","path":"objects/oMainMenu/oMainMenu.yy",},},
     {"id":{"name":"oMushroomSmall","path":"objects/oMushroomSmall/oMushroomSmall.yy",},},
     {"id":{"name":"oOverworldItem","path":"objects/oOverworldItem/oOverworldItem.yy",},},
+    {"id":{"name":"oPausable","path":"objects/oPausable/oPausable.yy",},},
     {"id":{"name":"oPauseMenu","path":"objects/oPauseMenu/oPauseMenu.yy",},},
     {"id":{"name":"oPuppetMaster","path":"objects/oPuppetMaster/oPuppetMaster.yy",},},
     {"id":{"name":"oShadowDrawing","path":"objects/oShadowDrawing/oShadowDrawing.yy",},},

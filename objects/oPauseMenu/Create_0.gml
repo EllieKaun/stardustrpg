@@ -1,38 +1,35 @@
 // Меню паузы в мире. Оверлей поверх оверворлда: 1 background + 1 foreground слой
-// + пункты (пункты ВЫШЕ foreground). ПОЛНОСТЬЮ замораживает игру:
-// instance_deactivate_all(true) останавливает Step/Alarm/пути у всех объектов,
-// кроме самой паузы — спавн врагов, движение, камера, всё стоит.
-// Открывается по Esc в оверворлде (см. oGameController). Закрытие — Esc / Resume.
+// + пункты (пункты ВЫШЕ foreground). Замораживает игру через global.gamePaused:
+// Step-логика мировых объектов (спавн врагов, враги, камера, деревья) стоит, но
+// их Draw продолжает рисовать — поэтому замороженный мир виден под меню.
+// Esc (открытие и закрытие) обрабатывает oGameController; отсюда закрытие — close().
 
 // Запоминаем размер GUI оверворлда и поднимаем до размера окна (чёткий текст).
 prevGuiW = display_get_gui_width()
 prevGuiH = display_get_gui_height()
 menuEnsureCrispGui()
 
-// Полная заморозка: деактивируем всё, кроме этого оверлея.
-instance_deactivate_all(true)
+// Заморозка мира: gamePaused гейтит Step-логику мировых объектов (мир виден, но
+// не обрабатывается). uiModal дополнительно блокирует героя и Tab/Ctrl.
+global.gamePaused = true
 global.uiModal = true
 
-// Пропустить ввод на первом кадре, чтобы Esc, которым открыли паузу, не закрыл её
-// сразу (гонка с обработчиком в oGameController).
-openedThisFrame = true
-
-// Закрытие паузы: разморозить мир, восстановить GUI, снять модалку, удалить оверлей.
+// Закрытие паузы: разморозить, восстановить GUI, снять модалку, удалить оверлей.
 close = function() {
-    instance_activate_all()
-    display_set_gui_size(prevGuiW, prevGuiH)
+    global.gamePaused = false
     global.uiModal = false
+    display_set_gui_size(prevGuiW, prevGuiH)
     instance_destroy()
 }
 
 // --- Слои ---
-// Мир на паузе не отрисовывается (объекты деактивированы), поэтому background —
-// непрозрачный тёмный фон; foreground — декоративный слой поверх (плейсхолдер).
+// background полупрозрачно затемняет замороженный мир; foreground — декоративный
+// слой поверх (плейсхолдер, низкий alpha, чтобы мир просвечивал).
 backLayers = [
-    new MenuLayer(noone, { name: "pause-bg", alpha: 1,    placeholderColor: make_color_rgb(8, 10, 16) })
+    new MenuLayer(noone, { name: "pause-bg", alpha: 0.55, placeholderColor: make_color_rgb(6, 8, 14) })
 ]
 foreLayers = [
-    new MenuLayer(noone, { name: "pause-fg", scrollX: 8, alpha: 0.35, placeholderColor: make_color_rgb(40, 46, 64) })
+    new MenuLayer(noone, { name: "pause-fg", scrollX: 8, alpha: 0.18, placeholderColor: make_color_rgb(40, 46, 64) })
 ]
 itemsAboveForeground = true
 

@@ -38,6 +38,7 @@ selected_character = partyMembers[0]
 global.mpGrid = -1 // Motion Planning
 global.battleSection = 1
 global.uiModal = false // Флаг для метки если запускается какое-то модальное окно, чтобы блокировать движение в основном экране
+global.gamePaused = false // Полная пауза мира (замораживает Step-логику, но мир продолжает рисоваться). См. oPauseMenu
 global.zoneConfig = { // нужно для определение секций и зон на карте
     cx: room_width / 2,
     cy: room_height / 2,

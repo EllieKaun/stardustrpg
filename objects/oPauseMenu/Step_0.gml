@@ -1,15 +1,8 @@
 // Анимация слоёв
 menuUpdateLayers(backLayers, foreLayers)
 
-// Первый кадр после открытия: игнорируем ввод, чтобы Esc, которым открыли паузу,
-// не закрыл её тут же.
-if (openedThisFrame) { openedThisFrame = false; exit }
-
-// Esc — выйти из паузы. После close() инстанс уничтожен — дальше не работаем.
-if (keyboard_check_pressed(vk_escape)) {
-    close()
-    exit
-}
+// Esc (открыть/закрыть паузу) обрабатывает oGameController — здесь его не читаем,
+// чтобы не было двойного срабатывания на одном нажатии.
 
 // Ввод меню (клавиатура + мышь)
 var mx = device_mouse_x_to_gui(0)

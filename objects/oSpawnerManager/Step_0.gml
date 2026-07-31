@@ -1,4 +1,6 @@
 
+if (global.gamePaused) exit // на паузе спавн полностью остановлен
+
 for (var i = ds_list_size(enemyList) - 1; i >= 0; i--) {
     if (!instance_exists(enemyList[| i])) {
         ds_list_delete(enemyList, i)
