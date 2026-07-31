@@ -22,6 +22,7 @@ if (!variable_global_exists("displayModeReady")) {
     global.displayModeReady = true
     setDisplayMode(true)
 }
+uiFontInit() // кэш UI-шрифта и высоты строки (см. scrDrawing)
 initEffectRegistry() // регистрация эффектов
 cardIdsInit() // инициализация карт ид
 cardRegistryInit() // регистация карт  

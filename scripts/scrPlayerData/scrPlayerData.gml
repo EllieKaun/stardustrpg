@@ -9,20 +9,38 @@ function playerDataInit() {
     // global.playerData - свойство для хранения структуры пользователя для сохранения
     if (!playerDataLoad()) global.playerData = playerDataDefault()
 
-    // Если пусто, значит новая игра и иницилазируем базовые карты 
+    // Флаг новой игры: нужен стартовому флоу (первого врага показываем сразу
+    // в зоне видимости игрока). По умолчанию false — загруженная игра.
+    global.isNewGame = false
+
+    // Если пусто, значит новая игра и иницилазируем базовые карты
     if (array_length(variable_struct_get_names(global.playerData.collection)) == 0) {
+        global.isNewGame = true
         playerGrantStarterCards()
         playerDataSave()
     }
 }
 
-// Иницилазиация базовых карт 
+// Иницилазиация базовых карт и стартовых дек героев.
+// На старте у каждого героя ровно 3 карты обычной редкости.
 function playerGrantStarterCards() {
     var C = global.CardId;
-    unlockCard(C.physicalDamageSingleTarget);
-    unlockCard(C.magicalDamageSingleTarget);
-    unlockCard(C.instantHealSingleTarget);
-    unlockCard(C.buffPhysicalDamageSingleTarget);
+
+    // Открываем базовые карты. Количество = сколько нужно на стартовые деки обоих героев.
+    unlockCard(C.physicalDamageSingleTarget, CardsRarity.Default, 2)      // Вив: 2 атакующие
+    unlockCard(C.magicalDamageSingleTarget)                              // Лана: магическая
+    unlockCard(C.instantHealSingleTarget)                               // Лана: лечащая
+    unlockCard(C.buffPhysicalDamageSingleTarget, CardsRarity.Default, 2) // Лана + Вив: усиливающая
+
+    // Лана: 1 магическая, 1 усиливающая, 1 лечащая
+    setDeckSlot(Characters.Lana, 0, C.magicalDamageSingleTarget)
+    setDeckSlot(Characters.Lana, 1, C.buffPhysicalDamageSingleTarget)
+    setDeckSlot(Characters.Lana, 2, C.instantHealSingleTarget)
+
+    // Вив: 2 атакующие, 1 усиливающая
+    setDeckSlot(Characters.Viv, 0, C.physicalDamageSingleTarget)
+    setDeckSlot(Characters.Viv, 1, C.physicalDamageSingleTarget)
+    setDeckSlot(Characters.Viv, 2, C.buffPhysicalDamageSingleTarget)
 }
 
 // Моковые данные о пользователе

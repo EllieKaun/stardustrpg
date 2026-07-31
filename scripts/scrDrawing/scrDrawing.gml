@@ -125,22 +125,37 @@ function cardLocalToScreen(cx, cy, lx, ly, angle) {
     }
 }
 
+/// @desc Резолвит UI-шрифт один раз и кэширует в глобалки, чтобы не дёргать
+///       asset_get_index("fnUI") и string_height() на каждый вызов drawUiText
+///       (в отрисовке боя это десятки лишних lookup'ов за кадр). Вызывается на
+///       старте (oGameController Create); есть и ленивый фолбэк ниже.
+function uiFontInit() {
+    var f = asset_get_index("fnUI")   // -1 если ассет ещё не создан
+    global.uiFontIsTTF = (f >= 0 && font_exists(f))
+    global.uiFontIndex = global.uiFontIsTTF ? f : fnM3x6_22
+    // Высота строки — константа шрифта; меряем один раз с активным UI-шрифтом.
+    var prev = draw_get_font()
+    draw_set_font(global.uiFontIndex)
+    global.uiFontLineHeight = max(1, string_height("0"))
+    if (prev >= 0) draw_set_font(prev)
+}
+
 /// @desc Единый шрифт UI. Если ассет `fnUI` (TTF) есть — берём его (чёткий при
 ///       любом размере, плавно масштабируется). Иначе откат на пиксельный m3x6.
 function uiFont() {
-    var f = asset_get_index("fnUI")   // -1 если ассет ещё не создан
-    return (f >= 0 && font_exists(f)) ? f : fnM3x6_22
+    if (!variable_global_exists("uiFontIndex")) uiFontInit()
+    return global.uiFontIndex
 }
 
 /// @desc Масштаб текущего шрифта, чтобы строка была ~targetH пикселей в высоту,
 ///       но не шире maxW. Для TTF — дробный (плавно). Для пиксельного отката —
 ///       округляем до целого, чтобы шрифт не рвался.
 function uiTextScale(txt, targetH, maxW) {
-    var fh = string_height("0")
-    var sc = targetH / max(1, fh)
+    if (!variable_global_exists("uiFontIndex")) uiFontInit()
+    var sc = targetH / global.uiFontLineHeight
     var tw = string_width(txt) * sc
     if (tw > maxW) sc *= maxW / max(1, tw)
-    if (asset_get_index("fnUI") < 0) sc = max(1, floor(sc))  // пиксельный откат — целый масштаб
+    if (!global.uiFontIsTTF) sc = max(1, floor(sc))  // пиксельный откат — целый масштаб
     return sc
 }
 

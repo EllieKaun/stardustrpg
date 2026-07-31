@@ -18,36 +18,40 @@ function Card(name,
     self.cardBorderSpr = cardBorderSpr
     self.cardTokenSpr = cardTokenSpr
     self.energy = energy
-    self.costType = function() {
-        if actionType == StarriorStates.Attack {
-            return CostType.Health
+
+    // Стоимость карты детерминирована (зависит только от actionType/effects/rarity,
+    // которые после создания не меняются) — считаем один раз при создании, а не
+    // каждый кадр в отрисовке.
+    self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana
+    self.costValueCached = computeCardCost(rarity, effects)
+    self.costType  = function() { return self.costTypeCached }
+    self.costValue = function() { return self.costValueCached }
+}
+
+// Стоимость карты по её первому эффекту и редкости. Детерминирована, поэтому
+// считается один раз при создании карты (кэшируется в costValueCached).
+function computeCardCost(rarity, effects) {
+    var effectsCount = array_length(effects)
+    if (effectsCount == 0) return 0
+
+    var effect = effects[0]
+    // У эффекта может не быть type (kind-only эффекты вроде BossClone) —
+    // тогда уходим в ветку по умолчанию.
+    var effectType = variable_struct_exists(effect, "type") ? effect.type : undefined
+    if (effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Physical) {
+        if (effectsCount > 1) {
+            return getCostByRarity(rarity, 4, 5, 6, 7)
         } else {
-            return CostType.Mana
-        }
-    }
-    self.costValue = function() {
-        var effectsCount = array_length(effects)
-        if effectsCount == 0 { return 0 }
-            
-        var effect = effects[0]
-        // У эффекта может не быть type (kind-only эффекты вроде BossClone) —
-        // тогда уходим в ветку по умолчанию.
-        var effectType = variable_struct_exists(effect, "type") ? effect.type : undefined
-        if effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Physical {
-            if effectsCount > 1 {
-                return getCostByRarity(rarity, 4, 5, 6, 7)
-            } else {
-                return getCostByRarity(rarity, 2, 3, 4, 5)
-            }
-        } else if effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Magical {
-            return getCostByRarity(rarity, 3, 4, 5, 6)
-        } else if effectType == EffectTypes.Heal && effect.timing == Timing.Instant {
-            return getCostByRarity(rarity, 3, 4, 5, 6)
-        } else if effectType == EffectTypes.Heal && effect.timing == Timing.EndOfTurn {
             return getCostByRarity(rarity, 2, 3, 4, 5)
-        } else {
-            return getCostByRarity(rarity, 3, 4, 5, 6)
-        }   
+        }
+    } else if (effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Magical) {
+        return getCostByRarity(rarity, 3, 4, 5, 6)
+    } else if (effectType == EffectTypes.Heal && effect.timing == Timing.Instant) {
+        return getCostByRarity(rarity, 3, 4, 5, 6)
+    } else if (effectType == EffectTypes.Heal && effect.timing == Timing.EndOfTurn) {
+        return getCostByRarity(rarity, 2, 3, 4, 5)
+    } else {
+        return getCostByRarity(rarity, 3, 4, 5, 6)
     }
 }
 
