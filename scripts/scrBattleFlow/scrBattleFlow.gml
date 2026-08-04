@@ -1,8 +1,12 @@
 function afterPlayChecks() {
-    // End Of Turn эффекты
-    executeEndOfTurn(selectedCharacter)
-    updateOvertime(selectedCharacter)
     selectedCard = 0
+    // End-of-turn эффекты и тик длительностей — ТОЛЬКО когда ход реально завершён
+    // (энергия кончилась), а не после каждой сыгранной карты (иначе при энергии>1
+    // DoT и длительности баффов тикали лишний раз).
+    if (instance_exists(selectedCharacter) && selectedCharacter.energy <= 0) {
+        executeEndOfTurn(selectedCharacter)
+        updateOvertime(selectedCharacter)
+    }
     removeDeadPuppets()
       if (!instance_exists(selectedCharacter)) {
         selectNextCharacter()
@@ -128,6 +132,7 @@ function selectNextCharacter() {
             selectedCharacterNumber = currentIndex
             selectedCharacter = candidate
             selectedCharacter.isActive = true
+            selectedCharacter.energy = selectedCharacter.maxEnergy // сброс энергии на новый ход
             cards = selectedCharacter.getCardsInHand()
             
             show_debug_message("new selectNextCharacter " + selectedCharacter.name)
@@ -163,6 +168,18 @@ function initTargetSelection(targets) {
         if !targets[i].isKO() array_push(aliveTargets, targets[i])
     }
     targetOptions = aliveTargets
+    selectedTargetNumber = -1
+    selectNextTarget()
+}
+
+// Выбор целей ТОЛЬКО среди павших (не-кукол) — для воскрешения
+function initTargetSelectionKO(targets) {
+    unselectionToAll()
+    var pool = []
+    for(var i = 0; i < array_length(targets); i++) {
+        if (targets[i].isKO() && !targets[i].isPuppet) array_push(pool, targets[i])
+    }
+    targetOptions = pool
     selectedTargetNumber = -1
     selectNextTarget()
 }

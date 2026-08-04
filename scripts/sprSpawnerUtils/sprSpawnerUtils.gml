@@ -140,16 +140,39 @@ function rewardPoolForSection(section) {
     return { ids: ids, rarities: rarities }
 }
 
+// Единый пул наград «лес» (демо): объединение пулов всех секций.
+// Редкости — обычная/необычная. Враги остаются по секциям, а награда — общая.
+function forestRewardPool() {
+    var ids = []
+    var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
+    for (var i = 0; i < array_length(sections); i++) {
+        var pool = rewardPoolForSection(sections[i])
+        for (var j = 0; j < array_length(pool.ids); j++) array_push(ids, pool.ids[j])
+    }
+    return { ids: ids, rarities: [CardsRarity.Default, CardsRarity.Unusual] }
+}
+
 // итоговое создание битвы из фабрик
 function makeEncounter(enemyCreators, reward) {
     return { enemyCreators: enemyCreators, reward: reward }
 }
 
-// создание битвы для рандомного врага секции 
+// Единый пул композиций врагов «лес» (демо): все композиции всех секций.
+function forestCompositions() {
+    var _all = []
+    var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
+    for (var i = 0; i < array_length(sections); i++) {
+        var comps = sectionCompositions(sections[i])
+        for (var j = 0; j < array_length(comps); j++) array_push(_all, comps[j])
+    }
+    return _all
+}
+
+// создание битвы для рандомного врага (демо: враги и награда — из общего лесного пула)
 function randomSectionEncounter(section) {
-    var comps = sectionCompositions(section)
+    var comps = forestCompositions()                       // демо: враги из всех секций
     var comp  = comps[irandom(array_length(comps) - 1)];   // [createNut, createLeaf, ...]
-    return makeEncounter(comp, rewardPoolForSection(section))
+    return makeEncounter(comp, forestRewardPool())         // демо: единый лесной пул наград
 }
 
 // создание битвы для босса Марионетки

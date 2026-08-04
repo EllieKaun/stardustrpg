@@ -33,10 +33,14 @@ function createStarrior(
     intelligence,
     aura,
     guts,
-    deck
+    deck,
+    weaknesses = undefined,
+    strengths = undefined
 ) {
     var starrior = instance_create_depth(0, 0, depth - 1, Starrior)
     starrior.name = name
+    starrior.weaknesses = weaknesses ?? []
+    starrior.strengths  = strengths  ?? []
     starrior.hp = hp 
     starrior.maxHp = maxHp
     starrior.mana = mana 

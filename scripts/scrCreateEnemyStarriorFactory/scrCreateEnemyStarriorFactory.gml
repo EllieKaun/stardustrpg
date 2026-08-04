@@ -3,10 +3,11 @@ function createCrackerNut() {
         sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle, 
         16, 16,  0, 0,  1, 1, /*str*/2, /*int*/0, /*aura*/0, /*guts*/0,
         [
-            createPhysicalDamageSingleTargetCard(), 
+            createPhysicalDamageSingleTargetCard(),
             createPhysicalDamageStunChanseSingleTargetCard(),
-            createCardBuffPhysicalDamageSingleTarget() 
-        ]);
+            createCardBuffPhysicalDamageSingleTarget()
+        ],
+        [ StatusNames.Stun ]);   // слабость: Оглушение
 }
 
 function createLeaf() {
@@ -14,10 +15,11 @@ function createLeaf() {
         HealLeaf, HealLeaf, HealLeaf, HealLeaf,
         20, 20,  0, 0,  1, 1,  /*str*/1, /*int*/1, /*aura*/0, /*guts*/0,
         [
-            createPhysicalDamageSingleTargetCard(), 
+            createPhysicalDamageSingleTargetCard(),
             createPhysicalDamageWeakeningChanseSingleTargetCard(),
-            createInstantHealSingleTargetCard() 
-        ])
+            createInstantHealSingleTargetCard()
+        ],
+        [ StatusNames.Burn ])   // слабость: Огонь
 }
 
 function createMushroom() {
@@ -27,8 +29,9 @@ function createMushroom() {
         [
             createPhysicalDamageSingleTargetCard(),
             createPhysicalDamageVampirismChanseSingleTargetCard(),
-            createCardDebuffPhysicalProtectionSingleTarget() 
-        ])
+            createCardDebuffPhysicalProtectionSingleTarget()
+        ],
+        [ StatusNames.Bomb ])   // слабость: Взрыв
 }
 
 function createFlower() {
@@ -36,10 +39,11 @@ function createFlower() {
         PowerFlower, PowerFlower, PowerFlower, PowerFlower,
         12, 12,  0, 0,  1, 1,  /*str*/1, /*int*/3, /*aura*/0, /*guts*/0,
         [
-            createPhysicalDamageSingleTargetCard(), 
+            createPhysicalDamageSingleTargetCard(),
             createMagicalDamageSingleTargetCard(),
             createCardBuffMagicalDamageSingleTarget()
-        ])
+        ],
+        [ StatusNames.Freeze ])   // слабость: Лёд
 }
 
 function createPuppetMaster() {

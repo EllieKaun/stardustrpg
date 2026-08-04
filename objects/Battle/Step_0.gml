@@ -168,7 +168,8 @@ switch (battleState) {
                     initTargetSelection(enemies)
                 } else if currentCard.target == TargetTypes.SingleAllyTarget {
                     battleState = BattleStates.AllyTargetSelection
-                    initTargetSelection(heroes)
+                    if (cardIsResurrection(currentCard)) initTargetSelectionKO(heroes) // цель — павший
+                    else initTargetSelection(heroes)
                 } else if currentCard.target == TargetTypes.AllEnemies {
                     playCardAnimated(currentCard, selectedCharacter, enemies)
                 } else if currentCard.target == TargetTypes.AllAllies {

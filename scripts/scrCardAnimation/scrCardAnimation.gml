@@ -67,7 +67,7 @@ function defaultCardAnimConfig() {
         arcHeight: 120,
         ease: easeOutQuad,
         fade: fadeTail,
-        particles: damageCardParticleConfig()
+        particles: defaultCardParticleConfig()   // звёзды; цвет ставится по категории в playCardAnimated
     }
 }
 
@@ -331,6 +331,9 @@ function selectedCardTransform() {
 // Запускает анимацию выбранной карты перед тем как начать фактическое разыгрывание
 function playCardAnimated(card, caster, targets, cfg) {
     if (cfg == undefined) cfg = defaultCardAnimConfig()
+    // след из звёзд цвета категории карты (как вкладки декбилдера)
+    cfg.particles.color = categoryColor(cardCategoryOf(card))
+    cfg.particles.draw  = drawStarSparkle
     var transform = selectedCardTransform()
 
     animPendingCard = card

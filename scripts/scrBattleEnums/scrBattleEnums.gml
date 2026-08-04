@@ -1,6 +1,10 @@
-#macro ENEMYS_TURN 0 
+#macro ENEMYS_TURN 0
 #macro PUPPET_TURN 1
 #macro MAX_PUPPETS 3
+
+// Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
+#macro WEAKNESS_DAMAGE_MODIFIER 0.1
+#macro WEAKNESS_STATUS_CHANCE_BONUS 0.25
 
 enum CardsRarity {
     Default,
@@ -148,4 +152,16 @@ function cardCategoryOf(_card) {
     if (_card.cardBaseSpr == healCard) return CardCategory.Heal
     if (_card.cardBaseSpr == buffCard) return CardCategory.Buff
     return CardCategory.Attack
+}
+
+// Цвет категории — совпадает с цветами вкладок декбилдера (oDeckBuilder Create)
+function categoryColor(category) {
+    switch (category) {
+        case CardCategory.Magic:   return #9944CC
+        case CardCategory.Buff:    return #CC44CC
+        case CardCategory.Heal:    return #44CC44
+        case CardCategory.Attack:  return #CC4444
+        case CardCategory.Special: return c_white
+        default:                   return c_white
+    }
 }

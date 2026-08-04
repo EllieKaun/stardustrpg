@@ -3,12 +3,12 @@ function createInstantHealSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Instant Heal",
         rarity,
         targetType,
         StarriorStates.Cast,
         1,
-        [ HealEffect(random_range(1, 3)) ],
+        [ HealEffect(irandom_range(1, 3)) ],
         healCard,
         hpHealSolo,
         commonBorder,
@@ -21,12 +21,12 @@ function createInstantMultipleTargetsHealCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllAllies
     return new Card(
-        "Default heal",
+        "Instant Heal Group",
         rarity,
         targetType,
         StarriorStates.Cast,
         1,
-        [ HealEffect(random_range(1, 3)) ],
+        [ HealEffect(irandom_range(1, 3)) ],
         healCard,
         hpHealGroup,
         commonBorder,
@@ -39,12 +39,12 @@ function createOvertimeHealSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Heal Over Time",
         rarity,
         targetType,
         StarriorStates.Cast,
         1,
-        [ HealOverTimeEffect(random_range(1, 3), 1) ],
+        [ HealOverTimeEffect(irandom_range(1, 3), 1) ],
         healCard,
         hpHealOT,
         commonBorder,
@@ -59,12 +59,12 @@ function createInstantManaGainSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Mana Gain",
         rarity,
         targetType,
         StarriorStates.Cast,
         1,
-        [ ManaGainEffect(random_range(1, 3)) ],
+        [ ManaGainEffect(irandom_range(1, 3)) ],
         healCard,
         mpHealSolo,
         commonBorder,
@@ -77,12 +77,12 @@ function createInstantMultipleTargetsManaGainCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllAllies
     return new Card(
-        "Default heal",
+        "Mana Gain Group",
         rarity,
         targetType,
         StarriorStates.Cast,
         1,
-        [ ManaGainEffect(random_range(1, 3)) ],
+        [ ManaGainEffect(irandom_range(1, 3)) ],
         healCard,
         mpHealGroup,
         commonBorder,
@@ -95,12 +95,12 @@ function createOvertimeManaGainSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Mana Over Time",
         rarity,
         targetType,
         StarriorStates.Cast,
         1,
-        [ ManaGainOverTimeEffect(random_range(1, 3), 1) ],
+        [ ManaGainOverTimeEffect(irandom_range(1, 3), 1) ],
         healCard,
         mpHealOT,
         commonBorder,
@@ -113,7 +113,7 @@ function createRemoveStatusShockSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Remove Shock",
         rarity,
         targetType,
         StarriorStates.Cast,
@@ -131,7 +131,7 @@ function createRemoveStatusBurnSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Remove Burn",
         rarity,
         targetType,
         StarriorStates.Cast,
@@ -149,7 +149,7 @@ function createRemoveStatusFreezeSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Remove Freeze",
         rarity,
         targetType,
         StarriorStates.Cast,
@@ -167,7 +167,7 @@ function createRemoveStatusBleedingSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Remove Bleeding",
         rarity,
         targetType,
         StarriorStates.Cast,
@@ -185,7 +185,7 @@ function createRemoveStatusStunSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
-        "Default heal",
+        "Remove Stun",
         rarity,
         targetType,
         StarriorStates.Cast,

@@ -63,8 +63,10 @@ function initEffectRegistry() {
     variable_struct_set(R, "Resurrection", {
         onInstant: function(effect, caster, targets) {
             if (targets.isPuppet) return
-            effect.value = targets.maxHp / 2
-            executeHealing(effect, caster, targets)
+            if (!targets.isKO()) return                              // воскрешают только павшего
+            targets.hp = floor(targets.maxHp / 2)                    // поднять на половину HP (не хил, а установка)
+            targets.changeActionState(StarriorStates.Idle, undefined) // снять нокаут
+            targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
         },
     })
 
@@ -277,6 +279,11 @@ function StatusEffect(effectType, statusName, duration, chance, timing) {
 }
 function StunEffect(duration, chance) {
     return StatusEffect(EffectTypes.Stun, StatusNames.Stun, duration, chance, Timing.Overtime)
+}
+// Шок (от молнии): пропуск хода как стан (type=Stun), но отдельный статус Shock
+// (своя иконка + снимается картой removeShock).
+function ShockEffect(duration, chance) {
+    return StatusEffect(EffectTypes.Stun, StatusNames.Shock, duration, chance, Timing.Overtime)
 }
 // timing оставлен параметром: в исходных картах одиночная слабость Overtime,
 // групповая — EndOfTurn (сохраняем как было).

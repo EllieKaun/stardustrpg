@@ -6,13 +6,13 @@ function createMagicalDamageSingleTargetCard() {
         "MagicalDamageSingleTargetCard",
         rarity,
         targetType,
-        StarriorStates.Attack,
+        StarriorStates.Cast,
         1,
         [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)) ],
         mgcCard,
         lightningSingleTarget,
         commonBorder,
-        hpCostToken
+        mpCostToken
     )
 }
 
@@ -21,16 +21,16 @@ function createMagicalDamageMultipleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllEnemies
     return new Card(
-        "PhysicalDamageMultipleTargetCard",
+        "MagicalDamageMultipleTargetCard",
         rarity,
         targetType,
-        StarriorStates.Attack,
+        StarriorStates.Cast,
         1,
         [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)) ],
         mgcCard,
         lightningGroup,
         commonBorder,
-        hpCostToken
+        mpCostToken
     )
 }
 
@@ -46,12 +46,12 @@ function createMagicalDamageStunChanseSingleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
-            StunEffect(1, 1.0)
+            ShockEffect(1, 1.0)
         ],
         mgcCard,
         lightningSingleTarget,
         commonBorder,
-        hpCostToken
+        mpCostToken
     )
 }
 
@@ -60,19 +60,19 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllEnemies
     return new Card(
-        "MagicalDamageStunChanseSingleTarget",
+        "MagicalDamageStunChanseMultipleTarget",
         rarity,
         targetType,
         StarriorStates.Cast,
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
-            StunEffect(1, 1.0)
+            ShockEffect(1, 1.0)
         ],
         mgcCard,
         lightningGroup,
         commonBorder,
-        hpCostToken
+        mpCostToken
     )
 }
 
@@ -81,10 +81,10 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
-        "Default attack",
+        "MagicalDamageBurnChanceSingleTarget",
         rarity,
         targetType,
-        StarriorStates.Attack,
+        StarriorStates.Cast,
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
@@ -93,7 +93,7 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
         mgcCard,
         fireballSingleTarget,
         commonBorder,
-        hpCostToken
+        mpCostToken
     )
 }
 
@@ -102,10 +102,10 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
     var rarity = CardsRarity.Default
     var targetType = TargetTypes.AllEnemies
     return new Card(
-        "Default attack",
+        "MagicalDamageBurnChanceMultipleTarget",
         rarity,
         targetType,
-        StarriorStates.Attack,
+        StarriorStates.Cast,
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
@@ -114,7 +114,7 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         mgcCard,
         fireballGroup,
         commonBorder,
-        hpCostToken
+        mpCostToken
     )
 }
 // Атака льдом одного врага - (Имеет шанс заморозить врага. Замороженный враг получает повышенный физ урон х количество ходов)
@@ -125,7 +125,7 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         "MagicalDamageFreezingChanceSingleTarget",
         rarity,
         targetType,
-        StarriorStates.Attack,
+        StarriorStates.Cast,
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
@@ -134,7 +134,7 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         mgcCard,
         lightningSingleTarget,
         commonBorder,
-        hpCostToken
+        mpCostToken
     )
 }
 
@@ -146,7 +146,7 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         "MagicalDamageFreezingChanceMultipleTarget",
         rarity,
         targetType,
-        StarriorStates.Attack,
+        StarriorStates.Cast,
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
@@ -155,7 +155,7 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         mgcCard,
         lightningGroup,
         commonBorder,
-        hpCostToken
+        mpCostToken
     )
 }
 

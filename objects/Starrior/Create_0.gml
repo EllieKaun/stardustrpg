@@ -93,17 +93,19 @@ function applyDamage(value) {
 }
 
 function applyHeal(value) {
-    hp += value
+    var healed = min(value, max(0, maxHp - hp))   // не выше максимума
+    hp += healed
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
-    drawDamageNumber(spawnX, spawnY, value, c_green)
+    drawDamageNumber(spawnX, spawnY, healed, c_green)
 }
 
 function applyMana(value) {
-    mana += value
+    var gained = min(value, max(0, maxMana - mana))   // не выше максимума
+    mana += gained
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
-    drawDamageNumber(spawnX, spawnY, value, c_blue)
+    drawDamageNumber(spawnX, spawnY, gained, c_blue)
 }
 
 function isKO() {
