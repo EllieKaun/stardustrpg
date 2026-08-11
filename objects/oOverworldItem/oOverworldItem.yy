@@ -12,7 +12,10 @@
     "name":"Objects",
     "path":"folders/Overworld/Objects.yy",
   },
-  "parentObjectId":null,
+  "parentObjectId":{
+    "name":"oPausable",
+    "path":"objects/oPausable/oPausable.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,

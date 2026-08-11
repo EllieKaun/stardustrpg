@@ -23,6 +23,11 @@ function drawFitTextCentered(text, areaX, areaY, areaW, areaH, fonts = undefined
     draw_set_valign(fa_top)
 }
 
+// Попадание точки в прямоугольник
+function pointInRect(px, py, rx, ry, rw, rh) {
+    return (px >= rx && px < rx + rw && py >= ry && py < ry + rh)
+}
+
 // Конфигурация панели, которая отвечает за отрисовку в дек билдере
 function Panel(_config) constructor {
     x = _config[$ "x"] ?? 0
@@ -59,6 +64,8 @@ function Panel(_config) constructor {
     cursorCol = 0
     cursorRow = 0
     selectedSlot = -1
+    hoverSlot = -1        // слот под курсором мыши (только подсветка)
+    uiScale = 1           // множитель дизайн→окно (ставит layoutPanels) для спрайтов фикс. размера
     focused = false
     onTabRow = false
     justGainedFocus = false
@@ -82,9 +89,9 @@ function Panel(_config) constructor {
         var rows = max(1, visibleRows)
     
         var ratio = 2 / 3
-    
-        var minGap = 4
-    
+
+        var minGap = padding * 0.5   // пропорционально паддингу — панель координатно-независима
+
         // Сколько места минимум займут отступы
         var reservedW = minGap * (cols + 1)
         var reservedH = minGap * (rows + 1)
@@ -305,7 +312,60 @@ function Panel(_config) constructor {
         }
     }
 
-    // Метод отрисовки панели (нужно вызывать в Draw GUI) 
+    // Считывание и обработка мыши. Работает независимо от фокуса (наведение +
+    // клик по табам/слотам). Возвращает true, если курсор над этой панелью.
+    static stepMouse = function() {
+        hoverSlot = -1
+        // панель свёрстана прямо в координатах GUI (окна), поэтому мышь берём как есть
+        var mx = device_mouse_x_to_gui(0)
+        var my = device_mouse_y_to_gui(0)
+
+        // область панели вместе со строкой табов над ней
+        if (!pointInRect(mx, my, x, y - tabH, w, h + tabH)) return false
+
+        var clicked = mouse_check_button_pressed(mb_left)
+
+        // Табы
+        for (var t = 0; t < array_length(tabs); t++) {
+            var tr = getTabRect(t)
+            if (pointInRect(mx, my, tr.tx, tr.ty, tr.tw, tr.th)) {
+                if (clicked) {
+                    oDeckBuilder.focusPanel(self)
+                    onTabRow = true
+                    activeTab = t
+                    if (onTabClick != undefined) onTabClick(self, t)
+                }
+                return true
+            }
+        }
+
+        // Слоты
+        var first = scrollRow * cols
+        var last  = min(first + visibleRows * cols, array_length(slots))
+        for (var i = first; i < last; i++) {
+            var sr = getSlotRect(i)
+            if (pointInRect(mx, my, sr.sx, sr.sy, sr.sw, sr.sh)) {
+                hoverSlot = i
+                if (clicked) {
+                    oDeckBuilder.focusPanel(self)
+                    onTabRow = false
+                    cursorRow = i div cols
+                    cursorCol = i mod cols
+                    selectedSlot = i
+                    var slot = slots[i]
+                    if (slot.state != "locked" && onSlotClick != undefined) onSlotClick(self, i)
+                }
+                return true
+            }
+        }
+
+        // Колесо — прокрутка списка
+        if (mouse_wheel_down()) scrollRow = clamp(scrollRow + 1, 0, max(0, totalRows - visibleRows))
+        if (mouse_wheel_up())   scrollRow = clamp(scrollRow - 1, 0, max(0, totalRows - visibleRows))
+        return true
+    }
+
+    // Метод отрисовки панели (нужно вызывать в Draw GUI)
     static draw = function() {
         var oldFont = draw_get_font()
 
@@ -367,14 +427,21 @@ function Panel(_config) constructor {
                     slotRect.sh + 2)
 
             if (pointerSprite != undefined && focused && !onTabRow) {
-                var pointerHeight = sprite_get_height(pointerSprite);
                 var pointerX = slotRect.sx + slotRect.sw * 0.10
                 var pointerY = slotRect.sy + (slotRect.sh) / 2
-                draw_sprite(sPointer, 
-                    0,
-                    pointerX, 
-                    pointerY)
+                draw_sprite_ext(pointerSprite, 0, pointerX, pointerY, uiScale, uiScale, 0, c_white, 1)
             }
+        }
+
+        // Подсветка слота под курсором мыши
+        if (hoverSlot >= first && hoverSlot < last && hoverSlot != selectedSlot) {
+            var hoverRect = getSlotRect(hoverSlot)
+            draw_set_color(c_yellow)
+            draw_set_alpha(0.6)
+            draw_rectangle(hoverRect.sx - 1, hoverRect.sy - 1,
+                hoverRect.sx + hoverRect.sw, hoverRect.sy + hoverRect.sh, true)
+            draw_set_alpha(1)
+            draw_set_color(c_white)
         }
 
         // Табы
@@ -392,11 +459,17 @@ function Panel(_config) constructor {
                 draw_set_alpha(1.0)
             }
 
-            draw_set_color(c_white)
-            drawFitTextCentered(tab.name,
-                tabRow.tx + tabPadding, tabRow.ty + 1,
-                tabRow.tw - tabPadding * 2, tabRow.th - 2,
-                tabFonts)
+            // Подпись вкладки рисуется на месте (координаты уже оконные, GUI в
+            // нативном разрешении) шрифтом uiFont() — чётко, без отдельного прохода.
+            draw_set_font(uiFont())
+            draw_set_color(tab[$ "textColor"] ?? c_white)
+            draw_set_halign(fa_center)
+            draw_set_valign(fa_middle)
+            var labelScale = uiTextScale(tab.name, tabRow.th * 0.55, tabRow.tw - tabPadding * 2)
+            draw_text_transformed(tabRow.tx + tabRow.tw / 2, tabRow.ty + tabRow.th / 2,
+                tab.name, labelScale, labelScale, 0)
+            draw_set_halign(fa_left)
+            draw_set_valign(fa_top)
 
             if (onTabRow && focused && isActive) {
                 draw_set_color(c_yellow)
@@ -406,6 +479,7 @@ function Panel(_config) constructor {
 
         // Скролл индткатор
         if (totalRows > visibleRows) {
+            var barW   = 4 * uiScale
             var barX   = x + w - padding
             var barY   = y + padding
             var barH   = h - padding * 2
@@ -413,10 +487,10 @@ function Panel(_config) constructor {
             var thumbY = barY + (barH - thumbH) * (scrollRow / max(1, totalRows - visibleRows))
             draw_set_color(c_dkgray)
             draw_set_alpha(0.4)
-            draw_rectangle(barX, barY, barX + 4, barY + barH, false)
+            draw_rectangle(barX, barY, barX + barW, barY + barH, false)
             draw_set_color(c_white)
             draw_set_alpha(0.8)
-            draw_rectangle(barX, thumbY, barX + 4, thumbY + thumbH, false)
+            draw_rectangle(barX, thumbY, barX + barW, thumbY + thumbH, false)
             draw_set_alpha(1.0)
         }
 

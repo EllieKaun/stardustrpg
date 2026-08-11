@@ -1,10 +1,12 @@
 function afterPlayChecks() {
-    // End Of Turn эффекты
-    executeEndOfTurn(selectedCharacter)
-    updateOvertime(selectedCharacter)
     selectedCard = 0
+    // End-of-turn эффекты и тик длительностей
+    if (instance_exists(selectedCharacter) && selectedCharacter.energy <= 0) {
+        executeEndOfTurn(selectedCharacter)
+        updateOvertime(selectedCharacter)
+    }
     removeDeadPuppets()
-      if (!instance_exists(selectedCharacter)) {
+    if (!instance_exists(selectedCharacter)) {
         selectNextCharacter()
         beginTurnFor(selectedCharacter)
         selectedTarget = noone
@@ -128,6 +130,7 @@ function selectNextCharacter() {
             selectedCharacterNumber = currentIndex
             selectedCharacter = candidate
             selectedCharacter.isActive = true
+            selectedCharacter.energy = selectedCharacter.maxEnergy // сброс энергии на новый ход
             cards = selectedCharacter.getCardsInHand()
             
             show_debug_message("new selectNextCharacter " + selectedCharacter.name)
@@ -167,6 +170,18 @@ function initTargetSelection(targets) {
     selectNextTarget()
 }
 
+// Выбор целей ТОЛЬКО среди павших (не-кукол) — для воскрешения
+function initTargetSelectionKO(targets) {
+    unselectionToAll()
+    var pool = []
+    for(var i = 0; i < array_length(targets); i++) {
+        if (targets[i].isKO() && !targets[i].isPuppet) array_push(pool, targets[i])
+    }
+    targetOptions = pool
+    selectedTargetNumber = -1
+    selectNextTarget()
+}
+
 // Выбор целей для игровки
 function selectNextTarget() {
     if array_length(targetOptions) == 0 return
@@ -200,6 +215,24 @@ function unselectTargets() {
     for (var i = 0; i < array_length(targetOptions); i++) {
         targetOptions[i].isTarget = false
     }
+}
+
+// Навести цель мышью: если под курсором (мировые координаты) есть цель из
+// targetOptions — выбрать её. Возвращает true, если цель под курсором найдена.
+function selectTargetAtMouse() {
+    for (var i = 0; i < array_length(targetOptions); i++) {
+        var t = targetOptions[i]
+        if (instance_exists(t) && position_meeting(mouse_x, mouse_y, t)) {
+            if (selectedTarget != t) {
+                unselectTargets()
+                selectedTargetNumber = i
+                selectedTarget = t
+                selectedTarget.isTarget = true
+            }
+            return true
+        }
+    }
+    return false
 }
 
 // Фильтр колбэк

@@ -36,8 +36,10 @@ function stepGameOverScreen() {
 
 // Отобразить победный скрин
 function drawVictoryScreen() {
+    // координаты GUI/окна — бой рисуется без матрицы (см. Battle Draw GUI)
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()
+    var s  = sw / guiBaseWidth()
 
     // Затемнение
     draw_set_color(c_black); draw_set_alpha(0.5)
@@ -45,26 +47,23 @@ function drawVictoryScreen() {
     draw_set_alpha(1)
 
     // Надпись победы
-    draw_set_font(fnM3x6_22)
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    draw_text(sw / 2, floor(sh * 0.12), "VICTORY")
+    drawUiText(sw / 2, floor(sh * 0.12), "VICTORY", sh * 0.06)
 
-    
     var count = array_length(rewardChoices)
-    
-    // Если нет наград 
+
+    // Если нет наград
     if (count == 0) {
-        draw_set_font(fnM3x6_14)
-        draw_text(sw / 2, sh / 2, "No rewards — press Enter")
+        drawUiText(sw / 2, sh / 2, "No rewards — press Enter", sh * 0.03)
         draw_set_halign(fa_left); draw_set_valign(fa_top)
         return
     }
 
     var cardH = sh / 3.5
     var cardW = cardH * 2 / 3
-    var gap = 8
+    var gap = 8 * s
     var totalW = count * cardW + (count - 1) * gap
     var startX = (sw - totalW) / 2
     var cardY = floor(sh * 0.22)
@@ -73,19 +72,19 @@ function drawVictoryScreen() {
     for (var i = 0; i < count; i++) {
         var cx = floor(startX + i * (cardW + gap))
         var isSel = (i == rewardCursor)
-        var dy = isSel ? cardY - 3 : cardY
+        var dy = isSel ? cardY - 3 * s : cardY
 
         drawCard(rewardChoices[i], cx, dy, cardW, cardH)
 
         if (isSel) {
             draw_set_color(c_yellow)
             draw_rectangle(cx - 1, dy - 1, cx + cardW + 1, dy + cardH + 1, true)
-            draw_sprite(sPointer, 0, floor(cx - 10), floor(dy + cardH / 2))
+            draw_sprite_ext(sPointer, 0, floor(cx - 10 * s), floor(dy + cardH / 2), s, s, 0, c_white, 1)
         }
     }
 
     // Панель описания
-    var panelY = floor(cardY + cardH + 12);
+    var panelY = floor(cardY + cardH + 12 * s);
     var panelH = floor(sh - panelY - sh * 0.06);
     drawRewardDescription(rewardChoices[rewardCursor], startX, panelY, totalW, panelH)
 
@@ -99,17 +98,18 @@ function drawRewardDescription(card, px, py, pw, ph) {
     draw_sprite_stretched(sprCardDesk, 0, px, py, pw, ph) // Бэк
     if (card == undefined) return
 
+    var s = display_get_gui_width() / guiBaseWidth()
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
-    draw_set_font(fnM3x6_14)
     draw_set_color(c_white)
 
-    var ix = floor(px + 8)
-    var iy = floor(py + 6)
-    var lh = 12
+    var ix = floor(px + 8 * s)
+    var iy = floor(py + 6 * s)
+    var lh = 12 * s
+    var textH = lh * 0.9
 
-    draw_text(ix, iy, string(card.name))
-    draw_text(ix, iy + lh, "Type: " + (card.actionType == StarriorStates.Attack ? "Attack" : "Cast"))
+    drawUiText(ix, iy, string(card.name), textH)
+    drawUiText(ix, iy + lh, "Type: " + (card.actionType == StarriorStates.Attack ? "Attack" : "Cast"), textH)
 
     var cy = iy + lh * 2
 
@@ -137,7 +137,7 @@ function drawRewardDescription(card, px, py, pw, ph) {
                 }
             }
             var label = (effect.type == EffectTypes.Damage) ? "Damage: " : "Heal: "
-            draw_text(ix, cy, label + "1-" + string(maxNum))
+            drawUiText(ix, cy, label + "1-" + string(maxNum), textH)
             cy += lh
             break
         }
@@ -149,50 +149,50 @@ function drawRewardDescription(card, px, py, pw, ph) {
         if (effect.type != EffectTypes.Damage && effect.type != EffectTypes.Heal)
             effectStr += effectTypeToString(effect.type) + " "
     }
-    if (effectStr != "") { 
-        draw_text(ix, cy, "Effects: " + effectStr)
+    if (effectStr != "") {
+        drawUiText(ix, cy, "Effects: " + effectStr, textH)
         cy += lh
     }
 
     var costLabel = (card.costType() == CostType.Mana) ? "MP" : "HP"
-    draw_text(ix, cy, "Cost: " + string(card.costValue()) + " " + costLabel)
+    drawUiText(ix, cy, "Cost: " + string(card.costValue()) + " " + costLabel, textH)
 }
 
 // Рисование экрана поражения
 function drawGameOverScreen() {
+    // координаты GUI/окна — бой рисуется без матрицы (см. Battle Draw GUI)
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()
+    var s  = sw / guiBaseWidth()
 
-    draw_set_color(c_black) 
+    draw_set_color(c_black)
     draw_set_alpha(0.6)
     draw_rectangle(0, 0, sw, sh, false) // Затемнение
     draw_set_alpha(1)
 
-    draw_set_font(fnM3x6_22)
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    draw_text(sw / 2, floor(sh * 0.30), "GAME OVER") // GameOver надпись
+    drawUiText(sw / 2, floor(sh * 0.30), "GAME OVER", sh * 0.06) // GameOver надпись
 
     var labels = ["RETRY", "EXIT"]
-    var btnW = 64, btnH = 18, gap = 16
+    var btnW = 64 * s, btnH = 18 * s, gap = 16 * s
     var totalW = btnW * 2 + gap;
     var startX = (sw - totalW) / 2
     var btnY   = floor(sh * 0.5)
 
-    draw_set_font(fnM3x6_14)
     for (var i = 0; i < 2; i++) { // Рисование кнопок Ретрай и Выход
         var bx = floor(startX + i * (btnW + gap))
         var isSel = (gameOverCursor == i)
 
         draw_sprite_stretched(sprCardDeskFull, 0, bx, btnY, btnW, btnH)
         draw_set_color(isSel ? c_yellow : c_white)
-        draw_text(bx + btnW / 2, btnY + btnH / 2, labels[i])
+        drawUiText(bx + btnW / 2, btnY + btnH / 2, labels[i], btnH * 0.55)
 
         if (isSel) {
             draw_set_color(c_yellow)
             draw_rectangle(bx, btnY, bx + btnW, btnY + btnH, true)
-            draw_sprite(sPointer, 0, floor(bx - 10), floor(btnY + btnH / 2))
+            draw_sprite_ext(sPointer, 0, floor(bx - 10 * s), floor(btnY + btnH / 2), s, s, 0, c_white, 1)
         }
     }
 

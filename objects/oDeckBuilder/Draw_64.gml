@@ -1,4 +1,4 @@
-var a = 0.45 // Ночь будет примерно 0.45, 0 для дня
+var a = 0.45 // Ночь 0.45, 0 для дня
 if (a > 0) {
     draw_set_alpha(a)
     draw_set_color(make_color_rgb(10, 20, 60))
@@ -9,5 +9,6 @@ if (a > 0) {
 
 if (!open) exit
 
+layoutPanels()
 collectionPanel.draw()
 deckPanel.draw()

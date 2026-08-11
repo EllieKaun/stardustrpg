@@ -1,6 +1,10 @@
-#macro ENEMYS_TURN 0 
+#macro ENEMYS_TURN 0
 #macro PUPPET_TURN 1
 #macro MAX_PUPPETS 3
+
+// Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
+#macro WEAKNESS_DAMAGE_MODIFIER 0.1
+#macro WEAKNESS_STATUS_CHANCE_BONUS 0.25
 
 enum CardsRarity {
     Default,
@@ -133,12 +137,30 @@ enum EffectVisualizerType {
     TimeBased
 }
 
-enum CardCategory { Attack, Magic, Heal, Buff }
+enum CardCategory { Attack, Magic, Heal, Buff, Special }
 
+// Категория карты — данные реестра
 function cardCategoryOf(_card) {
+    if (is_struct(_card) && variable_struct_exists(_card, "cardId") && cardExists(_card.cardId)) {
+        var def = global.cardRegistry[$ _card.cardId]
+        if (variable_struct_exists(def, "category")) return def.category
+    }
+    // Запасной вариант по спрайту (для карт, построенных вне реестра)
     if (_card.cardBaseSpr == atcCard) return CardCategory.Attack
     if (_card.cardBaseSpr == mgcCard) return CardCategory.Magic
     if (_card.cardBaseSpr == healCard) return CardCategory.Heal
     if (_card.cardBaseSpr == buffCard) return CardCategory.Buff
     return CardCategory.Attack
+}
+
+// Цвет категории 
+function categoryColor(category) {
+    switch (category) {
+        case CardCategory.Magic: return #9944CC
+        case CardCategory.Buff: return #CC44CC
+        case CardCategory.Heal: return #44CC44
+        case CardCategory.Attack:  return #CC4444
+        case CardCategory.Special: return c_white
+        default: return c_white
+    }
 }

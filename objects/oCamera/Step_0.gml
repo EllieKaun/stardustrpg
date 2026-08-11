@@ -1,3 +1,5 @@
+if (global.gamePaused) exit // на паузе камера заморожена
+
 if(instance_exists(follow)){
 	xTo = follow.x;
 	yTo = follow.y;

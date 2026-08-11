@@ -9,7 +9,7 @@
   "canGenerateBitmap":true,
   "charset":0,
   "first":0,
-  "fontName":"m3x6",
+  "fontName":"PixelPurl",
   "glyphOperations":0,
   "glyphs":{
     "32":{"character":32,"h":15,"offset":0,"shift":3,"w":3,"x":2,"y":2,},
@@ -107,10 +107,10 @@
     "124":{"character":124,"h":15,"offset":3,"shift":6,"w":1,"x":63,"y":19,},
     "125":{"character":125,"h":15,"offset":0,"shift":4,"w":4,"x":57,"y":19,},
     "126":{"character":126,"h":15,"offset":1,"shift":6,"w":5,"x":23,"y":87,},
-    "9647":{"character":9647,"h":15,"offset":2,"shift":7,"w":3,"x":30,"y":87,},
+    "9647":{"character":9647,"h":15,"offset":2,"shift":11,"w":6,"x":30,"y":87,},
   },
   "hinting":0,
-  "includeTTF":false,
+  "includeTTF":true,
   "interpreter":0,
   "italic":false,
   "kerningPairs":[
@@ -144,6 +144,6 @@
     "name":"Default",
     "path":"texturegroups/Default",
   },
-  "TTFName":"",
+  "TTFName":"/Users/ilafazylbaev/GameMakerProjects/stellarpunk_rpg/fonts/fnM3x6_8/PixelPurl.ttf",
   "usesSDF":false,
 }

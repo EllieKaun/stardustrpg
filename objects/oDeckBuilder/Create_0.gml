@@ -1,15 +1,9 @@
-// Ресайз размера GUI под размер игры 
-display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
 
-var camW = camera_get_view_width(view_camera[0])
-var camH = camera_get_view_height(view_camera[0])
-var margin = 8
-var tabH = 18
-var panelW = (camW - margin * 2) / 2;
-var panelTop = margin + tabH       
-var panelH = camH - panelTop - margin
+dbBaseW = camera_get_view_width(view_camera[0])
+dbBaseH = camera_get_view_height(view_camera[0])
+display_set_gui_size(dbBaseW, dbBaseH)
 
-activePanel = 0; // 0 = коллекция всех карт, 1 = дека
+activePanel = 0 // 0 = коллекция всех карт, 1 = дека
 
 var tabFonts = [fnM3x6_22, fnM3x6_14, fnM3x6_13, fnM3x6_12,
                  fnM3x6_11, fnM3x6_10, fnM3x6_9,  fnM3x6_8, fnM3x6_7]
@@ -19,7 +13,7 @@ switchFocusTo = function(target, row) {
     with (oDeckBuilder) {
         var src = (target.tag == Panels.Collection) ? deckPanel : collectionPanel
         collectionPanel.focused = (target.tag == Panels.Collection)
-        deckPanel.focused  = (target.tag == Panels.Deck)
+        deckPanel.focused = (target.tag == Panels.Deck)
         activePanel = (target.tag == Panels.Collection) ? Panels.Collection : Panels.Deck
         if (target.x < src.x) target.enterFromRight(row)
         else target.enterFromLeft(row)
@@ -30,7 +24,8 @@ switchFocusTo = function(target, row) {
 panelSwitchCallback = function(panel, direction) {
     with (oDeckBuilder) {
         var otherPanel = (panel.tag == Panels.Collection) ? deckPanel : collectionPanel
-        if ((direction > 0 && panel.x < otherPanel.x) || (direction < 0 && panel.x > otherPanel.x)) {
+        if ((direction > 0 && panel.x < otherPanel.x) 
+            || (direction < 0 && panel.x > otherPanel.x)) {
             switchFocusTo(otherPanel, panel.cursorRow)
         }
     }
@@ -44,16 +39,14 @@ categoryForTab = function(tab) { // Мап индекса таба фильтр�
         case 1: return CardCategory.Buff
         case 2: return CardCategory.Heal
         case 3: return CardCategory.Attack
+        case 4: return CardCategory.Special
         default: return undefined
     }
 }
 
-// Панель коллекции всех карт
+// Панель коллекции всех карт 
 collectionPanel = new Panel({
-    x: margin, 
-    y: panelTop, 
-    w: panelW, 
-    h: panelH,
+    x: 0, y: 0, w: 0, h: 0,
     bgSprite: sprCardDeskFull,
     slotSpriteEmpty: EmptyCardPlace,
     slotSpriteLocked: LockedCardPlace,
@@ -64,11 +57,10 @@ collectionPanel = new Panel({
         { name: "MAGIC", color: #9944CC },
         { name: "BUFF", color: #CC44CC },
         { name: "HEAL", color: #44CC44 },
-        { name: "ATTACK", color: #CC4444 }
+        { name: "ATTACK", color: #CC4444 },
+        { name: "SPECIAL", color: c_white, textColor: c_black }
     ],
-    visibleRows: 3, 
-    tabH: tabH, 
-    padding: 8,
+    visibleRows: 3,
     slots: buildCollectionSlots(CardCategory.Magic),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
@@ -90,10 +82,7 @@ collectionPanel.tag = Panels.Collection
 
 // Панель деки
 deckPanel = new Panel({
-    x: margin + panelW, 
-    y: panelTop, 
-    w: panelW, 
-    h: panelH,
+    x: 0, y: 0, w: 0, h: 0,
     bgSprite: sprCardDeskFull,
     slotSpriteEmpty: EmptyCardPlace,
     slotSpriteLocked: LockedCardPlace,
@@ -104,9 +93,7 @@ deckPanel = new Panel({
         { name: "LANA", color: #4488CC },
         { name: "VIV", color: #44CC88 }
     ],
-    visibleRows: 3, 
-    tabH: tabH, 
-    padding: 8,
+    visibleRows: 3,
     slots: buildDeckSlots(Characters.Lana),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
@@ -140,6 +127,38 @@ deckPanel = new Panel({
 })
 deckPanel.tag = Panels.Deck
 
+// Сфокусировать конкретную панель (используется мышью)
+focusPanel = function(panel) {
+    collectionPanel.focused = (panel == collectionPanel)
+    deckPanel.focused = (panel == deckPanel)
+    activePanel = (panel == collectionPanel) ? Panels.Collection : Panels.Deck
+}
+
+// Верстает обе панели
+layoutPanels = function() {
+    var s = display_get_gui_width() / dbBaseW
+    var mg  = 8  * s // внешний отступ
+    var tH  = 18 * s // высота вкладок
+    var pw  = (dbBaseW * s - mg * 2) / 2
+    var top = mg + tH
+    var ph  = dbBaseH * s - top - mg
+
+    var panels = [collectionPanel, deckPanel]
+    for (var i = 0; i < 2; i++) {
+        var p = panels[i]
+        p.x = mg + i * pw
+        p.y = top
+        p.w = pw
+        p.h = ph
+        p.padding = 8 * s
+        p.tabH = tH
+        p.tabGap = 2 * s
+        p.tabPadding = 4 * s
+        p.uiScale = s // для спрайтов фикс. размера
+    }
+}
+layoutPanels()
+
 // Инициализация панелей
 collectionPanel.focused = true
 deckPanel.focused = false
@@ -149,7 +168,8 @@ activePanel = Panels.Collection
 open = false
 
 openBuilder = function() {
-    display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
+    display_set_gui_size(max(window_get_width(), dbBaseW), max(window_get_height(), dbBaseH))
+    layoutPanels()
     open = true
     global.uiModal = true
     collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab))
@@ -168,4 +188,5 @@ openBuilder = function() {
 closeBuilder = function() {
     open = false
     global.uiModal = false
+    display_set_gui_size(dbBaseW, dbBaseH)
 }

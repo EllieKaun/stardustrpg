@@ -58,16 +58,16 @@ function fadeShrink(p, anim) {                  // вместо гаснуть �
 function defaultCardAnimConfig() {
     return {
         dur: 40,
-        toX: undefined, // undefined => центр GUI
+        toX: undefined, // undefined - центр GUI
         toY: undefined,
         toAngle: 0,
         scaleFrom: 1.12,
-        scaleTo:1.12, // без раздувания
+        scaleTo:1.12, 
         path: pathArc,
         arcHeight: 120,
         ease: easeOutQuad,
         fade: fadeTail,
-        particles: damageCardParticleConfig()
+        particles: defaultCardParticleConfig()   // звёзды; цвет ставится по категории в playCardAnimated
     }
 }
 
@@ -102,7 +102,7 @@ function damageCardParticleConfig() {
         sizeMax: 10,
         rotSpeed: 3, // макс. скорость вращения
         gravity: 0.2,
-        color: make_color_rgb(247, 80, 36), // тёплый золотой
+        color: make_color_rgb(247, 80, 36), // красный
         draw: drawRectSparkle // как рисовать одну частицу
     }
 }
@@ -142,6 +142,8 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
     self.alpha = 1
 
     static update = function() {
+        // множитель дизайн→окно: масштабирует абсолютные размеры/скорости частиц
+        var uiS = display_get_gui_width() / guiBaseWidth()
         if (!done) {
             var px = x, py = y // позиция до шага (для следа)
             t = min(t + 1, dur)
@@ -161,11 +163,11 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
                     var s = {
                         x: x + random_range(-cardW * pcfg.posSpread, cardW * pcfg.posSpread),
                         y: y + random_range(-cardH * pcfg.posSpread, cardH * pcfg.posSpread),
-                        vx: (px - x) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter),
-                        vy: (py - y) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter),
+                        vx: (px - x) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter) * uiS,
+                        vy: (py - y) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter) * uiS,
                         life: irandom_range(pcfg.lifeMin, pcfg.lifeMax),
                         maxlife: 1,
-                        size: random_range(pcfg.sizeMin, pcfg.sizeMax),
+                        size: random_range(pcfg.sizeMin, pcfg.sizeMax) * uiS,
                         rot: random(360),
                         rotSpeed: random_range(-pcfg.rotSpeed, pcfg.rotSpeed)
                     };
@@ -186,7 +188,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
         // частицы живут и после приземления карты
         for (var i = array_length(particles) - 1; i >= 0; i--) {
             var s = particles[i]
-            s.x += s.vx; s.y += s.vy; s.vy += pcfg.gravity
+            s.x += s.vx; s.y += s.vy; s.vy += pcfg.gravity * uiS
             s.rot += s.rotSpeed
             s.life -= 1
             if (s.life <= 0) array_delete(particles, i, 1)
@@ -233,7 +235,9 @@ function drawStarSparkle(cx, cy, outer, rot, alpha, col) {
 
 // Квадрат. outer — радиус до угла 
 function drawRectSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) return
+    if (outer <= 0) {
+        return
+    }
     draw_set_color(col)
     draw_set_alpha(alpha)
     draw_primitive_begin(pr_trianglefan)
@@ -262,7 +266,9 @@ function drawTriangleSparkle(cx, cy, outer, rot, alpha, col) {
 
 // Круг. outer — радиус
 function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) return
+    if (outer <= 0) {
+        return
+    }
     draw_set_color(col)
     draw_set_alpha(alpha)
     draw_primitive_begin(pr_trianglefan)
@@ -271,8 +277,6 @@ function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
         draw_vertex(cx + lengthdir_x(outer, a), cy + lengthdir_y(outer, a))
     }
     draw_primitive_end()
-    draw_set_alpha(1)
-    draw_set_color(c_white)
 }
 
 
@@ -281,18 +285,20 @@ function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
 //  из Step/скриптов
 // ------------------------------------------------------------
 function cardDeskGeometry() {
+    // координаты GUI/окна — та же геометрия, что в Battle Draw GUI (без матрицы)
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
+    var s = screenWidth / guiBaseWidth()
 
     var deskH = screenHeight / 3
-    var cardSpacing = 6;
-    var cardH = deskH - (5 + 3)
+    var cardSpacing = 6 * s
+    var cardH = deskH - (5 + 3) * s
     var cardW = cardH * 2 / 3
     var deskW = cardW * maxCardsOnDeskNumber + cardSpacing * (maxCardsOnDeskNumber + 1)
     var startX = (screenWidth - deskW) / 2
     var startY = screenHeight - deskH
 
-    var vPad = 8
+    var vPad = 8 * s
     var drawCardH = deskH - vPad * 2
     var drawCardW = drawCardH * 2 / 3
 
@@ -306,15 +312,16 @@ function cardDeskGeometry() {
 
 function selectedCardTransform() {
     var g = cardDeskGeometry()
+    var s = display_get_gui_width() / guiBaseWidth()
     var hand = selectedCharacter.getCardsInHand()
     var n = min(array_length(hand), maxCardsOnDeskNumber)
     var spread = min(g.drawCardW * 0.8, (g.deskW - g.drawCardW) / max(1, n))
     var mid  = (n - 1) / 2
     var off  = selectedCard - mid
-    var arcLift = 2
+    var arcLift = 2 * s
     return {
         x: g.handCenterX + off * spread,
-        y: g.handCenterY - abs(off) * arcLift - 6,
+        y: g.handCenterY - abs(off) * arcLift - 6 * s,
         angle: 0,
         w: g.drawCardW,
         h: g.drawCardH
@@ -324,6 +331,9 @@ function selectedCardTransform() {
 // Запускает анимацию выбранной карты перед тем как начать фактическое разыгрывание
 function playCardAnimated(card, caster, targets, cfg) {
     if (cfg == undefined) cfg = defaultCardAnimConfig()
+    // след из звёзд цвета категории карты (как вкладки декбилдера)
+    cfg.particles.color = categoryColor(cardCategoryOf(card))
+    cfg.particles.draw  = drawStarSparkle
     var transform = selectedCardTransform()
 
     animPendingCard = card

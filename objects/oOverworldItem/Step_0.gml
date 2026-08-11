@@ -1,3 +1,5 @@
+if (global.gamePaused) exit // на паузе деревья/предметы заморожены
+
 var p = instance_nearest(x, y, oLana);
 
 var tree_base_depth = -bbox_bottom;

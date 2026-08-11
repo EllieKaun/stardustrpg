@@ -2,11 +2,21 @@ focusArea = FocusArea.Deck
 selectedMenuItem = 0
 menuItems = ["Shuffle", "Info", "Run"]
 
-// Synchronize GUI size with camera view to prevent UI jumping
-display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
+// High-res GUI: draw the low-res battle UI scaled up so that text overlaid on
+// the cards can be rendered at full GUI resolution and stay readable
+global.guiBaseW = camera_get_view_width(view_camera[0])
+global.guiBaseH = camera_get_view_height(view_camera[0])
+display_set_gui_size(max(window_get_width(), global.guiBaseW), max(window_get_height(), global.guiBaseH))
 selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false
+
+// Хит-боксы для управления мышью (заполняются в Draw GUI, читаются в Step)
+cardHitRects = []
+menuHitRects = []
+infoCloseRect = undefined
+mouseLastX = -1 // для детекта движения мыши 
+mouseLastY = -1
 
 // Анимация розыгрыша карты (см. scrCardAnimation)
 activeCardAnims = []
