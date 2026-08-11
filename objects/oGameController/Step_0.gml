@@ -1,11 +1,9 @@
-// F11 — borderless на весь экран ↔ окно
+// F11 — borderless на весь экран
 if (keyboard_check_pressed(vk_f11)) {
     setDisplayMode(!global.displayFullscreen)
 }
 
-// Esc — переключатель паузы (единственный обработчик, чтобы не было гонки
-// открыл/закрыл на одном нажатии). Открываем только если нет другой модалки
-// (деккбилдер/диалог ставят global.uiModal).
+// Esc — переключатель паузы 
 if (keyboard_check_pressed(vk_escape)) {
     if (instance_exists(oPauseMenu)) {
         with (oPauseMenu) close()

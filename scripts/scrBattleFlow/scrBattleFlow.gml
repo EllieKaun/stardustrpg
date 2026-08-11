@@ -1,14 +1,12 @@
 function afterPlayChecks() {
     selectedCard = 0
-    // End-of-turn эффекты и тик длительностей — ТОЛЬКО когда ход реально завершён
-    // (энергия кончилась), а не после каждой сыгранной карты (иначе при энергии>1
-    // DoT и длительности баффов тикали лишний раз).
+    // End-of-turn эффекты и тик длительностей
     if (instance_exists(selectedCharacter) && selectedCharacter.energy <= 0) {
         executeEndOfTurn(selectedCharacter)
         updateOvertime(selectedCharacter)
     }
     removeDeadPuppets()
-      if (!instance_exists(selectedCharacter)) {
+    if (!instance_exists(selectedCharacter)) {
         selectNextCharacter()
         beginTurnFor(selectedCharacter)
         selectedTarget = noone

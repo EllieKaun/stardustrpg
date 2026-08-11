@@ -1,32 +1,14 @@
-// ============================================================================
-//  Переиспользуемая система меню (главное меню, пауза и т.п.).
-//
-//    MenuItem  — пункт: текст + иконка (обычная и для выделения) + колбэк.
-//    MenuLayer — анимированный слой фон/передний план (скролл/покачивание/alpha).
-//                Пока нет спрайта — рисует заглушку-заливку, чтобы всё работало
-//                без арта.
-//    Menu      — контроллер: навигация (клавиши + мышь), выделение (иконка
-//                выделенного пункта меняется), отрисовка пунктов.
-//
-//  Всё рисуется в координатах GUI; размеры задаются в ДОЛЯХ высоты экрана, поэтому
-//  не зависит от разрешения и соотношения сторон. Порядок слоёв (фон/пункты/
-//  передний план) собирается в объекте меню — см. oMainMenu / oPauseMenu.
-// ============================================================================
-
-// Достать поле структуры-параметров с дефолтом (params — необязательный конфиг).
 function menuParam(params, key, def) {
     return (is_struct(params) && variable_struct_exists(params, key)) ? params[$ key] : def
 }
 
-// ---- Пункт меню -------------------------------------------------------------
-// iconSpr / iconSelectedSpr могут быть noone. Если iconSelectedSpr == noone —
-// для выделенного пункта используется обычная иконка. onSelect: function(item).
+// Пункт меню 
 function MenuItem(label, iconSpr = noone, iconSelectedSpr = noone, onSelect = undefined) constructor {
-    self.label           = label
-    self.iconSpr         = iconSpr
+    self.label = label
+    self.iconSpr = iconSpr
     self.iconSelectedSpr = (iconSelectedSpr == noone) ? iconSpr : iconSelectedSpr
-    self.onSelect        = onSelect
-    self.enabled         = true
+    self.onSelect = onSelect
+    self.enabled = true
 
     // Иконка с учётом состояния выделения.
     self.icon = function(isSelected) {
@@ -34,39 +16,36 @@ function MenuItem(label, iconSpr = noone, iconSelectedSpr = noone, onSelect = un
     }
 }
 
-// ---- Анимированный слой (фон / передний план) ------------------------------
-// Рисуется на весь экран. spr == noone → заглушка (заливка + подпись [name]).
-// Параметры (все опциональны):
-//   name             — подпись для заглушки
-//   scrollX/scrollY  — скорость скролла тайлинга, px/сек
-//   bobAmp/bobFreq   — амплитуда (px) и частота (Гц) синусного покачивания по Y
-//   alpha            — прозрачность 0..1
-//   tiled            — замостить (true) или растянуть на весь экран (false)
-//   placeholderColor — цвет заглушки, пока нет спрайта
+// Анимированный слой
+// name — подпись для заглушки
+// scrollX/scrollY — скорость скролла, px/сек
+// bobAmp/bobFreq — амплитуда (px) и частота (Гц) синусного покачивания по Y
+// alpha — прозрачность 0..1
+// tiled — растянуть на весь экран для false
+// placeholderColor — цвет заглушки
 function MenuLayer(spr = noone, params = {}) constructor {
-    self.spr     = spr
-    self.name    = menuParam(params, "name", "layer")
+    self.spr = spr
+    self.name = menuParam(params, "name", "layer")
     self.scrollX = menuParam(params, "scrollX", 0)
     self.scrollY = menuParam(params, "scrollY", 0)
-    self.bobAmp  = menuParam(params, "bobAmp", 0)
+    self.bobAmp = menuParam(params, "bobAmp", 0)
     self.bobFreq = menuParam(params, "bobFreq", 0)
-    self.alpha   = menuParam(params, "alpha", 1)
-    self.tiled   = menuParam(params, "tiled", true)
+    self.alpha = menuParam(params, "alpha", 1)
+    self.tiled = menuParam(params, "tiled", true)
     self.placeholderColor = menuParam(params, "placeholderColor", make_color_rgb(20, 24, 34))
-    self.time = 0     // секунды с создания
-    self.ox   = 0     // накопленный горизонтальный скролл
+    self.time = 0 // секунды с создания
+    self.ox = 0 // накопленный горизонтальный скролл
 
     self.update = function() {
-        var dt = delta_time / 1000000   // микросекунды → секунды
+        var dt = delta_time / 1000000
         self.time += dt
-        self.ox   += self.scrollX * dt
+        self.ox += self.scrollX * dt
     }
 
     self.draw = function(gw, gh) {
         var bob = (self.bobAmp != 0) ? sin(self.time * self.bobFreq * 2 * pi) * self.bobAmp : 0
-        var oy  = self.scrollY * self.time + bob
+        var oy = self.scrollY * self.time + bob
 
-        // --- заглушка без спрайта ---
         if (self.spr == noone || !sprite_exists(self.spr)) {
             draw_set_alpha(self.alpha)
             draw_set_color(self.placeholderColor)
@@ -83,12 +62,15 @@ function MenuLayer(spr = noone, params = {}) constructor {
         var sh = sprite_get_height(self.spr)
 
         if (self.tiled) {
-            // Бесшовное замощение с учётом скролла/покачивания.
-            var offX = self.ox mod sw; if (offX > 0) offX -= sw   // (-sw, 0]
-            var offY = oy      mod sh; if (offY > 0) offY -= sh
-            for (var yy = offY; yy < gh; yy += sh)
-            for (var xx = offX; xx < gw; xx += sw)
-                draw_sprite_ext(self.spr, 0, xx, yy, 1, 1, 0, c_white, self.alpha)
+            var offX = self.ox mod sw;
+            if (offX > 0) offX -= sw    
+            var offY = oy mod sh; 
+            if (offY > 0) {
+                offY -= sh
+            } 
+            for (var yy = offY; yy < gh; yy += sh) 
+                for (var xx = offX; xx < gw; xx += sw)
+                    draw_sprite_ext(self.spr, 0, xx, yy, 1, 1, 0, c_white, self.alpha)
         } else {
             // Растянуть на весь экран со сдвигом.
             draw_sprite_stretched_ext(self.spr, 0, self.ox, oy, gw, gh, c_white, self.alpha)
@@ -204,7 +186,7 @@ function Menu(items, config = {}) constructor {
                 default:        left = cx;              break
             }
 
-            // иконка (origin спрайта считаем верх-левым → центрируем по вертикали строки)
+            // иконка
             if (hasIcon) {
                 var isc = iconPx / max(sprite_get_width(icon), sprite_get_height(icon))
                 draw_sprite_ext(icon, 0, left, yy - iconPx / 2, isc, isc, 0, c_white, 1)
@@ -224,9 +206,8 @@ function Menu(items, config = {}) constructor {
     }
 }
 
-// ---- Помощник композиции слоёв ---------------------------------------------
-// Единый порядок отрисовки сцены меню для объекта: фон → (пункты, если ниже) →
-// передний план → (пункты, если выше). backLayers/foreLayers — массивы MenuLayer.
+//// Помощник композиции слоёв 
+// Единый порядок отрисовки сцены меню
 function menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, gw, gh) {
     for (var i = 0; i < array_length(backLayers); i++) backLayers[i].draw(gw, gh)
     if (!itemsAboveForeground && menu != undefined) menu.draw(gw, gh)
@@ -234,13 +215,13 @@ function menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, gw, g
     if (itemsAboveForeground && menu != undefined) menu.draw(gw, gh)
 }
 
-// Обновление анимации всех слоёв сцены (вызывать в Step).
+// Обновление анимации всех слоёв сцены (вызывать в Step)
 function menuUpdateLayers(backLayers, foreLayers) {
     for (var i = 0; i < array_length(backLayers); i++) backLayers[i].update()
     for (var i = 0; i < array_length(foreLayers); i++) foreLayers[i].update()
 }
 
-// Гарантирует, что GUI-слой не меньше окна (чёткий текст/слои, как в бою).
+// Гарантирует, что GUI-слой не меньше окна
 function menuEnsureCrispGui() {
     if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
         display_set_gui_size(max(window_get_width(), 320), max(window_get_height(), 180))

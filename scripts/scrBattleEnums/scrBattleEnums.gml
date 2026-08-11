@@ -139,8 +139,7 @@ enum EffectVisualizerType {
 
 enum CardCategory { Attack, Magic, Heal, Buff, Special }
 
-// Категория карты — данные реестра (см. cardRegistryInit). Спрайт больше не
-// определяет категорию, поэтому «особые» карты можно свободно раскидывать.
+// Категория карты — данные реестра
 function cardCategoryOf(_card) {
     if (is_struct(_card) && variable_struct_exists(_card, "cardId") && cardExists(_card.cardId)) {
         var def = global.cardRegistry[$ _card.cardId]
@@ -154,14 +153,14 @@ function cardCategoryOf(_card) {
     return CardCategory.Attack
 }
 
-// Цвет категории — совпадает с цветами вкладок декбилдера (oDeckBuilder Create)
+// Цвет категории 
 function categoryColor(category) {
     switch (category) {
-        case CardCategory.Magic:   return #9944CC
-        case CardCategory.Buff:    return #CC44CC
-        case CardCategory.Heal:    return #44CC44
+        case CardCategory.Magic: return #9944CC
+        case CardCategory.Buff: return #CC44CC
+        case CardCategory.Heal: return #44CC44
         case CardCategory.Attack:  return #CC4444
         case CardCategory.Special: return c_white
-        default:                   return c_white
+        default: return c_white
     }
 }

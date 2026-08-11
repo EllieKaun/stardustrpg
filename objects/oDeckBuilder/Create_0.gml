@@ -1,12 +1,9 @@
-// dbBaseW/dbBaseH — эталонный размер дизайна (камера игры). Весь UI декбилдера
-// верстается ПРЯМО в координатах GUI (окна): один множитель s = guiW/dbBaseW
-// применяется к константам дизайна в layoutPanels() — без матрицы, одно
-// пространство координат. Пока билдер закрыт, GUI = базовому; при открытии = окну.
+
 dbBaseW = camera_get_view_width(view_camera[0])
 dbBaseH = camera_get_view_height(view_camera[0])
 display_set_gui_size(dbBaseW, dbBaseH)
 
-activePanel = 0; // 0 = коллекция всех карт, 1 = дека
+activePanel = 0 // 0 = коллекция всех карт, 1 = дека
 
 var tabFonts = [fnM3x6_22, fnM3x6_14, fnM3x6_13, fnM3x6_12,
                  fnM3x6_11, fnM3x6_10, fnM3x6_9,  fnM3x6_8, fnM3x6_7]
@@ -16,7 +13,7 @@ switchFocusTo = function(target, row) {
     with (oDeckBuilder) {
         var src = (target.tag == Panels.Collection) ? deckPanel : collectionPanel
         collectionPanel.focused = (target.tag == Panels.Collection)
-        deckPanel.focused  = (target.tag == Panels.Deck)
+        deckPanel.focused = (target.tag == Panels.Deck)
         activePanel = (target.tag == Panels.Collection) ? Panels.Collection : Panels.Deck
         if (target.x < src.x) target.enterFromRight(row)
         else target.enterFromLeft(row)
@@ -27,7 +24,8 @@ switchFocusTo = function(target, row) {
 panelSwitchCallback = function(panel, direction) {
     with (oDeckBuilder) {
         var otherPanel = (panel.tag == Panels.Collection) ? deckPanel : collectionPanel
-        if ((direction > 0 && panel.x < otherPanel.x) || (direction < 0 && panel.x > otherPanel.x)) {
+        if ((direction > 0 && panel.x < otherPanel.x) 
+            || (direction < 0 && panel.x > otherPanel.x)) {
             switchFocusTo(otherPanel, panel.cursorRow)
         }
     }
@@ -46,7 +44,7 @@ categoryForTab = function(tab) { // Мап индекса таба фильтр�
     }
 }
 
-// Панель коллекции всех карт (геометрия задаётся в layoutPanels())
+// Панель коллекции всех карт 
 collectionPanel = new Panel({
     x: 0, y: 0, w: 0, h: 0,
     bgSprite: sprCardDeskFull,
@@ -82,7 +80,7 @@ collectionPanel = new Panel({
 })
 collectionPanel.tag = Panels.Collection
 
-// Панель деки (геометрия задаётся в layoutPanels())
+// Панель деки
 deckPanel = new Panel({
     x: 0, y: 0, w: 0, h: 0,
     bgSprite: sprCardDeskFull,
@@ -136,13 +134,11 @@ focusPanel = function(panel) {
     activePanel = (panel == collectionPanel) ? Panels.Collection : Panels.Deck
 }
 
-// Верстает обе панели ПРЯМО в координатах GUI (окна). s — тот же множитель,
-// что раньше давала матрица (guiW/dbBaseW), но теперь применяется к константам
-// дизайна один раз здесь. Вызывается каждый кадр (в т.ч. переживает ресайз окна).
+// Верстает обе панели
 layoutPanels = function() {
     var s = display_get_gui_width() / dbBaseW
-    var mg  = 8  * s   // внешний отступ
-    var tH  = 18 * s   // высота вкладок
+    var mg  = 8  * s // внешний отступ
+    var tH  = 18 * s // высота вкладок
     var pw  = (dbBaseW * s - mg * 2) / 2
     var top = mg + tH
     var ph  = dbBaseH * s - top - mg
@@ -154,11 +150,11 @@ layoutPanels = function() {
         p.y = top
         p.w = pw
         p.h = ph
-        p.padding    = 8 * s
-        p.tabH       = tH
-        p.tabGap     = 2 * s
+        p.padding = 8 * s
+        p.tabH = tH
+        p.tabGap = 2 * s
         p.tabPadding = 4 * s
-        p.uiScale    = s   // для спрайтов фикс. размера (указатель)
+        p.uiScale = s // для спрайтов фикс. размера
     }
 }
 layoutPanels()
@@ -172,7 +168,6 @@ activePanel = Panels.Collection
 open = false
 
 openBuilder = function() {
-    // поднимаем GUI до размера окна и пересчитываем вёрстку в оконных координатах
     display_set_gui_size(max(window_get_width(), dbBaseW), max(window_get_height(), dbBaseH))
     layoutPanels()
     open = true
@@ -193,6 +188,5 @@ openBuilder = function() {
 closeBuilder = function() {
     open = false
     global.uiModal = false
-    // возвращаем GUI к базовому разрешению, чтобы не ломать UI оверворлда
     display_set_gui_size(dbBaseW, dbBaseH)
 }

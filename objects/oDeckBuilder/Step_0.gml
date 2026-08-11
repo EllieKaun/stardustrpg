@@ -5,10 +5,9 @@ if (keyboard_check_pressed(vk_escape)) {
     exit
 }
 
-// Держим вёрстку актуальной (напр. при ресайзе), чтобы хит-тест мыши совпадал
 layoutPanels()
 
-// Мышь (обе панели, независимо от фокуса): наведение + клик по табам/слотам
+// Мышь: наведение + клик по табам/слотам
 collectionPanel.stepMouse()
 deckPanel.stepMouse()
 

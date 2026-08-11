@@ -3,10 +3,7 @@ selectedMenuItem = 0
 menuItems = ["Shuffle", "Info", "Run"]
 
 // High-res GUI: draw the low-res battle UI scaled up so that text overlaid on
-// the cards can be rendered at full GUI resolution and stay readable (see the
-// Draw GUI event). guiBaseW/H are the "logical" battle coordinates.
-// The GUI is matched to the WINDOW size: a GUI bigger than the window would be
-// downscaled by the OS and make the crisp text look ragged.
+// the cards can be rendered at full GUI resolution and stay readable
 global.guiBaseW = camera_get_view_width(view_camera[0])
 global.guiBaseH = camera_get_view_height(view_camera[0])
 display_set_gui_size(max(window_get_width(), global.guiBaseW), max(window_get_height(), global.guiBaseH))
@@ -15,11 +12,11 @@ maxCardsOnDeskNumber = 4
 copyNextCard = false
 
 // Хит-боксы для управления мышью (заполняются в Draw GUI, читаются в Step)
-cardHitRects  = []
-menuHitRects  = []
+cardHitRects = []
+menuHitRects = []
 infoCloseRect = undefined
-mouseLastX    = -1   // для детекта движения мыши (чтобы не перебивать клавиатуру в покое)
-mouseLastY    = -1
+mouseLastX = -1 // для детекта движения мыши 
+mouseLastY = -1
 
 // Анимация розыгрыша карты (см. scrCardAnimation)
 activeCardAnims = []

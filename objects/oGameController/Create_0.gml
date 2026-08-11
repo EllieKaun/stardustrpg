@@ -16,13 +16,12 @@ setDisplayMode = function(fullscreen) {
         window_set_position((display_get_width() - ww) div 2, (display_get_height() - wh) div 2)
     }
 }
-// применяем borderless один раз за запуск (Create может сработать повторно при
-// возврате в комнату — тогда не сбрасываем выбранный игроком режим)
+// применяем borderless
 if (!variable_global_exists("displayModeReady")) {
     global.displayModeReady = true
     setDisplayMode(true)
 }
-uiFontInit() // кэш UI-шрифта и высоты строки (см. scrDrawing)
+uiFontInit() // кэш UI-шрифта и высоты строки
 initEffectRegistry() // регистрация эффектов
 cardIdsInit() // инициализация карт ид
 cardRegistryInit() // регистация карт  
@@ -38,7 +37,7 @@ selected_character = partyMembers[0]
 global.mpGrid = -1 // Motion Planning
 global.battleSection = 1
 global.uiModal = false // Флаг для метки если запускается какое-то модальное окно, чтобы блокировать движение в основном экране
-global.gamePaused = false // Полная пауза мира (замораживает Step-логику, но мир продолжает рисоваться). См. oPauseMenu
+global.gamePaused = false // Полная пауза мира 
 global.zoneConfig = { // нужно для определение секций и зон на карте
     cx: room_width / 2,
     cy: room_height / 2,

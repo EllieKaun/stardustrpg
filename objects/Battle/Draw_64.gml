@@ -2,17 +2,16 @@
 if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
     display_set_gui_size(max(window_get_width(), guiBaseWidth()), max(window_get_height(), guiBaseHeight()))
 
-// Весь UI боя рисуется ПРЯМО в координатах GUI (окна) — без матрицы, одно
-// пространство координат. s — множитель дизайн→окно (guiW / базовая ширина),
-// применяется к абсолютным константам (как раньше делала матрица). Относительные
-// величины (screenWidth*0.6, screenHeight/3, …) масштабируются сами.
+// Весь UI боя рисуется в координатах GUI (окна) 
+// s — множитель дизайн→окно (guiW / базовая ширина),
+// применяется к абсолютным константам. 
 var screenWidth  = display_get_gui_width()
 var screenHeight = display_get_gui_height()
 var s = screenWidth / guiBaseWidth()
 
-// Хит-боксы для мыши (координаты GUI/окна, читаются в Step).
-cardHitRects  = []
-menuHitRects  = []
+// Хит-боксы для мыши (координаты GUI/окна, читаются в Step)
+cardHitRects = []
+menuHitRects = []
 infoCloseRect = undefined
 
 var cardDeskHeight = screenHeight / 3
@@ -139,47 +138,49 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
 } else {
     if (selectedCharacter != noone) {
         var hand = selectedCharacter.getCardsInHand()
-        var n    = min(array_length(hand), maxCardsOnDeskNumber)
+        var n = min(array_length(hand), maxCardsOnDeskNumber)
 
-        // card size: clamp to desk with padding
-        var vPad      = 8 * s
+        var vPad = 8 * s
         var drawCardH = cardDeskHeight - vPad * 2
         var drawCardW = drawCardH * 2 / 3
 
         var handCenterX = cardDeskStartX + cardDeskWidth / 2
-        var handCenterY = cardDeskStartY + cardDeskHeight / 2   // desk vertical middle
-        var spread      = min(drawCardW * 0.8, (cardDeskWidth - drawCardW) / max(1, n))
-        var mid         = (n - 1) / 2
+        var handCenterY = cardDeskStartY + cardDeskHeight / 2
+        var spread = min(drawCardW * 0.8, (cardDeskWidth - drawCardW) / max(1, n))
+        var mid = (n - 1) / 2
 
         var arcLift = 2 * s
-        var arcTilt = 5    // угол (градусы) — НЕ масштабируем
+        var arcTilt = 5 // поворот
 
         // two passes: non-selected first, selected last so it draws on top
         for (var pass = 0; pass < 2; pass++) {
             for (var i = 0; i < n; i++) {
                 var isSelected = (selectedCard == i)
-                if ((pass == 0) == isSelected) continue   // pass 0 = others, pass 1 = selected
+                if ((pass == 0) == isSelected) continue // pass 0 = others, pass 1 = selected
 
                 var card = hand[i]
                 if (animatingCard != noone && card == animatingCard) continue // летит — не рисуем в руке
                 var off  = i - mid
 
                 // compute transform, THEN apply selected overrides, THEN derive scale
-                var cx    = handCenterX + off * spread
-                var cy    = handCenterY - abs(off) * arcLift
+                var cx = handCenterX + off * spread
+                var cy = handCenterY - abs(off) * arcLift
                 var angle = -off * arcTilt
                 var scale = 1
 
-                if (isSelected) { cy -= 6 * s; scale = 1.12; angle = 0; }
-
-                // Middle-Centre origin → draw at CENTER (cx/cy), pass real angle
-                var sx = (drawCardW / sprite_get_width(card.cardBaseSpr))  * scale
+                if (isSelected) { 
+                    cy -= 6 * s
+                    scale = 1.12 
+                    angle = 0
+                }
+                
+                var sx = (drawCardW / sprite_get_width(card.cardBaseSpr)) * scale
                 var sy = (drawCardH / sprite_get_height(card.cardBaseSpr)) * scale
 
-                draw_sprite_ext(card.cardBaseSpr,         0, cx, cy, sx, sy, angle, c_white, 1)
+                draw_sprite_ext(card.cardBaseSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
                 draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
-                draw_sprite_ext(card.cardBorderSpr,       0, cx, cy, sx, sy, angle, c_white, 1)
-                draw_sprite_ext(card.cardTokenSpr,        0, cx, cy, sx, sy, angle, c_white, 1)
+                draw_sprite_ext(card.cardBorderSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
+                draw_sprite_ext(card.cardTokenSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
 
                 // хит-бокс карты для мыши (координаты окна, с учётом наклона)
                 array_push(cardHitRects, {
@@ -188,8 +189,7 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                     angle: angle, index: i
                 })
 
-                // статы поверх ЭТОЙ карты (координаты уже оконные, шрифт fnUI —
-                // чётко); задние карты не перекрывают передние, т.к. рисуем внутри цикла
+                // статы поверх этой карты
                 drawCardStats(cx, cy, drawCardW * scale, drawCardH * scale, angle, card)
 
                 if (isSelected && focusArea == FocusArea.Deck) {

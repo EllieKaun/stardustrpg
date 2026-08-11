@@ -76,7 +76,7 @@ function cardRegistryInit() {
         global.cardRegistry[$ _id] = { id: _id, canVaryRarity: _canVary, category: _category, build: _build };
     };
 
-    // Физические → Атакующие
+    // Физические
     registerCard(C.physicalDamageSingleTarget, true, CardCategory.Attack, function(_r) { return createPhysicalDamageSingleTargetCard() })
     registerCard(C.physicalDamageMultipleTarget, true, CardCategory.Attack, function(_r) { return createPhysicalDamageMultipleTargetCard() })
     registerCard(C.physicalDamageStunChanceSingleTarget, true, CardCategory.Attack, function(_r) { return createPhysicalDamageStunChanseSingleTargetCard() })
@@ -133,7 +133,7 @@ function cardRegistryInit() {
     registerCard(C.resurrection, false, CardCategory.Heal, function(_r) { return createResurrectionCard() })
     registerCard(C.summonHealPuppet, false, CardCategory.Heal, function(_r){ return createSummonHealPuppetCard() })
 
-    // Особые (утилитарные, без редкости)
+    // Особые
     registerCard(C.copyNextPlayedCard, false, CardCategory.Special, function(_r) { return createCopyNextPlayedCardCard() })
     registerCard(C.addEnergy, false, CardCategory.Special, function(_r) { return createAddEnergyCard() })
     registerCard(C.shuffleDeck, false, CardCategory.Special, function(_r) { return createShuffleDeckCard() })
