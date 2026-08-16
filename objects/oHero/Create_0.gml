@@ -11,8 +11,6 @@ distanceToStopFollowing = 24
 
 sprIdle = sViv
 sprWalk = sVivWalk
-sprBackIdle = sVivBackwards
-sprBackWalk = sVivWalkBackwards
 
 // Движение выбранного персонажа
 stepControlled = function() {
@@ -34,25 +32,34 @@ stepControlled = function() {
 // MP движение невыделенного персонажа
 stepFollowing = function() {
     var leader = oGameController.selected_character
-    if (!instance_exists(leader)) { 
+    if (!instance_exists(leader)) {
         path_end()
         return
     }
 
     var dis = point_distance(x, y, leader.x, leader.y)
-    if (dis > distanceToStopFollowing) {
-        if (calcPathTimer-- <= 0) {
-            calcPathTimer = calcPathDelay
-            var found = mp_grid_path(global.mpGrid, path, x, y, leader.x, leader.y, true)
-            if (found) { 
-                path_start(path, nSpeed, path_action_stop, false)
-            } else {
-                path_end()
-                move_towards_point(leader.x, leader.y, nSpeed)
-            }
-        }
-    } else {
+    if (dis <= distanceToStopFollowing) {
         path_end()
         speed = 0
+        return
+    }
+
+    // Прямая линия до лидера свободна -> идём напрямую, минуя сетку (без «крюков»)
+    if (collision_line(x, y, leader.x, leader.y, oWall, true, true) == noone) {
+        path_end()
+        move_towards_point(leader.x, leader.y, nSpeed)
+        return
+    }
+
+    // Иначе обходим препятствия по сетке (пересчёт с задержкой)
+    if (calcPathTimer-- <= 0) {
+        calcPathTimer = calcPathDelay
+        var found = mp_grid_path(global.mpGrid, path, x, y, leader.x, leader.y, true)
+        if (found) {
+            path_start(path, nSpeed, path_action_stop, false)
+        } else {
+            path_end()
+            move_towards_point(leader.x, leader.y, nSpeed)
+        }
     }
 }

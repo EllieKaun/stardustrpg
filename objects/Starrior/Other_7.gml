@@ -12,7 +12,19 @@ switch (actionState) {
             actionCallback = undefined
         }
         changeActionState(StarriorStates.Idle, undefined)
-    break       
+    break
+	case StarriorStates.Spell:
+        if (!is_undefined(actionCallback)) {
+            actionCallback()
+            actionCallback = undefined
+        }
+        changeActionState(StarriorStates.Idle, undefined)
+    break
 	case StarriorStates.KnockOut:
-    break       
+    break
+	case StarriorStates.Spawn:
+        changeActionState(StarriorStates.Idle, undefined)
+    break
+	case StarriorStates.Dance:
+    break
 }

@@ -184,3 +184,13 @@ function puppetMasterEncounter() {
           rarities: [CardsRarity.Rare, CardsRarity.Epic] }
     )
 }
+
+// Зацикленный звук ходьбы по траве выделенного персонажа.
+function updateWalkSound(active) {
+    if (!variable_global_exists("walkSound") || global.walkSound < 0) return
+    if (active) {
+        if (!audio_is_playing(global.walkSound)) audio_play_sound(global.walkSound, 1, true)
+    } else {
+        if (audio_is_playing(global.walkSound)) audio_stop_sound(global.walkSound)
+    }
+}

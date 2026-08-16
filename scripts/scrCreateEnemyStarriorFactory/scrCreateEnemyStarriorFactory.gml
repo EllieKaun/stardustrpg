@@ -1,6 +1,6 @@
 function createCrackerNut() { 
     return createStarrior("CrackerNut",
-        sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle, 
+        sprCrackerNutIdle, sprCrackerNutHit, sprCrackerNutCast, sprCrackerNutCast, sprCrackerNutIdle, noone,
         16, 16,  0, 0,  1, 1, /*str*/2, /*int*/0, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
@@ -12,7 +12,7 @@ function createCrackerNut() {
 
 function createLeaf() {
     return createStarrior("Leaf",
-        HealLeaf, HealLeaf, HealLeaf, HealLeaf,
+        HealLeafIdle, HealLeafAtk, HealLeafCast, HealLeafCast, HealLeafIdle, noone,
         20, 20,  0, 0,  1, 1,  /*str*/1, /*int*/1, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
@@ -24,7 +24,7 @@ function createLeaf() {
 
 function createMushroom() {
     return createStarrior("Mushroom",
-        sprMushroom, sprMushroom, sprMushroom, sprMushroom,
+        sprMushroomIdle, sprMushroomAttack, sprMushroomCast, sprMushroomCast, sprMushroomIdle, noone,
         12, 12,  0, 0,  1, 1,  /*str*/3, /*int*/0, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
@@ -36,7 +36,7 @@ function createMushroom() {
 
 function createFlower() {
     return createStarrior("Flower",
-        PowerFlower, PowerFlower, PowerFlower, PowerFlower,
+        sprPowerFlowerIdle, sprPowerFlowerAttack, sprPowerFlowerSpell, sprPowerFlowerCast, sprPowerFlowerIdle, noone,
         12, 12,  0, 0,  1, 1,  /*str*/1, /*int*/3, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
@@ -48,7 +48,7 @@ function createFlower() {
 
 function createPuppetMaster() {
     return createStarrior("Puppet Master",
-        sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle, sprCrackerNutIdle,
+        MasterPuppetIdle, MasterPuppetAtk, MasterPuppetCast, MasterPuppetCast, MasterPuppetIdle, noone,
         40, 40,  0, 0,  2, 2,  /*str*/3, /*int*/4, /*aura*/2, /*guts*/2,
         [
             createMagicalDamageSingleTargetCard(),

@@ -150,12 +150,13 @@ function playCard(card, caster, targets) {
     }
     
     removeCardFromHand(caster, card)
+    playPendingCaster = caster
     show_debug_message("play card: " + card.name)
-    caster.changeActionState(card.actionType, function() {
-        var card = other.pendingCard
+    caster.changeActionState(cardAnimState(card), function() {
+        var caster = playPendingCaster
+        var card = caster.pendingCard
         var effects = card.effects
-        var targets = other.pendingTargets
-        var caster = other
+        var targets = caster.pendingTargets
         for(var i = 0; i < array_length(effects); i++) {
             var effect = effects[i]
             show_debug_message("processing effect: " + (variable_struct_exists(effect, "kind") ? string(effect.kind) : effectTypeToString(effect.type)))
@@ -175,13 +176,13 @@ function playCard(card, caster, targets) {
                 break
             }
         }
-        selectedCharacter.energy -= card.energy 
+        selectedCharacter.energy -= card.energy
         if copyNextCard {
             copyNextCard = false
             array_push(selectedCharacter.deck.cardsInHand, card)
         }
         afterPlayChecks()
-    })
+    }, cardCastSpriteOverride(card))
 }
 
 // Конец хода: обобщённый проход. Для каждого EndOfTurn-эффекта вызываем

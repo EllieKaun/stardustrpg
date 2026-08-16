@@ -43,15 +43,15 @@ function drawBorderAroundCard(
     )
 }
 
-// --- Battle high-res GUI helpers ---------------------------------------------
+//// Battle high-res GUI helpers
 // The battle draws its UI in the "logical" base resolution (global.guiBaseW/H)
 // and scales it up into a higher-resolution GUI buffer with a world matrix.
 // These return that base size, falling back to the raw GUI size outside battle.
 function guiBaseWidth()  { return variable_global_exists("guiBaseW") ? global.guiBaseW : display_get_gui_width()  }
 function guiBaseHeight() { return variable_global_exists("guiBaseH") ? global.guiBaseH : display_get_gui_height() }
 
-/// @desc Попадание точки в повёрнутый прямоугольник (центр cx,cy; размер w,h;
-///       угол angle — та же конвенция, что у draw_sprite_ext). Для хит-теста карт.
+// Попадание точки в повёрнутый прямоугольник (центр cx,cy; размер w,h;
+// угол angle — та же конвенция, что у draw_sprite_ext). Для хит-теста карт
 function pointInRotatedRect(px, py, cx, cy, w, h, angle) {
     var c = dcos(angle), s = dsin(angle)
     var dx = px - cx, dy = py - cy
@@ -60,8 +60,8 @@ function pointInRotatedRect(px, py, cx, cy, w, h, angle) {
     return (abs(lx) <= w * 0.5 && abs(ly) <= h * 0.5)
 }
 
-/// @desc Turn an internal card id ("PhysicalDamageSingleTargetCard") into a
-///       human label ("Physical Damage Single Target"). Display-only.
+// Turn an internal card id ("PhysicalDamageSingleTargetCard") into a
+// human label ("Physical Damage Single Target"). Display-only.
 function prettifyCardName(nm) {
     nm = string(nm)
     var len = string_length(nm)
@@ -83,8 +83,8 @@ function prettifyCardName(nm) {
     return out
 }
 
-/// @desc Card's headline numbers for the compact on-card display.
-///       { kind:"dmg"|"heal"|"none", minNum, maxNum, effectName, costType, costValue }
+// Card's headline numbers for the compact on-card display.
+// { kind:"dmg"|"heal"|"none", minNum, maxNum, effectName, costType, costValue }
 function cardDisplayStats(card) {
     var st = {
         kind: "none", minNum: 1, maxNum: 0, effectName: "",
@@ -116,8 +116,8 @@ function cardDisplayStats(card) {
     return st
 }
 
-/// @desc Map a card-local point (lx right, ly down; origin = card centre) to
-///       screen space for a card drawn with draw_sprite_ext(angle).
+// Map a card-local point (lx right, ly down; origin = card centre) to
+// screen space for a card drawn with draw_sprite_ext(angle).
 function cardLocalToScreen(cx, cy, lx, ly, angle) {
     return {
         x: cx + lx * dcos(angle) + ly * dsin(angle),
@@ -126,55 +126,66 @@ function cardLocalToScreen(cx, cy, lx, ly, angle) {
 }
 
 function uiFontInit() {
-    var f = asset_get_index("fnUI") // -1 если ассет ещё не создан
-    global.uiFontIsTTF = (f >= 0 && font_exists(f))
-    global.uiFontIndex = global.uiFontIsTTF ? f : fnM3x6_22
+    var candidates = ["fnUI_7","fnUI_8", "fnUI_9", "fnUI_10", "fnUI_12", "fnUI_14", "fnUI_15", "fnUI_16", "fnUI_17", "fnUI_18", "fnUI_20", "fnUI_24", "fnUI_28", "fnUI_32", "fnUI_40", "fnUI_48", "fnUI"]
+    var ladder = []
     var prev = draw_get_font()
-    draw_set_font(global.uiFontIndex)
-    global.uiFontLineHeight = max(1, string_height("0"))
+    for (var i = 0; i < array_length(candidates); i++) {
+        var f = asset_get_index(candidates[i])
+        if (f >= 0 && font_exists(f)) {
+            draw_set_font(f)
+            array_push(ladder, { font: f, lineH: max(1, string_height("0")) })
+        }
+    }
+    if (array_length(ladder) == 0) {
+        draw_set_font(fnUI_24)
+        array_push(ladder, { font: fnUI_24, lineH: max(1, string_height("0")) })
+    }
     if (prev >= 0) draw_set_font(prev)
+    array_sort(ladder, function(a, b) { return a.lineH - b.lineH })
+    global.uiFontLadder = ladder
+    global.uiFontCurrent = ladder[array_length(ladder) - 1].font
 }
 
-// Единый шрифт UI
 function uiFont() {
-    if (!variable_global_exists("uiFontIndex")) uiFontInit()
-    return global.uiFontIndex
+    if (!variable_global_exists("uiFontLadder")) uiFontInit()
+    return global.uiFontCurrent
 }
 
-// Масштаб текущего шрифта, чтобы строка была ~targetH пикселей в высоту,
-// но не шире maxW. Для TTF — дробный (плавно). Для пиксельного отката —
-// округляем до целого, чтобы шрифт не рвался.
 function uiTextScale(txt, targetH, maxW) {
-    if (!variable_global_exists("uiFontIndex")) uiFontInit()
-    var sc = targetH / global.uiFontLineHeight
+    if (!variable_global_exists("uiFontLadder")) uiFontInit()
+    var ladder = global.uiFontLadder
+    var pick = ladder[0]
+    for (var i = 0; i < array_length(ladder); i++) {
+        if (ladder[i].lineH <= targetH) pick = ladder[i]
+    }
+    global.uiFontCurrent = pick.font
+    draw_set_font(pick.font)
+    var sc = targetH / pick.lineH
     var tw = string_width(txt) * sc
     if (tw > maxW) sc *= maxW / max(1, tw)
-    if (!global.uiFontIsTTF) sc = max(1, floor(sc))  // пиксельный откат — целый масштаб
     return sc
 }
 
-/// @desc Рисует строку шрифтом uiFont() высотой ~pxH пикселей, сохраняя текущие
-///       halign/valign/color. Возвращает применённый масштаб (нужен для ширины).
 function drawUiText(xx, yy, str, pxH) {
-    draw_set_font(uiFont())
     var sc = uiTextScale(str, pxH, 1000000)
     draw_text_transformed(xx, yy, str, sc, sc, 0)
     return sc
 }
 
-/// @desc Draw short text at a card-local point with a clean one-pixel drop
-///       shadow, rotated to the card angle. Uses the current font & given scale.
+// Draw short text at a card-local point with a clean one-pixel drop
+// shadow, rotated to the card angle. Uses the current font & given scale.
 function drawCardStatText(cx, cy, lx, ly, angle, txt, col, scale) {
     if (txt == "") return
-    var p  = cardLocalToScreen(cx, cy, lx, ly, angle)
-    var sh = max(1, scale)   // shadow offset
-    draw_text_transformed_colour(p.x + sh, p.y + sh, txt, scale, scale, angle, c_black, c_black, c_black, c_black, 0.6)
-    draw_text_transformed_colour(p.x,      p.y,      txt, scale, scale, angle, col, col, col, col, 1)
+    var off = max(1, scale)
+    var main = cardLocalToScreen(cx, cy, lx, ly, angle)
+    var _shadow = cardLocalToScreen(cx, cy, lx + off, ly + off, angle)
+    draw_text_transformed_colour(_shadow.x, _shadow.y, txt, scale, scale, angle, c_black, c_black, c_black, c_black, 0.6)
+    draw_text_transformed_colour(main.x, main.y, txt, scale, scale, angle, col, col, col, col, 1)
 }
 
-/// @desc Compact stats drawn over the card at full GUI resolution:
-///       a big value in the name box + the cost number on the cost token.
-///       x,y = card centre; w,h = drawn card size (screen px).
+// Compact stats drawn over the card at full GUI resolution:
+// a big value in the name box + the cost number on the cost token.
+// x,y = card centre; w,h = drawn card size (screen px).
 function drawCardStats(x, y, w, h, angle, card) {
     var st = cardDisplayStats(card)
 
@@ -220,15 +231,8 @@ function drawFitTextInArea(
     areaWidth,
     areaHeight
 ) {
-    var fonts = [fnM3x6_22,
-        fnM3x6_14, 
-        fnM3x6_13, 
-        fnM3x6_12, 
-        fnM3x6_11, 
-        fnM3x6_10, 
-        fnM3x6_9,
-        fnM3x6_8,
-        fnM3x6_7]
+    var fonts = [fnUI_48, fnUI_32, fnUI_24, fnUI_16,
+                 fnUI_14, fnUI_12, fnUI_10, fnUI_9, fnUI_8, fnUI_7]
 
     for (var i = 0; i < array_length(fonts); i++) {
         draw_set_font(fonts[i])
@@ -352,6 +356,64 @@ function drawCardTransformed(card, cx, cy, w, h, angle, scale, alpha = 1) {
     draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, alpha);
     draw_sprite_ext(card.cardBorderSpr,       0, cx, cy, sx, sy, angle, c_white, alpha);
     draw_sprite_ext(card.cardTokenSpr,        0, cx, cy, sx, sy, angle, c_white, alpha);
+}
+
+function drawSpriteOutline(spr, sub, xx, yy, xs, ys, ang, col) {
+    gpu_set_fog(true, col, 0, 0)
+    draw_sprite_ext(spr, sub, xx - 1, yy, xs, ys, ang, c_white, 1)
+    draw_sprite_ext(spr, sub, xx + 1, yy, xs, ys, ang, c_white, 1)
+    draw_sprite_ext(spr, sub, xx, yy - 1, xs, ys, ang, c_white, 1)
+    draw_sprite_ext(spr, sub, xx, yy + 1, xs, ys, ang, c_white, 1)
+    gpu_set_fog(false, col, 0, 0)
+}
+
+function menuBadgeSize(label, badgeScale) {
+    var nativeW = sprite_get_width(ActionButtnBackground)
+    var nativeH = sprite_get_height(ActionButtnBackground)
+    var base = nativeH * badgeScale
+    var heightFactor = 1
+    var bh = base * heightFactor
+    var textH = base * 0.9
+    var padX = 4 * badgeScale
+    var sc = uiTextScale(label, textH, 100000)
+    var bw = max(nativeW * badgeScale, string_width(label) * sc + padX * 2)
+    return { w: bw, h: bh, textH: textH, scale: sc }
+}
+
+function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, colorMain, colorPanel) {
+    var size = menuBadgeSize(label, badgeScale)
+    var badgeWidth = size.w
+    var badgeHeight = size.h
+    var scale = size.scale
+    var flip = ballOnLeft ? 1 : -1
+    var cx = badgeX + badgeWidth * 0.5
+    var cy = badgeY + badgeHeight * 0.5
+    var bgSx = badgeWidth / sprite_get_width(ActionButtnBackground)
+    var bgSy = badgeHeight / sprite_get_height(ActionButtnBackground)
+    var fgSx = badgeWidth / sprite_get_width(ActionButtonForeground)
+    var fgSy = badgeHeight / sprite_get_height(ActionButtonForeground)
+    draw_sprite_ext(ActionButtnBackground, 0, cx, cy, bgSx * flip, bgSy, 0, colorMain, 1)
+    draw_sprite_ext(ActionButtonForeground, 0, cx, cy, fgSx * flip, fgSy, 0, colorPanel, 1)
+
+    var textShift = (ballOnLeft ? 1 : -1) * 2 * badgeScale
+    draw_set_halign(fa_center)
+    draw_set_valign(fa_middle)
+    draw_set_color(colorMain)
+    draw_text_transformed(badgeX + badgeWidth * 0.5 + textShift, badgeY + badgeHeight * 0.5, label, scale, scale, 0)
+
+    var ballCenterX = ballOnLeft ? badgeX : badgeX + badgeWidth
+    var ballCenterY = badgeY + badgeHeight * 0.5
+    var ballScale = badgeHeight / sprite_get_height(ActionButtonCircle)
+    draw_sprite_ext(ActionButtonCircle, 0, ballCenterX, ballCenterY, ballScale, ballScale, 0, colorMain, 1)
+
+    draw_set_color(colorPanel)
+    var ksc = uiTextScale(hotkey, size.textH, badgeHeight * 0.6)
+    draw_text_transformed(ballCenterX, ballCenterY, hotkey, ksc, ksc, 0)
+
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+    draw_set_color(c_white)
+    return size
 }
 
 

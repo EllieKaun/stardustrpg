@@ -8,9 +8,9 @@ function createMagicalDamageSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)) ],
+        [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), StarEnergy, StarMagic) ],
         mgcCard,
-        lightningSingleTarget,
+        starsSingleTarget,
         commonBorder,
         mpCostToken
     )
@@ -26,9 +26,9 @@ function createMagicalDamageMultipleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)) ],
+        [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), StarEnergy, StarMagic) ],
         mgcCard,
-        lightningGroup,
+        starsGroup,
         commonBorder,
         mpCostToken
     )
@@ -45,7 +45,7 @@ function createMagicalDamageStunChanseSingleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), lightningStrike, LightningMagic),
             ShockEffect(1, 1.0)
         ],
         mgcCard,
@@ -66,7 +66,7 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), lightningStrike, LightningMagic),
             ShockEffect(1, 1.0)
         ],
         mgcCard,
@@ -87,7 +87,7 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), flameStrike, FireMagic),
             Burn(2, 1, 1.0)
         ],
         mgcCard,
@@ -108,7 +108,7 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), flameStrike, FireMagic),
             Burn(2, 1, 1.0)
         ],
         mgcCard,
@@ -128,11 +128,11 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), iceStrike, IceMagic),
             FreezeEffect(1, 1.0)
         ],
         mgcCard,
-        lightningSingleTarget,
+        iceSingleTarget,
         commonBorder,
         mpCostToken
     )
@@ -149,82 +149,14 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), iceStrike, IceMagic),
             FreezeEffect(1, 1.0)
         ],
         mgcCard,
-        lightningGroup,
+        iceGroup,
         commonBorder,
         mpCostToken
     )
 }
 
-// Копирует следующую использованную карту и добавляет в руку героя - уникальная
-function createCopyNextPlayedCardCard() {
-    var rarity = CardsRarity.Default
-    var targetType = TargetTypes.SingleAllyTarget
-    return new Card(
-        "CopyNextPlayedCard",
-        rarity,
-        targetType,
-        StarriorStates.Cast,
-        0,
-        [ CopyCardEffect() ],
-        mgcCard,
-        cardCopy,
-        commonBorder,
-        hpCostToken
-    )
-}
 
-// Дает дополнительный ход герою - уникальная
-function createAddEnergyCard() {
-    var rarity = CardsRarity.Default
-    var targetType = TargetTypes.SingleAllyTarget
-    return new Card(
-        "AddEnergyCard",
-        rarity,
-        targetType,
-        StarriorStates.Cast,
-        0,
-        [ AddEnergyEffect(1) ],
-        mgcCard,
-        cardCopy,
-        commonBorder,
-        hpCostToken
-    )
-}
-
-// Перемешивает колоду без траты хода  - уникальная
-function createShuffleDeckCard() {
-    var rarity = CardsRarity.Default
-    var targetType = TargetTypes.SingleAllyTarget
-    return new Card(
-        "ShuffleDeckCard",
-        rarity,
-        targetType,
-        StarriorStates.Cast,
-        0,
-        [ ShuffleDeckEffect() ],
-        mgcCard,
-        shuffle,
-        commonBorder,
-        hpCostToken
-    )
-}
-
-// Убирает слабость одного героя на х ходов - (Слабые места*)
-function createCardIgnoreWeaknessSingleTarget() {
-    return new Card(
-        "Ignore Weakness",
-        CardsRarity.Default,
-        TargetTypes.SingleAllyTarget,
-        StarriorStates.Cast,
-        1,
-        [ IgnoreWeaknessEffect(2) ],
-        buffCard,
-        magicBuff,
-        commonBorder,
-        hpCostToken
-    )
-}

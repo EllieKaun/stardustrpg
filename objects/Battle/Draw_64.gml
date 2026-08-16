@@ -1,13 +1,12 @@
-// GUI matched to the window so text stays crisp (a larger GUI would be downscaled).
 if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
     display_set_gui_size(max(window_get_width(), guiBaseWidth()), max(window_get_height(), guiBaseHeight()))
 
 // Весь UI боя рисуется в координатах GUI (окна) 
-// s — множитель дизайн→окно (guiW / базовая ширина),
+// scaleToGui — множитель дизайн→окно (guiW / базовая ширина),
 // применяется к абсолютным константам. 
 var screenWidth  = display_get_gui_width()
 var screenHeight = display_get_gui_height()
-var s = screenWidth / guiBaseWidth()
+var scaleToGui = screenWidth / guiBaseWidth()
 
 // Хит-боксы для мыши (координаты GUI/окна, читаются в Step)
 cardHitRects = []
@@ -15,9 +14,9 @@ menuHitRects = []
 infoCloseRect = undefined
 
 var cardDeskHeight = screenHeight / 3
-var topSpacing = (3 + 2) * s
-var bottomSpacing = 3 * s
-var cardSpacing = 6 * s
+var topSpacing = (3 + 2) * scaleToGui
+var bottomSpacing = 3 * scaleToGui
+var cardSpacing = 6 * scaleToGui
 var cardHeight = cardDeskHeight - (topSpacing + bottomSpacing)
 var cardWidth = cardHeight * 2 / 3
 
@@ -26,107 +25,38 @@ var cardDeskWidth = cardWidth * maxCardsOnDeskNumber + cardSpacing * (maxCardsOn
 var cardDeskStartX = (screenWidth - cardDeskWidth) / 2
 var cardDeskStartY = screenHeight - cardDeskHeight
 
-// Дополнительные UI боксы слева и справа
-var sideBoxWidth = floor(cardDeskStartX)
-var sideBoxHeight = floor(cardDeskHeight * 0.8)
+if (battleState == BattleStates.CharacterPlay && selectedCharacter != noone) {
+    var badgeScale = scaleToGui
+    var badgeGap = 4 * scaleToGui
+    var colMain = selectedCharacter.themeColor
+    var colPanel = c_white
 
-// Левый бокс
-draw_sprite_stretched(sprCardDesk, 0, 0, floor(screenHeight - sideBoxHeight), sideBoxWidth, sideBoxHeight)
+    var leftEdge = selectedCharacter.bbox_left * scaleToGui - 11 * scaleToGui
+    var rightEdge = selectedCharacter.bbox_right * scaleToGui + 11 * scaleToGui
+    var headY = selectedCharacter.bbox_top * scaleToGui
 
-// Меню в левом боксе
-var menuPadding = 6 * s
-var menuItemHeight = 16 * s
+    var shuffleSize = menuBadgeSize("SHUFFLE", badgeScale)
+    var infoSize = menuBadgeSize("INFO", badgeScale)
+    var runSize = menuBadgeSize("RUN", badgeScale)
 
-if (battleState != BattleStates.EnemysTurn) {
-	draw_set_halign(fa_right)
-	for (var i = 0; i < array_length(menuItems); i++) {
-	    var isMenuItemSelected = (focusArea == FocusArea.Menu && selectedMenuItem == i)
-	    draw_set_color(isMenuItemSelected ? c_yellow : c_white)
+    var shuffleX = rightEdge
+    var shuffleY = headY
+    drawMenuBadge(shuffleX, shuffleY, badgeScale, "SHUFFLE", "S", true, colMain, colPanel)
+    array_push(menuHitRects, { x: shuffleX, y: shuffleY, w: shuffleSize.w, h: shuffleSize.h, name: "Shuffle" })
 
-	    var textX = floor(sideBoxWidth - menuPadding)
-	    var textY = floor(screenHeight - sideBoxHeight + menuPadding + i * menuItemHeight)
+    var infoX = rightEdge
+    var infoY = shuffleY + shuffleSize.h + badgeGap
+    drawMenuBadge(infoX, infoY, badgeScale, "INFO", "I", true, colMain, colPanel)
+    array_push(menuHitRects, { x: infoX, y: infoY, w: infoSize.w, h: infoSize.h, name: "Info" })
 
-	    var mScale = drawUiText(textX, textY, menuItems[i], menuItemHeight * 0.62)
-	    array_push(menuHitRects, { x: 0, y: textY, w: sideBoxWidth, h: menuItemHeight, index: i })
-
-	    if (isMenuItemSelected) {
-	        var textW = string_width(menuItems[i]) * mScale
-	        draw_sprite_ext(sPointer, 0, floor(textX - textW - 12 * s), floor(textY + menuItemHeight / 2), s, s, 0, c_white, 1)
-	    }
-	}
+    var runX = leftEdge - runSize.w
+    var runY = headY + (shuffleSize.h + badgeGap) * 0.5
+    drawMenuBadge(runX, runY, badgeScale, "RUN", "R", false, colMain, colPanel)
+    array_push(menuHitRects, { x: runX, y: runY, w: runSize.w, h: runSize.h, name: "Run" })
 }
-draw_set_halign(fa_left)
-
-// Правый бокс
-draw_sprite_stretched(sprCardDesk, 0, floor(cardDeskStartX + cardDeskWidth), floor(screenHeight - sideBoxHeight), sideBoxWidth, sideBoxHeight)
-
-// Инфо о карте в ПРАВОМ боксе
-if (focusArea == FocusArea.Deck && selectedCharacter != noone && battleState != BattleStates.EnemysTurn) {
-	var cardsInHand = selectedCharacter.getCardsInHand()
-	if (selectedCard < array_length(cardsInHand)) {
-		var card = cardsInHand[selectedCard]
-		draw_set_halign(fa_left)
-		draw_set_color(c_white)
-
-		var infoX = floor(cardDeskStartX + cardDeskWidth + menuPadding)
-		var infoY = floor(screenHeight - sideBoxHeight + menuPadding)
-		var infoLineH = 12 * s
-		var infoTextH = infoLineH * 0.9
-
-		// Название и Тип
-		drawUiText(infoX, infoY, prettifyCardName(card.name), infoTextH)
-		drawUiText(infoX, infoY + infoLineH, "Type: " + (card.actionType == StarriorStates.Attack ? "Attack" : "Cast"), infoTextH)
-
-		var currentY = infoY + infoLineH * 2
-
-		// Damage/Heal Range
-		var rangeStr = ""
-		for (var i = 0; i < array_length(card.effects); i++) {
-			var effect = card.effects[i]
-			if (effect.type == EffectTypes.Damage || effect.type == EffectTypes.Heal) {
-				var minNum = 1
-				var maxNum = 0
-				var isAll = (card.target == TargetTypes.AllEnemies || card.target == TargetTypes.AllAllies)
-
-				switch (card.rarity) {
-					case CardsRarity.Default: maxNum = isAll ? 2 : 4; break;
-					case CardsRarity.Unusual: maxNum = isAll ? 4 : 6; break;
-					case CardsRarity.Rare: maxNum = isAll ? 6 : 8; break;
-					case CardsRarity.Epic: maxNum = isAll ? 8 : 12; break;
-				}
-
-				var label = (effect.type == EffectTypes.Damage) ? "Damage: " : "Heal: "
-				rangeStr = label + string(minNum) + "-" + string(maxNum)
-				drawUiText(infoX, currentY, rangeStr, infoTextH)
-				currentY += infoLineH
-				break
-			}
-		}
-
-		// Effects
-		var effectStr = ""
-		for (var i = 0; i < array_length(card.effects); i++) {
-			var effect = card.effects[i]
-			if (effect.type != EffectTypes.Damage && effect.type != EffectTypes.Heal) {
-				effectStr += effectTypeToString(effect.type) + " "
-			}
-		}
-		if (effectStr != "") {
-			drawUiText(infoX, currentY, "Effects: " + effectStr, infoTextH)
-			currentY += infoLineH
-		}
-
-		// Cost
-		var costLabel = (card.costType() == CostType.Mana) ? "MP: " : "HP: "
-		drawUiText(infoX, currentY, "Cost: " + string(card.costValue()) + " " + costLabel, infoTextH)
-	}
-}
-
-// Центральный стол
-draw_sprite_stretched(sprCardDesk, 0, cardDeskStartX, cardDeskStartY, cardDeskWidth, cardDeskHeight)
 
 // Рисуем карты
-var selectedBorderWidth = max(1, 1 * s)
+var selectedBorderWidth = max(1, 1 * scaleToGui)
 
 if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn) {
     draw_set_color(c_white)
@@ -140,36 +70,36 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
         var hand = selectedCharacter.getCardsInHand()
         var n = min(array_length(hand), maxCardsOnDeskNumber)
 
-        var vPad = 8 * s
+        var vPad = 8 * scaleToGui
         var drawCardH = cardDeskHeight - vPad * 2
         var drawCardW = drawCardH * 2 / 3
 
         var handCenterX = cardDeskStartX + cardDeskWidth / 2
-        var handCenterY = cardDeskStartY + cardDeskHeight / 2
+        var handCenterY = cardDeskStartY + cardDeskHeight / 2 + cardDeskHeight * 0.08
         var spread = min(drawCardW * 0.8, (cardDeskWidth - drawCardW) / max(1, n))
         var mid = (n - 1) / 2
 
-        var arcLift = 2 * s
+        var arcLift = 2 * scaleToGui
         var arcTilt = 5 // поворот
 
-        // two passes: non-selected first, selected last so it draws on top
+        // Рисуем карты в две фазы, невыбранные, затем выбранная, чтобы поверх рисовать выбранную
         for (var pass = 0; pass < 2; pass++) {
             for (var i = 0; i < n; i++) {
                 var isSelected = (selectedCard == i)
-                if ((pass == 0) == isSelected) continue // pass 0 = others, pass 1 = selected
+                if ((pass == 0) == isSelected) continue 
 
                 var card = hand[i]
                 if (animatingCard != noone && card == animatingCard) continue // летит — не рисуем в руке
                 var off  = i - mid
 
-                // compute transform, THEN apply selected overrides, THEN derive scale
+                // сначала расчет оффсетов и поворотов, потом по выделению оффсет, потом скейлим к ui 
                 var cx = handCenterX + off * spread
                 var cy = handCenterY - abs(off) * arcLift
                 var angle = -off * arcTilt
                 var scale = 1
 
                 if (isSelected) { 
-                    cy -= 6 * s
+                    cy -= 6 * scaleToGui
                     scale = 1.12 
                     angle = 0
                 }
@@ -196,14 +126,33 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                     var bw = drawCardW * scale
                     var bh = drawCardH * scale
                     drawBorderAroundCard(cx - bw / 2, cy - bh / 2, selectedBorderWidth, bw, bh)
-                    draw_sprite_ext(sPointer, 0, cx - bw / 2, cy, s, s, 0, c_white, 1)
+                    draw_sprite_ext(sPointer, 0, cx - bw / 2, cy, scaleToGui, scaleToGui, 0, c_white, 1)
                 }
             }
         }
     }
 }
 
-// Enemy Info Popup
+if (selectedCharacter != noone) {
+    var deckCount = array_length(selectedCharacter.getShuffeledDeck())
+    if (deckCount > 0) {
+        var deckH = cardDeskHeight * 0.7
+        var deckScale = deckH / sprite_get_height(CardBack)
+        var deckW = sprite_get_width(CardBack) * deckScale
+        var deckMargin = 8 * scaleToGui
+        var deckStep = 2 * scaleToGui
+        var deckX = screenWidth - deckMargin - deckW
+        var deckBottomY = screenHeight - deckMargin
+
+        for (var i = 0; i < deckCount; i++) {
+            var dx = deckX - i * deckStep
+            var dy = deckBottomY - deckH - i * deckStep
+            draw_sprite_stretched(CardBack, 0, dx, dy, deckW, deckH)
+        }
+    }
+}
+
+// Информация о врагу
 if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     var popupWidth = screenWidth * 0.6
     var popupHeight = screenHeight * 0.5
@@ -212,8 +161,8 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
 
     draw_sprite_stretched(sprCardDeskFull, 0, popupX, popupY, popupWidth, popupHeight)
 
-    var margin = 16 * s
-    var spriteBoxSize = 64 * s
+    var margin = 16 * scaleToGui
+    var spriteBoxSize = 64 * scaleToGui
     var spriteBoxX = popupX + margin
     var spriteBoxY = popupY + margin
 
@@ -232,7 +181,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
 
     var statsX = spriteBoxX + spriteBoxSize + margin
     var statsY = spriteBoxY
-    var lineH = 14 * s
+    var lineH = 14 * scaleToGui
     var popupTextH = lineH * 0.72
     draw_set_color(c_white)
     draw_set_halign(fa_left)
@@ -257,7 +206,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     infoCloseRect = { x: btnX, y: btnY, w: btnWidth, h: btnHeight }
 
     // Pointer on Close Button
-    draw_sprite_ext(sPointer, 0, btnX - 12 * s, btnY + btnHeight / 2, s, s, 0, c_white, 1)
+    draw_sprite_ext(sPointer, 0, btnX - 12 * s, btnY + btnHeight / 2, scaleToGui, scaleToGui, 0, c_white, 1)
 }
 
 if (battleState == BattleStates.Victory) drawVictoryScreen()

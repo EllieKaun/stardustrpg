@@ -10,7 +10,7 @@ function createPhysicalDamageSingleTargetCard() {
         1,
         [ DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType)) ],
         atcCard,
-        bleedSingleTarget,
+        atcSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -28,7 +28,7 @@ function createPhysicalDamageMultipleTargetCard() {
         1,
         [ DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType)) ],
         atcCard,
-        bleedSingleTarget,
+        atcGroup,
         commonBorder,
         hpCostToken
     )
@@ -87,7 +87,7 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
         StarriorStates.Attack,
         1,
         [
-            DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType), slice),
             Bleeding(getDamageFuncOnRariryAndTarget(rarity, targetType), 1, 1.0)
         ],
         atcCard,
@@ -108,7 +108,7 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
         StarriorStates.Attack,
         1,
         [
-            DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType), slice),
             Bleeding(getDamageFuncOnRariryAndTarget(rarity, targetType), 1, 1.0)
         ],
         atcCard,
@@ -129,7 +129,7 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
         StarriorStates.Attack,
         1,
         [
-            DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType), bombEffect),
             BombEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType), 1.0)
         ],
         atcCard,
@@ -150,7 +150,7 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
         StarriorStates.Attack,
         1,
         [
-            DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType)),
+            DamageEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType), bombEffect),
             BombEffect(DamageTypes.Physical, getDamageFuncOnRariryAndTarget(rarity, targetType), 1.0)
         ],
         atcCard,
@@ -175,7 +175,7 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
             WeakeningEffect(1, 1.0, Timing.Overtime)
         ],
         atcCard,
-        bombSingleTarget,
+        exhSingleTarget,
         commonBorder,
         hpCostToken
     )
@@ -196,7 +196,7 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
             WeakeningEffect(1, 1.0, Timing.EndOfTurn)
         ],
         atcCard,
-        bombGroup,
+        exhGroup,
         commonBorder,
         hpCostToken
     )

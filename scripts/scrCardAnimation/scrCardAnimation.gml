@@ -8,7 +8,7 @@
 //  Пример кастомизации:
 //    var c = defaultCardAnimConfig()
 //    c.path = pathLine // лететь по прямой
-//    c.fade = fadeShrink // не гаснуть, а ужиматься
+//    c.fade = fadeShrink 
 //    c.dur  = 60 // помедленнее
 //    playCardAnimated(card, caster, targets, c)
 //
@@ -62,13 +62,25 @@ function defaultCardAnimConfig() {
         toY: undefined,
         toAngle: 0,
         scaleFrom: 1.12,
-        scaleTo:1.12, 
+        scaleTo:1.12,
         path: pathArc,
         arcHeight: 120,
         ease: easeOutQuad,
         fade: fadeTail,
+        playOverlay: true,
         particles: defaultCardParticleConfig()   // звёзды; цвет ставится по категории в playCardAnimated
     }
+}
+
+function drawCardAnimConfig() {
+    var c = defaultCardAnimConfig()
+    c.dur = 26
+    c.arcHeight = 90
+    c.scaleFrom = 1
+    c.scaleTo = 1
+    c.fade = fadeNone
+    c.playOverlay = false
+    return c
 }
 
 function defaultCardParticleConfig() {
@@ -107,11 +119,6 @@ function damageCardParticleConfig() {
     }
 }
 
-
-
-
-
-
 // ------------------------------------------------------------
 //  Анимация одной карты
 // ------------------------------------------------------------
@@ -141,8 +148,15 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
     self.scale = cfg.scaleFrom
     self.alpha = 1
 
+    self.playSpr = CardPlayAnimation
+    self.playing = false
+    self.playDone = false
+    self.playFrame = 0
+    self.cardHidden = false
+    self.hideFrame = 11
+
     static update = function() {
-        // множитель дизайн→окно: масштабирует абсолютные размеры/скорости частиц
+        // множитель для ui: масштабирует абсолютные размеры/скорости частиц
         var uiS = display_get_gui_width() / guiBaseWidth()
         if (!done) {
             var px = x, py = y // позиция до шага (для следа)
@@ -169,7 +183,8 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
                         maxlife: 1,
                         size: random_range(pcfg.sizeMin, pcfg.sizeMax) * uiS,
                         rot: random(360),
-                        rotSpeed: random_range(-pcfg.rotSpeed, pcfg.rotSpeed)
+                        rotSpeed: random_range(-pcfg.rotSpeed, pcfg.rotSpeed),
+                        spr: choose(StarParticle1, StarParticle2, StarParticle3)
                     };
                     s.maxlife = s.life
                     array_push(particles, s)
@@ -178,10 +193,26 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
 
             if (t >= dur) {
                 done = true
-                if (onDone != undefined && !effectFired) { 
+                if (onDone != undefined && !effectFired) {
                     effectFired = true
-                    onDone() 
+                    onDone()
                 }
+                if (cfg.playOverlay && sprite_exists(playSpr)) playing = true
+                else playDone = true
+            }
+        }
+
+        if (playing && !playDone) {
+            var spd = sprite_get_speed(playSpr)
+            if (sprite_get_speed_type(playSpr) == spritespeed_framespersecond) {
+                spd /= game_get_speed(gamespeed_fps)
+            }
+            playFrame += spd
+            if (playFrame >= hideFrame) cardHidden = true
+            var lastFrame = sprite_get_number(playSpr) - 1
+            if (playFrame >= lastFrame) { 
+                playFrame = lastFrame
+                playDone = true 
             }
         }
 
@@ -196,23 +227,33 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
     }
 
     static finished = function() {
-        return done && array_length(particles) == 0
+        return done && playDone && array_length(particles) == 0
     }
 
     static draw = function() {
-        // частицы — под картой
+        // частицы — под картой, заливаем цветом категории через туман
+        gpu_set_fog(true, pcfg.color, 0, 0)
         for (var i = 0; i < array_length(particles); i++) {
             var s = particles[i];
             var k = s.life / s.maxlife;
-            pcfg.draw(s.x, s.y, s.size * k, s.rot, k, pcfg.color)
+            var pscale = (s.size * k * 2) / sprite_get_width(s.spr)
+            draw_sprite_ext(s.spr, 0, s.x, s.y, pscale, pscale, s.rot, c_white, k)
         }
+        gpu_set_fog(false, pcfg.color, 0, 0)
         // сама карта
-        var sx = (cardW / sprite_get_width(card.cardBaseSpr))  * scale
-        var sy = (cardH / sprite_get_height(card.cardBaseSpr)) * scale
-        draw_sprite_ext(card.cardBaseSpr, 0, x, y, sx, sy, angle, c_white, alpha)
-        draw_sprite_ext(card.cardIllustrationSpr, 0, x, y, sx, sy, angle, c_white, alpha)
-        draw_sprite_ext(card.cardBorderSpr, 0, x, y, sx, sy, angle, c_white, alpha)
-        draw_sprite_ext(card.cardTokenSpr, 0, x, y, sx, sy, angle, c_white, alpha)
+        if (!cardHidden) {
+            var sx = (cardW / sprite_get_width(card.cardBaseSpr))  * scale
+            var sy = (cardH / sprite_get_height(card.cardBaseSpr)) * scale
+            draw_sprite_ext(card.cardBaseSpr, 0, x, y, sx, sy, angle, c_white, 1)
+            draw_sprite_ext(card.cardIllustrationSpr, 0, x, y, sx, sy, angle, c_white, 1)
+            draw_sprite_ext(card.cardBorderSpr, 0, x, y, sx, sy, angle, c_white, 1)
+            draw_sprite_ext(card.cardTokenSpr, 0, x, y, sx, sy, angle, c_white, 1)
+        }
+
+        if (playing) {
+            var aScale = (cardH * scale) / (sprite_get_bbox_bottom(playSpr) - sprite_get_bbox_top(playSpr))
+            draw_sprite_ext(playSpr, floor(playFrame), x, y, aScale, aScale, angle, c_white, 1)
+        }
     }
 }
 
@@ -281,11 +322,11 @@ function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
 
 
 // ------------------------------------------------------------
-//  Геометрия стола карт — та же математика, что в Draw_64, но доступная
+//  Геометрия стола карт — та же математика, что в Draw GUI, но доступная
 //  из Step/скриптов
 // ------------------------------------------------------------
 function cardDeskGeometry() {
-    // координаты GUI/окна — та же геометрия, что в Battle Draw GUI (без матрицы)
+    // координаты GUI/окна — та же геометрия, что в Battle Draw GUI
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
     var s = screenWidth / guiBaseWidth()
@@ -306,7 +347,7 @@ function cardDeskGeometry() {
         deskW: deskW, deskH: deskH,
         drawCardW: drawCardW, drawCardH: drawCardH,
         handCenterX: startX + deskW / 2,
-        handCenterY: startY + deskH / 2
+        handCenterY: startY + deskH / 2 + deskH * 0.08
     }
 }
 
@@ -352,6 +393,85 @@ function playCardAnimated(card, caster, targets, cfg) {
         function() {
             playCard(animPendingCard, animPendingCaster, animPendingTargets)
         }, 
+        cfg
+    )
+    array_push(activeCardAnims, anim)
+}
+
+function handSlotTransform(i, n) {
+    var g = cardDeskGeometry()
+    var s = display_get_gui_width() / guiBaseWidth()
+    var spread = min(g.drawCardW * 0.8, (g.deskW - g.drawCardW) / max(1, n))
+    var mid = (n - 1) / 2
+    var off = i - mid
+    var arcLift = 2 * s
+    var arcTilt = 5
+    return {
+        x: g.handCenterX + off * spread,
+        y: g.handCenterY - abs(off) * arcLift,
+        angle: -off * arcTilt,
+        w: g.drawCardW,
+        h: g.drawCardH
+    }
+}
+
+function deckPileTopCenter(deckCount) {
+    var screenWidth = display_get_gui_width()
+    var screenHeight = display_get_gui_height()
+    var s = screenWidth / guiBaseWidth()
+    var cardDeskHeight = screenHeight / 3
+    var deckH = cardDeskHeight * 0.7
+    var deckScale = deckH / sprite_get_height(CardBack)
+    var deckW = sprite_get_width(CardBack) * deckScale
+    var deckMargin = 8 * s
+    var deckStep = 2 * s
+    var deckX = screenWidth - deckMargin - deckW
+    var deckBottomY = screenHeight - deckMargin
+    var i = max(0, deckCount - 1)
+    var dx = deckX - i * deckStep
+    var dy = deckBottomY - deckH - i * deckStep
+    return { x: dx + deckW * 0.5, y: dy + deckH * 0.5 }
+}
+
+// Можно ли добрать карту в начале хода (герой, не в стане, есть колода, рука не полна)
+function canDrawCardForTurn(character) {
+    if (character.isEnemy || character.isPuppet) return false
+    if (checkIfHasEffectType(character, EffectTypes.Stun)) return false
+    if (array_length(character.getShuffeledDeck()) == 0) return false
+    if (array_length(character.getCardsInHand()) >= maxCardsOnDeskNumber) return false
+    return true
+}
+
+// Добор карты из колоды: летит из стопки в руку, добавляется на месте
+function beginDrawCardAnim(character) {
+    var pile = character.getShuffeledDeck()
+    var hand = character.getCardsInHand()
+    var pileCountBefore = array_length(pile)
+    var card = array_shift(pile)
+    drawPendingCard = card
+
+    var newHandSize = array_length(hand) + 1
+    var slot = handSlotTransform(newHandSize - 1, newHandSize)
+    var src = deckPileTopCenter(pileCountBefore)
+
+    var cfg = drawCardAnimConfig()
+    cfg.toX = slot.x
+    cfg.toY = slot.y
+    cfg.toAngle = slot.angle
+    cfg.particles.color = categoryColor(cardCategoryOf(card))
+    cfg.particles.draw = drawStarSparkle
+
+    battleState = BattleStates.CardAnimating
+    animatingCard = card
+
+    var anim = new CardPlayAnim(
+        card,
+        src.x, src.y, 0,
+        slot.w, slot.h,
+        function() {
+            array_push(selectedCharacter.getCardsInHand(), drawPendingCard)
+            beginTurnFor(selectedCharacter)
+        },
         cfg
     )
     array_push(activeCardAnims, anim)

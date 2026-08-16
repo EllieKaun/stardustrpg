@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrEffectSystem",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/BattleDomain/Scripts.yy",
+    "name":"Cards",
+    "path":"folders/BattleDomain/Scripts/Cards.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

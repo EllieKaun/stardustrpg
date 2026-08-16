@@ -1,9 +1,11 @@
 function createLana(){
     var starrior = createStarrior("Lana",    
             sprLanaBattleIdle, 
+            sprLanaBattleAttack, 
             sprLanaBattleSpell,
             sprLanaBatlleCast,
             sprLanaBattleKO,
+            sprLanaBattleDance,
             30, 
             60, 
             70,
@@ -14,21 +16,24 @@ function createLana(){
             4,
             3,
             1,
-            playerDeckFor(Characters.Lana) 
+            playerDeckFor(Characters.Lana)
     )
+    starrior.themeColor = make_color_rgb(214, 36, 140)
     return starrior
 }
 
 
 function createViv(){
-    return createStarrior(
-        "Viv", 
+    var starrior = createStarrior(
+        "Viv",
         sprVivBatlleIdle,
         sprVivBattleAttack,
-        sprVivBattleAttack,
+        sprVivBattleSpell,
+        sprVivBattleCast,
         sprVivBattleKO,
-        30, 
-        76, 
+        noone,
+        30,
+        76,
         50,
         50,
         1,
@@ -37,6 +42,8 @@ function createViv(){
         2,
         1,
         3,
-        playerDeckFor(Characters.Viv) 
+        playerDeckFor(Characters.Viv)
     )
+    starrior.themeColor = make_color_rgb(60, 140, 220)
+    return starrior
 }

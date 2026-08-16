@@ -21,9 +21,10 @@ tutorialMaxDist = 140 // в пределах экрана (полу-ширина
 // Попытка заспавнить врага в кольце [minDist, maxDist] от игрока.
 // Возвращает true при успешном спавне.
 trySpawnEnemy = function(minDist, maxDist) {
-    if (!instance_exists(oLana)) return false // Сейчас спавн идет от ланы, надо сделать универсально
-    var px = oLana.x
-    var py = oLana.y
+    var leader = oGameController.selected_character
+    if (!instance_exists(leader)) return false
+    var px = leader.x
+    var py = leader.y
 
     var spawners = ds_list_create() // спавнеры на карте
     with (oSpawner) {
@@ -87,6 +88,7 @@ trySpawnEnemy = function(minDist, maxDist) {
         }
         var enemy = instance_create_layer(sx, sy, "Instances", chosenType) // создаем мини врага
         enemy.spawnSection = sectionAt(sx, sy) // определение секции
+        enemy.spawnedDynamically = true // заспавненный (не из редактора) -> удаляется после боя
         ds_list_add(enemyList, enemy)
         if (spawnDebug) show_debug_message("CREATING ENEMY SUCCESS")
         spawned = true

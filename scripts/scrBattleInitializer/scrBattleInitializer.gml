@@ -21,8 +21,10 @@ function createStarrior(
     name, 
     spriteIdle, 
     spriteAttack, 
+    spriteSpell,
     spriteCast,
     spriteKO,
+    spriteDance,
     hp, 
     maxHp, 
     mana,
@@ -51,6 +53,8 @@ function createStarrior(
     starrior.spriteActionAttack = spriteAttack
     starrior.spriteActionIdle = spriteIdle
     starrior.spriteActionCast = spriteCast
+    starrior.spriteActionSpell = spriteSpell
+    starrior.spriteActionDance = spriteDance
     starrior.spriteActionKO = spriteKO
     starrior.sprite_index = spriteIdle
     starrior.strength = strength 
@@ -58,8 +62,8 @@ function createStarrior(
     starrior.aura = aura 
     starrior.guts = guts 
     starrior.mask_index = spriteIdle
-    starrior.isPuppet = false;
-    starrior.isEnemy  = false; 
+    starrior.isPuppet = false
+    starrior.isEnemy  = false
     return starrior
 }
 
@@ -83,19 +87,20 @@ function initStarriorsPositions(
     spacingBetweenStarriors,
 ) {
     var verticalSpacing = (starriorsZoneHeight - 16 * 2) / 2
+    var extraSpread = 8 
     var startY = starriorsZoneHeight
-    var step   = spacingBetweenStarriors + 16          // шаг между бойцами (как раньше)
+    var step = spacingBetweenStarriors + 16  // шаг между бойцами
 
-    var halfW          = screenWidth / 2
-    var heroesCenterX  = halfW * 0.5                    // центр ЛЕВОЙ половины
-    var enemiesCenterX = halfW + halfW * 0.5           // центр ПРАВОЙ половины
+    var halfW = screenWidth / 2
+    var heroesCenterX  = halfW * 0.5 // центр левой половины
+    var enemiesCenterX = halfW + halfW * 0.5 // центр правой половины
 
     // Герои — по центру левой половины
     var heroCount  = array_length(heroes)
-    var heroStartX = heroesCenterX - (heroCount - 1) * step / 2   // центрируем группу
+    var heroStartX = heroesCenterX - (heroCount - 1) * step / 2  // центрируем группу
     for (var i = 0; i < heroCount; i++) {
         heroes[i].x = heroStartX + i * step
-        heroes[i].y = startY + (i mod 2 == 0 ? verticalSpacing : starriorsZoneHeight - verticalSpacing)
+        heroes[i].y = startY + (i mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
     }
 
     // Враги — по центру правой половины
@@ -103,6 +108,6 @@ function initStarriorsPositions(
     var enemyStartX = enemiesCenterX - (enemyCount - 1) * step / 2
     for (var i = 0; i < enemyCount; i++) {
         enemies[i].x = enemyStartX + i * step
-        enemies[i].y = startY + (i mod 2 == 0 ? verticalSpacing : starriorsZoneHeight - verticalSpacing)
+        enemies[i].y = startY + (i mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
     }
 }

@@ -1,38 +1,16 @@
-if (global.gamePaused) exit // на паузе деревья/предметы заморожены
+if (global.gamePaused) exit 
 
-var p = instance_nearest(x, y, oLana);
+depth = -bbox_bottom 
 
-var tree_base_depth = -bbox_bottom;
+var p = instance_nearest(x, y, oHero)
 
 if (p != noone) {
+    var trunk_top = bbox_bottom - trunk_height
 
-    // Player feet
-    var px = p.x;
-    var py = p.bbox_top;
+    // Игрок позади
+    var player_behind = point_in_rectangle(p.x, p.bbox_bottom, bbox_left, bbox_top, bbox_right, trunk_top)
 
-    // Trunk zone
-    var trunk_base = bbox_bottom;
-    var trunk_top  = trunk_base - trunk_height;
-
-    var trunk_left  = x - trunk_width * 0.5;
-    var trunk_right = x + trunk_width * 0.5;
-
-    // Player is BEHIND tree (fully above trunk)
-    var player_behind =
-        (py < trunk_top) &&
-        (px > trunk_left) &&
-        (px < trunk_right);
-
-    if (player_behind) {
-        // Tree in front of player
-        depth = p.depth - 1;
-        image_alpha = lerp(image_alpha, fade_alpha, fade_speed);
-    } else {
-        // Player in front of tree
-        depth = p.depth + 1;
-        image_alpha = lerp(image_alpha, 1, fade_speed);
-    }
-
+    image_alpha = lerp(image_alpha, player_behind ? fade_alpha : 1, fade_speed)
 } else {
-    depth = tree_base_depth;
+    image_alpha = lerp(image_alpha, 1, fade_speed)
 }

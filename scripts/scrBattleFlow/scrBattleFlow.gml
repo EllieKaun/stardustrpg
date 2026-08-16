@@ -8,7 +8,7 @@ function afterPlayChecks() {
     removeDeadPuppets()
     if (!instance_exists(selectedCharacter)) {
         selectNextCharacter()
-        beginTurnFor(selectedCharacter)
+        startTurnFor(selectedCharacter)
         selectedTarget = noone
         return;
     }
@@ -28,12 +28,21 @@ function afterPlayChecks() {
         // если сыграл карту, а энергия еще осталась, играем еще
         show_debug_message("selectedCharacter.energy > 0 " + selectedCharacter.name)
         beginTurnFor(selectedCharacter)
-    } else { 
+    } else {
         // иначе ходит следубщий по порядку
         selectNextCharacter()
-        beginTurnFor(selectedCharacter)
+        startTurnFor(selectedCharacter)
     }
     selectedTarget = noone
+}
+
+function startTurnFor(character) {
+    if (canDrawCardForTurn(character)) {
+        battleState = BattleStates.CardAnimating
+        alarm_set(HERO_DRAW_DELAY, game_get_speed(gamespeed_fps))
+    } else {
+        beginTurnFor(character)
+    }
 }
 
 function beginTurnFor(character) {
@@ -155,6 +164,25 @@ function restoreSelection() {
             playOrder[i].isActive = true
             return
         }
+    }
+}
+
+function doMenuAction(name) {
+    switch (name) {
+        case "Shuffle":
+            shuffleDeckAndTake4(selectedCharacter)
+            skipTurn()
+        break
+        case "Run":
+            with (oTransition) {
+                target_room = global.returnRoom
+                state = "fade_out"
+            }
+        break
+        case "Info":
+            battleState = BattleStates.EnemyInfoSelection
+            initTargetSelection(enemies)
+        break
     }
 }
 

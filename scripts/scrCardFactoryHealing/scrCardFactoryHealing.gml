@@ -210,7 +210,7 @@ function createResurrectionCard() {
         1,
         [ ResurrectionEffect(hphealEffect) ],
         healCard,
-        bleedRemove,
+        resurection,
         commonBorder,
         mpCostToken
     )
