@@ -2,25 +2,25 @@
 //  СИСТЕМА ЭФФЕКТОВ (data-driven)
 //
 //  Поведение каждого эффекта живёт в реестре global.effectRegistry:
-//  ключ ("kind") -> структура с хуками жизненного цикла.
+//  ключ ("kind") -> структура с хуками жизненного цикла
 //
 //  Движок НЕ делает switch по типу эффекта. Он находит обработчик и
 //  вызывает нужный хук в зависимости от тайминга:
-//    onInstant(effect, caster, targets)  — Timing.Instant
-//    onPlay(effect, caster, targets)     — Timing.OnActions (мгновенно)
-//    onEndOfTurn(effect, character)      — Timing.EndOfTurn (тик в конце хода)
-//    onApply(effect, caster, target)     — в момент наложения статуса
-//    iconFor(effect) / icon              — иконка статуса
+//    onInstant(effect, caster, targets) — Timing.Instant
+//    onPlay(effect, caster, targets) — Timing.OnActions (мгновенно)
+//    onEndOfTurn(effect, character) — Timing.EndOfTurn (тик в конце хода)
+//    onApply(effect, caster, target) — в момент наложения статуса
+//    iconFor(effect) / icon — иконка статуса
 //
 //  Пассивные модификаторы (Buff/Debuff/Stun/Weakening/IgnoreWeakness/
 //  CreateTemporaryWeakness) не имеют активного хука — они просто лежат
 //  на цели как данные, а боевые расчёты их опрашивают (checkIfHasBuff,
-//  mitigateDamage, beginTurnFor и т.д.).
+//  mitigateDamage, beginTurnFor и т.д.)
 //
 //  Добавить новый эффект = добавить ОДНУ запись в initEffectRegistry().
-//  Никаких правок в executeEffect / executeEndOfTurn / statusIconFor.
+//  Никаких правок в executeEffect / executeEndOfTurn / statusIconFor
 //
-//  initEffectRegistry() вызывается один раз в Battle → Create.
+//  initEffectRegistry() вызывается один раз в Battle - Create.
 // ============================================================
 
 function initEffectRegistry() {
@@ -63,8 +63,8 @@ function initEffectRegistry() {
     variable_struct_set(R, "Resurrection", {
         onInstant: function(effect, caster, targets) {
             if (targets.isPuppet) return
-            if (!targets.isKO()) return                              // воскрешают только павшего
-            targets.hp = floor(targets.maxHp / 2)                    // поднять на половину HP (не хил, а установка)
+            if (!targets.isKO()) return // воскрешают только павшего
+            targets.hp = floor(targets.maxHp / 2) // поднять на половину HP
             targets.changeActionState(StarriorStates.Idle, undefined) // снять нокаут
             targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
         },
@@ -110,21 +110,19 @@ function initEffectRegistry() {
     })
 
     // --- Пассивные модификаторы: только иконка (поведение читают расчёты). ---
-    variable_struct_set(R, "Buff",   { iconFor: function(e) { return buffIcon(e, true) } })
+    variable_struct_set(R, "Buff", { iconFor: function(e) { return buffIcon(e, true) } })
     variable_struct_set(R, "Debuff", { iconFor: function(e) { return buffIcon(e, false) } })
-    variable_struct_set(R, "Stun",                    { icon: noone })
-    variable_struct_set(R, "Weakening",               { icon: noone })
-    variable_struct_set(R, "IgnoreWeakness",          { icon: noone })
+    variable_struct_set(R, "Stun", { icon: noone })
+    variable_struct_set(R, "Weakening", { icon: noone })
+    variable_struct_set(R, "IgnoreWeakness", { icon: noone })
     variable_struct_set(R, "CreateTemporaryWeakness", { icon: noone })
 
     global.effectRegistry = R
 }
 
-// ------------------------------------------------------------
-//  Поиск обработчика
-// ------------------------------------------------------------
+//// ----- Поиск обработчика -----
 
-// Ключ реестра для эффекта: явный effect.kind или производный от type.
+// Ключ реестра для эффекта
 function effectKind(effect) {
     if (variable_instance_exists(effect, "kind")) return effect.kind
     if (!variable_instance_exists(effect, "type")) return undefined
@@ -132,25 +130,25 @@ function effectKind(effect) {
 }
 
 // EffectTypes -> строковый ключ реестра (без пробелов, в отличие от
-// effectTypeToString, который для UI).
+// effectTypeToString, который для UI)
 function effectKindFromType(type) {
     switch (type) {
-        case EffectTypes.Damage:                  return "Damage"
-        case EffectTypes.Heal:                    return "Heal"
-        case EffectTypes.Stun:                    return "Stun"
-        case EffectTypes.Buff:                    return "Buff"
-        case EffectTypes.RemoveEffect:            return "RemoveEffect"
-        case EffectTypes.ManaGain:                return "ManaGain"
-        case EffectTypes.Weakening:               return "Weakening"
-        case EffectTypes.Debuff:                  return "Debuff"
-        case EffectTypes.CopyCard:                return "CopyCard"
-        case EffectTypes.AddEnergy:               return "AddEnergy"
-        case EffectTypes.ShuffleDeck:             return "ShuffleDeck"
-        case EffectTypes.Resurrection:            return "Resurrection"
-        case EffectTypes.IgnoreWeakness:          return "IgnoreWeakness"
+        case EffectTypes.Damage: return "Damage"
+        case EffectTypes.Heal: return "Heal"
+        case EffectTypes.Stun: return "Stun"
+        case EffectTypes.Buff: return "Buff"
+        case EffectTypes.RemoveEffect: return "RemoveEffect"
+        case EffectTypes.ManaGain: return "ManaGain"
+        case EffectTypes.Weakening: return "Weakening"
+        case EffectTypes.Debuff: return "Debuff"
+        case EffectTypes.CopyCard: return "CopyCard"
+        case EffectTypes.AddEnergy: return "AddEnergy"
+        case EffectTypes.ShuffleDeck: return "ShuffleDeck"
+        case EffectTypes.Resurrection: return "Resurrection"
+        case EffectTypes.IgnoreWeakness: return "IgnoreWeakness"
         case EffectTypes.CreateTemporaryWeakness: return "CreateTemporaryWeakness"
-        case EffectTypes.CreatePuppet:            return "CreatePuppet"
-        default:                                  return undefined
+        case EffectTypes.CreatePuppet: return "CreatePuppet"
+        default: return undefined
     }
 }
 
@@ -165,9 +163,7 @@ function effectHasHook(handler, hookName) {
     return handler != undefined && variable_struct_exists(handler, hookName)
 }
 
-// ------------------------------------------------------------
-//  Обобщённый запуск хуков (вызывается из тех же мест, что старые switch).
-// ------------------------------------------------------------
+//// ----- Обобщённый запуск хуков (вызывается из тех же мест, что старые switch) -----
 
 function runInstant(effect, caster, targets) {
     var h = effectHandler(effect)
@@ -185,19 +181,16 @@ function runOnApply(effect, caster, target) {
     if (effectHasHook(h, "onApply")) h.onApply(effect, caster, target)
 }
 
-// ------------------------------------------------------------
-//  Иконки статусов (заменяет statusIconFor). Приоритет — как раньше:
-//  сначала statusName, затем buffType (через iconFor обработчика).
-// ------------------------------------------------------------
+//// Иконки статусов
 
 function statusNameIcon(effect) {
     if (!variable_instance_exists(effect, "statusName")) return noone
     switch (effect.statusName) {
-        case StatusNames.Stun:     return StunIcon
-        case StatusNames.Burn:     return BurnIcon
+        case StatusNames.Stun: return StunIcon
+        case StatusNames.Burn: return BurnIcon
         case StatusNames.Bleeding: return BleedIcon
-        case StatusNames.Freeze:   return FreezeIcon
-        case StatusNames.Shock:    return ShockIcon
+        case StatusNames.Freeze: return FreezeIcon
+        case StatusNames.Shock: return ShockIcon
     }
     return noone
 }
@@ -205,8 +198,8 @@ function statusNameIcon(effect) {
 function buffIcon(effect, isBuff) {
     if (!variable_instance_exists(effect, "buffType")) return noone
     switch (effect.buffType) {
-        case ModifiersToBuff.PhysicalDamage:     return isBuff ? StrBuff104 : StrDebuff
-        case ModifiersToBuff.MagicalDamage:      return isBuff ? MagicBuff107 : MagicDebuff
+        case ModifiersToBuff.PhysicalDamage: return isBuff ? StrBuffStatus : StrDebuff
+        case ModifiersToBuff.MagicalDamage: return isBuff ? MagicBuffStatus : MagicDebuff
         case ModifiersToBuff.PhysicalProtection: return isBuff ? GutsBuff : GutsDebuff
     }
     return noone
@@ -217,34 +210,33 @@ function effectIcon(effect) {
     if (s != noone) return s
     var h = effectHandler(effect)
     if (effectHasHook(h, "iconFor")) return h.iconFor(effect)
-    if (effectHasHook(h, "icon"))    return h.icon
+    if (effectHasHook(h, "icon")) return h.icon
     return noone
 }
 
-// ------------------------------------------------------------
 //  Помощники BossClone
-// ------------------------------------------------------------
 
 function countAliveOn(team) {
     var n = 0
-    for (var i = 0; i < array_length(team); i++) if (!team[i].isKO()) n++
+    for (var i = 0; i < array_length(team); i++) 
+        if (!team[i].isKO()) n++
     return n
 }
 
 // Клон кастера: те же спрайты/статы/колода. isPuppet=true, чтобы
 // removeDeadPuppets корректно убирал клонов при гибели.
 function cloneStarrior(src) {
-    var clone = createStarrior(
-        src.name,
-        src.spriteActionIdle, src.spriteActionAttack, src.spriteActionCast, src.spriteActionKO,
-        src.maxHp, src.maxHp,  src.maxMana, src.maxMana,  src.maxEnergy, src.maxEnergy,
-        src.strength, src.intelligence, src.aura, src.guts,
-        cloneDeckFrom(src)
-    )
-    clone.isEnemy      = src.isEnemy
-    clone.isPuppet     = true
-    clone.justSummoned = true
-    return clone
+ //   var clone = createStarrior(
+ //       src.name,
+ //       src.spriteActionIdle, src.spriteActionAttack, src.spriteActionCast, src.spriteActionKO,
+  //      src.maxHp, src.maxHp,  src.maxMana, src.maxMana,  src.maxEnergy, src.maxEnergy,
+  //      src.strength, src.intelligence, src.aura, src.guts,
+  //      cloneDeckFrom(src)
+  //  )
+  //  clone.isEnemy = src.isEnemy
+  //  clone.isPuppet = true
+  //  clone.justSummoned = true
+  //  return clone
 }
 
 function cloneDeckFrom(src) {
@@ -254,101 +246,106 @@ function cloneDeckFrom(src) {
     return deck
 }
 
-// ------------------------------------------------------------
-//  Конструкторы эффектов (сахар; фабрики могут переходить постепенно).
-// ------------------------------------------------------------
+////  Конструкторы эффектов
 
 // --- Урон ---
-// Мгновенная атака. value — число или функция (бросок кубика).
-function DamageEffect(damageType, value) {
+// Мгновенная атака
+// value — число или функция 
+// sprite — визуал попадания на цели,sound — звук эффекта
+function DamageEffect(damageType, value, sprite = attackEffect, sound = noone) {
     return { type: EffectTypes.Damage, damageType: damageType, value: value,
-             timing: Timing.Instant, sprite: attackEffect }
+             timing: Timing.Instant, sprite: sprite, sound: sound }
 }
-// Урон по времени со статусом (Burn, Bleeding).
-function DamageOverTimeEffect(damageType, value, duration, statusName, chance) {
-    return { type: EffectTypes.Damage, damageType: damageType, value: value,
-             duration: duration, statusName: statusName, chance: chance,
-             timing: Timing.EndOfTurn }
+// Урон со временем времени со статусом (Burn, Bleeding)
+function DamageOverTimeEffect(damageType, value, duration, statusName, chance, sprite = noone, sound = noone) {
+    var e = { type: EffectTypes.Damage, damageType: damageType, value: value,
+              duration: duration, statusName: statusName, chance: chance,
+              timing: Timing.EndOfTurn, sound: sound }
+    if (sprite != noone) e.sprite = sprite
+    return e
 }
-// Статус-эффект вторым эффектом карты (Stun/Weakening). Без спрайта —
-// иконка берётся по statusName. timing задаём явно (в исходных картах он
-// различается). Без спрайта, как в оригинале.
+// Статус-эффект вторым эффектом карты (Stun/Weakening)
 function StatusEffect(effectType, statusName, duration, chance, timing) {
     return { type: effectType, statusName: statusName, duration: duration,
              chance: chance, timing: timing }
 }
+
+// Стан
 function StunEffect(duration, chance) {
     return StatusEffect(EffectTypes.Stun, StatusNames.Stun, duration, chance, Timing.Overtime)
 }
-// Шок (от молнии): пропуск хода как стан (type=Stun), но отдельный статус Shock
-// (своя иконка + снимается картой removeShock).
+
+// Шок (от молнии): пропуск хода как стан, но отдельный статус Shock
+// (своя иконка + снимается картой removeShock)
 function ShockEffect(duration, chance) {
     return StatusEffect(EffectTypes.Stun, StatusNames.Shock, duration, chance, Timing.Overtime)
 }
-// timing оставлен параметром: в исходных картах одиночная слабость Overtime,
-// групповая — EndOfTurn (сохраняем как было).
+
+// Ослабление
 function WeakeningEffect(duration, chance, timing) {
     return StatusEffect(EffectTypes.Weakening, StatusNames.Weakening, duration, chance, timing)
 }
-// Взрыв: ещё один мгновенный удар (statusName Bomb — декоративный). Без спрайта.
-function BombEffect(damageType, value, chance) {
-    return { type: EffectTypes.Damage, damageType: damageType, value: value,
-             chance: chance, statusName: StatusNames.Bomb, timing: Timing.Instant }
+
+// Взрыв: мгновенный удар (statusName Bomb)
+function BombEffect(damageType, value, chance, sprite = bombEffect, sound = noone) {
+    var e = { type: EffectTypes.Damage, damageType: damageType, value: value,
+              chance: chance, statusName: StatusNames.Bomb, timing: Timing.Instant, sound: sound }
+    if (sprite != noone) e.sprite = sprite
+    return e
 }
-// Заморозка: дебафф физ. защиты + statusName Freeze (для иконки).
-// value добавлено намеренно (в оригинале его не было -> чтение .value в
-// mitigateDamage падало). 0.3 => замороженный получает +30% физ. урона.
+// Заморозка: дебафф физ. защиты
+// value 0.3 => замороженный получает +30% физ. урона
 function FreezeEffect(duration, chance) {
     return { type: EffectTypes.Debuff, buffType: ModifiersToBuff.PhysicalProtection,
              value: 0.3, statusName: StatusNames.Freeze, duration: duration,
              chance: chance, timing: Timing.Overtime }
 }
-// Вампиризм: полноценный урон + statusName Vampirism + chance (лечит кастера
-// в executeDamageEffect).
-function VampirismEffect(damageType, value, chance) {
+// Вампиризм
+function VampirismEffect(damageType, value, chance, sprite = attackEffect, sound = SliceAtc) {
     return { type: EffectTypes.Damage, damageType: damageType, value: value,
              statusName: StatusNames.Vampirism, chance: chance,
-             timing: Timing.Instant, sprite: attackEffect }
+             timing: Timing.Instant, sprite: sprite, sound: sound }
 }
 
-function Burn(value, duration, chance) {
-    return DamageOverTimeEffect(DamageTypes.Magical, value, duration, StatusNames.Burn, chance)
+// Горение и Кровотечение
+function Burn(value, duration, chance, sound = FireMagic) {
+    return DamageOverTimeEffect(DamageTypes.Magical, value, duration, StatusNames.Burn, chance, flameStrike, sound)
 }
-function Bleeding(value, duration, chance) {
-    return DamageOverTimeEffect(DamageTypes.Physical, value, duration, StatusNames.Bleeding, chance)
+function Bleeding(value, duration, chance, sound = SliceAtc) {
+    return DamageOverTimeEffect(DamageTypes.Physical, value, duration, StatusNames.Bleeding, chance, slice, sound)
 }
 
-// --- Лечение / мана ---
-function HealEffect(value) {
-    return { type: EffectTypes.Heal, value: value, timing: Timing.Instant, sprite: hphealEffect }
+// Лечение, мана
+function HealEffect(value, sprite = hphealEffect, sound = HealMagic) {
+    return { type: EffectTypes.Heal, value: value, timing: Timing.Instant, sprite: sprite, sound: sound }
 }
-function HealOverTimeEffect(value, duration) {
+function HealOverTimeEffect(value, duration, sprite = hphealEffect, sound = HealMagic) {
     return { type: EffectTypes.Heal, value: value, duration: duration,
-             timing: Timing.EndOfTurn, sprite: hphealEffect }
+             timing: Timing.EndOfTurn, sprite: sprite, sound: sound }
 }
-function ManaGainEffect(value) {
-    return { type: EffectTypes.ManaGain, value: value, timing: Timing.Instant, sprite: mphealEffect }
+function ManaGainEffect(value, sprite = mphealEffect, sound = HealMagic) {
+    return { type: EffectTypes.ManaGain, value: value, timing: Timing.Instant, sprite: sprite, sound: sound }
 }
-function ManaGainOverTimeEffect(value, duration) {
+function ManaGainOverTimeEffect(value, duration, sprite = mphealEffect, sound = HealMagic) {
     return { type: EffectTypes.ManaGain, value: value, duration: duration,
-             timing: Timing.EndOfTurn, sprite: mphealEffect }
+             timing: Timing.EndOfTurn, sprite: sprite, sound: sound }
 }
 
-// --- Баффы / дебаффы (модификатор атаки или защиты) ---
-function BuffEffect(modifier, value, duration) {
+// Баффы, дебаффы 
+function BuffEffect(modifier, value, duration, sprite = buffEffect, sound = MagicBuff) {
     return { type: EffectTypes.Buff, buffType: modifier, value: value,
-             duration: duration, timing: Timing.Overtime, sprite: buffEffect }
+             duration: duration, timing: Timing.Overtime, sprite: sprite, sound: sound }
 }
-function DebuffEffect(modifier, value, duration) {
+function DebuffEffect(modifier, value, duration, sprite = debuffEffect, sound = DebuffMagic) {
     return { type: EffectTypes.Debuff, buffType: modifier, value: value,
-             duration: duration, timing: Timing.Overtime, sprite: debuffEffect }
+             duration: duration, timing: Timing.Overtime, sprite: sprite, sound: sound }
 }
 function TemporaryWeaknessEffect(weakness, duration) {
     return { type: EffectTypes.CreateTemporaryWeakness, weakness: weakness,
              duration: duration, timing: Timing.Overtime, sprite: debuffEffect }
 }
 
-// --- Прочее ---
+// Прочее
 function RemoveStatusEffect(statusName, sprite) {
     return { type: EffectTypes.RemoveEffect, statusName: statusName,
              timing: Timing.Instant, sprite: sprite }

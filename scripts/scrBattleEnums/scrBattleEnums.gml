@@ -1,5 +1,6 @@
 #macro ENEMYS_TURN 0
 #macro PUPPET_TURN 1
+#macro HERO_DRAW_DELAY 2
 #macro MAX_PUPPETS 3
 
 // Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
@@ -51,20 +52,20 @@ enum EffectTypes {
 
 function effectTypeToString(type) {
     switch (type) {
-        case EffectTypes.Damage:        return "Damage"
-        case EffectTypes.Heal:          return "Heal"
-        case EffectTypes.Stun:          return "Stun"
-        case EffectTypes.Buff:          return "Buff"
-        case EffectTypes.RemoveEffect:  return "Remove Effect"
-        case EffectTypes.ManaGain:      return "Mana Gain"
-        case EffectTypes.Weakening:     return "Weakening"
-        case EffectTypes.Debuff:        return "Debuff"
-        case EffectTypes.CopyCard:      return "Copy Card"
-        case EffectTypes.AddEnergy:     return "Add Energy"
-        case EffectTypes.ShuffleDeck:   return "Shuffle Deck"
-        case EffectTypes.Resurrection:  return "Resurrection" 
-        case EffectTypes.CreatePuppet:  return "CreatePuppet"
-        default:                        return "Unknown"
+        case EffectTypes.Damage: return "Damage"
+        case EffectTypes.Heal: return "Heal"
+        case EffectTypes.Stun: return "Stun"
+        case EffectTypes.Buff: return "Buff"
+        case EffectTypes.RemoveEffect: return "Remove Effect"
+        case EffectTypes.ManaGain: return "Mana Gain"
+        case EffectTypes.Weakening: return "Weakening"
+        case EffectTypes.Debuff: return "Debuff"
+        case EffectTypes.CopyCard: return "Copy Card"
+        case EffectTypes.AddEnergy: return "Add Energy"
+        case EffectTypes.ShuffleDeck: return "Shuffle Deck"
+        case EffectTypes.Resurrection: return "Resurrection" 
+        case EffectTypes.CreatePuppet: return "CreatePuppet"
+        default: return "Unknown"
     }
 }
 
@@ -119,7 +120,10 @@ enum StarriorStates {
 	Idle,
     Attack,
     Cast,
-    KnockOut
+    KnockOut,
+    Spell,
+    Spawn,
+    Dance
 }
 
 enum CostType {
@@ -145,7 +149,7 @@ function cardCategoryOf(_card) {
         var def = global.cardRegistry[$ _card.cardId]
         if (variable_struct_exists(def, "category")) return def.category
     }
-    // Запасной вариант по спрайту (для карт, построенных вне реестра)
+   
     if (_card.cardBaseSpr == atcCard) return CardCategory.Attack
     if (_card.cardBaseSpr == mgcCard) return CardCategory.Magic
     if (_card.cardBaseSpr == healCard) return CardCategory.Heal
@@ -153,14 +157,40 @@ function cardCategoryOf(_card) {
     return CardCategory.Attack
 }
 
-// Цвет категории 
+// Анимация кастера по категории карты: 
+function cardAnimState(card) {
+    switch (cardCategoryOf(card)) {
+        case CardCategory.Attack: return StarriorStates.Attack
+        case CardCategory.Magic: return StarriorStates.Spell
+        default: return StarriorStates.Cast
+    }
+}
+
+// Спрайт каста при призыве марионетки (по её категории), иначе noone
+// Позволяет мастеру играть свою анимацию призыва под конкретную марионетку
+function cardCastSpriteOverride(card) {
+    for (var i = 0; i < array_length(card.effects); i++) {
+        var e = card.effects[i]
+        if (e.type == EffectTypes.CreatePuppet) {
+            switch (e.puppetCategory) {
+                case CardCategory.Attack: return MasterPuppetCreateAtc
+                case CardCategory.Magic: return MasterPuppetCreateMgc
+                case CardCategory.Heal: return MasterPuppetCreateHeal
+                case CardCategory.Buff: return MasterPuppetCreateBuff
+            }
+        }
+    }
+    return noone
+}
+
+// Цвет категории
 function categoryColor(category) {
     switch (category) {
-        case CardCategory.Magic: return #9944CC
-        case CardCategory.Buff: return #CC44CC
-        case CardCategory.Heal: return #44CC44
-        case CardCategory.Attack:  return #CC4444
-        case CardCategory.Special: return c_white
-        default: return c_white
+        case CardCategory.Magic: return #9c65c8
+        case CardCategory.Buff: return #77cce0
+        case CardCategory.Heal: return #83c073
+        case CardCategory.Attack: return #d56463
+        case CardCategory.Special: return #c4c4c4
+        default: return #c4c4c4
     }
 }

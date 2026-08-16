@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrBattleFlow",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/BattleDomain/Scripts.yy",
+    "name":"BattleLogic",
+    "path":"folders/BattleDomain/Scripts/BattleLogic.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

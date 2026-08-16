@@ -1,6 +1,10 @@
 if (global.gamePaused) exit // на паузе камера заморожена
 
-if(instance_exists(follow)){
+if (instance_exists(oGameController) && instance_exists(oGameController.selected_character)) {
+	follow = oGameController.selected_character;
+}
+
+if (instance_exists(follow)) {
 	xTo = follow.x;
 	yTo = follow.y;
 }

@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"sprPuppetManagement",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/BattleDomain/Scripts.yy",
+    "name":"Starriors",
+    "path":"folders/BattleDomain/Scripts/Starriors.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

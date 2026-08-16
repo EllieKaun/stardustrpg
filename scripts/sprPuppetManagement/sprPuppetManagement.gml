@@ -8,12 +8,23 @@ function countAlivePuppetsIn(team) {
 }
 
 function puppetSpritesForCategory(category) {
-    switch (category) {    
-        case CardCategory.Attack: return { idle: WarriorPuppet, attack: WarriorPuppet, cast: WarriorPuppet, ko: WarriorPuppet }
-        case CardCategory.Magic: return { idle: WizardPuppet, attack: WizardPuppet, cast: WizardPuppet, ko: WizardPuppet }
-        case CardCategory.Heal: return { idle: HealerPuppet, attack: HealerPuppet, cast: HealerPuppet, ko: HealerPuppet }
-        case CardCategory.Buff: return { idle: PriestPuppet, attack: PriestPuppet, cast: PriestPuppet, ko: PriestPuppet }
+    switch (category) {
+        case CardCategory.Attack: return { idle: scrWarriorPuppetIdle, attack: sprWarriorPuppetAttack, spell: scrWarriorPuppetIdle, cast: scrWarriorPuppetIdle, ko: scrWarriorPuppetIdle, dance: noone }
+        case CardCategory.Magic:  return { idle: scrWizardPuppetIIdle,  attack: scrWizardPuppetIIdle,   spell: sprWizardPuppetSpell,  cast: sprWizardPuppetCast,    ko: scrWizardPuppetIIdle,   dance: noone }
+        case CardCategory.Heal:   return { idle: scrHealerPuppetIdle,   attack: scrHealerPuppetIdle,    spell: scrHealerPuppetIdle,   cast: sprHealerPuppetHeal,    ko: scrHealerPuppetIdle,    dance: noone }
+        case CardCategory.Buff:   return { idle: sprPriestPuppetIdle,   attack: sprPriestPuppetIdle,    spell: sprPriestPuppetIdle,   cast: sprPriestPuppetIdle,    ko: sprPriestPuppetIdle,    dance: noone }
     }
+}
+
+// Спрайт-эффект появления марионетки по её категории
+function puppetSpawnSprite(category) {
+    switch (category) {
+        case CardCategory.Attack: return WarriotPuppetSpawn
+        case CardCategory.Magic:  return WizardPuppetSpawn
+        case CardCategory.Heal:   return HealerPuppetSpawn
+        case CardCategory.Buff:   return PriestPuppetSpawn
+    }
+    return noone
 }
 
 function puppetDeckForCategory(category) {
@@ -47,19 +58,25 @@ function spawnPuppet(category, caster) {
     var spr = puppetSpritesForCategory(category)
     var p = createStarrior(
         "Puppet",
-        spr.idle, spr.attack, spr.cast, spr.ko,
+        spr.idle, spr.attack, spr.spell, spr.cast, spr.ko, spr.dance,
         8, 8,  0, 0,  1, 1,  /*str*/2, /*int*/2, /*aura*/0, /*guts*/0,
         puppetDeckForCategory(category)
     );
     p.isPuppet = true
     p.isEnemy = enemySide
     p.puppetCategory = category
-    p.justSummoned   = true   
+    p.justSummoned   = true
     array_push(team, p)
-    array_push(playOrder, p) 
+    array_push(playOrder, p)
     shuffleDeckAndTake4(p)
 
     initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)
+
+    var spawnSpr = puppetSpawnSprite(category)
+    if (spawnSpr != noone) {
+        p.spriteActionSpawn = spawnSpr
+        p.changeActionState(StarriorStates.Spawn, undefined)
+    }
 }
 
 //// Логика ходов Марионеток
@@ -79,12 +96,16 @@ function aliveOf(arr) {
 }
 
 function runPuppetTurn(puppet) {
-    if (puppet.justSummoned) {       
+    if (puppet.justSummoned) {
         puppet.justSummoned = false
         skipTurn()
         return
     }
-    
+
+    if (array_length(puppet.getCardsInHand()) == 0) {
+        shuffleDeckAndTake4(puppet)
+    }
+
     var hand = puppet.getCardsInHand()
     var playable = []
     for (var i = 0; i < array_length(hand); i++) {

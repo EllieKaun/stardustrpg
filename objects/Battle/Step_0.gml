@@ -1,6 +1,6 @@
 updateCardAnims() // двигаем/чистим летящие карты в любом состоянии
 
-// ---- Управление мышью (в дополнение к клавиатуре) ---------------------------
+// - Управление мышью -
 // UI боя рисуется прямо в координатах GUI (окна), поэтому мышь берём как есть.
 // Хит-боксы карт/меню тоже в оконных координатах. Враги — мировые объекты.
 var mbx = device_mouse_x_to_gui(0)
@@ -13,7 +13,6 @@ var mouseConfirm = false
 
 switch (battleState) {
     case BattleStates.CharacterPlay:
-        // карты в руке — сверху вниз по z (последняя нарисованная — верхняя)
         var hoveredCard = -1
         for (var i = array_length(cardHitRects) - 1; i >= 0; i--) {
             var r = cardHitRects[i]
@@ -29,8 +28,7 @@ switch (battleState) {
             for (var i = 0; i < array_length(menuHitRects); i++) {
                 var r = menuHitRects[i]
                 if (pointInRect(mbx, mby, r.x, r.y, r.w, r.h)) {
-                    if (mouseMoved) { focusArea = FocusArea.Menu; selectedMenuItem = r.index }
-                    if (mClick)     { focusArea = FocusArea.Menu; selectedMenuItem = r.index; mouseConfirm = true }
+                    if (mClick) doMenuAction(r.name)
                     break
                 }
             }
@@ -111,64 +109,26 @@ switch (battleState) {
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
-        
-        if (focusArea == FocusArea.Deck) { // Переключение стрелками в деке
-            if (leftPressed) { 
-                if (selectedCard == 0) {
-                    focusArea = FocusArea.Menu // Переключение в меню
-                    selectedMenuItem = 0
-                } else {
-                    selectedCard--
-                }
-            }
-            if (rightPressed) {
-                if (selectedCard < array_length(selectedCharacter.getCardsInHand()) - 1) {
-                    selectedCard++
-                }
-            }
-        } else if (focusArea == FocusArea.Menu) { // Переключение стрелками в меню
-            var upPressed = keyboard_check_pressed(vk_up)
-            var downPressed = keyboard_check_pressed(vk_down)
-            
-            if (upPressed) {
-                selectedMenuItem = selectedMenuItem - 1 < 0 ? array_length(menuItems) - 1 : selectedMenuItem - 1
-            }
-            if (downPressed) {
-                selectedMenuItem = selectedMenuItem + 1 >= array_length(menuItems) ? 0 : selectedMenuItem + 1
-            }
-            if (rightPressed) {
-                focusArea = FocusArea.Deck // Возвращение в деку
-                selectedCard = 0
-            }
-        }
-        if (enterPressed) { // Выбор
-            if (focusArea == FocusArea.Menu) { // если меню
-                switch (menuItems[selectedMenuItem]) {
-                    case "Shuffle": // Перемешать
-                        shuffleDeckAndTake4(selectedCharacter) 
-                        skipTurn()
-                    break
-                    case "Run": // Сбежать
-                        with (oTransition) {
-                            target_room = global.returnRoom
-                            state = "fade_out"
-                        }
-                    break // Информация о врагах
-                    case "Info":
-                        battleState = BattleStates.EnemyInfoSelection
-                        initTargetSelection(enemies)
-                    break
-                }
-            } else if (array_length(selectedCharacter.getCardsInHand()) > 0) {  // Если дека и есть карты в руке
-                var currentCard = selectedCharacter.getCardsInHand()[selectedCard] // Текущая карта
-                var check = checkIfCanPlayCard(selectedCharacter, currentCard) // Проверка условий, возможно ли сыграть карту
+
+        if (keyboard_check_pressed(ord("R"))) { doMenuAction("Run"); break }
+        if (keyboard_check_pressed(ord("S"))) { doMenuAction("Shuffle"); break }
+        if (keyboard_check_pressed(ord("I"))) { doMenuAction("Info"); break }
+
+        var handLen = array_length(selectedCharacter.getCardsInHand())
+        if (leftPressed && selectedCard > 0) selectedCard--
+        if (rightPressed && selectedCard < handLen - 1) selectedCard++
+
+        if (enterPressed) {
+            if (handLen > 0) {
+                var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
+                var check = checkIfCanPlayCard(selectedCharacter, currentCard)
                 if !check { return }
-                if currentCard.target == TargetTypes.SingleEnemyTarget { // Игровка карты в зависимости от типа карты
+                if currentCard.target == TargetTypes.SingleEnemyTarget {
                     battleState = BattleStates.EnemyTargetSelection
                     initTargetSelection(enemies)
                 } else if currentCard.target == TargetTypes.SingleAllyTarget {
                     battleState = BattleStates.AllyTargetSelection
-                    if (cardIsResurrection(currentCard)) initTargetSelectionKO(heroes) // цель — павший
+                    if (cardIsResurrection(currentCard)) initTargetSelectionKO(heroes)
                     else initTargetSelection(heroes)
                 } else if currentCard.target == TargetTypes.AllEnemies {
                     playCardAnimated(currentCard, selectedCharacter, enemies)
@@ -176,7 +136,7 @@ switch (battleState) {
                     playCardAnimated(currentCard, selectedCharacter, heroes)
                 }
             } else {
-                skipTurn() // Если нет карт - пропуск хода
+                skipTurn()
             }
         }
     break
@@ -210,6 +170,28 @@ switch (battleState) {
         
     break
     case BattleStates.BattleOver:
-        
+
     break
+}
+
+// Танец простоя: 5 сек без ввода на ходу героя -> зациклённый танец до любого ввода
+if (battleState == BattleStates.CharacterPlay && instance_exists(selectedCharacter)) {
+    if (mClick || keyboard_check_pressed(vk_anykey)) {
+        idleDanceTimer = 0
+        if (selectedCharacter.actionState == StarriorStates.Dance) {
+            selectedCharacter.changeActionState(StarriorStates.Idle, undefined)
+        }
+    } else {
+        idleDanceTimer += 1
+        if (idleDanceTimer >= 5 * game_get_speed(gamespeed_fps)
+            && selectedCharacter.spriteActionDance != noone
+            && selectedCharacter.actionState == StarriorStates.Idle) {
+            selectedCharacter.changeActionState(StarriorStates.Dance, undefined)
+        }
+    }
+} else {
+    if (instance_exists(selectedCharacter) && selectedCharacter.actionState == StarriorStates.Dance) {
+        selectedCharacter.changeActionState(StarriorStates.Idle, undefined)
+    }
+    idleDanceTimer = 0
 }

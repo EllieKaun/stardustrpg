@@ -19,7 +19,8 @@ function MenuItem(label, iconSpr = noone, iconSelectedSpr = noone, onSelect = un
 // Анимированный слой
 // name — подпись для заглушки
 // scrollX/scrollY — скорость скролла, px/сек
-// bobAmp/bobFreq — амплитуда (px) и частота (Гц) синусного покачивания по Y
+// bobAmp/bobFreq — амплитуда (доля высоты) и частота (Гц) синусного покачивания по Y
+// scale — оверскан слоя (1 = ровно экран); >1 не даёт краям обрезаться при бобе
 // alpha — прозрачность 0..1
 // tiled — растянуть на весь экран для false
 // placeholderColor — цвет заглушки
@@ -30,8 +31,9 @@ function MenuLayer(spr = noone, params = {}) constructor {
     self.scrollY = menuParam(params, "scrollY", 0)
     self.bobAmp = menuParam(params, "bobAmp", 0)
     self.bobFreq = menuParam(params, "bobFreq", 0)
+    self.scale = menuParam(params, "scale", 1)
     self.alpha = menuParam(params, "alpha", 1)
-    self.tiled = menuParam(params, "tiled", true)
+    self.tiled = menuParam(params, "tiled", false)
     self.placeholderColor = menuParam(params, "placeholderColor", make_color_rgb(20, 24, 34))
     self.time = 0 // секунды с создания
     self.ox = 0 // накопленный горизонтальный скролл
@@ -43,7 +45,7 @@ function MenuLayer(spr = noone, params = {}) constructor {
     }
 
     self.draw = function(gw, gh) {
-        var bob = (self.bobAmp != 0) ? sin(self.time * self.bobFreq * 2 * pi) * self.bobAmp : 0
+        var bob = (self.bobAmp != 0) ? sin(self.time * self.bobFreq * 2 * pi) * self.bobAmp * gh : 0
         var oy = self.scrollY * self.time + bob
 
         if (self.spr == noone || !sprite_exists(self.spr)) {
@@ -54,7 +56,7 @@ function MenuLayer(spr = noone, params = {}) constructor {
             draw_set_color(c_white)
             draw_set_halign(fa_left)
             draw_set_valign(fa_top)
-            drawUiText(6, 6, "[" + self.name + "]", gh * 0.04)
+            //drawUiText(6, 6, "[" + self.name + "]", gh * 0.04)
             return
         }
 
@@ -72,8 +74,12 @@ function MenuLayer(spr = noone, params = {}) constructor {
                 for (var xx = offX; xx < gw; xx += sw)
                     draw_sprite_ext(self.spr, 0, xx, yy, 1, 1, 0, c_white, self.alpha)
         } else {
-            // Растянуть на весь экран со сдвигом.
-            draw_sprite_stretched_ext(self.spr, 0, self.ox, oy, gw, gh, c_white, self.alpha)
+            // Растянуть с оверсканом и центрированием, чтобы боб не оголял края.
+            var ew = gw * self.scale
+            var eh = gh * self.scale
+            var baseX = (gw - ew) * 0.5 + self.ox
+            var baseY = (gh - eh) * 0.5 + oy
+            draw_sprite_stretched_ext(self.spr, 0, baseX, baseY, ew, eh, c_white, self.alpha)
         }
     }
 }
@@ -91,15 +97,15 @@ function MenuLayer(spr = noone, params = {}) constructor {
 function Menu(items, config = {}) constructor {
     self.items = items
     self.index = 0
-    self.wrap        = menuParam(config, "wrap", true)
-    self.anchorX     = menuParam(config, "anchorX", 0.5)
-    self.startY      = menuParam(config, "startY", 0.45)
-    self.spacing     = menuParam(config, "spacing", 0.10)
-    self.textH       = menuParam(config, "textH", 0.055)
-    self.iconGap     = menuParam(config, "iconGap", 0.02)
-    self.halign      = menuParam(config, "halign", fa_center)
-    self.colNormal   = menuParam(config, "colNormal", c_white)
-    self.colSelect   = menuParam(config, "colSelect", c_yellow)
+    self.wrap = menuParam(config, "wrap", true)
+    self.anchorX = menuParam(config, "anchorX", 0.5)
+    self.startY = menuParam(config, "startY", 0.45)
+    self.spacing = menuParam(config, "spacing", 0.10)
+    self.textH = menuParam(config, "textH", 0.055)
+    self.iconGap = menuParam(config, "iconGap", 0.02)
+    self.halign = menuParam(config, "halign", fa_center)
+    self.colNormal = menuParam(config, "colNormal", c_white)
+    self.colSelect = menuParam(config, "colSelect", c_yellow)
     self.colDisabled = menuParam(config, "colDisabled", make_color_rgb(120, 120, 130))
 
     self.hitRects = []   // { x, y, w, h, index } в GUI-координатах, заполняется в draw
@@ -151,8 +157,8 @@ function Menu(items, config = {}) constructor {
         return confirmed
     }
 
-    // Отрисовка пунктов в GUI. Заполняет hitRects. Иконка слева от текста; группа
-    // "иконка+текст" выравнивается по halign относительно anchorX.
+    // Отрисовка пунктов в GUI. Заполняет hitRects. Иконка слева от текста. группа
+    // "иконка текст" выравнивается по halign относительно anchorX.
     self.draw = function(gw, gh) {
         self.hitRects = []
 
@@ -160,30 +166,36 @@ function Menu(items, config = {}) constructor {
         var stepPx = gh * self.spacing
         var iconPx = textPx * 1.15
         var gapPx  = gh * self.iconGap
-        var cx     = gw * self.anchorX
-        var y0     = gh * self.startY
+        var cx = gw * self.anchorX
+        var y0 = gh * self.startY
 
         draw_set_valign(fa_middle)
         draw_set_halign(fa_left)
         draw_set_font(uiFont())
 
         for (var i = 0; i < array_length(self.items); i++) {
-            var it      = self.items[i]
-            var isSel   = (i == self.index)
-            var yy      = y0 + i * stepPx
-            var icon    = it.icon(isSel)
+            var it = self.items[i]
+            var isSel = (i == self.index)
+            var yy = y0 + i * stepPx
+            var icon = it.icon(isSel)
             var hasIcon = (icon != noone && sprite_exists(icon))
 
             var tScale = uiTextScale(it.label, textPx, gw)
-            var textW  = string_width(it.label) * tScale
-            var iconW  = hasIcon ? iconPx : 0
+            var textW = string_width(it.label) * tScale
+            var iconW = hasIcon ? iconPx : 0
             var groupW = iconW + (hasIcon ? gapPx : 0) + textW
 
             var left
             switch (self.halign) {
-                case fa_center: left = cx - groupW / 2; break
-                case fa_right:  left = cx - groupW;     break
-                default:        left = cx;              break
+                case fa_center: 
+                    left = cx - groupW / 2
+                    break
+                case fa_right: 
+                    left = cx - groupW
+                    break
+                default: 
+                    left = cx
+                    break
             }
 
             // иконка

@@ -5,8 +5,8 @@ charProgress = 0
 charsPerStep = 0.8
 onComplete = undefined
 
-boxFont = fnM3x6_14
-nameFont = fnM3x6_14
+boxFont = fnUI_14
+nameFont = fnUI_14
 portraitSize = 96
 
 // Начать диалог

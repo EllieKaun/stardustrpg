@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrCardAnimation",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/BattleDomain/Scripts.yy",
+    "name":"Drawing",
+    "path":"folders/BattleDomain/Scripts/Drawing.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -13,10 +13,10 @@ close = function() {
 }
 
 backLayers = [
-    new MenuLayer(noone, { name: "pause-bg", alpha: 0.55, placeholderColor: make_color_rgb(6, 8, 14) })
+    new MenuLayer(noone, { alpha: 0.55, placeholderColor: make_color_rgb(6, 8, 14) })
 ]
 foreLayers = [
-    new MenuLayer(noone, { name: "pause-fg", scrollX: 8, alpha: 0.18, placeholderColor: make_color_rgb(40, 46, 64) })
+    new MenuLayer(PauseLana, { name: "pause-fg", scrollX: 0, alpha: 1, placeholderColor: make_color_rgb(40, 46, 64) })
 ]
 itemsAboveForeground = true
 
@@ -25,7 +25,7 @@ menu = new Menu([
     new MenuItem("Settings", noone, noone, function(it) { show_debug_message("Pause: Settings") }),
     new MenuItem("Quit", noone, noone, function(it) { game_end() })
 ], {
-    anchorX: 0.5, startY: 0.42, spacing: 0.12, textH: 0.06, halign: fa_center
+    anchorX: 0.6, startY: 0.5, spacing: 0.12, textH: 0.06, halign: fa_center
 })
 
 mouseLastX = -1

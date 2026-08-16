@@ -6,7 +6,9 @@ function Deck(originalDeck) constructor {
 
 function shuffleDeckAndTake4(character) {
     var originalDeck = character.getOriginalDeck()
-    var shuffeledDeck = array_shuffle(originalDeck)
+    var deckCopy = array_create(array_length(originalDeck))
+    array_copy(deckCopy, 0, originalDeck, 0, array_length(originalDeck))
+    var shuffeledDeck = array_shuffle(deckCopy)
     var top4Cards = take4CardsFromDeckTop(shuffeledDeck, [])
     character.deck.shuffeledDeck = shuffeledDeck
     character.deck.cardsInHand = top4Cards

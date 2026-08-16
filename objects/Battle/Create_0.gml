@@ -1,9 +1,7 @@
 focusArea = FocusArea.Deck
 selectedMenuItem = 0
-menuItems = ["Shuffle", "Info", "Run"]
+menuItems = ["Run", "Shuffle", "Info"]
 
-// High-res GUI: draw the low-res battle UI scaled up so that text overlaid on
-// the cards can be rendered at full GUI resolution and stay readable
 global.guiBaseW = camera_get_view_width(view_camera[0])
 global.guiBaseH = camera_get_view_height(view_camera[0])
 display_set_gui_size(max(window_get_width(), global.guiBaseW), max(window_get_height(), global.guiBaseH))
@@ -15,8 +13,9 @@ copyNextCard = false
 cardHitRects = []
 menuHitRects = []
 infoCloseRect = undefined
-mouseLastX = -1 // для детекта движения мыши 
+mouseLastX = -1 // для детекта движения мыши
 mouseLastY = -1
+idleDanceTimer = 0 // тики простоя выбранного персонажа (для танца)
 
 // Анимация розыгрыша карты (см. scrCardAnimation)
 activeCardAnims = []
@@ -24,6 +23,8 @@ animatingCard = noone // карта, которая сейчас летит (п�
 animPendingCard = noone
 animPendingCaster = noone
 animPendingTargets = noone
+drawPendingCard = noone
+playPendingCaster = noone
 
 maxEnemiesCount = 5
 spacingBetweenStarriors = 16

@@ -4,12 +4,12 @@ randomize()
 setDisplayMode = function(fullscreen) {
     global.displayFullscreen = fullscreen
     if (fullscreen) {
-        // безрамочное окно в размер экрана
+        // полноэкранный режим
         window_set_showborder(false)
         window_set_size(display_get_width(), display_get_height())
         window_set_position(0, 0)
     } else {
-        // обычное окно 4× базового разрешения (1280×720), по центру
+        // обычное окно
         var ww = 1280, wh = 720
         window_set_showborder(true)
         window_set_size(ww, wh)
@@ -25,7 +25,12 @@ uiFontInit() // кэш UI-шрифта и высоты строки
 initEffectRegistry() // регистрация эффектов
 cardIdsInit() // инициализация карт ид
 cardRegistryInit() // регистация карт  
-playerDataInit() // инициализация данных пользователя
+if (variable_global_exists("startNewGame") && global.startNewGame) {
+    global.startNewGame = false
+    playerDataNewGame() // новая игра 
+} else {
+    playerDataInit() // инициализация данных пользователя
+}
 if (!instance_exists(oTransition)) {
     instance_create_layer(0, 0, "Instances", oTransition)
 }
@@ -33,6 +38,11 @@ if (!instance_exists(oTransition)) {
 partyMembers = [oLana, oViv]
 selectedIndex = 0;
 selected_character = partyMembers[0]
+
+global.walkSound = asset_get_index("GrassWalk") // звук ходьбы по траве (-1 пока ассета нет)
+
+global.returningFromBattle = false // флаг возврата из боя (обрабатывается на Room Start)
+global.fightEnemy = noone           // враг, с которым дрались
 
 global.mpGrid = -1 // Motion Planning
 global.battleSection = 1

@@ -1,7 +1,7 @@
 enum Characters { Lana, Viv }
 
 #macro PLAYER_SAVE_FILE "player_data.json"
-#macro DECK_DEFAULT_UNLOCKED 4
+#macro DECK_DEFAULT_UNLOCKED 5
 #macro DECK_CAPACITY 12
 
 // Инициализация пользователя (каждый раз на старте)
@@ -19,6 +19,14 @@ function playerDataInit() {
         playerGrantStarterCards()
         playerDataSave()
     }
+}
+
+// Начать новую игру: свежие данные, стартовые карты, флаг новой игры
+function playerDataNewGame() {
+    global.playerData = playerDataDefault()
+    global.isNewGame = true
+    playerGrantStarterCards()
+    playerDataSave()
 }
 
 // Иницилазиация базовых карт и стартовых дек героев.

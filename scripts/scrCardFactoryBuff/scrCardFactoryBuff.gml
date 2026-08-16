@@ -75,7 +75,7 @@ function createCardBuffMagicalProtectionSingleTarget() {
         1,
         [ BuffEffect(ModifiersToBuff.MagicalProtection, 0.3, 1) ],
         atcCard,
-        defBuff,
+        magicDef,
         commonBorder,
         hpCostToken
     )
@@ -110,7 +110,7 @@ function createCardDebuffPhysicalDamageSingleTarget() {
         1,
         [ DebuffEffect(ModifiersToBuff.PhysicalDamage, 1.5, 1) ],
         buffCard,
-        strBuff,
+        strengthDebuff,
         commonBorder,
         hpCostToken
     )
@@ -126,7 +126,7 @@ function createCardDebuffMagicalDamageSingleTarget() {
         1,
         [ DebuffEffect(ModifiersToBuff.MagicalDamage, 1.5, 1) ],
         buffCard,
-        magicBuff,
+        magicDamageDebuff,
         commonBorder,
         hpCostToken
     )
@@ -142,7 +142,7 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
         1,
         [ DebuffEffect(ModifiersToBuff.PhysicalProtection, 0.3, 1) ],
         buffCard,
-        defBuff,
+        defDebuff,
         commonBorder,
         hpCostToken
     )
@@ -158,7 +158,7 @@ function createCardDebuffMagicalProtectionSingleTarget() {
         1,
         [ DebuffEffect(ModifiersToBuff.MagicalProtection, 0.3, 1) ],
         buffCard,
-        defBuff,
+        magicDefDebuff,
         commonBorder,
         hpCostToken
     )
@@ -174,7 +174,7 @@ function createCardCreateTemporaryWeaknessMagicalDamageSingleTarget() {
         1,
         [ TemporaryWeaknessEffect(ModifiersToBuff.MagicalDamage, 1) ],
         buffCard,
-        defBuff,
+        magicWeakness,
         commonBorder,
         hpCostToken
     )
@@ -190,7 +190,7 @@ function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget() {
         1,
         [ TemporaryWeaknessEffect(ModifiersToBuff.PhysicalDamage, 1) ],
         buffCard,
-        defBuff,
+        strWeakness,
         commonBorder,
         hpCostToken
     )

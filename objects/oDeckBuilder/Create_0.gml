@@ -5,8 +5,8 @@ display_set_gui_size(dbBaseW, dbBaseH)
 
 activePanel = 0 // 0 = коллекция всех карт, 1 = дека
 
-var tabFonts = [fnM3x6_22, fnM3x6_14, fnM3x6_13, fnM3x6_12,
-                 fnM3x6_11, fnM3x6_10, fnM3x6_9,  fnM3x6_8, fnM3x6_7]
+var tabFonts = [fnUI_48, fnUI_32, fnUI_24, fnUI_16,
+                 fnUI_14, fnUI_12, fnUI_10,  fnUI_8]
 
 // Смена фокуса панели на определнную строку
 switchFocusTo = function(target, row) {

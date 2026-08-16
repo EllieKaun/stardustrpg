@@ -1,6 +1,7 @@
+if isActive drawSpriteOutline(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_yellow)
 draw_self()
 if isActive {
-    draw_sprite(selectionArrow, 
+    draw_sprite(selectionArrow,
     0,
     bbox_left - sprite_get_width(selectionArrow) / 2, 
     bbox_top - sprite_get_height(selectionArrow) / 2)

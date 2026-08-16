@@ -1,6 +1,7 @@
 name = ""
-isActive = false 
+isActive = false
 isTarget = false
+themeColor = c_fuchsia
 
 hp = 0 
 maxHp = 0 
@@ -27,14 +28,17 @@ actionState = StarriorStates.Idle
 spriteActionIdle = sprLanaBattleIdle
 spriteActionAttack = sprLanaBattleIdle
 spriteActionCast = sprLanaBatlleCast
+spriteActionSpell = sprLanaBattleSpell
+spriteActionSpawn = noone
+spriteActionDance = noone
 spriteActionKO = sprLanaBattleKO
 actionCallback = undefined
 
-function changeActionState(state, callback) {
+function changeActionState(state, callback, spriteOverride = noone) {
     actionState = state
     actionCallback = callback
-    
-    switch (actionState) { 
+
+    switch (actionState) {
         case StarriorStates.Idle: 
             sprite_index = spriteActionIdle
         break 
@@ -42,21 +46,42 @@ function changeActionState(state, callback) {
             sprite_index = spriteActionAttack
             image_index = 0
             image_speed = 1
-        break   
+        break
         case StarriorStates.Cast:
-            sprite_index = spriteActionAttack
+            sprite_index = spriteActionCast
             image_index = 0
             image_speed = 1
-        break 
+        break
+        case StarriorStates.Spell:
+            sprite_index = spriteActionSpell
+            image_index = 0
+            image_speed = 1
+        break
+        case StarriorStates.Spawn:
+            sprite_index = spriteActionSpawn
+            image_index = 0
+            image_speed = 1
+        break
+        case StarriorStates.Dance:
+            sprite_index = spriteActionDance
+            image_index = 0
+            image_speed = 1
+        break
         case StarriorStates.KnockOut:
             sprite_index = spriteActionKO
-            image_index = 0; 
+            image_index = 0;
             if image_number > 1 {
                 image_speed = 1
             } else {
                 image_speed = 0
             }
-        break      
+        break
+    }
+
+    if (spriteOverride != noone) {
+        sprite_index = spriteOverride
+        image_index = 0
+        image_speed = 1
     }
 }
 
@@ -113,7 +138,9 @@ function isKO() {
 }
 
 function showEffectNotification(effect, dismissMode, duration) {
-    // kind-only эффекты (например BossClone) не имеют sprite — просто выходим.
+    if (variable_instance_exists(effect, "sound") && effect.sound != noone) {
+        audio_play_sound(effect.sound, 1, false)
+    }
     if !variable_instance_exists(effect, "sprite") { return }
     var inst = instance_create_depth(x, y, depth - 1, oEffectVisualizer)
     inst.sprite_index = effect.sprite
