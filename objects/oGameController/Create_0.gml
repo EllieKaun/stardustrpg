@@ -1,5 +1,7 @@
 randomize()
 
+gpu_set_tex_filter(false)
+
 // --- Режим отображения: borderless (безрамочный на весь экран) / окно --------
 setDisplayMode = function(fullscreen) {
     global.displayFullscreen = fullscreen

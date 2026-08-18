@@ -33,8 +33,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"sCrackerNutSmall",
-    "path":"sprites/sCrackerNutSmall/sCrackerNutSmall.yy",
+    "name":"sprPuppetMaster",
+    "path":"sprites/sprPuppetMaster/sprPuppetMaster.yy",
   },
   "spriteMaskId":null,
   "visible":true,

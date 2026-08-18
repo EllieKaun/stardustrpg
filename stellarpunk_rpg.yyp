@@ -322,6 +322,7 @@
     {"id":{"name":"sprPowerFlowerIdle","path":"sprites/sprPowerFlowerIdle/sprPowerFlowerIdle.yy",},},
     {"id":{"name":"sprPowerFlowerSpell","path":"sprites/sprPowerFlowerSpell/sprPowerFlowerSpell.yy",},},
     {"id":{"name":"sprPriestPuppetIdle","path":"sprites/sprPriestPuppetIdle/sprPriestPuppetIdle.yy",},},
+    {"id":{"name":"sprPuppetMaster","path":"sprites/sprPuppetMaster/sprPuppetMaster.yy",},},
     {"id":{"name":"sprVivBatlleIdle","path":"sprites/sprVivBatlleIdle/sprVivBatlleIdle.yy",},},
     {"id":{"name":"sprVivBattleAttack","path":"sprites/sprVivBattleAttack/sprVivBattleAttack.yy",},},
     {"id":{"name":"sprVivBattleCast","path":"sprites/sprVivBattleCast/sprVivBattleCast.yy",},},
