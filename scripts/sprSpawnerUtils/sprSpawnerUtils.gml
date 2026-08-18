@@ -21,6 +21,7 @@ function sectionAt(px, py) {
 
 // Типы мини врагов для секции 
 function enemyTypesForRegion(zone, section) {
+    return [oCrakerNutSmall, oMushroomSmall, oFlowerSmall, oLeafSmall]
     switch (zone) {
         case Zone.Outer:
             switch (section) {
@@ -46,6 +47,7 @@ function enemyTypesForRegion(zone, section) {
 
 // Генерация врагов по секции для внешней зоны (для битвы)
 function sectionCompositions(section) {
+    section = [Section.BottomLeft, Section.BottomRight, Section.TopLeft, Section.TopRight][irandom(3)]
     switch (section) { 
         case Section.TopLeft: 
             return [                                
@@ -157,7 +159,7 @@ function makeEncounter(enemyCreators, reward) {
     return { enemyCreators: enemyCreators, reward: reward }
 }
 
-// Единый пул композиций врагов «лес» (демо): все композиции всех секций.
+// Единый пул композиций врагов «лес» 
 function forestCompositions() {
     var _all = []
     var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
@@ -168,7 +170,7 @@ function forestCompositions() {
     return _all
 }
 
-// создание битвы для рандомного врага (демо: враги и награда — из общего лесного пула)
+// создание битвы для рандомного врага 
 function randomSectionEncounter(section) {
     var comps = forestCompositions()                       // демо: враги из всех секций
     var comp  = comps[irandom(array_length(comps) - 1)];   // [createNut, createLeaf, ...]
