@@ -5,7 +5,13 @@
 
 // Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
 #macro WEAKNESS_DAMAGE_MODIFIER 0.1
-#macro WEAKNESS_STATUS_CHANCE_BONUS 0.25
+#macro WEAKNESS_STATUS_CHANCE_BONUS 0.1
+
+// Лечение всего здоровья
+#macro HEAL_FULL 999999
+
+// Восстановление всей маны
+#macro MANA_FULL 999999
 
 enum CardsRarity {
     Default,

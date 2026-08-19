@@ -8,7 +8,7 @@ function createMagicalDamageSingleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), StarEnergy, StarMagic) ],
+        [ DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), StarEnergy, StarMagic) ],
         mgcCard,
         starsSingleTarget,
         commonBorder,
@@ -26,7 +26,7 @@ function createMagicalDamageMultipleTargetCard() {
         targetType,
         StarriorStates.Cast,
         1,
-        [ DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), StarEnergy, StarMagic) ],
+        [ DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), StarEnergy, StarMagic) ],
         mgcCard,
         starsGroup,
         commonBorder,
@@ -45,7 +45,7 @@ function createMagicalDamageStunChanseSingleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), lightningStrike, LightningMagic),
+            DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), lightningStrike, LightningMagic),
             ShockEffect(1, 1.0)
         ],
         mgcCard,
@@ -66,7 +66,7 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), lightningStrike, LightningMagic),
+            DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), lightningStrike, LightningMagic),
             ShockEffect(1, 1.0)
         ],
         mgcCard,
@@ -87,7 +87,7 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), flameStrike, FireMagic),
+            DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), flameStrike, FireMagic),
             Burn(2, 1, 1.0)
         ],
         mgcCard,
@@ -108,7 +108,7 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), flameStrike, FireMagic),
+            DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), flameStrike, FireMagic),
             Burn(2, 1, 1.0)
         ],
         mgcCard,
@@ -128,7 +128,7 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), iceStrike, IceMagic),
+            DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), iceStrike, IceMagic),
             FreezeEffect(1, 1.0)
         ],
         mgcCard,
@@ -149,7 +149,7 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         StarriorStates.Cast,
         1,
         [
-            DamageEffect(DamageTypes.Magical, getDamageFuncOnRariryAndTarget(rarity, targetType), iceStrike, IceMagic),
+            DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), iceStrike, IceMagic),
             FreezeEffect(1, 1.0)
         ],
         mgcCard,

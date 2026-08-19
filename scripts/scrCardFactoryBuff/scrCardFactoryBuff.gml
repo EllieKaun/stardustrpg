@@ -6,7 +6,7 @@ function createCardBuffPhysicalDamageSingleTarget() {
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        [ BuffEffect(ModifiersToBuff.PhysicalDamage, 1.5, 4) ],
+        [ BuffEffect(ModifiersToBuff.PhysicalDamage, getBuffValueOnRarity(CardsRarity.Default), 4) ],
         buffCard,
         strBuff,
         commonBorder,
@@ -21,8 +21,8 @@ function createCardBuffMagicalDamageSingleTarget() {
         CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
-        3,
-        [ BuffEffect(ModifiersToBuff.MagicalDamage, 1.5, 1) ],
+        1,
+        [ BuffEffect(ModifiersToBuff.MagicalDamage, getBuffValueOnRarity(CardsRarity.Default), 1) ],
         buffCard,
         magicBuff,
         commonBorder,
@@ -39,8 +39,8 @@ function createCardBuffAnyDamageMultipleTarget() {
         StarriorStates.Cast,
         1,
         [
-            BuffEffect(ModifiersToBuff.PhysicalDamage, 1.5, 1),
-            BuffEffect(ModifiersToBuff.MagicalDamage, 1.5, 1)
+            BuffEffect(ModifiersToBuff.PhysicalDamage, getBuffValueOnRarity(CardsRarity.Default), 1),
+            BuffEffect(ModifiersToBuff.MagicalDamage, getBuffValueOnRarity(CardsRarity.Default), 1)
         ],
         buffCard,
         strAndMagicBuff,
@@ -52,12 +52,12 @@ function createCardBuffAnyDamageMultipleTarget() {
 // Усиление физ защиты героя
 function createCardBuffPhysicalProtectionSingleTarget() {
     return new Card(
-        "Buff physical damage single target",
+        "Buff physical protection single target",
         CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        [ BuffEffect(ModifiersToBuff.PhysicalProtection, 0.3, 1) ],
+        [ BuffEffect(ModifiersToBuff.PhysicalProtection, getBuffValueOnRarity(CardsRarity.Default), 1) ],
         buffCard,
         defBuff,
         commonBorder,
@@ -68,12 +68,12 @@ function createCardBuffPhysicalProtectionSingleTarget() {
 // Усиления маг защиты героя
 function createCardBuffMagicalProtectionSingleTarget() {
     return new Card(
-        "Buff magical damage single target",
+        "Buff magical protection single target",
         CardsRarity.Default,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
-        [ BuffEffect(ModifiersToBuff.MagicalProtection, 0.3, 1) ],
+        [ BuffEffect(ModifiersToBuff.MagicalProtection, getBuffValueOnRarity(CardsRarity.Default), 1) ],
         atcCard,
         magicDef,
         commonBorder,
@@ -90,8 +90,8 @@ function createCardBuffAnyProtectionMultipleTarget() {
         StarriorStates.Cast,
         1,
         [
-            BuffEffect(ModifiersToBuff.PhysicalProtection, 0.3, 1),
-            BuffEffect(ModifiersToBuff.MagicalProtection, 0.3, 1)
+            BuffEffect(ModifiersToBuff.PhysicalProtection, getBuffValueOnRarity(CardsRarity.Default), 1),
+            BuffEffect(ModifiersToBuff.MagicalProtection, getBuffValueOnRarity(CardsRarity.Default), 1)
         ],
         buffCard,
         defAndMagicDefBuff,
@@ -108,7 +108,7 @@ function createCardDebuffPhysicalDamageSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [ DebuffEffect(ModifiersToBuff.PhysicalDamage, 1.5, 1) ],
+        [ DebuffEffect(ModifiersToBuff.PhysicalDamage, getBuffValueOnRarity(CardsRarity.Default), 1) ],
         buffCard,
         strengthDebuff,
         commonBorder,
@@ -124,7 +124,7 @@ function createCardDebuffMagicalDamageSingleTarget() {
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [ DebuffEffect(ModifiersToBuff.MagicalDamage, 1.5, 1) ],
+        [ DebuffEffect(ModifiersToBuff.MagicalDamage, getBuffValueOnRarity(CardsRarity.Default), 1) ],
         buffCard,
         magicDamageDebuff,
         commonBorder,
@@ -135,12 +135,12 @@ function createCardDebuffMagicalDamageSingleTarget() {
 // Снижение физ защиты врага
 function createCardDebuffPhysicalProtectionSingleTarget() {
     return new Card(
-        "Buff physical damage single target",
+        "Debuff physical protection single target",
         CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [ DebuffEffect(ModifiersToBuff.PhysicalProtection, 0.3, 1) ],
+        [ DebuffEffect(ModifiersToBuff.PhysicalProtection, getBuffValueOnRarity(CardsRarity.Default), 1) ],
         buffCard,
         defDebuff,
         commonBorder,
@@ -151,12 +151,12 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
 // Снижение маг защиты врага
 function createCardDebuffMagicalProtectionSingleTarget() {
     return new Card(
-        "Buff magical damage single target",
+        "Debuff magical protection single target",
         CardsRarity.Default,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         1,
-        [ DebuffEffect(ModifiersToBuff.MagicalProtection, 0.3, 1) ],
+        [ DebuffEffect(ModifiersToBuff.MagicalProtection, getBuffValueOnRarity(CardsRarity.Default), 1) ],
         buffCard,
         magicDefDebuff,
         commonBorder,
