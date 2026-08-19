@@ -19,17 +19,13 @@ function Card(name,
     self.cardTokenSpr = cardTokenSpr
     self.energy = energy
 
-    // Стоимость карты детерминирована (зависит только от actionType/effects/rarity,
-    // которые после создания не меняются) — считаем один раз при создании, а не
-    // каждый кадр в отрисовке.
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana
     self.costValueCached = computeCardCost(rarity, effects)
     self.costType  = function() { return self.costTypeCached }
     self.costValue = function() { return self.costValueCached }
 }
 
-// Стоимость карты по её первому эффекту и редкости. Детерминирована, поэтому
-// считается один раз при создании карты (кэшируется в costValueCached).
+// Стоимость карты по её первому эффекту и редкости (кэшируется в costValueCached)
 function computeCardCost(rarity, effects) {
     var effectsCount = array_length(effects)
     if (effectsCount == 0) return 0
@@ -68,35 +64,93 @@ function getCostByRarity(rarity, dafault, unusual, rare, epic) {
     }
 }
 
-function getDamageFuncOnRariryAndTarget(rarity, target) {
+// Множитель к характеристике (сила/интеллект) для мгновенного урона карты
+// по редкости и типу цели
+function getDamageMultiplierOnRarityAndTarget(rarity, target) {
+    var single = (target == TargetTypes.SingleEnemyTarget)
     if rarity == CardsRarity.Default {
-        if target == TargetTypes.SingleEnemyTarget {
-            return function() { return irandom_range(1, 4) } 
-        } else {
-            return function() { return irandom_range(1, 2) } 
-        }
+        return single ? 1 : 1
     } else if rarity == CardsRarity.Unusual {
-        if target == TargetTypes.SingleEnemyTarget {
-            return function() { return irandom_range(1, 6) } 
-        } else {
-            return function() { return irandom_range(1, 4) } 
-        }
+        return single ? 1.5 : 1
     } else if rarity == CardsRarity.Rare {
-        if target == TargetTypes.SingleEnemyTarget {
-            return function() { return irandom_range(1, 8) } 
-        } else {
-            return function() { return irandom_range(1, 6) } 
-        }
+        return single ? 2 : 1.5
     } else if rarity == CardsRarity.Epic {
-        if target == TargetTypes.SingleEnemyTarget {
-            return function() { return irandom_range(1, 12) } 
-        } else {
-            return function() { return irandom_range(1, 8) } 
-        }
+        return single ? 2.5 : 2
     }
 }
 
-// Есть ли у карты эффект воскрешения?
+// Мгновенное лечение по редкости
+function getInstantHealValueOnRarity(rarity) {
+    switch (rarity) {
+        case CardsRarity.Default: return 10
+        case CardsRarity.Unusual: return 20
+        case CardsRarity.Rare: return 30
+        case CardsRarity.Epic: return HEAL_FULL
+    }
+}
+
+// Постепенное лечение по редкости
+function getOvertimeHealValueOnRarity(rarity) {
+    switch (rarity) {
+        case CardsRarity.Default: return 6
+        case CardsRarity.Unusual: return 8
+        case CardsRarity.Rare: return 12
+        case CardsRarity.Epic: return 16
+    }
+}
+
+// Длительность постепенного лечения по редкости 
+function getOvertimeHealDurationOnRarity(rarity) {
+    switch (rarity) {
+        case CardsRarity.Default: return 2
+        case CardsRarity.Unusual: return 2
+        case CardsRarity.Rare: return 3
+        case CardsRarity.Epic: return 3
+    }
+}
+
+
+// Мгновенное восстановление маны по редкости
+function getInstantManaValueOnRarity(rarity) {
+    switch (rarity) {
+        case CardsRarity.Default: return 10
+        case CardsRarity.Unusual: return 20
+        case CardsRarity.Rare: return 30
+        case CardsRarity.Epic: return MANA_FULL
+    }
+}
+
+// Постепенное восстановление маны по редкости за ход
+function getOvertimeManaValueOnRarity(rarity) {
+    switch (rarity) {
+        case CardsRarity.Default: return 6
+        case CardsRarity.Unusual: return 8
+        case CardsRarity.Rare: return 12
+        case CardsRarity.Epic: return 16
+    }
+}
+
+// Длительность постепенного восстановления маны
+function getOvertimeManaDurationOnRarity(rarity) {
+    switch (rarity) {
+        case CardsRarity.Default: return 2
+        case CardsRarity.Unusual: return 2
+        case CardsRarity.Rare: return 3
+        case CardsRarity.Epic: return 3
+    }
+}
+
+// Величина усиления/снижения характеристики по редкости
+function getBuffValueOnRarity(rarity) {
+    switch (rarity) {
+        case CardsRarity.Default: return 2
+        case CardsRarity.Unusual: return 4
+        case CardsRarity.Rare:    return 6
+        case CardsRarity.Epic:    return 8
+    }
+}
+
+// Есть ли у карты эффект воскрешения
 function cardIsResurrection(card) {
     for (var i = 0; i < array_length(card.effects); i++) {
         var e = card.effects[i]
@@ -115,25 +169,24 @@ function checkIfCanPlayCard(caster, card) {
         if (!hasKO) return false
     }
 
-    if (caster.isEnemy) return true                   // враги играют бесплатно (нет маны)
+    if (caster.isEnemy) return true // враги играют бесплатно
 
     if (card.costType() == CostType.Mana) {
         if (caster.maxMana <= 0) return true
         return caster.mana >= card.costValue()
     } else {
-        return caster.hp > card.costValue()           // нельзя уйти в 0 HP от стоимости
+        return caster.hp > card.costValue() // нельзя уйти в 0 HP от стоимости
     }
 }
 
 function applyCost(caster, card) {
-    if (caster.isEnemy) return                        // враги играют бесплатно (не режут себе HP)
+    if (caster.isEnemy) return // враги играют бесплатно 
 
     if (card.costType() == CostType.Mana) {
         if (caster.maxMana <= 0) return
         caster.mana = caster.mana - card.costValue()
     } else {
         caster.hp = caster.hp - card.costValue()
-        // подстраховка: если герой всё же ушёл в 0 HP — нокаут
         if (caster.hp <= 0 && caster.actionState != StarriorStates.KnockOut) {
             caster.changeActionState(StarriorStates.KnockOut, undefined)
         }
@@ -185,9 +238,8 @@ function playCard(card, caster, targets) {
     }, cardCastSpriteOverride(card))
 }
 
-// Конец хода: обобщённый проход. Для каждого EndOfTurn-эффекта вызываем
-// onEndOfTurn его обработчика, показываем нотификацию и тикаем длительность.
-// Никакого switch по типу — поведение задано в реестре (scrEffectSystem).
+// Конец хода. Для каждого EndOfTurn-эффекта вызываем
+// onEndOfTurn его обработчика
 function executeEndOfTurn(character) {
     var effects = character.effects
     for(var i = array_length(effects) - 1; i >= 0; i--) {
@@ -206,7 +258,7 @@ function executeEndOfTurn(character) {
 }
 
 // Поверхностная копия эффекта. Нужна, чтобы у каждой цели был свой
-// экземпляр (своя duration), а не общая ссылка на эффект карты.
+// экземпляр, а не общая ссылка на эффект карты
 function cloneEffect(effect) {
     var copy = {}
     var names = variable_struct_get_names(effect)
@@ -216,7 +268,7 @@ function cloneEffect(effect) {
     return copy
 }
 
-// Поле эффекта или undefined, если его нет (для structs работает так же)
+// Поле эффекта или undefined, если его нет
 function effectField(effect, fieldName) {
     return variable_instance_exists(effect, fieldName)
         ? variable_struct_get(effect, fieldName)
@@ -224,16 +276,16 @@ function effectField(effect, fieldName) {
 }
 
 // Считаем эффекты "одинаковыми", если совпадает тип и уточняющие признаки:
-// статус (Burn/Freeze...), модификатор баффа/дебаффа, цель временной слабости.
+// статус (Burn/Freeze...), модификатор баффа/дебаффа, цель временной слабости
 function effectsMatch(a, b) {
     if (effectField(a, "type") != effectField(b, "type")) return false
     if (effectField(a, "statusName") != effectField(b, "statusName")) return false
-    if (effectField(a, "buffType")   != effectField(b, "buffType"))   return false
-    if (effectField(a, "weakness")   != effectField(b, "weakness"))   return false
+    if (effectField(a, "buffType") != effectField(b, "buffType")) return false
+    if (effectField(a, "weakness") != effectField(b, "weakness")) return false
     return true
 }
 
-// Если такой же эффект уже наложен — обновляем длительность вместо дубликата.
+// Если такой же эффект уже наложен — обновляем длительность вместо дубликата
 function refreshOrPushEffect(target, effect) {
     var effects = target.effects
     for (var i = 0; i < array_length(effects); i++) {
@@ -250,7 +302,7 @@ function refreshOrPushEffect(target, effect) {
 }
 
 // Эффективный шанс наложения статуса на цель: базовый + бонус, если цель слаба
-// к этому статусу («выше вероятность быть оглушённым/подожжённым» из спеки).
+// к этому статусу 
 function effectChanceFor(target, effect) {
     if (!variable_instance_exists(effect, "chance")) return 1   // без шанса — всегда
     var c = effect.chance
@@ -282,8 +334,7 @@ function effectApplyStatus(effect, caster, targets) {
     }
 }
 
-// Мгновенный эффект: вызываем onInstant обработчика и сбрасываем выбор цели.
-// Поведение каждого типа задано в реестре (scrEffectSystem), без switch.
+// Мгновенный эффект: вызываем onInstant обработчика и сбрасываем выбор цели
 function executeEffect(effect, caster, targets) {
     runInstant(effect, caster, targets)
     selectedTargetNumber = -1
@@ -291,9 +342,7 @@ function executeEffect(effect, caster, targets) {
     battleState = BattleStates.AfterPlayChecks
 }
 
-// Сила к стихии/статусу входящего эффекта (совпадение по statusName; массивы
-// strengths хранят значения StatusNames, поэтому сравниваем только с ним, чтобы
-// не пересечься по числам с EffectTypes).
+// Сила к стихии/статусу входящего эффекта
 function checkIfHasStrengths(target, effect) {
     if (variable_instance_exists(effect, "statusName")
         && array_contains(target.strengths, effect.statusName)) {
@@ -302,8 +351,7 @@ function checkIfHasStrengths(target, effect) {
     return false
 }
 
-// Слабость к стихии/статусу входящего эффекта (по statusName) + временная
-// слабость к типу урона от карты Create Temporary Weakness.
+// Слабость к стихии/статусу входящего эффекта
 function checkIfHasWeaknesses(target, effect) {
     if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) return false
     if (variable_instance_exists(effect, "statusName")
@@ -323,8 +371,7 @@ function checkIfHasWeaknesses(target, effect) {
     return false
 }
 
-// Находится ли цель в состоянии (активный статус), к которому она слаба?
-// Спека: «повышенное получение урона в таком состоянии».
+// Находится ли цель в состоянии, к которому она слаба?
 function checkIfWeakStateActive(target) {
     if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) return false
     var effects = target.effects
@@ -344,34 +391,30 @@ function executeDamageEffect(
     targets
 ) {
     var damageType = effect.damageType
-    var damage = is_method(effect.value) ? effect.value() : effect.value
+    var cardMult = is_method(effect.value) ? effect.value() : effect.value
 
-    // Базовый урон с учетом характеристики кастера
-    switch (damageType) {
-        case DamageTypes.Physical: damage *= caster.strength;     break
-        case DamageTypes.Magical:  damage *= caster.intelligence; break
-    }
-
-    // Модификаторы ИСХОДЯЩЕГО урона кастера: баффы/дебаффы атаки — множители
-    // (бафф value=1.5 => x1.5, дебафф value=1.5 => /1.5).
-    var outMult = 1
+    // Характеристика кастера + баффы/дебаффы атаки
+    // Итоговый урон = характеристика * множитель карты
+    var stat, atkModifier
     if (damageType == DamageTypes.Physical) {
-        var pdBuff   = checkIfHasBuff(caster, EffectTypes.Buff,   ModifiersToBuff.PhysicalDamage)
-        var pdDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.PhysicalDamage)
-        if (pdBuff   != undefined && pdBuff.value   != 0) outMult *= pdBuff.value
-        if (pdDebuff != undefined && pdDebuff.value != 0) outMult /= pdDebuff.value
+        stat = caster.strength
+        atkModifier = ModifiersToBuff.PhysicalDamage
     } else {
-        var mdBuff   = checkIfHasBuff(caster, EffectTypes.Buff,   ModifiersToBuff.MagicalDamage)
-        var mdDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, ModifiersToBuff.MagicalDamage)
-        if (mdBuff   != undefined && mdBuff.value   != 0) outMult *= mdBuff.value
-        if (mdDebuff != undefined && mdDebuff.value != 0) outMult /= mdDebuff.value
+        stat = caster.intelligence
+        atkModifier = ModifiersToBuff.MagicalDamage
     }
-    if (checkIfHasEffectType(caster, EffectTypes.Weakening)) outMult *= 0.9
+    var atkBuff   = checkIfHasBuff(caster, EffectTypes.Buff,   atkModifier)
+    var atkDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, atkModifier)
+    if (atkBuff   != undefined) stat += atkBuff.value
+    if (atkDebuff != undefined) stat -= atkDebuff.value
+    stat = max(stat, 0)
 
-    damage *= outMult
+    var damage = cardMult * stat
 
-    // Митигация на стороне ЦЕЛИ: защита (баффы/дебаффы), броня, слабости/сопротивления.
-    // Та же функция используется и для End Of Turn урона, поэтому логика едина.
+    // Ослабление кастера
+    if (checkIfHasEffectType(caster, EffectTypes.Weakening)) damage *= 0.9
+
+    // Модификация на стороне ЦЕЛИ: защита (+ баффы/дебаффы), слабости/сопротивления
     damage = mitigateDamage(targets, effect, damage)
 
     show_debug_message("damage " + string(damage) )
@@ -458,23 +501,22 @@ function mitigateDamage(target, effect, rawDamage) {
     var modifier = 0
     var damageType = getEffectDamageType(effect)
 
-    switch (damageType) {
-        case DamageTypes.Physical:
-            damage -= target.guts
-            var pProtBuff = checkIfHasBuff(target, EffectTypes.Buff,   ModifiersToBuff.PhysicalProtection)
-            var pProtDebuff = checkIfHasBuff(target, EffectTypes.Debuff, ModifiersToBuff.PhysicalProtection)
-            if (pProtBuff != undefined) modifier -= pProtBuff.value
-            if (pProtDebuff != undefined) modifier += pProtDebuff.value
-            break
-        case DamageTypes.Magical:
-            damage -= target.aura
-            var mProtBuff   = checkIfHasBuff(target, EffectTypes.Buff,   ModifiersToBuff.MagicalProtection)
-            var mProtDebuff = checkIfHasBuff(target, EffectTypes.Debuff, ModifiersToBuff.MagicalProtection)
-            if (mProtBuff   != undefined) modifier -= mProtBuff.value
-            if (mProtDebuff != undefined) modifier += mProtDebuff.value
-            break
+    // Защита цели + баффы/дебаффы защиты + заморозка как дебафф физ. защиты
+    var def, protModifier
+    if (damageType == DamageTypes.Magical) {
+        def = target.aura
+        protModifier = ModifiersToBuff.MagicalProtection
+    } else {
+        def = target.guts
+        protModifier = ModifiersToBuff.PhysicalProtection
     }
+    var protBuff   = checkIfHasBuff(target, EffectTypes.Buff,   protModifier)
+    var protDebuff = checkIfHasBuff(target, EffectTypes.Debuff, protModifier)
+    if (protBuff   != undefined) def += protBuff.value
+    if (protDebuff != undefined) def -= protDebuff.value
+    damage -= max(def, 0)
 
+    // Слабые места и ослабление как процентные модификаторы урона
     if (checkIfHasEffectType(target, EffectTypes.Weakening)) modifier += 0.1
     // Слабые места: сила (−); слабость к стихии входящего эффекта (+);
     // и доп. урон, пока цель В СОСТОЯНИИ, к которому слаба (+).
@@ -483,5 +525,5 @@ function mitigateDamage(target, effect, rawDamage) {
     if (checkIfWeakStateActive(target))       modifier += WEAKNESS_DAMAGE_MODIFIER
 
     damage += damage * modifier
-    return max(round(damage), 0)   // урон — целое число
+    return max(round(damage), 1)
 }

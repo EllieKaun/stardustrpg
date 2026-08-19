@@ -51,7 +51,7 @@ function initEffectRegistry() {
     // --- Восстановление маны: мгновенное и по времени. ---
     variable_struct_set(R, "ManaGain", {
         onInstant: function(effect, caster, targets) { executeManaGain(effect, caster, targets) },
-        onEndOfTurn: function(effect, character) { character.mana += effect.value },
+        onEndOfTurn: function(effect, character) { character.applyMana(effect.value) },
     })
 
     // --- Снятие статуса. ---
@@ -293,12 +293,12 @@ function BombEffect(damageType, value, chance, sprite = bombEffect, sound = noon
     if (sprite != noone) e.sprite = sprite
     return e
 }
-// Заморозка: дебафф физ. защиты
-// value 0.3 => замороженный получает +30% физ. урона
+
+// Заморозка с дебаффом физ. защиты
 function FreezeEffect(duration, chance) {
     return { type: EffectTypes.Debuff, buffType: ModifiersToBuff.PhysicalProtection,
-             value: 0.3, statusName: StatusNames.Freeze, duration: duration,
-             chance: chance, timing: Timing.Overtime }
+             value: getBuffValueOnRarity(CardsRarity.Default), statusName: StatusNames.Freeze,
+             duration: duration, chance: chance, timing: Timing.Overtime }
 }
 // Вампиризм
 function VampirismEffect(damageType, value, chance, sprite = attackEffect, sound = SliceAtc) {
