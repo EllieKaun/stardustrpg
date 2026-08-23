@@ -12,6 +12,8 @@ copyNextCard = false
 // Хит-боксы для управления мышью (заполняются в Draw GUI, читаются в Step)
 cardHitRects = []
 menuHitRects = []
+rewardHitRects = [] // карты награды на экране победы
+gameOverHitRects = [] // кнопки RETRY/EXIT на экране поражения
 infoCloseRect = undefined
 mouseLastX = -1 // для детекта движения мыши
 mouseLastY = -1

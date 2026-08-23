@@ -123,6 +123,28 @@ function isEnemysTurn() {
     return array_contains(enemies, selectedCharacter)
 }
 
+// Выбор цели для карты. foes — противники кастера, allies — союзники
+// preferAlly/preferFoe — предпочтительная одиночная цель (иначе случайная). noone если цели нет.
+function enemyResolveTarget(card, caster, foes, allies, preferAlly, preferFoe) {
+    switch (card.target) {
+        case TargetTypes.SingleEnemyTarget:
+            if (array_length(foes) == 0) return noone
+            return (preferFoe != noone) ? preferFoe : foes[irandom(array_length(foes) - 1)]
+        case TargetTypes.AllEnemies:
+            return (array_length(foes) > 0) ? foes : noone
+        case TargetTypes.SingleAllyTarget:
+            if (array_length(allies) == 0) return noone
+            return (preferAlly != noone) ? preferAlly : allies[irandom(array_length(allies) - 1)]
+        case TargetTypes.AllAllies:
+            return (array_length(allies) > 0) ? allies : noone
+        case TargetTypes.Self:
+            return caster
+        default:
+            if (array_length(foes) == 0) return noone
+            return foes[irandom(array_length(foes) - 1)]
+    }
+}
+
 // Выбор следующего персонажа
 function selectNextCharacter() {
     var count = array_length(playOrder)

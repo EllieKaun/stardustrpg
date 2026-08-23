@@ -71,11 +71,11 @@ function getDamageMultiplierOnRarityAndTarget(rarity, target) {
     if rarity == CardsRarity.Default {
         return single ? 1 : 1
     } else if rarity == CardsRarity.Unusual {
-        return single ? 1.5 : 1
+        return single ? 2 : 1
     } else if rarity == CardsRarity.Rare {
-        return single ? 2 : 1.5
+        return single ? 3 : 2
     } else if rarity == CardsRarity.Epic {
-        return single ? 2.5 : 2
+        return single ? 4 : 3
     }
 }
 
@@ -420,9 +420,9 @@ function executeDamageEffect(
     show_debug_message("damage " + string(damage) )
     targets.applyDamage(damage)
     targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
-    if variable_instance_exists(effect, "chance") 
+    if variable_instance_exists(effect, "chance")
        && variable_instance_exists(effect, "statusName") {
-        var prob = random(1) 
+        var prob = random(1)
         if effect.statusName == StatusNames.Vampirism
            && prob <= effect.chance {
             caster.applyHeal(round(damage * 0.2))
@@ -458,7 +458,7 @@ function reduceOrRemoveEffectType(target, effectType) {
     }
 }
 
-function executeHealing(effect, caster, targets) { 
+function executeHealing(effect, caster, targets) {
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
             if !targets[i].isKO() {

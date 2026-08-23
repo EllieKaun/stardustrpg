@@ -1,8 +1,6 @@
 updateCardAnims() // двигаем/чистим летящие карты в любом состоянии
 
-// - Управление мышью -
-// UI боя рисуется прямо в координатах GUI (окна), поэтому мышь берём как есть.
-// Хит-боксы карт/меню тоже в оконных координатах. Враги — мировые объекты.
+// Управление мышью 
 var mbx = device_mouse_x_to_gui(0)
 var mby = device_mouse_y_to_gui(0)
 var mouseMoved = (mbx != mouseLastX || mby != mouseLastY)
@@ -174,7 +172,7 @@ switch (battleState) {
     break
 }
 
-// Танец простоя: 5 сек без ввода на ходу героя -> зациклённый танец до любого ввода
+// Танец простоя 
 if (battleState == BattleStates.CharacterPlay && instance_exists(selectedCharacter)) {
     if (mClick || keyboard_check_pressed(vk_anykey)) {
         idleDanceTimer = 0

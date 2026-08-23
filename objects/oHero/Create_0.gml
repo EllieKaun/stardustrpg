@@ -1,10 +1,10 @@
-spdWalk = 1
+spdWalk = 0.8
 last_v_dir = 1
 xPrev = x
 yPrev = y
 
 path = path_add()
-nSpeed = 1
+nSpeed = 0.8
 calcPathDelay = 8
 calcPathTimer = 0
 distanceToStopFollowing = 24

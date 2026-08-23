@@ -89,23 +89,29 @@ function initStarriorsPositions(
     var verticalSpacing = (starriorsZoneHeight - 16 * 2) / 2
     var extraSpread = 8 
     var startY = starriorsZoneHeight
-    var step = spacingBetweenStarriors + 16  // шаг между бойцами
-
     var halfW = screenWidth / 2
     var heroesCenterX  = halfW * 0.5 // центр левой половины
     var enemiesCenterX = halfW + halfW * 0.5 // центр правой половины
 
-    // Герои — по центру левой половины
+    var slotCount = MAX_STARRIORS_PER_SIDE
+
+   
+    var edgeMargin = 16
+    var baseStep = spacingBetweenStarriors + 16
+    var fitStep  = (halfW - edgeMargin * 2) / (slotCount - 1)
+    var step = min(baseStep, fitStep)
+
+    // Герои — по центру левой половины, заполняются справа налево
     var heroCount  = array_length(heroes)
-    var heroStartX = heroesCenterX - (heroCount - 1) * step / 2  // центрируем группу
+    var heroStartX = heroesCenterX - (slotCount - 1) * step / 2  // центрируем на 5 слотов
     for (var i = 0; i < heroCount; i++) {
-        heroes[i].x = heroStartX + i * step
+        heroes[i].x = heroStartX + (slotCount - 1 - i) * step
         heroes[i].y = startY + (i mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
     }
 
     // Враги — по центру правой половины
     var enemyCount  = array_length(enemies)
-    var enemyStartX = enemiesCenterX - (enemyCount - 1) * step / 2
+    var enemyStartX = enemiesCenterX - (slotCount - 1) * step / 2
     for (var i = 0; i < enemyCount; i++) {
         enemies[i].x = enemyStartX + i * step
         enemies[i].y = startY + (i mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)

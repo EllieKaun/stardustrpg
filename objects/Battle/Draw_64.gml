@@ -1,14 +1,11 @@
 if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
     display_set_gui_size(max(window_get_width(), guiBaseWidth()), max(window_get_height(), guiBaseHeight()))
 
-// Весь UI боя рисуется в координатах GUI (окна) 
-// scaleToGui — множитель дизайн→окно (guiW / базовая ширина),
-// применяется к абсолютным константам. 
 var screenWidth  = display_get_gui_width()
 var screenHeight = display_get_gui_height()
 var scaleToGui = screenWidth / guiBaseWidth()
 
-// Хит-боксы для мыши (координаты GUI/окна, читаются в Step)
+// Хит-боксы для мыши
 cardHitRects = []
 menuHitRects = []
 infoCloseRect = undefined

@@ -3,12 +3,17 @@ isActive = false
 isTarget = false
 themeColor = c_fuchsia
 
-hp = 0 
-maxHp = 0 
-mana = 0 
-maxMana = 0 
+hp = 0
+maxHp = 0
+mana = 0
+maxMana = 0
 energy = 0
 maxEnergy = 0
+
+// Плавная анимация полосок хп и маны
+displayHp = 0
+displayMana = 0
+hpBarReady = false
 
 intelligence = 0
 strength = 0

@@ -112,21 +112,71 @@ function runPuppetTurn(puppet) {
         var c = hand[i]
         if (isSingleTargetCard(c) && checkIfCanPlayCard(puppet, c)) array_push(playable, c)
     }
-    
-    if (array_length(playable) == 0) { 
+
+    if (array_length(playable) == 0) {
         skipTurn()
         return
     }
 
-    var card = playable[irandom(array_length(playable) - 1)]
-    var ownTeam = puppet.isEnemy ? enemies : heroes
-    var otherTeam = puppet.isEnemy ? heroes : enemies
-    var pool = puppetTargetsEnemies(puppet.puppetCategory) ? aliveOf(otherTeam) : aliveOf(ownTeam)
+    var allies = aliveOf(puppet.isEnemy ? enemies : heroes)   // союзники марионетки
+    var foes   = aliveOf(puppet.isEnemy ? heroes : enemies)   // противники марионетки
 
-    if (array_length(pool) == 0) { 
-        skipTurn() 
-        return 
+    // Категоризируем играбельные карты: первый хил / бафф / атака
+    var healChoice = noone, buffChoice = noone, attackChoice = noone
+    for (var i = 0; i < array_length(playable); i++) {
+        var c = playable[i]
+        switch (cardCategoryOf(c)) {
+            case CardCategory.Heal: if (healChoice == noone) healChoice = c; break
+            case CardCategory.Buff: if (buffChoice == noone) buffChoice = c; break
+            case CardCategory.Attack:
+            case CardCategory.Magic: if (attackChoice == noone) attackChoice = c; break
+        }
     }
-    var target = pool[irandom(array_length(pool) - 1)]
+
+    // Самый раненый союзник (для хила)
+    var woundedAlly = noone
+    var lowestHp = 999999
+    for (var i = 0; i < array_length(allies); i++) {
+        var a = allies[i]
+        if (a.hp < a.maxHp && a.hp < lowestHp) { lowestHp = a.hp; woundedAlly = a }
+    }
+
+    var card = noone
+    var target = noone
+
+    // Лечим самого раненого союзника
+    if (healChoice != noone && woundedAlly != noone) {
+        target = enemyResolveTarget(healChoice, puppet, foes, allies, woundedAlly, noone)
+        if (target != noone) card = healChoice
+    }
+
+    // Баффаем себя, если ещё не забаффаны этим модификатором
+    if (card == noone && buffChoice != noone) {
+        var alreadyBuffed = false
+        var e0 = buffChoice.effects[0]
+        if (variable_struct_exists(e0, "buffType"))
+            alreadyBuffed = !is_undefined(checkIfHasBuff(puppet, EffectTypes.Buff, e0.buffType))
+        if (!alreadyBuffed) {
+            target = enemyResolveTarget(buffChoice, puppet, foes, allies, puppet, noone)
+            if (target != noone) card = buffChoice
+        }
+    }
+
+    // Атакуем
+    if (card == noone && attackChoice != noone) {
+        target = enemyResolveTarget(attackChoice, puppet, foes, allies, noone, noone)
+        if (target != noone) card = attackChoice
+    }
+
+    // Если не получилось, случайная играбельная карта
+    if (card == noone) {
+        card = playable[irandom(array_length(playable) - 1)]
+        target = enemyResolveTarget(card, puppet, foes, allies, woundedAlly, noone)
+        if (target == noone) {
+            skipTurn()
+            return
+        }
+    }
+
     playCard(card, puppet, target)
 }

@@ -3,6 +3,8 @@
 #macro HERO_DRAW_DELAY 2
 #macro MAX_PUPPETS 3
 
+#macro MAX_STARRIORS_PER_SIDE 5
+
 // Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
 #macro WEAKNESS_DAMAGE_MODIFIER 0.1
 #macro WEAKNESS_STATUS_CHANCE_BONUS 0.1

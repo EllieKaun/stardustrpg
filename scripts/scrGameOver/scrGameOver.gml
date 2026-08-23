@@ -1,20 +1,35 @@
 // Обработка состояния победы (чтение с клавиатуры)
 function stepVictoryScreen() {
+    var mx = device_mouse_x_to_gui(0)
+    var my = device_mouse_y_to_gui(0)
+    var mClick = mouse_check_button_pressed(mb_left)
+
     var count = array_length(rewardChoices)
 
     if (count == 0) { // Если нет наград
-        if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space))
+        if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space) || mClick)
             returnToOverworld()
         return
     }
-    if (rewardSelected) return // когда награда уже выбрана энтером - все, блокируем
+    if (rewardSelected) return // когда награда уже выбрана
+
+    var confirm = keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)
+
+    for (var i = 0; i < array_length(rewardHitRects); i++) {
+        var r = rewardHitRects[i]
+        if (pointInRect(mx, my, r.x, r.y, r.w, r.h)) {
+            rewardCursor = r.index
+            if (mClick) confirm = true
+            break
+        }
+    }
 
     if (keyboard_check_pressed(vk_left)  || keyboard_check_pressed(ord("A")))
-        rewardCursor = (rewardCursor - 1 + count) mod count 
+        rewardCursor = (rewardCursor - 1 + count) mod count
     if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D")))
         rewardCursor = (rewardCursor + 1) mod count
 
-    if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) { // подтверждение награды
+    if (confirm) { // подтверждение награды
         var picked = rewardChoices[rewardCursor].cardRef
         unlockCard(picked.id, picked.rarity, 1)
         playerDataSave()
@@ -24,11 +39,27 @@ function stepVictoryScreen() {
 }
 
 // Обработка состояния поражения (чтение с клавиатуры)
-function stepGameOverScreen() { 
+function stepGameOverScreen() {
+    var mx = device_mouse_x_to_gui(0)
+    var my = device_mouse_y_to_gui(0)
+    var mClick = mouse_check_button_pressed(mb_left)
+
+    var confirm = keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)
+
     if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) gameOverCursor = 0
     if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) gameOverCursor = 1
 
-    if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) {
+    // Мышь: наведение выбирает кнопку, клик подтверждает
+    for (var i = 0; i < array_length(gameOverHitRects); i++) {
+        var r = gameOverHitRects[i]
+        if (pointInRect(mx, my, r.x, r.y, r.w, r.h)) {
+            gameOverCursor = r.index
+            if (mClick) confirm = true
+            break
+        }
+    }
+
+    if (confirm) {
         if (gameOverCursor == 0) retryBattle()
         else returnToOverworld()
     }
@@ -53,6 +84,7 @@ function drawVictoryScreen() {
     drawUiText(sw / 2, floor(sh * 0.12), "VICTORY", sh * 0.06)
 
     var count = array_length(rewardChoices)
+    rewardHitRects = []
 
     // Если нет наград
     if (count == 0) {
@@ -73,6 +105,8 @@ function drawVictoryScreen() {
         var cx = floor(startX + i * (cardW + gap))
         var isSel = (i == rewardCursor)
         var dy = isSel ? cardY - 3 * s : cardY
+
+        array_push(rewardHitRects, { x: cx, y: cardY, w: cardW, h: cardH, index: i })
 
         drawCard(rewardChoices[i], cx, dy, cardW, cardH)
 
@@ -180,10 +214,13 @@ function drawGameOverScreen() {
     var totalW = btnW * 2 + gap;
     var startX = (sw - totalW) / 2
     var btnY   = floor(sh * 0.5)
+    gameOverHitRects = []
 
     for (var i = 0; i < 2; i++) { // Рисование кнопок Ретрай и Выход
         var bx = floor(startX + i * (btnW + gap))
         var isSel = (gameOverCursor == i)
+
+        array_push(gameOverHitRects, { x: bx, y: btnY, w: btnW, h: btnH, index: i })
 
         draw_sprite_stretched(sprCardDeskFull, 0, bx, btnY, btnW, btnH)
         draw_set_color(isSel ? c_yellow : c_white)

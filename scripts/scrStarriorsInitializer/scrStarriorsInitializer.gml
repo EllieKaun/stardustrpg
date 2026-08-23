@@ -12,8 +12,8 @@ function createLana(){
             70,
             1,
             1,
-            2,
             4,
+            10,
             2,
             1,
             playerDeckFor(Characters.Lana)
@@ -38,8 +38,8 @@ function createViv(){
         30,
         1,
         1,
+        10,
         4,
-        2,
         1,
         2,
         playerDeckFor(Characters.Viv)
