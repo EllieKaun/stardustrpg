@@ -168,7 +168,7 @@ activePanel = Panels.Collection
 open = false
 
 openBuilder = function() {
-    display_set_gui_size(max(window_get_width(), dbBaseW), max(window_get_height(), dbBaseH))
+    setCrispGui(dbBaseW, dbBaseH)
     layoutPanels()
     open = true
     global.uiModal = true

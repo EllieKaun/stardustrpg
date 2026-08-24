@@ -50,6 +50,16 @@ function drawBorderAroundCard(
 function guiBaseWidth()  { return variable_global_exists("guiBaseW") ? global.guiBaseW : display_get_gui_width()  }
 function guiBaseHeight() { return variable_global_exists("guiBaseH") ? global.guiBaseH : display_get_gui_height() }
 
+// Ставит GUI-слой в 16:9 аспекте
+function setCrispGui(baseW, baseH) {
+    var scale = max(1, min(window_get_width() / baseW, window_get_height() / baseH))
+    var gw = round(baseW * scale)
+    var gh = round(baseH * scale)
+    if (display_get_gui_width() != gw || display_get_gui_height() != gh) {
+        display_set_gui_size(gw, gh)
+    }
+}
+
 // Попадание точки в повёрнутый прямоугольник (центр cx,cy; размер w,h;
 // угол angle — та же конвенция, что у draw_sprite_ext). Для хит-теста карт
 function pointInRotatedRect(px, py, cx, cy, w, h, angle) {

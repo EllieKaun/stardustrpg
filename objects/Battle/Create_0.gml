@@ -4,7 +4,7 @@ menuItems = ["Run", "Shuffle", "Info"]
 
 global.guiBaseW = camera_get_view_width(view_camera[0])
 global.guiBaseH = camera_get_view_height(view_camera[0])
-display_set_gui_size(max(window_get_width(), global.guiBaseW), max(window_get_height(), global.guiBaseH))
+setCrispGui(global.guiBaseW, global.guiBaseH)
 selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false
@@ -65,3 +65,6 @@ posSpacing = spacingBetweenStarriors
 
 // генерация уровня
 generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleEncounter)
+
+playMusicNamed("BattleMusic")
+stopAmbient()

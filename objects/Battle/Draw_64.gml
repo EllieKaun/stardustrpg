@@ -1,5 +1,4 @@
-if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
-    display_set_gui_size(max(window_get_width(), guiBaseWidth()), max(window_get_height(), guiBaseHeight()))
+setCrispGui(guiBaseWidth(), guiBaseHeight())
 
 var screenWidth  = display_get_gui_width()
 var screenHeight = display_get_gui_height()

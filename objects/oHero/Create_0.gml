@@ -2,6 +2,7 @@ spdWalk = 0.8
 last_v_dir = 1
 xPrev = x
 yPrev = y
+can_move = true // false при входе в бой
 
 path = path_add()
 nSpeed = 0.8
