@@ -64,8 +64,8 @@ function Panel(_config) constructor {
     cursorCol = 0
     cursorRow = 0
     selectedSlot = -1
-    hoverSlot = -1        // слот под курсором мыши (только подсветка)
-    uiScale = 1           // множитель дизайн→окно (ставит layoutPanels) для спрайтов фикс. размера
+    hoverSlot = -1 // слот под курсором мыши (только подсветка)
+    uiScale = 1 
     focused = false
     onTabRow = false
     justGainedFocus = false
@@ -138,15 +138,33 @@ function Panel(_config) constructor {
         return { sx: slotX, sy: slotY, sw: layout.cardWidth, sh: layout.cardHeight }
     }
 
-    // Вкладки сейчас равномерно распределены по ширине панели, поэтому они никогда 
-    // выходят за пределы панели. Они над бэком (ty = y - tabH).
+    // Вкладки — по ширине своего текста. Если суммарно
+    // не влезают в панель — все ширины ужимаются пропорционально
+    static getTabWidths = function() {
+        var tabsCount = array_length(tabs)
+        var widths = array_create(tabsCount, 0)
+        var total = 0
+        var prevFont = draw_get_font()
+        for (var i = 0; i < tabsCount; i++) {
+            // масштаб текста по высоте вкладки 
+            var sc = uiTextScale(tabs[i].name, tabH * 0.55, 1000000)
+            widths[i] = string_width(tabs[i].name) * sc + tabPadding * 2
+            total += widths[i]
+        }
+        draw_set_font(prevFont)
+        var avail = w - tabGap * max(0, tabsCount - 1)
+        var k = (total > avail && total > 0) ? avail / total : 1
+        return { widths: widths, k: k }
+    }
+
     // Данные о позиции и размере таба по индексу
     static getTabRect = function(index) {
         var tabsCount = array_length(tabs)
         if (tabsCount == 0) return { tx: x, ty: y - tabH, tw: 0, th: tabH }
-        var tabWidth = (w - tabGap * (tabsCount - 1)) / tabsCount
-        var tabX = x + index * (tabWidth + tabGap)
-        return { tx: tabX, ty: y - tabH, tw: tabWidth, th: tabH }
+        var tw = getTabWidths()
+        var tabX = x
+        for (var i = 0; i < index; i++) tabX += tw.widths[i] * tw.k + tabGap
+        return { tx: tabX, ty: y - tabH, tw: tw.widths[index] * tw.k, th: tabH }
     }
 
     //// Фокус и выделение
@@ -312,8 +330,8 @@ function Panel(_config) constructor {
         }
     }
 
-    // Считывание и обработка мыши. Работает независимо от фокуса (наведение +
-    // клик по табам/слотам). Возвращает true, если курсор над этой панелью.
+    // Считывание и обработка мыши (наведение +
+    // клик по табам/слотам). Возвращает true, если курсор над этой панелью
     static stepMouse = function() {
         hoverSlot = -1
         // панель свёрстана прямо в координатах GUI (окна), поэтому мышь берём как есть
@@ -369,12 +387,12 @@ function Panel(_config) constructor {
     static draw = function() {
         var oldFont = draw_get_font()
 
-        // Бёк
+        // Бэк
         if (bgSprite != undefined) draw_sprite_stretched(bgSprite, 0, x, y, w, h)
 
         // Слоты
         var first = scrollRow * cols
-        var last  = min(first + visibleRows * cols, array_length(slots))
+        var last = min(first + visibleRows * cols, array_length(slots))
         for (var i = first; i < last; i++) {
             var slot = slots[i]
             var slotRect = getSlotRect(i)
@@ -479,10 +497,10 @@ function Panel(_config) constructor {
 
         // Скролл индткатор
         if (totalRows > visibleRows) {
-            var barW   = 4 * uiScale
-            var barX   = x + w - padding
-            var barY   = y + padding
-            var barH   = h - padding * 2
+            var barW = 4 * uiScale
+            var barX = x + w - padding
+            var barY = y + padding
+            var barH = h - padding * 2
             var thumbH = barH * (visibleRows / totalRows)
             var thumbY = barY + (barH - thumbH) * (scrollRow / max(1, totalRows - visibleRows))
             draw_set_color(c_dkgray)
@@ -499,23 +517,10 @@ function Panel(_config) constructor {
     };
 }
 
-// Безопасная отрссовка карты
+// Отрисовка карты
 function drawCard(card, cardX, cardY, cardW, cardH) {
-    if (card.cardBaseSpr != undefined) 
-        draw_sprite_stretched(card.cardBaseSpr, 0, cardX, cardY, cardW, cardH)
-    if (card.cardIllustrationSpr != undefined) 
-        draw_sprite_stretched(card.cardIllustrationSpr, 0, cardX, cardY, cardW, cardH)
-    if (card.cardBorderSpr != undefined)
-         draw_sprite_stretched(card.cardBorderSpr, 0, cardX, cardY, cardW, cardH)
-    if (card.cardTokenSpr != undefined)
-        draw_sprite_stretched(card.cardTokenSpr, 0, cardX, cardY, cardW, cardH)
-    
-    draw_set_color(c_white)
-    draw_set_halign(fa_left)
- //   draw_text(cardX + 3, cardY + 3, string(_card.energy))
-    draw_set_halign(fa_center)
-    draw_set_valign(fa_bottom)
-   // draw_text(cardX + cardW / 2, cardY + cardH - 3, _card.name)
-    draw_set_halign(fa_left)
-    draw_set_valign(fa_top)
+    if (card.cardBaseSpr == undefined) { 
+        return
+    }
+    drawCardFace(card, cardX + cardW * 0.5, cardY + cardH * 0.5, cardW, cardH, 0)
 }

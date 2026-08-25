@@ -1,4 +1,5 @@
-updateCardAnims() // двигаем/чистим летящие карты в любом состоянии
+// двигаем/чистим летящие карты (кроме катсцены босса — там всё на паузе)
+if (battleState != BattleStates.BossIntro) updateCardAnims()
 
 // Управление мышью 
 var mbx = device_mouse_x_to_gui(0)
@@ -20,7 +21,11 @@ switch (battleState) {
             }
         }
         if (hoveredCard >= 0) {
-            if (mouseMoved) { focusArea = FocusArea.Deck; selectedCard = hoveredCard }
+            if (mouseMoved) {
+                focusArea = FocusArea.Deck
+                if (selectedCard != hoveredCard) playCardSelectSound()
+                selectedCard = hoveredCard
+            }
             if (mClick)     { focusArea = FocusArea.Deck; selectedCard = hoveredCard; mouseConfirm = true }
         } else {
             for (var i = 0; i < array_length(menuHitRects); i++) {
@@ -108,13 +113,28 @@ switch (battleState) {
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
 
-        if (keyboard_check_pressed(ord("R"))) { doMenuAction("Run"); break }
-        if (keyboard_check_pressed(ord("S"))) { doMenuAction("Shuffle"); break }
-        if (keyboard_check_pressed(ord("I"))) { doMenuAction("Info"); break }
+        if (keyboard_check_pressed(ord("R"))) { 
+            doMenuAction("Run")
+            break 
+        }
+        if (keyboard_check_pressed(ord("S"))) { 
+            doMenuAction("Shuffle") 
+            break 
+        }
+        if (keyboard_check_pressed(ord("I"))) { 
+            doMenuAction("Info") 
+            break 
+        }
 
         var handLen = array_length(selectedCharacter.getCardsInHand())
-        if (leftPressed && selectedCard > 0) selectedCard--
-        if (rightPressed && selectedCard < handLen - 1) selectedCard++
+        if (leftPressed && selectedCard > 0) {
+            selectedCard--
+            playCardSelectSound() 
+        }
+        if (rightPressed && selectedCard < handLen - 1) { 
+            selectedCard++
+            playCardSelectSound() 
+        }
 
         if (enterPressed) {
             if (handLen > 0) {
@@ -161,6 +181,16 @@ switch (battleState) {
     break
     case BattleStates.CardAnimating: // Карта летит и ввод заблокирован
     break
+    case BattleStates.BossIntro: { // Катсцена босса — ввод заблокирован
+        var introSpd = sprite_get_speed(bossIntroSprite)
+        if (sprite_get_speed_type(bossIntroSprite) == spritespeed_framespersecond) {
+            introSpd /= game_get_speed(gamespeed_fps)
+        }
+        bossIntroFrame += introSpd
+        if (bossIntroFrame >= sprite_get_number(bossIntroSprite)) {
+            battleState = bossIntroReturnState // спрайт кончился — возвращаем игру
+        }
+    } break
     case BattleStates.PlayResult:
         
     break

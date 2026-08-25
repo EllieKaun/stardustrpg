@@ -47,7 +47,7 @@ categoryForTab = function(tab) { // Мап индекса таба фильтр�
 // Панель коллекции всех карт 
 collectionPanel = new Panel({
     x: 0, y: 0, w: 0, h: 0,
-    bgSprite: sprCardDeskFull,
+    bgSprite: box,
     slotSpriteEmpty: EmptyCardPlace,
     slotSpriteLocked: LockedCardPlace,
     selectSprite: sprCardSelected,
@@ -83,7 +83,7 @@ collectionPanel.tag = Panels.Collection
 // Панель деки
 deckPanel = new Panel({
     x: 0, y: 0, w: 0, h: 0,
-    bgSprite: sprCardDeskFull,
+    bgSprite: box,
     slotSpriteEmpty: EmptyCardPlace,
     slotSpriteLocked: LockedCardPlace,
     selectSprite: sprCardSelected,

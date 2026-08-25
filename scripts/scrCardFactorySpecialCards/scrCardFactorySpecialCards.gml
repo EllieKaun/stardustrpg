@@ -12,7 +12,8 @@ function createCopyNextPlayedCardCard() {
         mgcCard,
         cardCopy,
         commonBorder,
-        hpCostToken
+        hpCostToken,
+        "copy next played card in hand"
     )
 }
 
@@ -30,7 +31,8 @@ function createAddEnergyCard() {
         mgcCard,
         extraTurn,
         commonBorder,
-        hpCostToken
+        hpCostToken,
+        "adds extra energy"
     )
 }
 
@@ -48,7 +50,8 @@ function createShuffleDeckCard() {
         mgcCard,
         shuffle,
         commonBorder,
-        hpCostToken
+        hpCostToken,
+        "shuffle"
     )
 }
 
@@ -64,7 +67,8 @@ function createCardIgnoreWeaknessSingleTarget() {
         buffCard,
         weaknessNull,
         commonBorder,
-        hpCostToken
+        hpCostToken,
+        "ignores weaknesses (2 turns)"
     )
 }
 
@@ -79,7 +83,8 @@ function createSummonPuppetCard(category, name, sprite) {
         mgcCard,
         sprite,
         commonBorder,
-        hpCostToken
+        hpCostToken,
+        "create a weak puppet"
     )
 }
 
@@ -115,6 +120,7 @@ function createBossCloneCard() {
         mgcCard,
         lightningSingleTarget,
         commonBorder,
-        hpCostToken
+        hpCostToken,
+        "clones itself into all empty slots"
     )
 }

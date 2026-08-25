@@ -12,8 +12,13 @@ if (keyboard_check_pressed(vk_escape)) {
     }
 }
 
-if (keyboard_check_pressed(vk_tab) && !global.uiModal) {
-    oDeckBuilder.openBuilder()
+// Открыть/закрыть декбилдер 
+if (keyboard_check_pressed(vk_tab) && instance_exists(oDeckBuilder)) {
+    if (oDeckBuilder.open) {
+        oDeckBuilder.closeBuilder()
+    } else if (!global.uiModal) { // не открываем поверх паузы/диалога
+        oDeckBuilder.openBuilder()
+    }
 //    say([
 //    dialogLine("Lana", placeholderLana, "left",
 //        "Hey hey"),

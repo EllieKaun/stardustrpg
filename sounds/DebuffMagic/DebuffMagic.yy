@@ -14,8 +14,8 @@
   "exportDir":"",
   "name":"DebuffMagic",
   "parent":{
-    "name":"Sounds",
-    "path":"folders/BattleDomain/Sounds.yy",
+    "name":"CardEffects",
+    "path":"folders/BattleDomain/Sounds/CardEffects.yy",
   },
   "preload":false,
   "resourceType":"GMSound",

@@ -100,13 +100,7 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                     angle = 0
                 }
                 
-                var sx = (drawCardW / sprite_get_width(card.cardBaseSpr)) * scale
-                var sy = (drawCardH / sprite_get_height(card.cardBaseSpr)) * scale
-
-                draw_sprite_ext(card.cardBaseSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
-                draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
-                draw_sprite_ext(card.cardBorderSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
-                draw_sprite_ext(card.cardTokenSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
+                drawCardFace(card, cx, cy, drawCardW, drawCardH, angle, scale, 1, isSelected)
 
                 // хит-бокс карты для мыши (координаты окна, с учётом наклона)
                 array_push(cardHitRects, {
@@ -115,13 +109,8 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                     angle: angle, index: i
                 })
 
-                // статы поверх этой карты
-                drawCardStats(cx, cy, drawCardW * scale, drawCardH * scale, angle, card)
-
                 if (isSelected && focusArea == FocusArea.Deck) {
                     var bw = drawCardW * scale
-                    var bh = drawCardH * scale
-                    drawBorderAroundCard(cx - bw / 2, cy - bh / 2, selectedBorderWidth, bw, bh)
                     draw_sprite_ext(sPointer, 0, cx - bw / 2, cy, scaleToGui, scaleToGui, 0, c_white, 1)
                 }
             }
@@ -148,14 +137,14 @@ if (selectedCharacter != noone) {
     }
 }
 
-// Информация о врагу
+// Информация о враге
 if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     var popupWidth = screenWidth * 0.6
     var popupHeight = screenHeight * 0.5
     var popupX = (screenWidth - popupWidth) / 2
     var popupY = (screenHeight - popupHeight) / 2
 
-    draw_sprite_stretched(sprCardDeskFull, 0, popupX, popupY, popupWidth, popupHeight)
+    draw_sprite_stretched(box, 0, popupX, popupY, popupWidth, popupHeight)
 
     var margin = 16 * scaleToGui
     var spriteBoxSize = 64 * scaleToGui
@@ -193,7 +182,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     var btnX = floor(popupX + popupWidth / 2 - btnWidth / 2)
     var btnY = floor(popupY + popupHeight + 4 * s) // 4 pixels below the popup
 
-    draw_sprite_stretched(sprCardDeskFull, 0, btnX, btnY, btnWidth, btnHeight)
+    draw_sprite_stretched(box, 0, btnX, btnY, btnWidth, btnHeight)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
     drawUiText(btnX + btnWidth / 2, btnY + btnHeight / 2, "CLOSE", btnHeight * 0.6)
@@ -211,4 +200,16 @@ if (battleState == BattleStates.GameOver) drawGameOverScreen()
 // Летящие карты — поверх всего интерфейса
 for (var i = 0; i < array_length(activeCardAnims); i++) {
     activeCardAnims[i].draw()
+}
+
+// Катсцена появления босса
+if (battleState == BattleStates.BossIntro && sprite_exists(bossIntroSprite)) {
+    draw_set_color(c_black)
+    draw_set_alpha(0.5)
+    draw_rectangle(0, 0, screenWidth, screenHeight, false)
+    draw_set_color(c_white)
+    draw_set_alpha(1)
+
+    var introFrame = min(floor(bossIntroFrame), sprite_get_number(bossIntroSprite) - 1)
+    draw_sprite_stretched(bossIntroSprite, introFrame, 0, 0, screenWidth, screenHeight)
 }

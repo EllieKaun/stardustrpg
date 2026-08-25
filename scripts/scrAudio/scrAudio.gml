@@ -1,5 +1,4 @@
-// Музыка (один трек) и фоновые звуки (отдельный канал)
-// track — индекс звукового ассета
+// Музыка и фоновые звуки
 
 function playMusic(track) {
     if (!variable_global_exists("currentMusic")) global.currentMusic = noone
@@ -37,9 +36,20 @@ function stopAmbient() {
     global.currentAmbient = noone
 }
 
-function playMusicNamed(name) { 
-    playMusic(asset_get_index(name)) 
+function playMusicNamed(name) {
+    playMusic(asset_get_index(name))
 }
-function playAmbientNamed(name) { 
-    playAmbient(asset_get_index(name)) 
+function playAmbientNamed(name) {
+    playAmbient(asset_get_index(name))
+}
+
+#macro SND_CARD_SELECT CardSelect // смена выбранной карты 
+#macro SND_CARD_PLAY CardFly // начало розыгрыша карты
+
+function playCardSelectSound() {
+    if (SND_CARD_SELECT != noone) audio_play_sound(SND_CARD_SELECT, 8, false)
+}
+
+function playCardPlaySound() {
+    if (SND_CARD_PLAY != noone) audio_play_sound(SND_CARD_PLAY, 8, false)
 }

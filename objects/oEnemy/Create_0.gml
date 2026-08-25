@@ -3,6 +3,7 @@ my_spawner = noone
 spawnedDynamically = false 
 rearmDistance = 48 // на сколько отойти, чтобы снова можно было драться
 
+shouldWalk = true
 homeX = x
 homeY = y
 patrolAxis = choose(0, 1) 

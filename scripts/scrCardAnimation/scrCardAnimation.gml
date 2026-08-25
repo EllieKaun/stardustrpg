@@ -240,14 +240,8 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
             draw_sprite_ext(s.spr, 0, s.x, s.y, pscale, pscale, s.rot, c_white, k)
         }
         gpu_set_fog(false, pcfg.color, 0, 0)
-        // сама карта
         if (!cardHidden) {
-            var sx = (cardW / sprite_get_width(card.cardBaseSpr))  * scale
-            var sy = (cardH / sprite_get_height(card.cardBaseSpr)) * scale
-            draw_sprite_ext(card.cardBaseSpr, 0, x, y, sx, sy, angle, c_white, 1)
-            draw_sprite_ext(card.cardIllustrationSpr, 0, x, y, sx, sy, angle, c_white, 1)
-            draw_sprite_ext(card.cardBorderSpr, 0, x, y, sx, sy, angle, c_white, 1)
-            draw_sprite_ext(card.cardTokenSpr, 0, x, y, sx, sy, angle, c_white, 1)
+            drawCardFace(card, x, y, cardW, cardH, angle, scale)
         }
 
         if (playing) {
@@ -371,6 +365,7 @@ function selectedCardTransform() {
 
 // Запускает анимацию выбранной карты перед тем как начать фактическое разыгрывание
 function playCardAnimated(card, caster, targets, cfg) {
+    playCardPlaySound() // звук начала розыгрыша карты
     if (cfg == undefined) cfg = defaultCardAnimConfig()
     // след из звёзд цвета категории карты (как вкладки декбилдера)
     cfg.particles.color = categoryColor(cardCategoryOf(card))

@@ -7,7 +7,7 @@ var leader = oGameController.selected_character
 if (!instance_exists(leader)) exit
 
 // логика прогулки
-if (!triggered) {
+if (!triggered && shouldWalk) {
     var minX = homeX - patrolAmp, maxX = homeX + patrolAmp
     var minY = homeY - patrolAmp, maxY = homeY + patrolAmp
     if (instance_exists(my_spawner)) {
@@ -20,7 +20,7 @@ if (!triggered) {
         var nx = x + patrolDir * patrolSpeed
         if (nx < minX || nx > maxX || place_meeting(nx, y, oWall)) patrolDir = -patrolDir
         else x = nx
-        image_xscale = (patrolDir < 0) ? -1 : 1 
+        image_xscale = (patrolDir < 0) ?  1 : -1
     } else {
         var ny = y + patrolDir * patrolSpeed
         if (ny < minY || ny > maxY || place_meeting(x, ny, oWall)) patrolDir = -patrolDir
