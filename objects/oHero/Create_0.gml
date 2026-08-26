@@ -22,10 +22,12 @@ stepControlled = function() {
     var mx = h * spdWalk
     var my = v * spdWalk
 
-    if (!place_meeting(x + mx, y, oWall)) { 
+    var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump]
+    
+    if (!place_meeting(x + mx, y, obstacles)) { 
         x += mx
     }
-    if (!place_meeting(x, y + my, oWall)) { 
+    if (!place_meeting(x, y + my, obstacles)) { 
         y += my
     }
 }
@@ -45,8 +47,10 @@ stepFollowing = function() {
         return
     }
 
+    var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump]
+
     // Прямая линия до лидера свободна -> идём напрямую, минуя сетку (без «крюков»)
-    if (collision_line(x, y, leader.x, leader.y, oWall, true, true) == noone) {
+    if (collision_line(x, y, leader.x, leader.y, obstacles, true, true) == noone) {
         path_end()
         move_towards_point(leader.x, leader.y, nSpeed)
         return

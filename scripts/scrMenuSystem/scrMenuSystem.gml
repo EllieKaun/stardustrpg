@@ -131,7 +131,7 @@ function Menu(items, config = {}) constructor {
         if (array_length(self.items) == 0) return false
         var it = self.current()
         if (!it.enabled) return false
-        if (is_method(it.onSelect)) it.onSelect(it)
+        if (it.onSelect != undefined) it.onSelect(it)
         return true
     }
 
@@ -236,4 +236,59 @@ function menuUpdateLayers(backLayers, foreLayers) {
 // GUI-слой в аспекте 16:9
 function menuEnsureCrispGui() {
     setCrispGui(320, 180)
+}
+
+// Возвращает список разрешений экрана, не превышающих размер дисплея
+function menuGetResolutions() {
+    var all_res = [
+        [1280, 720],
+        [1600, 900],
+        [1920, 1080],
+        [2560, 1440],
+        [3840, 2160]
+    ]
+    var valid_res = []
+    var dw = display_get_width()
+    var dh = display_get_height()
+    
+    // Если по какой-то причине дисплей не определен
+    if (dw == 0 || dh == 0) {
+        return all_res
+    }
+    
+    for (var i = 0; i < array_length(all_res); i++) {
+        if (all_res[i][0] <= dw && all_res[i][1] <= dh) {
+            array_push(valid_res, all_res[i])
+        }
+    }
+    
+    // Оставляем хотя бы одно разрешение на случай ошибок
+    if (array_length(valid_res) == 0) {
+        array_push(valid_res, all_res[0])
+    }
+    
+    return valid_res
+}
+
+// Применяет настройки дисплея при старте
+function initDisplaySettings() {
+    if (variable_global_exists("displayModeReady") && global.displayModeReady) return;
+    global.displayModeReady = true;
+    
+    ini_open("settings.ini")
+    var resInd = ini_read_real("Display", "ResolutionIndex", 2)
+    var fs = ini_read_real("Display", "Fullscreen", 0)
+    ini_close()
+
+    var res = menuGetResolutions()
+    resInd = min(resInd, array_length(res) - 1)
+    if (resInd >= 0) {
+        if (!fs) {
+            window_set_size(res[resInd][0], res[resInd][1])
+        }
+        window_set_fullscreen(fs)
+        surface_resize(application_surface, res[resInd][0], res[resInd][1])
+        display_set_gui_size(res[resInd][0], res[resInd][1])
+    }
+    global.displayFullscreen = fs
 }

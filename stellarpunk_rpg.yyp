@@ -95,6 +95,7 @@
   ],
   "IncludedFiles":[
     {"$GMIncludedFile":"","%Name":"m3x6.ttf","CopyToMask":-1,"filePath":"datafiles","name":"m3x6.ttf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"PixeloidSans.ttf","CopyToMask":-1,"filePath":"datafiles","name":"PixeloidSans.ttf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],
@@ -136,6 +137,7 @@
     {"id":{"name":"oPausable","path":"objects/oPausable/oPausable.yy",},},
     {"id":{"name":"oPauseMenu","path":"objects/oPauseMenu/oPauseMenu.yy",},},
     {"id":{"name":"oPuppetMaster","path":"objects/oPuppetMaster/oPuppetMaster.yy",},},
+    {"id":{"name":"oSettingsMenu","path":"objects/oSettingsMenu/oSettingsMenu.yy",},},
     {"id":{"name":"oShadowDrawing","path":"objects/oShadowDrawing/oShadowDrawing.yy",},},
     {"id":{"name":"oSpawner","path":"objects/oSpawner/oSpawner.yy",},},
     {"id":{"name":"oSpawnerManager","path":"objects/oSpawnerManager/oSpawnerManager.yy",},},
@@ -173,6 +175,7 @@
     {"id":{"name":"scrEffectSystem","path":"scripts/scrEffectSystem/scrEffectSystem.yy",},},
     {"id":{"name":"scrGameOver","path":"scripts/scrGameOver/scrGameOver.yy",},},
     {"id":{"name":"scrInfo","path":"scripts/scrInfo/scrInfo.yy",},},
+    {"id":{"name":"Script27","path":"scripts/Script27/Script27.yy",},},
     {"id":{"name":"scrMenuSystem","path":"scripts/scrMenuSystem/scrMenuSystem.yy",},},
     {"id":{"name":"scrPlayerData","path":"scripts/scrPlayerData/scrPlayerData.yy",},},
     {"id":{"name":"scrRewards","path":"scripts/scrRewards/scrRewards.yy",},},

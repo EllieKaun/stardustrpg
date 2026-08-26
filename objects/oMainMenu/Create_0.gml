@@ -1,5 +1,9 @@
 menuEnsureCrispGui()
 
+// Загрузка настроек
+initAudioVolumes()
+initDisplaySettings()
+
 // Слои
 backLayers = [new MenuLayer(MainMenuBack, { name: "fg-back" })]
 foreLayers = [
@@ -19,7 +23,10 @@ menu = new Menu([
         global.startNewGame = false
         room_goto(DemoWorld) 
     }),
-    new MenuItem("Settings", noone, noone, function(it) { show_debug_message("MainMenu: Settings") }),
+    new MenuItem("Settings", noone, noone, function(it) { 
+        visible = false
+        instance_create_layer(0, 0, "Instances", oSettingsMenu) 
+    }),
     new MenuItem("Quit", noone, noone, function(it) { game_end() })
 ], {
     anchorX: 0.75, startY: 0.45, spacing: 0.11, textH: 0.055, halign: fa_center
@@ -32,3 +39,5 @@ playMusicNamed("MainMenuMusic") // музыка меню
 // для детекта движения мыши
 mouseLastX = -1
 mouseLastY = -1
+
+menuCooldown = 0

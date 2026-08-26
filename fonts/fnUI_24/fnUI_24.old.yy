@@ -1,7 +1,7 @@
 {
   "$GMFont":"",
   "%Name":"fnUI_24",
-  "AntiAlias":1,
+  "AntiAlias":0,
   "applyKerning":0,
   "ascender":25,
   "ascenderOffset":0,

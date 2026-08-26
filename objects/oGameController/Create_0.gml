@@ -5,24 +5,24 @@ gpu_set_tex_filter(false)
 // --- Режим отображения: borderless (безрамочный на весь экран) / окно --------
 setDisplayMode = function(fullscreen) {
     global.displayFullscreen = fullscreen
-    if (fullscreen) {
-        // полноэкранный режим
-        window_set_showborder(false)
-        window_set_size(display_get_width(), display_get_height())
-        window_set_position(0, 0)
-    } else {
-        // обычное окно
-        var ww = 1280, wh = 720
-        window_set_showborder(true)
-        window_set_size(ww, wh)
-        window_set_position((display_get_width() - ww) div 2, (display_get_height() - wh) div 2)
+    
+    ini_open("settings.ini")
+    ini_write_real("Display", "Fullscreen", fullscreen ? 1 : 0)
+    var resInd = ini_read_real("Display", "ResolutionIndex", 2)
+    ini_close()
+
+    var res = menuGetResolutions()
+    resInd = min(resInd, array_length(res) - 1)
+    
+    if (!fullscreen) {
+        window_set_size(res[resInd][0], res[resInd][1])
     }
+    window_set_fullscreen(fullscreen)
+    surface_resize(application_surface, res[resInd][0], res[resInd][1])
+    display_set_gui_size(res[resInd][0], res[resInd][1])
 }
-// применяем borderless
-if (!variable_global_exists("displayModeReady")) {
-    global.displayModeReady = true
-    setDisplayMode(true)
-}
+// применяем настройки экрана
+initDisplaySettings()
 uiFontInit() // кэш UI-шрифта и высоты строки
 initEffectRegistry() // регистрация эффектов
 cardIdsInit() // инициализация карт ид

@@ -7,7 +7,10 @@ if (global.mpGrid != -1) {
     mp_grid_destroy(global.mpGrid)
 }
 global.mpGrid = mp_grid_create(0, 0, cols, rows, cell, cell)
-mp_grid_add_instances(global.mpGrid, oWall, false)
+var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oBush, oStump]
+for (var i = 0; i < array_length(obstacles); i++) {
+    mp_grid_add_instances(global.mpGrid, obstacles[i], false)
+}
 
 playMusicNamed("ForestDayMusic")
 playAmbientNamed("ForestAmbience")

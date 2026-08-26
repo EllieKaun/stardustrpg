@@ -144,7 +144,7 @@ function isKO() {
 
 function showEffectNotification(effect, dismissMode, duration) {
     if (variable_instance_exists(effect, "sound") && effect.sound != noone) {
-        audio_play_sound(effect.sound, 1, false)
+        playSfx(effect.sound, 1, false)
     }
     if !variable_instance_exists(effect, "sprite") { return }
     var inst = instance_create_depth(x, y, depth - 1, oEffectVisualizer)
