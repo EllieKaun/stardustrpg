@@ -13,6 +13,17 @@ if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
     } else if (menu.index == 1) {
         selectedFullscreen = !selectedFullscreen
         updateMenuLabels()
+    } else if (menu.index == 2) {
+        selectedVolMaster = clamp(selectedVolMaster - 0.1, 0, 1.0)
+        updateMenuLabels()
+    } else if (menu.index == 3) {
+        selectedVolMusic = clamp(selectedVolMusic - 0.1, 0, 1.0)
+        updateMenuLabels()
+    } else if (menu.index == 4) {
+        selectedVolSounds = clamp(selectedVolSounds - 0.1, 0, 1.0)
+        updateMenuLabels()
+        var snd = audio_play_sound(SND_CARD_SELECT, 8, false)
+        audio_sound_gain(snd, selectedVolSounds, 0)
     }
 }
 if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
@@ -22,10 +33,27 @@ if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
     } else if (menu.index == 1) {
         selectedFullscreen = !selectedFullscreen
         updateMenuLabels()
+    } else if (menu.index == 2) {
+        selectedVolMaster = clamp(selectedVolMaster + 0.1, 0, 1.0)
+        updateMenuLabels()
+    } else if (menu.index == 3) {
+        selectedVolMusic = clamp(selectedVolMusic + 0.1, 0, 1.0)
+        updateMenuLabels()
+    } else if (menu.index == 4) {
+        selectedVolSounds = clamp(selectedVolSounds + 0.1, 0, 1.0)
+        updateMenuLabels()
+        var snd = audio_play_sound(SND_CARD_SELECT, 8, false)
+        audio_sound_gain(snd, selectedVolSounds, 0)
     }
 }
 
 if (keyboard_check_pressed(vk_escape)) {
+    // Ревертим аудио, если вышли через Escape
+    selectedVolMaster = global.volMaster
+    selectedVolMusic = global.volMusic
+    selectedVolSounds = global.volSounds
+    previewAudioVolumes()
+    
     if (instance_exists(oMainMenu)) {
         with(oMainMenu) { visible = true; menuCooldown = 2; }
     }

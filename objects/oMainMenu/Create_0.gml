@@ -1,24 +1,8 @@
 menuEnsureCrispGui()
 
 // Загрузка настроек
-ini_open("settings.ini")
-var resInd = ini_read_real("Display", "ResolutionIndex", 2)
-var fs = ini_read_real("Display", "Fullscreen", 0)
-ini_close()
-
-var res = [
-    [1280, 720],
-    [1600, 900],
-    [1920, 1080],
-    [2560, 1440],
-    [3840, 2160]
-]
-if (resInd >= 0 && resInd < array_length(res)) {
-    window_set_fullscreen(fs)
-    if (!fs) {
-        window_set_size(res[resInd][0], res[resInd][1])
-    }
-}
+initAudioVolumes()
+initDisplaySettings()
 
 // Слои
 backLayers = [new MenuLayer(MainMenuBack, { name: "fg-back" })]

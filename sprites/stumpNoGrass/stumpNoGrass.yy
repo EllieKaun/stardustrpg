@@ -1,10 +1,10 @@
 {
   "$GMSprite":"v2",
   "%Name":"stumpNoGrass",
-  "bboxMode":0,
+  "bboxMode":2,
   "bbox_bottom":12,
-  "bbox_left":6,
-  "bbox_right":16,
+  "bbox_left":7,
+  "bbox_right":15,
   "bbox_top":7,
   "collisionKind":1,
   "collisionTolerance":0,
