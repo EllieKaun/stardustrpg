@@ -1,3 +1,10 @@
+if (!visible) exit
+
+if (menuCooldown > 0) {
+    menuCooldown--
+    exit
+}
+
 menuUpdateLayers(backLayers, foreLayers)
 
 var mx = device_mouse_x_to_gui(0)

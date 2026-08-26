@@ -22,7 +22,10 @@ itemsAboveForeground = true
 
 menu = new Menu([
     new MenuItem("Resume", noone, noone, method(id, function(it) { close() })),
-    new MenuItem("Settings", noone, noone, function(it) { show_debug_message("Pause: Settings") }),
+    new MenuItem("Settings", noone, noone, function(it) { 
+        visible = false
+        instance_create_layer(0, 0, "Instances", oSettingsMenu) 
+    }),
     new MenuItem("Quit", noone, noone, function(it) { game_end() })
 ], {
     anchorX: 0.6, startY: 0.5, spacing: 0.12, textH: 0.06, halign: fa_center
@@ -30,3 +33,5 @@ menu = new Menu([
 
 mouseLastX = -1
 mouseLastY = -1
+
+menuCooldown = 0

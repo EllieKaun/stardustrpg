@@ -95,6 +95,7 @@
   },
   "name":"stellarpunk_rpg",
   "resources":[
+    {"id":{"name":"oSettingsMenu","path":"objects/oSettingsMenu/oSettingsMenu.yy",},},
     {"id":{"name":"fnUI_10","path":"fonts/fnUI_10/fnUI_10.yy",},},
     {"id":{"name":"fnUI_12","path":"fonts/fnUI_12/fnUI_12.yy",},},
     {"id":{"name":"fnUI_14","path":"fonts/fnUI_14/fnUI_14.yy",},},

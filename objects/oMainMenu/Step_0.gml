@@ -1,3 +1,10 @@
+if (!visible) exit
+
+if (menuCooldown > 0) {
+    menuCooldown--
+    exit
+}
+
 // Анимация слоёв
 menuUpdateLayers(backLayers, foreLayers)
 

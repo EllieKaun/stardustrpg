@@ -131,7 +131,7 @@ function Menu(items, config = {}) constructor {
         if (array_length(self.items) == 0) return false
         var it = self.current()
         if (!it.enabled) return false
-        if (is_method(it.onSelect)) it.onSelect(it)
+        if (it.onSelect != undefined) it.onSelect(it)
         return true
     }
 
