@@ -233,8 +233,7 @@ function menuUpdateLayers(backLayers, foreLayers) {
     for (var i = 0; i < array_length(foreLayers); i++) foreLayers[i].update()
 }
 
-// Гарантирует, что GUI-слой не меньше окна
+// GUI-слой в аспекте 16:9
 function menuEnsureCrispGui() {
-    if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
-        display_set_gui_size(max(window_get_width(), 320), max(window_get_height(), 180))
+    setCrispGui(320, 180)
 }

@@ -1,6 +1,6 @@
 var selected = (oGameController.selected_character.id == id)
 
-if (global.uiModal) {
+if (global.uiModal || !can_move) {
     path_end()
     speed = 0
     sprite_index = sprIdle

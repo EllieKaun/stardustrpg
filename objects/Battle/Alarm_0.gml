@@ -16,7 +16,7 @@ if array_length(cards) == 0 { // Если карт нет - замешиваем
 var aliveHeroes  = filterNotKO(heroes) // противники врага
 var aliveEnemies = filterNotKO(enemies) // союзники врага
 
-// Категоризируем руку: первый хил / бафф / атака
+// Принимаем решение по разыгрыванию карты
 var healChoice = noone, buffChoice = noone, attackChoice = noone
 for (var i = 0; i < array_length(cards); i++) {
     var c = cards[i]

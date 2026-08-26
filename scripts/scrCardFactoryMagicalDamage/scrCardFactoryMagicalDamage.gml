@@ -12,7 +12,8 @@ function createMagicalDamageSingleTargetCard() {
         mgcCard,
         starsSingleTarget,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "deals minor star energy damage (single)"
     )
 }
 
@@ -30,7 +31,8 @@ function createMagicalDamageMultipleTargetCard() {
         mgcCard,
         starsGroup,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "deals minor star energy damage (group)"
     )
 }
 
@@ -51,7 +53,8 @@ function createMagicalDamageStunChanseSingleTargetCard() {
         mgcCard,
         lightningSingleTarget,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "deals minor lightning damage (single)"
     )
 }
 
@@ -72,7 +75,8 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
         mgcCard,
         lightningGroup,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "deals minor lightning damage (group)"
     )
 }
 
@@ -93,7 +97,8 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
         mgcCard,
         fireballSingleTarget,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "deals minor fire damage (single)"
     )
 }
 
@@ -114,7 +119,8 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         mgcCard,
         fireballGroup,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "deals minor fire damage (group)"
     )
 }
 // Атака льдом одного врага - (Имеет шанс заморозить врага. Замороженный враг получает повышенный физ урон х количество ходов)
@@ -134,7 +140,8 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         mgcCard,
         iceSingleTarget,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "deals minor ice damage (single)"
     )
 }
 
@@ -155,7 +162,8 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         mgcCard,
         iceGroup,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "deals minor ice damage (group)"
     )
 }
 

@@ -12,7 +12,8 @@ function createInstantHealSingleTargetCard() {
         healCard,
         hpHealSolo,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "restores a small amount of health (single)"
     )
 }
 
@@ -30,7 +31,8 @@ function createInstantMultipleTargetsHealCard() {
         healCard,
         hpHealGroup,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "restores a small amount of health (group)"
     )
 }
 
@@ -48,7 +50,8 @@ function createOvertimeHealSingleTargetCard() {
         healCard,
         hpHealOT,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "restores a small amount of health over 2 turns"
     )
 }
 
@@ -68,7 +71,8 @@ function createInstantManaGainSingleTargetCard() {
         healCard,
         mpHealSolo,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "restores a small amount of mana (single)"
     )
 }
 
@@ -86,7 +90,8 @@ function createInstantMultipleTargetsManaGainCard() {
         healCard,
         mpHealGroup,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "restores a small amount of mana (group)"
     )
 }
 
@@ -104,7 +109,8 @@ function createOvertimeManaGainSingleTargetCard() {
         healCard,
         mpHealOT,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "restores a small amount of mana over 2 turns"
     )
 }
 
@@ -122,7 +128,8 @@ function createRemoveStatusShockSingleTargetCard() {
         healCard,
         shockRemove,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "remove the Shock status"
     )
 }
 
@@ -140,7 +147,8 @@ function createRemoveStatusBurnSingleTargetCard() {
         healCard,
         burnRemove,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "remove the Burn status"
     )
 }
 
@@ -158,7 +166,8 @@ function createRemoveStatusFreezeSingleTargetCard() {
         healCard,
         freezeRemove,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "remove the Freeze status"
     )
 }
 
@@ -176,7 +185,8 @@ function createRemoveStatusBleedingSingleTargetCard() {
         healCard,
         bleedRemove,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "remove the Bleeding status"
     )
 }
 
@@ -194,7 +204,8 @@ function createRemoveStatusStunSingleTargetCard() {
         healCard,
         stunRemove,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "remove the Stun status"
     )
 }
 
@@ -212,6 +223,7 @@ function createResurrectionCard() {
         healCard,
         resurection,
         commonBorder,
-        mpCostToken
+        mpCostToken,
+        "resurrection"
     )
 }

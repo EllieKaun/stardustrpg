@@ -10,9 +10,9 @@ function countAlivePuppetsIn(team) {
 function puppetSpritesForCategory(category) {
     switch (category) {
         case CardCategory.Attack: return { idle: scrWarriorPuppetIdle, attack: sprWarriorPuppetAttack, spell: scrWarriorPuppetIdle, cast: scrWarriorPuppetIdle, ko: scrWarriorPuppetIdle, dance: noone }
-        case CardCategory.Magic:  return { idle: scrWizardPuppetIIdle,  attack: scrWizardPuppetIIdle,   spell: sprWizardPuppetSpell,  cast: sprWizardPuppetCast,    ko: scrWizardPuppetIIdle,   dance: noone }
-        case CardCategory.Heal:   return { idle: scrHealerPuppetIdle,   attack: scrHealerPuppetIdle,    spell: scrHealerPuppetIdle,   cast: sprHealerPuppetHeal,    ko: scrHealerPuppetIdle,    dance: noone }
-        case CardCategory.Buff:   return { idle: sprPriestPuppetIdle,   attack: sprPriestPuppetIdle,    spell: sprPriestPuppetIdle,   cast: sprPriestPuppetIdle,    ko: sprPriestPuppetIdle,    dance: noone }
+        case CardCategory.Magic: return { idle: scrWizardPuppetIIdle, attack: scrWizardPuppetIIdle,   spell: sprWizardPuppetSpell,  cast: sprWizardPuppetCast,    ko: scrWizardPuppetIIdle,   dance: noone }
+        case CardCategory.Heal: return { idle: scrHealerPuppetIdle, attack: scrHealerPuppetIdle,    spell: scrHealerPuppetIdle,   cast: sprHealerPuppetHeal,    ko: scrHealerPuppetIdle,    dance: noone }
+        case CardCategory.Buff: return { idle: sprPriestPuppetIdle, attack: sprPriestPuppetIdle,    spell: sprPriestPuppetIdle,   cast: sprPriestPuppetIdle,    ko: sprPriestPuppetIdle,    dance: noone }
     }
 }
 
@@ -20,9 +20,9 @@ function puppetSpritesForCategory(category) {
 function puppetSpawnSprite(category) {
     switch (category) {
         case CardCategory.Attack: return WarriotPuppetSpawn
-        case CardCategory.Magic:  return WizardPuppetSpawn
-        case CardCategory.Heal:   return HealerPuppetSpawn
-        case CardCategory.Buff:   return PriestPuppetSpawn
+        case CardCategory.Magic: return WizardPuppetSpawn
+        case CardCategory.Heal: return HealerPuppetSpawn
+        case CardCategory.Buff: return PriestPuppetSpawn
     }
     return noone
 }

@@ -1,13 +1,14 @@
-function Card(name, 
+function Card(name,
             rarity,
-            target, 
-            actionType, 
+            target,
+            actionType,
             energy,
-            effects, 
-            cardBaseSpr, 
-            cardIllustrationSpr, 
-            cardBorderSpr, 
-            cardTokenSpr) constructor {
+            effects,
+            cardBaseSpr,
+            cardIllustrationSpr,
+            cardBorderSpr,
+            cardTokenSpr,
+            description = "") constructor {
     self.name = name
     self.rarity = rarity
     self.target = target
@@ -17,6 +18,7 @@ function Card(name,
     self.cardIllustrationSpr = cardIllustrationSpr
     self.cardBorderSpr = cardBorderSpr
     self.cardTokenSpr = cardTokenSpr
+    self.description = description // текст на карте
     self.energy = energy
 
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana

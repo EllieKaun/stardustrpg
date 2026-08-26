@@ -4,7 +4,7 @@ menuItems = ["Run", "Shuffle", "Info"]
 
 global.guiBaseW = camera_get_view_width(view_camera[0])
 global.guiBaseH = camera_get_view_height(view_camera[0])
-display_set_gui_size(max(window_get_width(), global.guiBaseW), max(window_get_height(), global.guiBaseH))
+setCrispGui(global.guiBaseW, global.guiBaseH)
 selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false
@@ -65,3 +65,13 @@ posSpacing = spacingBetweenStarriors
 
 // генерация уровня
 generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleEncounter)
+
+// Катсцена появления босса через 2 секунды после начала боя 
+bossIntroSprite = variable_struct_exists(global.battleEncounter, "introSprite")
+    ? global.battleEncounter.introSprite : undefined
+bossIntroFrame = 0
+bossIntroReturnState = BattleStates.CharacterPlay
+if (bossIntroSprite != undefined) alarm[3] = 2 * game_get_speed(gamespeed_fps)
+
+playMusicNamed("BattleMusic")
+stopAmbient()

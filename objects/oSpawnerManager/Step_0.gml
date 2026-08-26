@@ -21,7 +21,7 @@ if (!tutorialSpawnDone) {
 spawnTimer++
 if (spawnTimer < spawnInterval) exit
 
-// Если врагов уже максимум — ждём следующий интервал (таймер сбрасываем).
+// Если врагов уже максимум — ждём следующий интервал 
 if (ds_list_size(enemyList) >= maxEnemies) {
     spawnTimer = 0
     exit

@@ -50,6 +50,8 @@ menu = new Menu([
 
 menu.items[1].enabled = hasSave
 
+playMusicNamed("MainMenuMusic") // музыка меню
+
 // для детекта движения мыши
 mouseLastX = -1
 mouseLastY = -1

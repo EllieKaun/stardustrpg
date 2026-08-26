@@ -121,7 +121,8 @@ enum BattleStates {
     Victory,
     GameOver,
     PuppetTurn,
-    CardAnimating
+    CardAnimating,
+    BossIntro
 }
 
 enum StarriorStates {

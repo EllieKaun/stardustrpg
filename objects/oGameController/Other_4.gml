@@ -9,6 +9,9 @@ if (global.mpGrid != -1) {
 global.mpGrid = mp_grid_create(0, 0, cols, rows, cell, cell)
 mp_grid_add_instances(global.mpGrid, oWall, false)
 
+playMusicNamed("ForestDayMusic")
+playAmbientNamed("ForestAmbience")
+
 // Возврат из боя: партия остаётся на месте (persistent). Динамического врага,
 // с которым дрались, убираем; ручной остаётся (остывает, см. oEnemy).
 if (global.returningFromBattle) {
