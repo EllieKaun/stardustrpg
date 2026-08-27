@@ -1,14 +1,10 @@
-if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
-    display_set_gui_size(max(window_get_width(), guiBaseWidth()), max(window_get_height(), guiBaseHeight()))
+setCrispGui(guiBaseWidth(), guiBaseHeight())
 
-// Весь UI боя рисуется в координатах GUI (окна) 
-// scaleToGui — множитель дизайн→окно (guiW / базовая ширина),
-// применяется к абсолютным константам. 
 var screenWidth  = display_get_gui_width()
 var screenHeight = display_get_gui_height()
 var scaleToGui = screenWidth / guiBaseWidth()
 
-// Хит-боксы для мыши (координаты GUI/окна, читаются в Step)
+// Хит-боксы для мыши
 cardHitRects = []
 menuHitRects = []
 infoCloseRect = undefined
@@ -104,13 +100,7 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                     angle = 0
                 }
                 
-                var sx = (drawCardW / sprite_get_width(card.cardBaseSpr)) * scale
-                var sy = (drawCardH / sprite_get_height(card.cardBaseSpr)) * scale
-
-                draw_sprite_ext(card.cardBaseSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
-                draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
-                draw_sprite_ext(card.cardBorderSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
-                draw_sprite_ext(card.cardTokenSpr, 0, cx, cy, sx, sy, angle, c_white, 1)
+                drawCardFace(card, cx, cy, drawCardW, drawCardH, angle, scale, 1, isSelected)
 
                 // хит-бокс карты для мыши (координаты окна, с учётом наклона)
                 array_push(cardHitRects, {
@@ -119,13 +109,8 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                     angle: angle, index: i
                 })
 
-                // статы поверх этой карты
-                drawCardStats(cx, cy, drawCardW * scale, drawCardH * scale, angle, card)
-
                 if (isSelected && focusArea == FocusArea.Deck) {
                     var bw = drawCardW * scale
-                    var bh = drawCardH * scale
-                    drawBorderAroundCard(cx - bw / 2, cy - bh / 2, selectedBorderWidth, bw, bh)
                     draw_sprite_ext(sPointer, 0, cx - bw / 2, cy, scaleToGui, scaleToGui, 0, c_white, 1)
                 }
             }
@@ -152,14 +137,14 @@ if (selectedCharacter != noone) {
     }
 }
 
-// Информация о врагу
+// Информация о враге
 if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     var popupWidth = screenWidth * 0.6
     var popupHeight = screenHeight * 0.5
     var popupX = (screenWidth - popupWidth) / 2
     var popupY = (screenHeight - popupHeight) / 2
 
-    draw_sprite_stretched(sprCardDeskFull, 0, popupX, popupY, popupWidth, popupHeight)
+    draw_sprite_stretched(box, 0, popupX, popupY, popupWidth, popupHeight)
 
     var margin = 16 * scaleToGui
     var spriteBoxSize = 64 * scaleToGui
@@ -197,7 +182,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     var btnX = floor(popupX + popupWidth / 2 - btnWidth / 2)
     var btnY = floor(popupY + popupHeight + 4 * s) // 4 pixels below the popup
 
-    draw_sprite_stretched(sprCardDeskFull, 0, btnX, btnY, btnWidth, btnHeight)
+    draw_sprite_stretched(box, 0, btnX, btnY, btnWidth, btnHeight)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
     drawUiText(btnX + btnWidth / 2, btnY + btnHeight / 2, "CLOSE", btnHeight * 0.6)

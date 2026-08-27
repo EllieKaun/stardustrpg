@@ -86,14 +86,14 @@ function MenuLayer(spr = noone, params = {}) constructor {
 
 // ---- Контроллер меню --------------------------------------------------------
 // items — массив MenuItem. config (опц.): расположение/вид в ДОЛЯХ экрана:
-//   anchorX  — точка привязки по X (0..1)
-//   startY   — верх списка по Y (0..1)
-//   spacing  — шаг между пунктами (доля высоты)
-//   textH    — высота текста (доля высоты)
-//   iconGap  — отступ иконка↔текст (доля высоты)
-//   halign   — fa_left/fa_center/fa_right (выравнивание группы "иконка+текст")
+//   anchorX — точка привязки по X (0..1)
+//   startY — верх списка по Y (0..1)
+//   spacing — шаг между пунктами (доля высоты)
+//   textH — высота текста (доля высоты)
+//   iconGap — отступ иконка↔текст (доля высоты)
+//   halign — fa_left/fa_center/fa_right (выравнивание группы "иконка+текст")
 //   colNormal/colSelect/colDisabled — цвета
-//   wrap     — зацикливать навигацию (true)
+//   wrap — зацикливать навигацию (true)
 function Menu(items, config = {}) constructor {
     self.items = items
     self.index = 0
@@ -115,7 +115,7 @@ function Menu(items, config = {}) constructor {
         var n = array_length(self.items)
         if (n == 0) return
         var i = self.index
-        repeat (n) {                       // перескакиваем выключенные пункты
+        repeat (n) { // перескакиваем выключенные пункты
             i += dir
             if (self.wrap) i = (i + n) mod n
             else i = clamp(i, 0, n - 1)
@@ -131,7 +131,7 @@ function Menu(items, config = {}) constructor {
         if (array_length(self.items) == 0) return false
         var it = self.current()
         if (!it.enabled) return false
-        if (is_method(it.onSelect)) it.onSelect(it)
+        if (it.onSelect != undefined) it.onSelect(it)
         return true
     }
 
@@ -233,8 +233,73 @@ function menuUpdateLayers(backLayers, foreLayers) {
     for (var i = 0; i < array_length(foreLayers); i++) foreLayers[i].update()
 }
 
-// Гарантирует, что GUI-слой не меньше окна
+// GUI-слой в аспекте 16:9
 function menuEnsureCrispGui() {
-    if (display_get_gui_width() != window_get_width() || display_get_gui_height() != window_get_height())
-        display_set_gui_size(max(window_get_width(), 320), max(window_get_height(), 180))
+    setCrispGui(320, 180)
+}
+
+// Возвращает список разрешений экрана, не превышающих размер дисплея
+function menuGetResolutions() {
+    var all_res = [
+        [1280, 720],
+        [1600, 900],
+        [1920, 1080],
+        [2560, 1440],
+        [3840, 2160]
+    ]
+    var valid_res = []
+    var dw = display_get_width()
+    var dh = display_get_height()
+    
+    // Если по какой-то причине дисплей не определен
+    if (dw == 0 || dh == 0) {
+        return all_res
+    }
+    
+    for (var i = 0; i < array_length(all_res); i++) {
+        if (all_res[i][0] <= dw && all_res[i][1] <= dh) {
+            array_push(valid_res, all_res[i])
+        }
+    }
+    
+    // Оставляем хотя бы одно разрешение на случай ошибок
+    if (array_length(valid_res) == 0) {
+        array_push(valid_res, all_res[0])
+    }
+    
+    return valid_res
+}
+
+// Применить режим окна: фуллскрин, либо оконный размер с центрированием
+function applyWindowMode(winW, winH, fullscreen) {
+    if (fullscreen) {
+        window_set_fullscreen(true)
+        return
+    }
+    window_set_fullscreen(false)
+    // оконный размер не больше рабочего стола
+    var dw = display_get_width(), dh = display_get_height()
+    winW = min(winW, dw)
+    winH = min(winH, dh)
+    window_set_size(winW, winH)
+    window_set_position((dw - winW) div 2, max(0, (dh - winH) div 2))
+}
+
+// Применяет настройки дисплея при старте
+function initDisplaySettings() {
+    if (variable_global_exists("displayModeReady") && global.displayModeReady) return;
+    global.displayModeReady = true;
+    
+    ini_open("settings.ini")
+    var resInd = ini_read_real("Display", "ResolutionIndex", 2)
+    var fs = ini_read_real("Display", "Fullscreen", 1)
+    ini_close()
+
+    var res = menuGetResolutions()
+    resInd = min(resInd, array_length(res) - 1)
+    if (resInd >= 0) {
+        applyWindowMode(res[resInd][0], res[resInd][1], fs)
+        display_set_gui_size(res[resInd][0], res[resInd][1])
+    }
+    global.displayFullscreen = fs
 }

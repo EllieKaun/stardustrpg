@@ -12,11 +12,24 @@ if isTarget {
     bbox_left, 
     y)
 }
+
+// Анимация уменьшения хп
+if (!hpBarReady) {
+    displayHp = hp
+    displayMana = mana
+    hpBarReady = true
+} else {
+    displayHp += (hp - displayHp) * 0.2
+    if (abs(displayHp - hp) < 0.5) displayHp = hp
+    displayMana += (mana - displayMana) * 0.2
+    if (abs(displayMana - mana) < 0.5) displayMana = mana
+}
+
 if !isKO() {
     if maxMana <= 0 {
-        drawHealthBar(bbox_left, bbox_top - 4, bbox_right - bbox_left, 4, hp, maxHp)
+        drawHealthBar(bbox_left, bbox_top - 4, bbox_right - bbox_left, 4, displayHp, maxHp)
     } else {
-        drawHealthBarMana(bbox_left, bbox_top - 6, bbox_right - bbox_left, 6, hp, maxHp, mana, maxMana)
+        drawHealthBarMana(bbox_left, bbox_top - 6, bbox_right - bbox_left, 6, displayHp, maxHp, displayMana, maxMana)
     }
 }
 

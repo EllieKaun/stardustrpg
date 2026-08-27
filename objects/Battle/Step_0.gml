@@ -1,8 +1,6 @@
-updateCardAnims() // двигаем/чистим летящие карты в любом состоянии
+updateCardAnims() // Анимации карт
 
-// - Управление мышью -
-// UI боя рисуется прямо в координатах GUI (окна), поэтому мышь берём как есть.
-// Хит-боксы карт/меню тоже в оконных координатах. Враги — мировые объекты.
+// Управление мышью 
 var mbx = device_mouse_x_to_gui(0)
 var mby = device_mouse_y_to_gui(0)
 var mouseMoved = (mbx != mouseLastX || mby != mouseLastY)
@@ -22,7 +20,11 @@ switch (battleState) {
             }
         }
         if (hoveredCard >= 0) {
-            if (mouseMoved) { focusArea = FocusArea.Deck; selectedCard = hoveredCard }
+            if (mouseMoved) {
+                focusArea = FocusArea.Deck
+                if (selectedCard != hoveredCard) playCardSelectSound()
+                selectedCard = hoveredCard
+            }
             if (mClick)     { focusArea = FocusArea.Deck; selectedCard = hoveredCard; mouseConfirm = true }
         } else {
             for (var i = 0; i < array_length(menuHitRects); i++) {
@@ -110,13 +112,28 @@ switch (battleState) {
         var leftPressed = keyboard_check_pressed(vk_left)
         var rightPressed = keyboard_check_pressed(vk_right)
 
-        if (keyboard_check_pressed(ord("R"))) { doMenuAction("Run"); break }
-        if (keyboard_check_pressed(ord("S"))) { doMenuAction("Shuffle"); break }
-        if (keyboard_check_pressed(ord("I"))) { doMenuAction("Info"); break }
+        if (keyboard_check_pressed(ord("R"))) { 
+            doMenuAction("Run")
+            break 
+        }
+        if (keyboard_check_pressed(ord("S"))) { 
+            doMenuAction("Shuffle") 
+            break 
+        }
+        if (keyboard_check_pressed(ord("I"))) { 
+            doMenuAction("Info") 
+            break 
+        }
 
         var handLen = array_length(selectedCharacter.getCardsInHand())
-        if (leftPressed && selectedCard > 0) selectedCard--
-        if (rightPressed && selectedCard < handLen - 1) selectedCard++
+        if (leftPressed && selectedCard > 0) {
+            selectedCard--
+            playCardSelectSound() 
+        }
+        if (rightPressed && selectedCard < handLen - 1) { 
+            selectedCard++
+            playCardSelectSound() 
+        }
 
         if (enterPressed) {
             if (handLen > 0) {
@@ -174,7 +191,7 @@ switch (battleState) {
     break
 }
 
-// Танец простоя: 5 сек без ввода на ходу героя -> зациклённый танец до любого ввода
+// Танец простоя 
 if (battleState == BattleStates.CharacterPlay && instance_exists(selectedCharacter)) {
     if (mClick || keyboard_check_pressed(vk_anykey)) {
         idleDanceTimer = 0

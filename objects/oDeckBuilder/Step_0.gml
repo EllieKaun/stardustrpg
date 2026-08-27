@@ -1,13 +1,7 @@
 if (!open) exit
-
-if (keyboard_check_pressed(vk_escape)) {
-    closeBuilder()
-    exit
-}
-
 layoutPanels()
 
-// Мышь: наведение + клик по табам/слотам
+// Мышь: наведение, а также клик по табам/слотам
 collectionPanel.stepMouse()
 deckPanel.stepMouse()
 

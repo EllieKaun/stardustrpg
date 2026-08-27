@@ -12,19 +12,19 @@
   "edgeFiltering":false,
   "For3D":false,
   "frames":[
-    {"$GMSpriteFrame":"v1","%Name":"d995ea4c-2170-4fd7-bd0f-71ba7a50e3cb","name":"d995ea4c-2170-4fd7-bd0f-71ba7a50e3cb","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
-    {"$GMSpriteFrame":"v1","%Name":"4b1b8983-b806-46de-997a-22f00cf38667","name":"4b1b8983-b806-46de-997a-22f00cf38667","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
-    {"$GMSpriteFrame":"v1","%Name":"8403d044-3d18-4ecf-8326-14f42f524237","name":"8403d044-3d18-4ecf-8326-14f42f524237","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
-    {"$GMSpriteFrame":"v1","%Name":"ba7518a7-5fab-4d9a-ac5d-3251e7676e0b","name":"ba7518a7-5fab-4d9a-ac5d-3251e7676e0b","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
-    {"$GMSpriteFrame":"v1","%Name":"4c2c29d0-187e-43ae-af86-7d707bbb8a1f","name":"4c2c29d0-187e-43ae-af86-7d707bbb8a1f","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
-    {"$GMSpriteFrame":"v1","%Name":"695e2342-3a0f-4527-9425-0120c3710dcf","name":"695e2342-3a0f-4527-9425-0120c3710dcf","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"bcb201cf-bb6f-4194-bddb-2b4929fa8489","name":"bcb201cf-bb6f-4194-bddb-2b4929fa8489","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"4918aba0-d89c-43f7-806a-4805b1601775","name":"4918aba0-d89c-43f7-806a-4805b1601775","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"6d20a558-3d84-4091-984b-bc1d9f85f308","name":"6d20a558-3d84-4091-984b-bc1d9f85f308","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"06a64430-765d-4146-b758-975ea6339b53","name":"06a64430-765d-4146-b758-975ea6339b53","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"f7255f85-7668-4e2a-8cbc-d128f57cc786","name":"f7255f85-7668-4e2a-8cbc-d128f57cc786","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"244b6e9d-7426-44a6-96e7-6c4e8ab9044f","name":"244b6e9d-7426-44a6-96e7-6c4e8ab9044f","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
   ],
   "gridX":0,
   "gridY":0,
   "height":32,
   "HTile":false,
   "layers":[
-    {"$GMImageLayer":"","%Name":"7b2061eb-d23a-48f2-87eb-fc7676c0c272","blendMode":0,"displayName":"default","isLocked":false,"name":"7b2061eb-d23a-48f2-87eb-fc7676c0c272","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
+    {"$GMImageLayer":"","%Name":"64f2fa67-c457-4ac5-b355-630707aab09e","blendMode":0,"displayName":"default","isLocked":false,"name":"64f2fa67-c457-4ac5-b355-630707aab09e","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
   "name":"StarEnergy",
   "nineSlice":null,
@@ -74,23 +74,23 @@
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"d995ea4c-2170-4fd7-bd0f-71ba7a50e3cb","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"38628dc5-2566-4c92-8be2-43478c995ac3","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"bcb201cf-bb6f-4194-bddb-2b4929fa8489","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"98bcd137-7ace-4a16-b4a3-491b47664f92","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"4b1b8983-b806-46de-997a-22f00cf38667","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"f551cd87-7fc8-4445-9a5f-d3bad74d3ad6","IsCreationKey":false,"Key":1.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"4918aba0-d89c-43f7-806a-4805b1601775","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"a45f2dce-9537-4ed4-a94d-dcebd9b2cbe4","IsCreationKey":false,"Key":1.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"8403d044-3d18-4ecf-8326-14f42f524237","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"362cc29e-b062-4b19-83c0-4c7647399b94","IsCreationKey":false,"Key":2.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"6d20a558-3d84-4091-984b-bc1d9f85f308","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"672f171d-f511-46ee-8fe1-31d77bf35c32","IsCreationKey":false,"Key":2.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"ba7518a7-5fab-4d9a-ac5d-3251e7676e0b","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"0ed6446b-8e6e-4d61-8bd4-6239d13e55a4","IsCreationKey":false,"Key":3.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"06a64430-765d-4146-b758-975ea6339b53","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"8f195f25-2951-473b-bfa6-0cffd410e7bd","IsCreationKey":false,"Key":3.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"4c2c29d0-187e-43ae-af86-7d707bbb8a1f","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"faa7f1b4-33ce-472a-a564-7ff8bb91a54e","IsCreationKey":false,"Key":4.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"f7255f85-7668-4e2a-8cbc-d128f57cc786","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"2990c0a7-ac00-4d0c-933b-48cabc5ae870","IsCreationKey":false,"Key":4.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"695e2342-3a0f-4527-9425-0120c3710dcf","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"8ac68037-95c9-400e-a45b-a3567d09d314","IsCreationKey":false,"Key":5.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"244b6e9d-7426-44a6-96e7-6c4e8ab9044f","path":"sprites/StarEnergy/StarEnergy.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"1a8453c1-2e30-466b-8429-b5d3f6cd43cb","IsCreationKey":false,"Key":5.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange":null,

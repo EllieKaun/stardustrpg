@@ -1,10 +1,11 @@
-spdWalk = 1
+spdWalk = 0.8
 last_v_dir = 1
 xPrev = x
 yPrev = y
+can_move = true // false при входе в бой
 
 path = path_add()
-nSpeed = 1
+nSpeed = 0.8
 calcPathDelay = 8
 calcPathTimer = 0
 distanceToStopFollowing = 24
@@ -21,10 +22,12 @@ stepControlled = function() {
     var mx = h * spdWalk
     var my = v * spdWalk
 
-    if (!place_meeting(x + mx, y, oWall)) { 
+    var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump]
+    
+    if (!place_meeting(x + mx, y, obstacles)) { 
         x += mx
     }
-    if (!place_meeting(x, y + my, oWall)) { 
+    if (!place_meeting(x, y + my, obstacles)) { 
         y += my
     }
 }
@@ -44,8 +47,10 @@ stepFollowing = function() {
         return
     }
 
+    var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump]
+
     // Прямая линия до лидера свободна -> идём напрямую, минуя сетку (без «крюков»)
-    if (collision_line(x, y, leader.x, leader.y, oWall, true, true) == noone) {
+    if (collision_line(x, y, leader.x, leader.y, obstacles, true, true) == noone) {
         path_end()
         move_towards_point(leader.x, leader.y, nSpeed)
         return

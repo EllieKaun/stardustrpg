@@ -3,12 +3,17 @@ isActive = false
 isTarget = false
 themeColor = c_fuchsia
 
-hp = 0 
-maxHp = 0 
-mana = 0 
-maxMana = 0 
+hp = 0
+maxHp = 0
+mana = 0
+maxMana = 0
 energy = 0
 maxEnergy = 0
+
+// Плавная анимация полосок хп и маны
+displayHp = 0
+displayMana = 0
+hpBarReady = false
 
 intelligence = 0
 strength = 0
@@ -139,7 +144,7 @@ function isKO() {
 
 function showEffectNotification(effect, dismissMode, duration) {
     if (variable_instance_exists(effect, "sound") && effect.sound != noone) {
-        audio_play_sound(effect.sound, 1, false)
+        playSfx(effect.sound, 1, false)
     }
     if !variable_instance_exists(effect, "sprite") { return }
     var inst = instance_create_depth(x, y, depth - 1, oEffectVisualizer)

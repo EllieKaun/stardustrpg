@@ -50,6 +50,16 @@ function drawBorderAroundCard(
 function guiBaseWidth()  { return variable_global_exists("guiBaseW") ? global.guiBaseW : display_get_gui_width()  }
 function guiBaseHeight() { return variable_global_exists("guiBaseH") ? global.guiBaseH : display_get_gui_height() }
 
+// Ставит GUI-слой в 16:9 аспекте
+function setCrispGui(baseW, baseH) {
+    var scale = max(1, min(window_get_width() / baseW, window_get_height() / baseH))
+    var gw = round(baseW * scale)
+    var gh = round(baseH * scale)
+    if (display_get_gui_width() != gw || display_get_gui_height() != gh) {
+        display_set_gui_size(gw, gh)
+    }
+}
+
 // Попадание точки в повёрнутый прямоугольник (центр cx,cy; размер w,h;
 // угол angle — та же конвенция, что у draw_sprite_ext). Для хит-теста карт
 function pointInRotatedRect(px, py, cx, cy, w, h, angle) {
@@ -114,6 +124,140 @@ function cardDisplayStats(card) {
         }
     }
     return st
+}
+
+//// Детальное описание карты
+#macro CARD_DESC_X1 6
+#macro CARD_DESC_Y1 35
+#macro CARD_DESC_X2 31
+#macro CARD_DESC_Y2 50
+
+// Ручной перенос строк под ширину maxW текущим шрифтом
+function wrapTextToWidth(text, maxW) {
+    var out = ""
+    var cur = ""
+    var word = ""
+    var n = string_length(text)
+    for (var i = 1; i <= n + 1; i++) {
+        var ch = (i <= n) ? string_char_at(text, i) : "\n" 
+        if (ch == " " || ch == "\n") {
+            if (word != "") {
+                var cand = (cur == "") ? word : cur + " " + word
+                if (cur != "" && string_width(cand) > maxW) {
+                    out += cur + "\n"
+                    cur = word
+                } else {
+                    cur = cand
+                }
+                word = ""
+            }
+            if (ch == "\n") {
+                out += cur
+                if (i <= n) out += "\n"
+                cur = ""
+            }
+        } else {
+            word += ch
+        }
+    }
+    return out
+}
+
+// Подбор шрифта под область
+function fitWrappedText(text, areaW, areaH) {
+    if (!variable_global_exists("uiFontLadder")) uiFontInit()
+    var ladder = global.uiFontLadder
+    var prevFont = draw_get_font()
+    var best = undefined
+    var bestSize = -1
+    for (var i = 0; i < array_length(ladder); i++) {
+        draw_set_font(ladder[i].font)
+        var wrapped = wrapTextToWidth(text, areaW)
+        var tw = string_width(wrapped)
+        var th = string_height(wrapped)
+        var sc = min(areaW / max(1, tw), areaH / max(1, th))
+        var effective = sc * ladder[i].lineH // итоговая высота строки на экране
+       
+        if (effective >= bestSize) {
+            bestSize = effective
+            best = { font: ladder[i].font, scale: sc, text: wrapped }
+        }
+    }
+    draw_set_font(prevFont)
+    return best
+}
+
+//// Лицо карты с текстом
+#macro CARD_FACE_SCALE 8
+
+function cardFaceLayout(card) {
+    if (!variable_global_exists("cardFaceLayouts")) global.cardFaceLayouts = {}
+    var key = string(card.name) + "|" + string(card.rarity)
+    if (variable_struct_exists(global.cardFaceLayouts, key)) return global.cardFaceLayouts[$ key]
+
+    var prevFont = draw_get_font()
+    var refW = sprite_get_width(card.cardBaseSpr) * CARD_FACE_SCALE
+    var refH = sprite_get_height(card.cardBaseSpr) * CARD_FACE_SCALE
+    var areaW = (CARD_DESC_X2 - CARD_DESC_X1) * CARD_FACE_SCALE
+    var areaH = (CARD_DESC_Y2 - CARD_DESC_Y1) * CARD_FACE_SCALE
+    // ручное описание с карты (card.description); задаётся в фабриках карт
+    var descText = variable_struct_exists(card, "description") ? card.description : ""
+    var fit = fitWrappedText(descText, areaW, areaH)
+
+    var costTxt = string(card.costValue())
+    var costScale = uiTextScale(costTxt, refH * 0.16, refW * 0.24) // ставит шрифт
+    var lay = {
+        refW: refW, refH: refH,
+        descFont: fit.font, descScale: fit.scale, descText: fit.text,
+        costTxt: costTxt, costFont: draw_get_font(), costScale: costScale
+    }
+    draw_set_font(prevFont)
+    global.cardFaceLayouts[$ key] = lay
+    return lay
+}
+
+// Рисуем полностью карту (спрайты + описание + стоимость)
+// центр cx,cy, целевой размер w,h, поворот angle
+function drawCardFace(card, cx, cy, w, h, angle, scale = 1, alpha = 1, isSelected = false) {
+    var baseW = sprite_get_width(card.cardBaseSpr)
+    var baseH = sprite_get_height(card.cardBaseSpr)
+    var sx = (w / baseW) * scale
+    var sy = (h / baseH) * scale
+    draw_sprite_ext(card.cardBaseSpr, 0, cx, cy, sx, sy, angle, c_white, alpha)
+    draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, alpha)
+    draw_sprite_ext(card.cardBorderSpr, 0, cx, cy, sx, sy, angle, c_white, alpha)
+    draw_sprite_ext(card.cardTokenSpr, 0, cx, cy, sx, sy, angle, c_white, alpha)
+
+    var lay = cardFaceLayout(card)
+    var k = min(w * scale / lay.refW, h * scale / lay.refH)
+    var prevFont = draw_get_font()
+    draw_set_halign(fa_center)
+    draw_set_valign(fa_middle)
+
+    // описание
+    if (lay.descText != "") {
+        draw_set_font(lay.descFont)
+        var descLx = w * scale * ((CARD_DESC_X1 + CARD_DESC_X2) * 0.5 / baseW - 0.5)
+        var descLy = h * scale * ((CARD_DESC_Y1 + CARD_DESC_Y2) * 0.5 / baseH - 0.5)
+        var descPt = cardLocalToScreen(cx, cy, descLx, descLy, angle)
+        var descScale = lay.descScale * k
+        draw_text_transformed_colour(descPt.x, descPt.y, lay.descText,
+            descScale, descScale, angle, c_black, c_black, c_black, c_black, alpha)
+    }
+
+    // стоимость
+    draw_set_font(lay.costFont)
+    drawCardStatText(cx, cy, w * scale * 0.28, -h * scale * 0.36, angle,
+        lay.costTxt, c_white, lay.costScale * k)
+
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+    draw_set_color(c_white)
+    draw_set_font(prevFont)
+    
+    if (isSelected) {
+        draw_sprite_ext(sprCardSelected, 0, cx, cy, sx, sy, angle, c_white, 1)
+    }
 }
 
 // Map a card-local point (lx right, ly down; origin = card centre) to
@@ -181,47 +325,6 @@ function drawCardStatText(cx, cy, lx, ly, angle, txt, col, scale) {
     var _shadow = cardLocalToScreen(cx, cy, lx + off, ly + off, angle)
     draw_text_transformed_colour(_shadow.x, _shadow.y, txt, scale, scale, angle, c_black, c_black, c_black, c_black, 0.6)
     draw_text_transformed_colour(main.x, main.y, txt, scale, scale, angle, col, col, col, col, 1)
-}
-
-// Compact stats drawn over the card at full GUI resolution:
-// a big value in the name box + the cost number on the cost token.
-// x,y = card centre; w,h = drawn card size (screen px).
-function drawCardStats(x, y, w, h, angle, card) {
-    var st = cardDisplayStats(card)
-
-    var colDmg  = make_color_rgb(222, 64,  52)
-    var colHeal = make_color_rgb(74,  194, 96)
-    var colEff  = make_color_rgb(240, 214, 120)
-
-    // ---- main value (or effect name), big & centred in the name box ----
-    var mainTxt = "", mainCol = c_white
-    switch (st.kind) {
-        case "dmg":  mainTxt = string(st.minNum) + "-" + string(st.maxNum); mainCol = colDmg;  break
-        case "heal": mainTxt = string(st.minNum) + "-" + string(st.maxNum); mainCol = colHeal; break
-        default:     mainTxt = st.effectName;                                mainCol = colEff;  break
-    }
-
-    // Смещения в долях размера карты (лёгкая подстройка центровки — крути тут):
-    var valueLx =  0.00   // значение: гориз. (0 = центр карты)
-    var valueLy =  0.31   // значение: вертик. (центр белого поля имени)
-    var costLx  =  0.32   // стоимость: гориз. (центр сердечка-токена)
-    var costLy  = -0.40   // стоимость: вертик. (центр сердечка-токена)
-
-    draw_set_font(uiFont())
-    draw_set_halign(fa_center)
-    draw_set_valign(fa_middle)
-
-    // значение (урон/лечение) — по центру поля имени
-    drawCardStatText(x, y, valueLx * w, valueLy * h, angle, mainTxt, mainCol,
-        uiTextScale(mainTxt, h * 0.22, w * 0.80))
-
-    // стоимость — цифрой на сердечке-токене (верх-право)
-    drawCardStatText(x, y, costLx * w, costLy * h, angle, string(st.costValue), c_white,
-        uiTextScale(string(st.costValue), h * 0.16, w * 0.24))
-
-    draw_set_halign(fa_left)
-    draw_set_valign(fa_top)
-    draw_set_color(c_white)
 }
 
 function drawFitTextInArea(
@@ -321,41 +424,35 @@ function statusIconFor(effect) {
 // returns {x, y, angle, scale} for card i of n, centered under the screen
 function handCardTransform(i, n, hoveredIndex) {
     // tunables
-    var spread  = 40;   // px between card centers
-    var arcLift = 3;    // px each card dips toward the ends
-    var arcTilt = 4;    // degrees rotation per step from center
+    var spread  = 40 // px between card centers
+    var arcLift = 3 // px each card dips toward the ends
+    var arcTilt = 4 // degrees rotation per step from center
 
-    var mid = (n - 1) / 2;
-    var off = i - mid;              // signed distance from the middle card
+    var mid = (n - 1) / 2
+    var off = i - mid // signed distance from the middle card
 
-    var baseX = display_get_gui_width() / 2;
-    var baseY = display_get_gui_height() - 70;
+    var baseX = display_get_gui_width() / 2
+    var baseY = display_get_gui_height() - 70
 
     var t = {
-        x:     baseX + off * spread,
-        y:     baseY + abs(off) * arcLift,   // ends dip down → arc
-        angle: -off * arcTilt,               // fan rotation
+        x: baseX + off * spread,
+        y: baseY + abs(off) * arcLift, // ends dip down → arc
+        angle: -off * arcTilt, // fan rotation
         scale: 1
-    };
+    }
 
     // hovered/selected card overrides: lift, straighten, enlarge
     if (i == hoveredIndex) {
-        t.y     -= 20;
-        t.angle  = 0;
-        t.scale  = 1.25;
+        t.y -= 20
+        t.angle = 0
+        t.scale = 1.25
     }
 
-    return t;
+    return t
 }
 
 function drawCardTransformed(card, cx, cy, w, h, angle, scale, alpha = 1) {
-    // sprite scale factors: sprite native size → target w/h, then * scale
-    var sx = (w / sprite_get_width(card.cardBaseSpr))  * scale;
-    var sy = (h / sprite_get_height(card.cardBaseSpr)) * scale;
-    draw_sprite_ext(card.cardBaseSpr,         0, cx, cy, sx, sy, angle, c_white, alpha);
-    draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, alpha);
-    draw_sprite_ext(card.cardBorderSpr,       0, cx, cy, sx, sy, angle, c_white, alpha);
-    draw_sprite_ext(card.cardTokenSpr,        0, cx, cy, sx, sy, angle, c_white, alpha);
+    drawCardFace(card, cx, cy, w, h, angle, scale, alpha)
 }
 
 function drawSpriteOutline(spr, sub, xx, yy, xs, ys, ang, col) {
@@ -367,16 +464,17 @@ function drawSpriteOutline(spr, sub, xx, yy, xs, ys, ang, col) {
     gpu_set_fog(false, col, 0, 0)
 }
 
+// Высота бейджа
+#macro MENU_BADGE_H 10
+
 function menuBadgeSize(label, badgeScale) {
-    var nativeW = sprite_get_width(ActionButtnBackground)
-    var nativeH = sprite_get_height(ActionButtnBackground)
-    var base = nativeH * badgeScale
-    var heightFactor = 1
-    var bh = base * heightFactor
+    var aspect = sprite_get_width(ActionButtnBackground) / sprite_get_height(ActionButtnBackground)
+    var base = MENU_BADGE_H * badgeScale
+    var bh = base
     var textH = base * 0.9
     var padX = 4 * badgeScale
     var sc = uiTextScale(label, textH, 100000)
-    var bw = max(nativeW * badgeScale, string_width(label) * sc + padX * 2)
+    var bw = max(base * aspect, string_width(label) * sc + padX * 2)
     return { w: bw, h: bh, textH: textH, scale: sc }
 }
 

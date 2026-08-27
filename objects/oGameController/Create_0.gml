@@ -2,27 +2,23 @@ randomize()
 
 gpu_set_tex_filter(false)
 
-// --- Режим отображения: borderless (безрамочный на весь экран) / окно --------
+// Режим отображения: borderless
 setDisplayMode = function(fullscreen) {
     global.displayFullscreen = fullscreen
-    if (fullscreen) {
-        // полноэкранный режим
-        window_set_showborder(false)
-        window_set_size(display_get_width(), display_get_height())
-        window_set_position(0, 0)
-    } else {
-        // обычное окно
-        var ww = 1280, wh = 720
-        window_set_showborder(true)
-        window_set_size(ww, wh)
-        window_set_position((display_get_width() - ww) div 2, (display_get_height() - wh) div 2)
-    }
+    
+    ini_open("settings.ini")
+    ini_write_real("Display", "Fullscreen", fullscreen ? 1 : 0)
+    var resInd = ini_read_real("Display", "ResolutionIndex", 2)
+    ini_close()
+
+    var res = menuGetResolutions()
+    resInd = min(resInd, array_length(res) - 1)
+
+    applyWindowMode(res[resInd][0], res[resInd][1], fullscreen)
+    display_set_gui_size(res[resInd][0], res[resInd][1])
 }
-// применяем borderless
-if (!variable_global_exists("displayModeReady")) {
-    global.displayModeReady = true
-    setDisplayMode(true)
-}
+// применяем настройки экрана
+initDisplaySettings()
 uiFontInit() // кэш UI-шрифта и высоты строки
 initEffectRegistry() // регистрация эффектов
 cardIdsInit() // инициализация карт ид
@@ -38,18 +34,35 @@ if (!instance_exists(oTransition)) {
 }
 
 partyMembers = [oLana, oViv]
-selectedIndex = 0;
+selectedIndex = 0
 selected_character = partyMembers[0]
 
 global.walkSound = asset_get_index("GrassWalk") // звук ходьбы по траве (-1 пока ассета нет)
 
 global.returningFromBattle = false // флаг возврата из боя (обрабатывается на Room Start)
-global.fightEnemy = noone           // враг, с которым дрались
+global.fightEnemy = noone // враг, с которым дрались
 
 global.mpGrid = -1 // Motion Planning
 global.battleSection = 1
 global.uiModal = false // Флаг для метки если запускается какое-то модальное окно, чтобы блокировать движение в основном экране
-global.gamePaused = false // Полная пауза мира 
+global.gamePaused = false // Полная пауза мира
+
+// Катсцена появления босса
+global.cutsceneActive = false
+cutsceneSprite = noone
+cutsceneFrame = 0
+cutsceneTargetRoom = noone
+
+// Запустить катсцену. Возвращает true, если катсцена запущена
+startBossCutscene = function(spr, targetRoom) {
+    if (spr == noone || spr == undefined || !sprite_exists(spr)) return false
+    cutsceneSprite = spr
+    cutsceneFrame = 0
+    cutsceneTargetRoom = targetRoom
+    global.cutsceneActive = true
+    global.uiModal = true // блокируем открытие меню/деки/паузы
+    return true
+}
 global.zoneConfig = { // нужно для определение секций и зон на карте
     cx: room_width / 2,
     cy: room_height / 2,

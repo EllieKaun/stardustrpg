@@ -13,51 +13,70 @@ if array_length(cards) == 0 { // Если карт нет - замешиваем
     }
 }
 
-var cardToPlay = cards[irandom(array_length(cards) - 1)] // Случайная карта для игры
+var aliveHeroes  = filterNotKO(heroes) // противники врага
+var aliveEnemies = filterNotKO(enemies) // союзники врага
 
-var aliveHeroes = filterNotKO(heroes)
-var aliveEnemies = filterNotKO(enemies)
+// Принимаем решение по разыгрыванию карты
+var healChoice = noone, buffChoice = noone, attackChoice = noone
+for (var i = 0; i < array_length(cards); i++) {
+    var c = cards[i]
+    switch (cardCategoryOf(c)) {
+        case CardCategory.Heal: 
+            if (healChoice == noone) healChoice = c
+            break
+        case CardCategory.Buff: 
+            if (buffChoice == noone) buffChoice = c
+            break
+        case CardCategory.Attack:
+        case CardCategory.Magic: 
+            if (attackChoice == noone) attackChoice = c
+            break
+    }
+}
+
+// Самый раненый союзник (для хила)
+var woundedAlly = noone
+var lowestHp = 999999
+for (var i = 0; i < array_length(aliveEnemies); i++) {
+    var a = aliveEnemies[i]
+    if (a.hp < a.maxHp && a.hp < lowestHp) { lowestHp = a.hp; woundedAlly = a }
+}
+
+var cardToPlay = noone
 var target = noone
 
-switch (cardToPlay.target) {
-    case TargetTypes.SingleEnemyTarget:
-        if (array_length(aliveHeroes) == 0) { 
-            skipTurn()
-            return 
-        }
-        target = aliveHeroes[irandom(array_length(aliveHeroes) - 1)]
-    break
-    case TargetTypes.AllEnemies:
-        if (array_length(aliveHeroes) == 0) { 
-            skipTurn()
-            return 
-        }
-        target = aliveHeroes
-    break
-    case TargetTypes.SingleAllyTarget:
-        if (array_length(aliveEnemies) == 0) { 
-            skipTurn()
-            return 
-        }
-        target = aliveEnemies[irandom(array_length(aliveEnemies) - 1)]
-    break
-    case TargetTypes.AllAllies:
-        if (array_length(aliveEnemies) == 0) { 
-            skipTurn() 
-            return 
-        }
-        target = aliveEnemies
-    break
-    case TargetTypes.Self:
-        target = currentEnemy
-    break
-    default:
-        if (array_length(aliveHeroes) == 0) { 
-            skipTurn() 
-            return 
-        }
-        target = aliveHeroes[irandom(array_length(aliveHeroes) - 1)]
-    break
+// ЕслиЕ есть хил и есть раненый союзник, значит лечим самого раненого
+if (healChoice != noone && woundedAlly != noone) {
+    target = enemyResolveTarget(healChoice, currentEnemy, aliveHeroes, aliveEnemies, woundedAlly, noone)
+    if (target != noone) cardToPlay = healChoice
+}
+
+// Если есть бафф и кастер ещё не забаффан этим модификаторо, значит баффаем себя
+if (cardToPlay == noone && buffChoice != noone) {
+    var alreadyBuffed = false
+    var e0 = buffChoice.effects[0]
+    if (variable_struct_exists(e0, "buffType"))
+        alreadyBuffed = !is_undefined(checkIfHasBuff(currentEnemy, EffectTypes.Buff, e0.buffType))
+    if (!alreadyBuffed) {
+        target = enemyResolveTarget(buffChoice, currentEnemy, aliveHeroes, aliveEnemies, currentEnemy, noone)
+        if (target != noone) cardToPlay = buffChoice
+    }
+}
+
+// Атакуем
+if (cardToPlay == noone && attackChoice != noone) {
+    target = enemyResolveTarget(attackChoice, currentEnemy, aliveHeroes, aliveEnemies, noone, noone)
+    if (target != noone) cardToPlay = attackChoice
+}
+
+// Если ничего не выполнилось, случайная карта из руки
+if (cardToPlay == noone) {
+    cardToPlay = cards[irandom(array_length(cards) - 1)]
+    target = enemyResolveTarget(cardToPlay, currentEnemy, aliveHeroes, aliveEnemies, woundedAlly, noone)
+    if (target == noone) {
+        skipTurn()
+        return
+    }
 }
 
 playCard(cardToPlay, currentEnemy, target) // Играем карту

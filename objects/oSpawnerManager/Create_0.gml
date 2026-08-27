@@ -1,7 +1,7 @@
 maxEnemies = 12
 spawnInterval = 90 // Задержка между спавном врагов
 minEnemySpacing = 96 // Минимальное расстояние между врагами
-visionRadius = 200 // Размер области видимости игрока (не уверен точно какое значение)
+visionRadius = 200 // Размер области видимости игрока
 spawnDistance = 500 // Расстояние от игрока в котором можно спавнить врагов
 maxSpawnAttempts = 30
 
@@ -11,12 +11,9 @@ enemyList = ds_list_create() // Список заспавненных враго
 // Логи спавна
 spawnDebug = false
 
-// Стартовый флоу: на новой игре первого врага показываем сразу и в зоне
-// видимости игрока , чтобы он появился на экране за первые секунды.
-// В обычной игре стартового спавна нет — сразу считаем его выполненным.
 tutorialSpawnDone = !(variable_global_exists("isNewGame") && global.isNewGame)
 tutorialMinDist = 64  // не вплотную к игроку
-tutorialMaxDist = 140 // в пределах экрана (полу-ширина вида = 160)
+tutorialMaxDist = 140 // в пределах экрана 
 
 // Попытка заспавнить врага в кольце [minDist, maxDist] от игрока.
 // Возвращает true при успешном спавне.
@@ -88,7 +85,8 @@ trySpawnEnemy = function(minDist, maxDist) {
         }
         var enemy = instance_create_layer(sx, sy, "Instances", chosenType) // создаем мини врага
         enemy.spawnSection = sectionAt(sx, sy) // определение секции
-        enemy.spawnedDynamically = true // заспавненный (не из редактора) -> удаляется после боя
+        enemy.spawnedDynamically = true // заспавненный 
+        enemy.my_spawner = seg 
         ds_list_add(enemyList, enemy)
         if (spawnDebug) show_debug_message("CREATING ENEMY SUCCESS")
         spawned = true

@@ -155,11 +155,12 @@ function forestRewardPool() {
 }
 
 // итоговое создание битвы из фабрик
-function makeEncounter(enemyCreators, reward) {
-    return { enemyCreators: enemyCreators, reward: reward }
+// introSprite — спрайт катсцены появления босса
+function makeEncounter(enemyCreators, reward, introSprite = undefined) {
+    return { enemyCreators: enemyCreators, reward: reward, introSprite: introSprite }
 }
 
-// Единый пул композиций врагов «лес» 
+// Единый пул композиций врагов в лесу
 function forestCompositions() {
     var _all = []
     var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
@@ -172,18 +173,19 @@ function forestCompositions() {
 
 // создание битвы для рандомного врага 
 function randomSectionEncounter(section) {
-    var comps = forestCompositions()                       // демо: враги из всех секций
-    var comp  = comps[irandom(array_length(comps) - 1)];   // [createNut, createLeaf, ...]
-    return makeEncounter(comp, forestRewardPool())         // демо: единый лесной пул наград
+    var comps = forestCompositions()
+    var comp = comps[irandom(array_length(comps) - 1)]
+    return makeEncounter(comp, forestRewardPool())
 }
 
 // создание битвы для босса Марионетки
 function puppetMasterEncounter() {
     var C = global.CardId;
     return makeEncounter(
-        [createPuppetMaster],  
+        [createPuppetMaster],
         { ids: [C.summonAttackPuppet, C.buffMagicalDamageSingleTarget, C.magicalDamageStunChanceSingleTarget],
-          rarities: [CardsRarity.Rare, CardsRarity.Epic] }
+          rarities: [CardsRarity.Rare, CardsRarity.Epic] },
+        PuppetMasterCutScene
     )
 }
 
@@ -191,7 +193,7 @@ function puppetMasterEncounter() {
 function updateWalkSound(active) {
     if (!variable_global_exists("walkSound") || global.walkSound < 0) return
     if (active) {
-        if (!audio_is_playing(global.walkSound)) audio_play_sound(global.walkSound, 1, true)
+        if (!audio_is_playing(global.walkSound)) playSfx(global.walkSound, 1, true)
     } else {
         if (audio_is_playing(global.walkSound)) audio_stop_sound(global.walkSound)
     }
