@@ -10,7 +10,7 @@
   "compression":0,
   "compressionQuality":4,
   "conversionMode":0,
-  "duration":115.2,
+  "duration":145.37502,
   "exportDir":"",
   "name":"BattleMusic",
   "parent":{
@@ -21,6 +21,6 @@
   "resourceType":"GMSound",
   "resourceVersion":"2.0",
   "sampleRate":44100,
-  "soundFile":"BattleMusic.ogg",
+  "soundFile":"BattleMusic.mp3",
   "volume":1.0,
 }

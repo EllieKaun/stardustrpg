@@ -2,7 +2,7 @@ randomize()
 
 gpu_set_tex_filter(false)
 
-// --- Режим отображения: borderless (безрамочный на весь экран) / окно --------
+// Режим отображения: borderless
 setDisplayMode = function(fullscreen) {
     global.displayFullscreen = fullscreen
     
@@ -13,12 +13,8 @@ setDisplayMode = function(fullscreen) {
 
     var res = menuGetResolutions()
     resInd = min(resInd, array_length(res) - 1)
-    
-    if (!fullscreen) {
-        window_set_size(res[resInd][0], res[resInd][1])
-    }
-    window_set_fullscreen(fullscreen)
-    surface_resize(application_surface, res[resInd][0], res[resInd][1])
+
+    applyWindowMode(res[resInd][0], res[resInd][1], fullscreen)
     display_set_gui_size(res[resInd][0], res[resInd][1])
 }
 // применяем настройки экрана
@@ -38,18 +34,35 @@ if (!instance_exists(oTransition)) {
 }
 
 partyMembers = [oLana, oViv]
-selectedIndex = 0;
+selectedIndex = 0
 selected_character = partyMembers[0]
 
 global.walkSound = asset_get_index("GrassWalk") // звук ходьбы по траве (-1 пока ассета нет)
 
 global.returningFromBattle = false // флаг возврата из боя (обрабатывается на Room Start)
-global.fightEnemy = noone           // враг, с которым дрались
+global.fightEnemy = noone // враг, с которым дрались
 
 global.mpGrid = -1 // Motion Planning
 global.battleSection = 1
 global.uiModal = false // Флаг для метки если запускается какое-то модальное окно, чтобы блокировать движение в основном экране
-global.gamePaused = false // Полная пауза мира 
+global.gamePaused = false // Полная пауза мира
+
+// Катсцена появления босса
+global.cutsceneActive = false
+cutsceneSprite = noone
+cutsceneFrame = 0
+cutsceneTargetRoom = noone
+
+// Запустить катсцену. Возвращает true, если катсцена запущена
+startBossCutscene = function(spr, targetRoom) {
+    if (spr == noone || spr == undefined || !sprite_exists(spr)) return false
+    cutsceneSprite = spr
+    cutsceneFrame = 0
+    cutsceneTargetRoom = targetRoom
+    global.cutsceneActive = true
+    global.uiModal = true // блокируем открытие меню/деки/паузы
+    return true
+}
 global.zoneConfig = { // нужно для определение секций и зон на карте
     cx: room_width / 2,
     cy: room_height / 2,

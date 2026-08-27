@@ -1,7 +1,7 @@
 if (!open) exit
 layoutPanels()
 
-// Мышь: наведение + клик по табам/слотам
+// Мышь: наведение, а также клик по табам/слотам
 collectionPanel.stepMouse()
 deckPanel.stepMouse()
 

@@ -66,12 +66,5 @@ posSpacing = spacingBetweenStarriors
 // генерация уровня
 generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleEncounter)
 
-// Катсцена появления босса через 2 секунды после начала боя 
-bossIntroSprite = variable_struct_exists(global.battleEncounter, "introSprite")
-    ? global.battleEncounter.introSprite : undefined
-bossIntroFrame = 0
-bossIntroReturnState = BattleStates.CharacterPlay
-if (bossIntroSprite != undefined) alarm[3] = 2 * game_get_speed(gamespeed_fps)
-
 playMusicNamed("BattleMusic")
 stopAmbient()

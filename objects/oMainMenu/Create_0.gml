@@ -7,8 +7,8 @@ initDisplaySettings()
 // Слои
 backLayers = [new MenuLayer(MainMenuBack, { name: "fg-back" })]
 foreLayers = [
-    new MenuLayer(MainMenuViv, { name: "fg-back", bobAmp: 0.015, bobFreq: 0.08, scale: 1.10, placeholderColor: make_color_rgb(24, 28, 40) }),
-    new MenuLayer(MainMenuLana, { name: "fg-front", bobAmp: 0.025, bobFreq: 0.12, scale: 1.14, placeholderColor: make_color_rgb(34, 40, 56) })
+    new MenuLayer(MainMenuViv, { name: "fg-back", bobAmp: -0.015, bobFreq: 0.14, scale: 1.10, placeholderColor: make_color_rgb(24, 28, 40) }),
+    new MenuLayer(MainMenuLana, { name: "fg-front", bobAmp: 0.025, bobFreq: 0.14, scale: 1.14, placeholderColor: make_color_rgb(34, 40, 56) })
 ]
 itemsAboveForeground = true
 

@@ -190,24 +190,45 @@ function clearDeckSlot(character, slot) {
     }
 }
 
+// Не занятые ни одной декой копии карты
+function freeCopies(cardIdentifier, rarity = CardsRarity.Default) {
+    var used = countCardInDeck(Characters.Lana, cardIdentifier, rarity)
+             + countCardInDeck(Characters.Viv,  cardIdentifier, rarity)
+    return getOwnedCount(cardIdentifier, rarity) - used
+}
+
 // Добавить карту в деку персонажа
 function setDeckSlot(character, slot, cardIdentifier, rarity = CardsRarity.Default) {
     if (!cardCanVaryRarity(cardIdentifier)) rarity = CardsRarity.Default
 
     var deck = deckOf(character)
-    if (slot < 0 || slot >= deck.unlocked)
+    if (slot < 0 || slot >= deck.unlocked) {
         return false
-    if (!isCardOwned(cardIdentifier, rarity)) 
+    }
+    if (!isCardOwned(cardIdentifier, rarity)) {
         return false
-
+    }
+    if (freeCopies(cardIdentifier, rarity) <= 0) {
+        return false
+    }
     var existing = deckSlotRef(character, slot)
     var alreadyHere = (existing != undefined && existing.id == cardIdentifier && existing.rarity == rarity)
 
-    if (alreadyHere) return false
-
+    if (alreadyHere) {
+        return false
+    }
     clearDeckSlot(character, slot)
     array_push(deck.cards, { slot: slot, id: cardIdentifier, rarity: rarity })
     return true
+}
+
+// Первый разблокированный и пустой слот деки, иначе -1
+function firstFreeDeckSlot(character) {
+    var deck = deckOf(character)
+    for (var i = 0; i < deck.unlocked; i++) {
+        if (deckSlotRef(character, i) == undefined) return i
+    }
+    return -1
 }
 
 // Разблокировать слот в деке персонажа
@@ -223,34 +244,79 @@ function clearDeck(character) {
 
 //// Работа с UI декбилдера
 
-// Построение слотов для панели всех карт, заполненные картой + пустые
-function buildCollectionSlots(category = undefined, cols = 4) {
-    var refs = getCollectionRefs()
-    var entries = [] // { card, ref }
-    for (var i = 0; i < array_length(refs); i++) {
-        var card = cardFromRef(refs[i])
-        if (card == undefined) continue
-        if (category == undefined || cardCategoryOf(card) == category)
-            array_push(entries, { card: card, ref: refs[i] })
+// Иконка персонажа
+function characterIcon(character) {
+    switch (character) {
+        case Characters.Lana: return LanaIcon
+        case Characters.Viv:  return VivIcon
+        default: return noone
     }
-
-    var count = array_length(entries)
-    var total = max(cols, ceil(count / cols) * cols)
-
-    var slots = []
-    for (var i = 0; i < total; i++) {
-        if (i < count) {
-            var slot = new Slot("filled", entries[i].card)
-            slot.ref = entries[i].ref
-            array_push(slots, slot)
-        } else {
-            array_push(slots, new Slot("empty"))
-        }
-    }
-    return slots;
 }
 
-// Построение слотов для панели деки персонажа, пустые, залоченные и заполненные картой.
+// Другой персонаж 
+function otherCharacter(character) {
+    return (character == Characters.Lana) ? Characters.Viv : Characters.Lana
+}
+
+// Построение слотов панели всех карт.
+// Одинаковые карты (id+редкость) группируются в один слот с числом.
+// Если часть копий занята деками — они выделяются в отдельные слоты:
+// свободные, занятые текущей декой, занятые чужой декой.
+// currentCharacter — чья дека сейчас открыта.
+function buildCollectionSlots(category = undefined, cols = 4, currentCharacter = Characters.Lana) {
+    var refs = getCollectionRefs()
+    var otherChar = otherCharacter(currentCharacter)
+    var slots = []
+
+    for (var i = 0; i < array_length(refs); i++) {
+        var ref = refs[i]
+        var card = cardFromRef(ref)
+        if (card == undefined) continue
+        if (category != undefined && cardCategoryOf(card) != category) continue
+
+        var total = ref.count
+        var inCurrent = countCardInDeck(currentCharacter, ref.id, ref.rarity)
+        var inOther = countCardInDeck(otherChar, ref.id, ref.rarity)
+        var free = max(0, total - inCurrent - inOther)
+
+        // свободные копии — обычный слот с числом, можно добавлять
+        if (free > 0) {
+            var s = new Slot("filled", card)
+            s.ref = { id: ref.id, rarity: ref.rarity }
+            s.count = free
+            s.addable = true
+            array_push(slots, s)
+        }
+        // копии в текущей деке — иконка владельца, добавлять нельзя
+        if (inCurrent > 0) {
+            var s = new Slot("filled", card)
+            s.ref = { id: ref.id, rarity: ref.rarity }
+            s.count = inCurrent
+            s.ownerIcon = characterIcon(currentCharacter)
+            s.addable = false
+            array_push(slots, s)
+        }
+        // копии в чужой деке — затемнены, добавлять нельзя
+        if (inOther > 0) {
+            var s = new Slot("filled", card)
+            s.ref = { id: ref.id, rarity: ref.rarity }
+            s.count = inOther
+            s.dimmed = true
+            s.ownerIcon = characterIcon(otherChar)
+            s.addable = false
+            array_push(slots, s)
+        }
+    }
+
+    // добить пустыми до минимум 20 слотов
+    var count = array_length(slots)
+    var totalSlots = max(20, ceil(count / cols) * cols)
+    repeat (totalSlots - count) array_push(slots, new Slot("empty"))
+
+    return slots
+}
+
+// Построение слотов для панели деки персонажа, пустые, залоченные и заполненные картой
 function buildDeckSlots(character, total = DECK_CAPACITY) {
     var deck = deckOf(character)
     var slots = []

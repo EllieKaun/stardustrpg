@@ -98,15 +98,10 @@ menu = new Menu([
         global.volMaster = selectedVolMaster
         global.volMusic = selectedVolMusic
         global.volSounds = selectedVolSounds
-        // applyAudioVolumes() is no longer strictly needed since previewAudioVolumes is called, but we leave it for consistency or we can omit it.
-        // Actually, let's keep it just in case.
         applyAudioVolumes()
         
-        if (!currentFullscreen) {
-            window_set_size(resolutions[currentResIndex][0], resolutions[currentResIndex][1])
-        }
-        window_set_fullscreen(currentFullscreen)
-        surface_resize(application_surface, resolutions[currentResIndex][0], resolutions[currentResIndex][1])
+        applyWindowMode(resolutions[currentResIndex][0], resolutions[currentResIndex][1], currentFullscreen)
+
         display_set_gui_size(resolutions[currentResIndex][0], resolutions[currentResIndex][1])
         
         ini_open("settings.ini")

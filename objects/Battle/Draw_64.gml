@@ -201,15 +201,3 @@ if (battleState == BattleStates.GameOver) drawGameOverScreen()
 for (var i = 0; i < array_length(activeCardAnims); i++) {
     activeCardAnims[i].draw()
 }
-
-// Катсцена появления босса
-if (battleState == BattleStates.BossIntro && sprite_exists(bossIntroSprite)) {
-    draw_set_color(c_black)
-    draw_set_alpha(0.5)
-    draw_rectangle(0, 0, screenWidth, screenHeight, false)
-    draw_set_color(c_white)
-    draw_set_alpha(1)
-
-    var introFrame = min(floor(bossIntroFrame), sprite_get_number(bossIntroSprite) - 1)
-    draw_sprite_stretched(bossIntroSprite, introFrame, 0, 0, screenWidth, screenHeight)
-}

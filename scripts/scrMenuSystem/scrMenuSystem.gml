@@ -86,14 +86,14 @@ function MenuLayer(spr = noone, params = {}) constructor {
 
 // ---- Контроллер меню --------------------------------------------------------
 // items — массив MenuItem. config (опц.): расположение/вид в ДОЛЯХ экрана:
-//   anchorX  — точка привязки по X (0..1)
-//   startY   — верх списка по Y (0..1)
-//   spacing  — шаг между пунктами (доля высоты)
-//   textH    — высота текста (доля высоты)
-//   iconGap  — отступ иконка↔текст (доля высоты)
-//   halign   — fa_left/fa_center/fa_right (выравнивание группы "иконка+текст")
+//   anchorX — точка привязки по X (0..1)
+//   startY — верх списка по Y (0..1)
+//   spacing — шаг между пунктами (доля высоты)
+//   textH — высота текста (доля высоты)
+//   iconGap — отступ иконка↔текст (доля высоты)
+//   halign — fa_left/fa_center/fa_right (выравнивание группы "иконка+текст")
 //   colNormal/colSelect/colDisabled — цвета
-//   wrap     — зацикливать навигацию (true)
+//   wrap — зацикливать навигацию (true)
 function Menu(items, config = {}) constructor {
     self.items = items
     self.index = 0
@@ -115,7 +115,7 @@ function Menu(items, config = {}) constructor {
         var n = array_length(self.items)
         if (n == 0) return
         var i = self.index
-        repeat (n) {                       // перескакиваем выключенные пункты
+        repeat (n) { // перескакиваем выключенные пункты
             i += dir
             if (self.wrap) i = (i + n) mod n
             else i = clamp(i, 0, n - 1)
@@ -270,6 +270,21 @@ function menuGetResolutions() {
     return valid_res
 }
 
+// Применить режим окна: фуллскрин, либо оконный размер с центрированием
+function applyWindowMode(winW, winH, fullscreen) {
+    if (fullscreen) {
+        window_set_fullscreen(true)
+        return
+    }
+    window_set_fullscreen(false)
+    // оконный размер не больше рабочего стола
+    var dw = display_get_width(), dh = display_get_height()
+    winW = min(winW, dw)
+    winH = min(winH, dh)
+    window_set_size(winW, winH)
+    window_set_position((dw - winW) div 2, max(0, (dh - winH) div 2))
+}
+
 // Применяет настройки дисплея при старте
 function initDisplaySettings() {
     if (variable_global_exists("displayModeReady") && global.displayModeReady) return;
@@ -277,17 +292,13 @@ function initDisplaySettings() {
     
     ini_open("settings.ini")
     var resInd = ini_read_real("Display", "ResolutionIndex", 2)
-    var fs = ini_read_real("Display", "Fullscreen", 0)
+    var fs = ini_read_real("Display", "Fullscreen", 1)
     ini_close()
 
     var res = menuGetResolutions()
     resInd = min(resInd, array_length(res) - 1)
     if (resInd >= 0) {
-        if (!fs) {
-            window_set_size(res[resInd][0], res[resInd][1])
-        }
-        window_set_fullscreen(fs)
-        surface_resize(application_surface, res[resInd][0], res[resInd][1])
+        applyWindowMode(res[resInd][0], res[resInd][1], fs)
         display_set_gui_size(res[resInd][0], res[resInd][1])
     }
     global.displayFullscreen = fs

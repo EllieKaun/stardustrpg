@@ -1,5 +1,4 @@
-// двигаем/чистим летящие карты (кроме катсцены босса — там всё на паузе)
-if (battleState != BattleStates.BossIntro) updateCardAnims()
+updateCardAnims() // Анимации карт
 
 // Управление мышью 
 var mbx = device_mouse_x_to_gui(0)
@@ -181,16 +180,6 @@ switch (battleState) {
     break
     case BattleStates.CardAnimating: // Карта летит и ввод заблокирован
     break
-    case BattleStates.BossIntro: { // Катсцена босса — ввод заблокирован
-        var introSpd = sprite_get_speed(bossIntroSprite)
-        if (sprite_get_speed_type(bossIntroSprite) == spritespeed_framespersecond) {
-            introSpd /= game_get_speed(gamespeed_fps)
-        }
-        bossIntroFrame += introSpd
-        if (bossIntroFrame >= sprite_get_number(bossIntroSprite)) {
-            battleState = bossIntroReturnState // спрайт кончился — возвращаем игру
-        }
-    } break
     case BattleStates.PlayResult:
         
     break

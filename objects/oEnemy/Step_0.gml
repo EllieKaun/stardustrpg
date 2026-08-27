@@ -1,7 +1,8 @@
 
 if (global.gamePaused) exit
+if (variable_global_exists("cutsceneActive") && global.cutsceneActive) exit
 
-depth = -bbox_bottom 
+depth = -bbox_bottom
 
 var leader = oGameController.selected_character
 if (!instance_exists(leader)) exit
@@ -39,9 +40,19 @@ if (place_meeting(x, y, leader)) {
         global.returnX = leader.x
         global.returnY = leader.y
         leader.can_move = false
-        with (oTransition) {
-            target_room = BattleRoom
-            state = "fade_out"
+
+        // Проверка на наличие катсцены. если есть, сначала проигрываем ее
+        var enc = global.battleEncounter
+        var intro = variable_struct_exists(enc, "introSprite") ? enc.introSprite : undefined
+        var started = false
+        if (intro != undefined && intro != noone && instance_exists(oGameController)) {
+            started = oGameController.startBossCutscene(intro, BattleRoom)
+        }
+        if (!started) {
+            with (oTransition) {
+                target_room = BattleRoom
+                state = "fade_out"
+            }
         }
     }
 } else {

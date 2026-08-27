@@ -15,8 +15,7 @@ for (var i = 0; i < array_length(obstacles); i++) {
 playMusicNamed("ForestDayMusic")
 playAmbientNamed("ForestAmbience")
 
-// Возврат из боя: партия остаётся на месте (persistent). Динамического врага,
-// с которым дрались, убираем; ручной остаётся (остывает, см. oEnemy).
+// Возврат из боя
 if (global.returningFromBattle) {
     global.returningFromBattle = false
     if (instance_exists(selected_character)) {
