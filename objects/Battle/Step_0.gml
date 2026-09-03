@@ -53,6 +53,18 @@ switch (battleState) {
     break
 }
 
+// Отмена выбранной карты
+var cancelPressed = mouse_check_button_pressed(mb_right) || keyboard_check_pressed(ord("C"))
+if (cancelPressed
+    && (battleState == BattleStates.EnemyTargetSelection
+     || battleState == BattleStates.AllyTargetSelection
+     || battleState == BattleStates.EnemyInfoSelection
+     || battleState == BattleStates.EnemyInfoDisplay)) {
+    battleState = BattleStates.CharacterPlay
+    unselectTargets()
+    restoreSelection()
+}
+
 switch (battleState) {
     case BattleStates.Victory:
         stepVictoryScreen() // Обработка действия на экране победы

@@ -287,7 +287,8 @@ function effectsMatch(a, b) {
     return true
 }
 
-// Если такой же эффект уже наложен — обновляем длительность вместо дубликата
+// Если такой же эффект уже наложен — обновляем длительность
+// justApplied=true — эффект наложен в текущем ходу
 function refreshOrPushEffect(target, effect) {
     var effects = target.effects
     for (var i = 0; i < array_length(effects); i++) {
@@ -295,10 +296,12 @@ function refreshOrPushEffect(target, effect) {
             if (variable_instance_exists(effect, "duration")) {
                 effects[i].duration = effect.duration
             }
+            effects[i].justApplied = true
             return effects[i]
         }
     }
     var applied = cloneEffect(effect)
+    applied.justApplied = true
     array_push(effects, applied)
     return applied
 }
@@ -395,7 +398,7 @@ function executeDamageEffect(
     var damageType = effect.damageType
     var cardMult = is_method(effect.value) ? effect.value() : effect.value
 
-    // Характеристика кастера + баффы/дебаффы атаки
+    // Характеристика кастера + баффы и дебаффы атаки
     // Итоговый урон = характеристика * множитель карты
     var stat, atkModifier
     if (damageType == DamageTypes.Physical) {
@@ -405,10 +408,11 @@ function executeDamageEffect(
         stat = caster.intelligence
         atkModifier = ModifiersToBuff.MagicalDamage
     }
-    var atkBuff   = checkIfHasBuff(caster, EffectTypes.Buff,   atkModifier)
+    var atkBuff = checkIfHasBuff(caster, EffectTypes.Buff,   atkModifier)
     var atkDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, atkModifier)
-    if (atkBuff   != undefined) stat += atkBuff.value
-    if (atkDebuff != undefined) stat -= atkDebuff.value
+    if (atkBuff != undefined && is_real(atkBuff.value)) stat += atkBuff.value
+    if (atkDebuff != undefined && is_real(atkDebuff.value)) stat -= atkDebuff.value
+    if (!is_real(stat)) stat = 0
     stat = max(stat, 0)
 
     var damage = cardMult * stat
@@ -416,7 +420,7 @@ function executeDamageEffect(
     // Ослабление кастера
     if (checkIfHasEffectType(caster, EffectTypes.Weakening)) damage *= 0.9
 
-    // Модификация на стороне ЦЕЛИ: защита (+ баффы/дебаффы), слабости/сопротивления
+    // Модификация на стороне ЦЕЛИ: защита (+ баффы и дебаффы), слабости и сопротивления
     damage = mitigateDamage(targets, effect, damage)
 
     show_debug_message("damage " + string(damage) )
@@ -503,7 +507,7 @@ function mitigateDamage(target, effect, rawDamage) {
     var modifier = 0
     var damageType = getEffectDamageType(effect)
 
-    // Защита цели + баффы/дебаффы защиты + заморозка как дебафф физ. защиты
+    // Защита цели + баффы и дебаффы защиты + заморозка как дебафф физ. защиты
     var def, protModifier
     if (damageType == DamageTypes.Magical) {
         def = target.aura
@@ -512,19 +516,20 @@ function mitigateDamage(target, effect, rawDamage) {
         def = target.guts
         protModifier = ModifiersToBuff.PhysicalProtection
     }
-    var protBuff   = checkIfHasBuff(target, EffectTypes.Buff,   protModifier)
+    var protBuff = checkIfHasBuff(target, EffectTypes.Buff, protModifier)
     var protDebuff = checkIfHasBuff(target, EffectTypes.Debuff, protModifier)
-    if (protBuff   != undefined) def += protBuff.value
-    if (protDebuff != undefined) def -= protDebuff.value
+    if (protBuff != undefined && is_real(protBuff.value)) def += protBuff.value
+    if (protDebuff != undefined && is_real(protDebuff.value)) def -= protDebuff.value
+    if (!is_real(def)) def = 0
     damage -= max(def, 0)
 
     // Слабые места и ослабление как процентные модификаторы урона
     if (checkIfHasEffectType(target, EffectTypes.Weakening)) modifier += 0.1
     // Слабые места: сила (−); слабость к стихии входящего эффекта (+);
     // и доп. урон, пока цель В СОСТОЯНИИ, к которому слаба (+).
-    if (checkIfHasStrengths(target, effect))  modifier -= WEAKNESS_DAMAGE_MODIFIER
+    if (checkIfHasStrengths(target, effect)) modifier -= WEAKNESS_DAMAGE_MODIFIER
     if (checkIfHasWeaknesses(target, effect)) modifier += WEAKNESS_DAMAGE_MODIFIER
-    if (checkIfWeakStateActive(target))       modifier += WEAKNESS_DAMAGE_MODIFIER
+    if (checkIfWeakStateActive(target)) modifier += WEAKNESS_DAMAGE_MODIFIER
 
     damage += damage * modifier
     return max(round(damage), 1)

@@ -1,12 +1,48 @@
-if isActive drawSpriteOutline(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_yellow)
+// Враг Повержен
+if (gone) exit
+
+// Анимация исчезновения
+if (disappearing) {
+    var currentSprite = sprite_index
+    var spriteWidth = sprite_get_width(currentSprite)
+    var spriteHeight = sprite_get_height(currentSprite)
+
+    if (!surface_exists(disappearSurf)) {
+        disappearSurf = surface_create(spriteWidth, spriteHeight)
+    } else if (surface_get_width(disappearSurf) != spriteWidth || surface_get_height(disappearSurf) != spriteHeight) {
+        surface_free(disappearSurf)
+        disappearSurf = surface_create(spriteWidth, spriteHeight)
+    }
+
+    surface_set_target(disappearSurf)
+    draw_clear_alpha(c_black, 0)
+    // спрайт персонажа
+    draw_sprite(currentSprite, image_index, sprite_get_xoffset(currentSprite), sprite_get_yoffset(currentSprite))
+
+    // стираем альфу там, где непрозрачна маска
+    gpu_set_blendmode_ext(bm_zero, bm_inv_src_alpha)
+
+    var maskNumber = sprite_get_number(disappearMaskSpr)
+    var maskFrame = clamp(floor(disappearTimer), 0, maskNumber - 1)
+    draw_sprite_stretched(disappearMaskSpr, maskFrame, 0, 0, spriteWidth, spriteHeight) 
+    gpu_set_blendmode(bm_normal)
+    surface_reset_target()
+
+    draw_surface(disappearSurf, x - sprite_get_xoffset(currentSprite), y - sprite_get_yoffset(currentSprite))
+    exit
+}
+
+if (isActive) {
+    drawSpriteOutline(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_yellow)
+} 
 draw_self()
-if isActive {
+if (isActive) {
     draw_sprite(selectionArrow,
     0,
     bbox_left - sprite_get_width(selectionArrow) / 2, 
     bbox_top - sprite_get_height(selectionArrow) / 2)
 }
-if isTarget {
+if (isTarget) {
     draw_sprite(sPointer, 
     0,
     bbox_left, 
@@ -34,10 +70,9 @@ if !isKO() {
 }
 
 
-// Рисование наложенных эффектов/cтатусов 
-
+// Рисование наложенных эффектов
 var statusIcons = []
-var seenIcons   = {}
+var seenIcons = {}
 for (var i = 0; i < array_length(effects); i++) { // ищем иконки
     var icon = statusIconFor(effects[i])
     if (icon == noone) continue;

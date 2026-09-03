@@ -15,6 +15,7 @@ function afterPlayChecks() {
     
     // Проверка на поражение
     if checkIfAllDead(heroes) {
+        addGold(-10) // штраф за поражение
         gameOverCursor = 0
         battleState = BattleStates.GameOver
         return
@@ -37,6 +38,10 @@ function afterPlayChecks() {
 }
 
 function startTurnFor(character) {
+    // Начало хода владельца
+    var effects = character.effects
+    for (var i = 0; i < array_length(effects); i++) effects[i].justApplied = false
+
     if (canDrawCardForTurn(character)) {
         battleState = BattleStates.CardAnimating
         alarm_set(HERO_DRAW_DELAY, game_get_speed(gamespeed_fps))
@@ -81,13 +86,19 @@ function checkIfHasBuff(character, effectType, modifierToBuff) {
     return undefined
 }
 
-// Обновление данных овертайм эффектов 
+// Обновление данных овертайм эффектов
 function updateOvertime(character) {
     var effects = character.effects
     for (var i = array_length(effects) - 1; i >= 0; i--) {
         if (effects[i].timing == Timing.Overtime) {
+            // Наложен в этом же ходу, значит пропускаем
+            if (variable_instance_exists(effects[i], "justApplied") && effects[i].justApplied) {
+                continue
+            }
             effects[i].duration -= 1
-            if (effects[i].duration <= 0) array_delete(effects, i, 1)
+            if (effects[i].duration <= 0) { 
+                array_delete(effects, i, 1)
+            }
         }
     }
 }
@@ -196,6 +207,7 @@ function doMenuAction(name) {
             skipTurn()
         break
         case "Run":
+            addGold(-5) // штраф за побег
             with (oTransition) {
                 target_room = global.returnRoom
                 state = "fade_out"
@@ -285,14 +297,13 @@ function selectTargetAtMouse() {
     return false
 }
 
-// Фильтр колбэк
-function filterCriteria(element, index) {
-    return !element.isKO()
-}
-
 // Фильтрация целей не в ауте
 function filterNotKO(targets) {
-    return array_filter(targets, filterCriteria)
+    var r = []
+    for (var i = 0; i < array_length(targets); i++) {
+        if (!targets[i].isKO()) array_push(r, targets[i])
+    }
+    return r
 }
 
 // Возвращение в мир

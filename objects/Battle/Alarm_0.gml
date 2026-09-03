@@ -13,6 +13,19 @@ if array_length(cards) == 0 { // Если карт нет - замешиваем
     }
 }
 
+var validCards = []
+for (var vi = 0; vi < array_length(cards); vi++) {
+    var vc = cards[vi]
+    if (is_struct(vc) && variable_struct_exists(vc, "cardBaseSpr") && variable_struct_exists(vc, "effects")) {
+        array_push(validCards, vc)
+    }
+}
+cards = validCards
+if (array_length(cards) == 0) {
+    skipTurn()
+    return
+}
+
 var aliveHeroes  = filterNotKO(heroes) // противники врага
 var aliveEnemies = filterNotKO(enemies) // союзники врага
 

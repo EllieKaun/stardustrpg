@@ -55,12 +55,36 @@ function playerGrantStarterCards() {
 function playerDataDefault() {
     return {
         version: 1,
+        gold: 0, // золото 
         collection: {}, // key "id@rarity" -> { id, rarity, count }
         decks: {
             lana: { unlocked: DECK_DEFAULT_UNLOCKED, cards: [] },  // cards: [{slot,id,rarity}]
             viv:  { unlocked: DECK_DEFAULT_UNLOCKED, cards: [] }
         }
     }
+}
+
+//// Золото 
+
+// Текущий баланс 
+function getGold() {
+    if (!variable_struct_exists(global.playerData, "gold")) global.playerData.gold = 0
+    return global.playerData.gold
+}
+
+// Изменить баланс на amount
+function addGold(amount) {
+    global.playerData.gold = max(0, getGold() + amount)
+    playerDataSave()
+    return global.playerData.gold
+}
+
+// Списать amount, если хватает
+function spendGold(amount) {
+    if (getGold() < amount) return false
+    global.playerData.gold = getGold() - amount
+    playerDataSave()
+    return true
 }
 
 // Сохранить данные о пользователе на устройство

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrShopDrawing",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrShopDrawing",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Shop/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
