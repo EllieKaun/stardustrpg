@@ -33,6 +33,8 @@ if (!instance_exists(oTransition)) {
     instance_create_layer(0, 0, "Instances", oTransition)
 }
 
+if (!variable_global_exists("safarJoined")) global.safarJoined = false
+
 partyMembers = [oLana, oViv]
 selectedIndex = 0
 selected_character = partyMembers[0]

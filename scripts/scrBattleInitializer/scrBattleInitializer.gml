@@ -7,6 +7,7 @@ function generateLevel(zoneH, screenW, spacing, encounter) {
 
 function initStarriorsFromEncounter(encounter) {
     heroes  = [createLana(), createViv()];
+    if (variable_global_exists("safarJoined") && global.safarJoined) array_push(heroes, createSafar());
     enemies = [];
     var creators = encounter.enemyCreators;
     for (var i = 0; i < array_length(creators); i++) array_push(enemies, creators[i]());

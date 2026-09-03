@@ -42,7 +42,10 @@ function rollRewardChoices(spec, count = 3) {
 
 // Награды после победы
 function grantBattleRewards() {
-    var spec = global.battleEncounter.reward;  
+    // Золото за победу: 6 за каждого побеждённого врага
+    addGold(6 * array_length(enemies))
+
+    var spec = global.battleEncounter.reward;
     var choices = rollRewardChoices(spec, 3)
     rewardChoices = []
 

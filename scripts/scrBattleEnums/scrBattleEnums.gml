@@ -158,7 +158,9 @@ function cardCategoryOf(_card) {
         var def = global.cardRegistry[$ _card.cardId]
         if (variable_struct_exists(def, "category")) return def.category
     }
-   
+
+    if (!is_struct(_card) || !variable_struct_exists(_card, "cardBaseSpr")) return CardCategory.Attack
+
     if (_card.cardBaseSpr == atcCard) return CardCategory.Attack
     if (_card.cardBaseSpr == mgcCard) return CardCategory.Magic
     if (_card.cardBaseSpr == healCard) return CardCategory.Heal

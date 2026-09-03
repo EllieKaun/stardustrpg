@@ -29,14 +29,16 @@ if (battleState == BattleStates.CharacterPlay && selectedCharacter != noone) {
 
     var leftEdge = selectedCharacter.bbox_left * scaleToGui - 11 * scaleToGui
     var rightEdge = selectedCharacter.bbox_right * scaleToGui + 11 * scaleToGui
-    var headY = selectedCharacter.bbox_top * scaleToGui
+    var centerY = (selectedCharacter.bbox_top + selectedCharacter.bbox_bottom) * 0.5 * scaleToGui
 
     var shuffleSize = menuBadgeSize("SHUFFLE", badgeScale)
     var infoSize = menuBadgeSize("INFO", badgeScale)
     var runSize = menuBadgeSize("RUN", badgeScale)
 
+    var rightStackH = shuffleSize.h + badgeGap + infoSize.h
+
     var shuffleX = rightEdge
-    var shuffleY = headY
+    var shuffleY = centerY - rightStackH * 0.5
     drawMenuBadge(shuffleX, shuffleY, badgeScale, "SHUFFLE", "S", true, colMain, colPanel)
     array_push(menuHitRects, { x: shuffleX, y: shuffleY, w: shuffleSize.w, h: shuffleSize.h, name: "Shuffle" })
 
@@ -46,7 +48,7 @@ if (battleState == BattleStates.CharacterPlay && selectedCharacter != noone) {
     array_push(menuHitRects, { x: infoX, y: infoY, w: infoSize.w, h: infoSize.h, name: "Info" })
 
     var runX = leftEdge - runSize.w
-    var runY = headY + (shuffleSize.h + badgeGap) * 0.5
+    var runY = centerY - runSize.h * 0.5
     drawMenuBadge(runX, runY, badgeScale, "RUN", "R", false, colMain, colPanel)
     array_push(menuHitRects, { x: runX, y: runY, w: runSize.w, h: runSize.h, name: "Run" })
 }
@@ -177,10 +179,10 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     drawUiText(statsX, statsY + lineH * 4, "Guts: " + string(selectedTarget.guts), popupTextH)
 
     // Close Button (Positioned below the popup)
-    var btnWidth = 48 * s
-    var btnHeight = 16 * s
+    var btnWidth = 48 * scaleToGui
+    var btnHeight = 16 * scaleToGui
     var btnX = floor(popupX + popupWidth / 2 - btnWidth / 2)
-    var btnY = floor(popupY + popupHeight + 4 * s) // 4 pixels below the popup
+    var btnY = floor(popupY + popupHeight + 4 * scaleToGui) // 4 pixels below the popup
 
     draw_sprite_stretched(box, 0, btnX, btnY, btnWidth, btnHeight)
     draw_set_halign(fa_center)
@@ -191,7 +193,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     infoCloseRect = { x: btnX, y: btnY, w: btnWidth, h: btnHeight }
 
     // Pointer on Close Button
-    draw_sprite_ext(sPointer, 0, btnX - 12 * s, btnY + btnHeight / 2, scaleToGui, scaleToGui, 0, c_white, 1)
+    draw_sprite_ext(sPointer, 0, btnX - 12 * scaleToGui, btnY + btnHeight / 2, scaleToGui, scaleToGui, 0, c_white, 1)
 }
 
 if (battleState == BattleStates.Victory) drawVictoryScreen()

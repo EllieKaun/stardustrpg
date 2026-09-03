@@ -49,14 +49,14 @@ stepFollowing = function() {
 
     var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump]
 
-    // Прямая линия до лидера свободна -> идём напрямую, минуя сетку (без «крюков»)
+    // Прямая линия до лидера 
     if (collision_line(x, y, leader.x, leader.y, obstacles, true, true) == noone) {
         path_end()
         move_towards_point(leader.x, leader.y, nSpeed)
         return
     }
 
-    // Иначе обходим препятствия по сетке (пересчёт с задержкой)
+    // Иначе обходим препятствия по сетке
     if (calcPathTimer-- <= 0) {
         calcPathTimer = calcPathDelay
         var found = mp_grid_path(global.mpGrid, path, x, y, leader.x, leader.y, true)

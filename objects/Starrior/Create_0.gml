@@ -15,6 +15,7 @@ displayHp = 0
 displayMana = 0
 hpBarReady = false
 
+// Характеристики 
 intelligence = 0
 strength = 0
 guts = 0
@@ -29,6 +30,14 @@ effectNotifications = []
 
 deck = new Deck([])
 
+// Исчезновение врага при смерти
+disappearing = false
+disappearTimer = 0
+gone = false
+disappearSurf = -1
+disappearMaskSpr = sprDisappear 
+
+// Спрайты
 actionState = StarriorStates.Idle
 spriteActionIdle = sprLanaBattleIdle
 spriteActionAttack = sprLanaBattleIdle
@@ -37,6 +46,8 @@ spriteActionSpell = sprLanaBattleSpell
 spriteActionSpawn = noone
 spriteActionDance = noone
 spriteActionKO = sprLanaBattleKO
+
+// Коллбэк
 actionCallback = undefined
 
 function changeActionState(state, callback, spriteOverride = noone) {
@@ -116,6 +127,11 @@ function applyDamage(value) {
     hp -= value
     if hp <= 0 && actionState != StarriorStates.KnockOut {
         changeActionState(StarriorStates.KnockOut, undefined)
+    }
+
+    if (hp <= 0 && isEnemy && !isPuppet && !disappearing && !gone) {
+        disappearing = true
+        disappearTimer = 0
     }
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
