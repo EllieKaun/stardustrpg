@@ -1,7 +1,6 @@
-// ============================================================
-//  Анимация розыгрыша карты — конфигурируемая
+//  Анимация розыгрыша карты 
 //
-//  Поведение задаётся стратегиями (функциями) в конфиге:
+//  Поведение задаётся функциями в конфиге:
 //  путь (path), сглаживание (ease), исчезновение (fade),
 //  частицы (particles)
 //
@@ -9,10 +8,8 @@
 //    var c = defaultCardAnimConfig()
 //    c.path = pathLine // лететь по прямой
 //    c.fade = fadeShrink 
-//    c.dur  = 60 // помедленнее
+//    c.dur = 60 
 //    playCardAnimated(card, caster, targets, c)
-//
-// ============================================================
 
 // ------------------------------------------------------------
 //  Стратегии ПУТИ: (from, to, p, opts) -> {x, y}.  p в [0..1]
@@ -30,31 +27,25 @@ function pathLine(from, to, p, opts) { // по прямой
     return { x: lerp(from.x, to.x, p), y: lerp(from.y, to.y, p) }
 }
 
-// ------------------------------------------------------------
-//  Стратегии СГЛАЖИВАНИЯ: (p) -> p'
-// ------------------------------------------------------------
+// Стратегии сглаживания
 function easeOutQuad(p) { return 1 - power(1 - p, 2) }
 function easeLinear(p) { return p }
 function easeInOutQuad(p) { return (p < 0.5) ? 2 * p * p : 1 - power(-2 * p + 2, 2) * 0.5 }
 
-// ------------------------------------------------------------
-//  Стратегии ИСЧЕЗНОВЕНИЯ: (p, anim) -> alpha. Могут менять и сам anim
-// ------------------------------------------------------------
-function fadeTail(p, anim) { return (p < 0.6) ? 1 : 1 - (p - 0.6) / 0.4; }  // текущее
-function fadeNone(p, anim) { return 1; }  // не гаснет
+// Стратегии исчезновения
+function fadeTail(p, anim) { return (p < 0.6) ? 1 : 1 - (p - 0.6) / 0.4 }  
+function fadeNone(p, anim) { return 1 }  
 function fadeInOut(p, anim) {
-    if (p < 0.15) return p / 0.15;
-    if (p > 0.85) return (1 - p) / 0.15;
-    return 1;
+    if (p < 0.15) return p / 0.15
+    if (p > 0.85) return (1 - p) / 0.15
+    return 1
 }
-function fadeShrink(p, anim) {                  // вместо гаснуть — ужиматься в точку
-    anim.scale = lerp(anim.cfg.scaleFrom, 0.15, p);
-    return 1;
+function fadeShrink(p, anim) { 
+    anim.scale = lerp(anim.cfg.scaleFrom, 0.15, p)
+    return 1
 }
 
-// ------------------------------------------------------------
 //  Конфиги по умолчанию 
-// ------------------------------------------------------------
 function defaultCardAnimConfig() {
     return {
         dur: 40,
@@ -62,25 +53,25 @@ function defaultCardAnimConfig() {
         toY: undefined,
         toAngle: 0,
         scaleFrom: 1.12,
-        scaleTo:1.12,
+        scaleTo: 1.12,
         path: pathArc,
         arcHeight: 120,
         ease: easeOutQuad,
         fade: fadeTail,
         playOverlay: true,
-        particles: defaultCardParticleConfig()   // звёзды; цвет ставится по категории в playCardAnimated
+        particles: defaultCardParticleConfig() // звёзды
     }
 }
 
 function drawCardAnimConfig() {
-    var c = defaultCardAnimConfig()
-    c.dur = 26
-    c.arcHeight = 90
-    c.scaleFrom = 1
-    c.scaleTo = 1
-    c.fade = fadeNone
-    c.playOverlay = false
-    return c
+    var config = defaultCardAnimConfig()
+    config.dur = 26
+    config.arcHeight = 90
+    config.scaleFrom = 1
+    config.scaleTo = 1
+    config.fade = fadeNone
+    config.playOverlay = false
+    return config
 }
 
 function defaultCardParticleConfig() {
@@ -96,7 +87,7 @@ function defaultCardParticleConfig() {
         sizeMax: 5,
         rotSpeed: 8, // макс. скорость вращения
         gravity: 0.06,
-        color: make_color_rgb(255, 236, 150), // тёплый золотой
+        color: make_color_rgb(255, 236, 150), // золотой
         draw: drawStarSparkle // как рисовать одну частицу
     }
 }
@@ -119,9 +110,7 @@ function damageCardParticleConfig() {
     }
 }
 
-// ------------------------------------------------------------
 //  Анимация одной карты
-// ------------------------------------------------------------
 function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) constructor {
     self.card  = card
     self.cardW = cardW
@@ -159,7 +148,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
         // множитель для ui: масштабирует абсолютные размеры/скорости частиц
         var uiS = display_get_gui_width() / guiBaseWidth()
         if (!done) {
-            var px = x, py = y // позиция до шага (для следа)
+            var px = x, py = y // позиция до шага 
             t = min(t + 1, dur)
             var p = t / dur
             var e = cfg.ease(p) // сглаженное время
@@ -231,7 +220,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
     }
 
     static draw = function() {
-        // частицы — под картой, заливаем цветом категории через туман
+        // частицы под картой
         gpu_set_fog(true, pcfg.color, 0, 0)
         for (var i = 0; i < array_length(particles); i++) {
             var s = particles[i];
@@ -251,7 +240,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
     }
 }
 
-// Рисует 4-конечную звёздочку, outer — размер лучей.
+// Рисует 4-конечную звёздочку, outer — размер лучей
 function drawStarSparkle(cx, cy, outer, rot, alpha, col) {
     if (outer <= 0) return
     var inner = outer * 0.4
@@ -315,12 +304,9 @@ function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
 }
 
 
-// ------------------------------------------------------------
-//  Геометрия стола карт — та же математика, что в Draw GUI, но доступная
-//  из Step/скриптов
-// ------------------------------------------------------------
+//  Геометрия стола
 function cardDeskGeometry() {
-    // координаты GUI/окна — та же геометрия, что в Battle Draw GUI
+    // координаты GUI
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
     var s = guiScale()
@@ -363,11 +349,11 @@ function selectedCardTransform() {
     }
 }
 
-// Запускает анимацию выбранной карты перед тем как начать фактическое разыгрывание
+// Запускает анимацию выбранной карты перед тем как начать разыгрывание
 function playCardAnimated(card, caster, targets, cfg) {
     playCardPlaySound() // звук начала розыгрыша карты
     if (cfg == undefined) cfg = defaultCardAnimConfig()
-    // след из звёзд цвета категории карты (как вкладки декбилдера)
+    // след из звёзд цвета категории карты
     cfg.particles.color = categoryColor(cardCategoryOf(card))
     cfg.particles.draw  = drawStarSparkle
     var transform = selectedCardTransform()
@@ -437,7 +423,7 @@ function canDrawCardForTurn(character) {
     return true
 }
 
-// Добор карты из колоды: летит из стопки в руку, добавляется на месте
+// Добор карты из колоды: летит из стопки в руку
 function beginDrawCardAnim(character) {
     var pile = character.getShuffeledDeck()
     var hand = character.getCardsInHand()
@@ -461,8 +447,11 @@ function beginDrawCardAnim(character) {
 
     var anim = new CardPlayAnim(
         card,
-        src.x, src.y, 0,
-        slot.w, slot.h,
+        src.x, 
+        src.y,
+        0,
+        slot.w,
+        slot.h,
         function() {
             array_push(selectedCharacter.getCardsInHand(), drawPendingCard)
             beginTurnFor(selectedCharacter)
@@ -472,7 +461,7 @@ function beginDrawCardAnim(character) {
     array_push(activeCardAnims, anim)
 }
 
-// Обновление/чистка всех активных анимаций (вызывать каждый шаг)
+// Обновление всех активных анимаций (вызывать каждый шаг)
 function updateCardAnims() {
     for (var i = array_length(activeCardAnims) - 1; i >= 0; i--) {
         activeCardAnims[i].update()

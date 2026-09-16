@@ -7,7 +7,7 @@ function createCrackerNut() {
             createPhysicalDamageStunChanseSingleTargetCard(),
             createCardBuffPhysicalDamageSingleTarget()
         ],
-        [ StatusNames.Stun ]);   // слабость: Оглушение
+        [ StatusNames.Stun ]); // слабость: Оглушение
 }
 
 function createLeaf() {
@@ -19,7 +19,7 @@ function createLeaf() {
             createPhysicalDamageWeakeningChanseSingleTargetCard(),
             createInstantHealSingleTargetCard()
         ],
-        [ StatusNames.Burn ])   // слабость: Огонь
+        [ StatusNames.Burn ]) // слабость: Огонь
 }
 
 function createMushroom() {
@@ -31,7 +31,7 @@ function createMushroom() {
             createPhysicalDamageVampirismChanseSingleTargetCard(),
             createCardDebuffPhysicalProtectionSingleTarget()
         ],
-        [ StatusNames.Bomb ])   // слабость: Взрыв
+        [ StatusNames.Bomb ]) // слабость: Взрыв
 }
 
 function createFlower() {
@@ -43,7 +43,7 @@ function createFlower() {
             createMagicalDamageStunChanseSingleTargetCard(),
             createCardBuffMagicalDamageSingleTarget()
         ],
-        [ StatusNames.Freeze ])   // слабость: Лёд
+        [ StatusNames.Freeze ]) // слабость: Лёд
 }
 
 function createPuppetMaster() {

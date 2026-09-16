@@ -60,12 +60,11 @@ function setCrispGui(baseW, baseH) {
     }
 }
 
-// Попадание точки в повёрнутый прямоугольник (центр cx,cy; размер w,h;
-// угол angle — та же конвенция, что у draw_sprite_ext). Для хит-теста карт
+// Попадание точки в повёрнутый прямоугольник (центр cx,cy; размер w,h; угол angle)
 function pointInRotatedRect(px, py, cx, cy, w, h, angle) {
     var c = dcos(angle), s = dsin(angle)
     var dx = px - cx, dy = py - cy
-    var lx = c * dx - s * dy    // точка в локальных координатах карты
+    var lx = c * dx - s * dy // точка в локальных координатах карты
     var ly = s * dx + c * dy
     return (abs(lx) <= w * 0.5 && abs(ly) <= h * 0.5)
 }
@@ -84,8 +83,8 @@ function prettifyCardName(nm) {
         var ch = string_char_at(nm, i)
         if (i > 1) {
             var prev     = string_char_at(nm, i - 1)
-            var chUpper  = (ch != string_lower(ch))      // uppercase letter
-            var prevLow  = (prev != string_upper(prev))  // lowercase letter
+            var chUpper  = (ch != string_lower(ch)) // uppercase letter
+            var prevLow  = (prev != string_upper(prev)) // lowercase letter
             if (chUpper && prevLow) out += " "
         }
         out += ch
@@ -109,13 +108,12 @@ function cardDisplayStats(card) {
             switch (card.rarity) {
                 case CardsRarity.Default: st.maxNum = isAll ? 2 : 4;  break
                 case CardsRarity.Unusual: st.maxNum = isAll ? 4 : 6;  break
-                case CardsRarity.Rare:    st.maxNum = isAll ? 6 : 8;  break
-                case CardsRarity.Epic:    st.maxNum = isAll ? 8 : 12; break
+                case CardsRarity.Rare: st.maxNum = isAll ? 6 : 8;  break
+                case CardsRarity.Epic: st.maxNum = isAll ? 8 : 12; break
             }
             return st
         }
     }
-    // no damage/heal — surface the first other effect's short name instead
     for (var i = 0; i < array_length(card.effects); i++) {
         var e = card.effects[i]
         if (e.type != EffectTypes.Damage && e.type != EffectTypes.Heal) {
@@ -200,7 +198,7 @@ function cardFaceLayout(card) {
     var refH = sprite_get_height(card.cardBaseSpr) * CARD_FACE_SCALE
     var areaW = (CARD_DESC_X2 - CARD_DESC_X1) * CARD_FACE_SCALE
     var areaH = (CARD_DESC_Y2 - CARD_DESC_Y1) * CARD_FACE_SCALE
-    // ручное описание с карты (card.description); задаётся в фабриках карт
+    // ручное описание с карты (card.description)
     var descText = variable_struct_exists(card, "description") ? card.description : ""
     var fit = fitWrappedText(descText, areaW, areaH)
 
@@ -419,7 +417,6 @@ function statusIconFor(effect) {
     return effectIcon(effect)
 }
 
-/////////////////////////////////////////
 // returns {x, y, angle, scale} for card i of n, centered under the screen
 function handCardTransform(i, n, hoveredIndex) {
     // tunables
@@ -526,8 +523,7 @@ function showCardReward(cardStruct, title = "New card!") {
     global.uiModal = true
 }
 
-// Панели информации о персонажах партии — снизу слева.
-// База: портрет, полоса HP, полоса MP, кружки энергии (макс 2).
+// Панели информации о персонажах партии 
 function drawPartyPanels(party, activeChar) {
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()
@@ -539,9 +535,9 @@ function drawPartyPanels(party, activeChar) {
 
     var panelW = sw * 0.24
     var panelH = sh * 0.09
-    var gap    = sh * 0.012
-    var mx     = sw * 0.012
-    var my     = sh * 0.02
+    var gap = sh * 0.012
+    var mx = sw * 0.012
+    var my = sh * 0.02
 
     for (var i = 0; i < array_length(members); i++) {
         var py = sh - my - panelH - i * (panelH + gap)

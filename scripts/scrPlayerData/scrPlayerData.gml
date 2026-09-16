@@ -9,8 +9,7 @@ function playerDataInit() {
     // global.playerData - свойство для хранения структуры пользователя для сохранения
     if (!playerDataLoad()) global.playerData = playerDataDefault()
 
-    // Флаг новой игры: нужен стартовому флоу (первого врага показываем сразу
-    // в зоне видимости игрока). По умолчанию false — загруженная игра.
+    // Флаг новой игры
     global.isNewGame = false
 
     // Если пусто, значит новая игра и иницилазируем базовые карты
@@ -33,7 +32,7 @@ function playerDataInit() {
         var joined = variable_global_exists("safarJoined") && global.safarJoined
         global.playerData.questSafarSpear = joined ? QuestSpearState.Completed : QuestSpearState.Inactive
     }
-    // Миграция старых строковых сейвов -> enum
+    // Миграция старых строковых сейвов в enum
     if (is_string(global.playerData.questSafarSpear)) {
         var qs = global.playerData.questSafarSpear
         var mapped = QuestSpearState.Inactive
@@ -52,23 +51,20 @@ function playerDataNewGame() {
     playerDataSave()
 }
 
-// Иницилазиация базовых карт и стартовых дек героев.
-// На старте у каждого героя ровно 3 карты обычной редкости.
+// Иницилазиация базовых карт и стартовых дек героев
 function playerGrantStarterCards() {
     var C = global.CardId;
 
-    // Открываем базовые карты. Количество = сколько нужно на стартовые деки обоих героев.
-    unlockCard(C.physicalDamageSingleTarget, CardsRarity.Default, 2)      // Вив: 2 атакующие
-    unlockCard(C.magicalDamageSingleTarget)                              // Лана: магическая
-    unlockCard(C.instantHealSingleTarget)                               // Лана: лечащая
-    unlockCard(C.buffPhysicalDamageSingleTarget, CardsRarity.Default, 2) // Лана + Вив: усиливающая
+    // Открываем базовые карты
+    unlockCard(C.physicalDamageSingleTarget, CardsRarity.Default, 2) // Вив: 2 атакующие
+    unlockCard(C.magicalDamageSingleTarget) // Лана: магическая
+    unlockCard(C.instantHealSingleTarget) // Лана: лечащая
+    unlockCard(C.buffPhysicalDamageSingleTarget, CardsRarity.Default, 2) // Лана и Вив усиливающая
 
-    // Лана: 1 магическая, 1 усиливающая, 1 лечащая
     setDeckSlot(Characters.Lana, 0, C.magicalDamageSingleTarget)
     setDeckSlot(Characters.Lana, 1, C.buffPhysicalDamageSingleTarget)
     setDeckSlot(Characters.Lana, 2, C.instantHealSingleTarget)
 
-    // Вив: 2 атакующие, 1 усиливающая
     setDeckSlot(Characters.Viv, 0, C.physicalDamageSingleTarget)
     setDeckSlot(Characters.Viv, 1, C.physicalDamageSingleTarget)
     setDeckSlot(Characters.Viv, 2, C.buffPhysicalDamageSingleTarget)
@@ -221,7 +217,7 @@ function playerDataLoad() {
 
 //// Вспомогательные методы для конвертации в удобный для экспорта вид
 
-// Мапим персонажей в строку
+// Мап персонажей в строку
 function characterKey(character) {
     switch (character) {
         case Characters.Lana: return "lana"
@@ -231,7 +227,7 @@ function characterKey(character) {
 }
 
 // Нужно мапить айди карты и редкость карты в одну строку, чтобы потом восстанавливать карты как структуры 
-// и не создавать дофига айдишек для каждой редкости
+// и не создавать много айдишек для каждой редкости
 function collectionKey(cardIdentifier, rarity) {
     return cardIdentifier + "@" + string(rarity)
 }

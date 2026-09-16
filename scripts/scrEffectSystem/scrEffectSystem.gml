@@ -1,33 +1,25 @@
-// ============================================================
-//  СИСТЕМА ЭФФЕКТОВ (data-driven)
+// Эффекта
+// Поведение каждого эффекта хранится в репо эффектов
+// Карты состоят из набора эффектов
+// "kind": { структура с хуками жизненного цикла }
+// Проигрывание находит обработчик и
+// вызывает нужный хук в зависимости от тайминга:
+// onInstant(effect, caster, targets) — Timing.Instant (мгновенно)
+// onPlay(effect, caster, targets) — Timing.OnActions (по выпронению какого-либо действия)
+// onEndOfTurn(effect, character) — Timing.EndOfTurn (тик в конце хода)
+// onApply(effect, caster, target) — в момент наложения статуса
+// iconFor(effect) / icon — иконка статуса
 //
-//  Поведение каждого эффекта живёт в реестре global.effectRegistry:
-//  ключ ("kind") -> структура с хуками жизненного цикла
+// Пассивные модификаторы (Buff/Debuff/Stun/Weakening/IgnoreWeakness/
+// CreateTemporaryWeakness) не имеют активного хука
 //
-//  Движок НЕ делает switch по типу эффекта. Он находит обработчик и
-//  вызывает нужный хук в зависимости от тайминга:
-//    onInstant(effect, caster, targets) — Timing.Instant
-//    onPlay(effect, caster, targets) — Timing.OnActions (мгновенно)
-//    onEndOfTurn(effect, character) — Timing.EndOfTurn (тик в конце хода)
-//    onApply(effect, caster, target) — в момент наложения статуса
-//    iconFor(effect) / icon — иконка статуса
-//
-//  Пассивные модификаторы (Buff/Debuff/Stun/Weakening/IgnoreWeakness/
-//  CreateTemporaryWeakness) не имеют активного хука — они просто лежат
-//  на цели как данные, а боевые расчёты их опрашивают (checkIfHasBuff,
-//  mitigateDamage, beginTurnFor и т.д.)
-//
-//  Добавить новый эффект = добавить ОДНУ запись в initEffectRegistry().
-//  Никаких правок в executeEffect / executeEndOfTurn / statusIconFor
-//
-//  initEffectRegistry() вызывается один раз в Battle - Create.
-// ============================================================
+// initEffectRegistry() вызывается один раз в Battle Create
 
 function initEffectRegistry() {
-    var R = {}
+    var effectsRepository = {}
 
-    // --- Урон: мгновенный (атаки) и по времени (Burn/Bleeding). ---
-    variable_struct_set(R, "Damage", {
+    // Урон: мгновенный (атаки) и по времени (Burn/Bleeding)
+    variable_struct_set(effectsRepository, "Damage", {
         onInstant: function(effect, caster, targets) {
             if (is_array(targets)) {
                 for (var i = 0; i < array_length(targets); i++)
@@ -42,25 +34,25 @@ function initEffectRegistry() {
         },
     })
 
-    // --- Лечение: мгновенное и по времени. ---
-    variable_struct_set(R, "Heal", {
+    // Лечение: мгновенное и по времени
+    variable_struct_set(effectsRepository, "Heal", {
         onInstant: function(effect, caster, targets) { executeHealing(effect, caster, targets) },
         onEndOfTurn: function(effect, character) { character.applyHeal(effect.value) },
     })
 
-    // --- Восстановление маны: мгновенное и по времени. ---
-    variable_struct_set(R, "ManaGain", {
+    // Восстановление маны: мгновенное и по времени 
+    variable_struct_set(effectsRepository, "ManaGain", {
         onInstant: function(effect, caster, targets) { executeManaGain(effect, caster, targets) },
         onEndOfTurn: function(effect, character) { character.applyMana(effect.value) },
     })
 
-    // --- Снятие статуса. ---
-    variable_struct_set(R, "RemoveEffect", {
+    // Снятие статуса 
+    variable_struct_set(effectsRepository, "RemoveEffect", {
         onInstant: function(effect, caster, targets) { executeRemoveStatus(targets, effect.statusName) },
     })
 
-    // --- Воскрешение: восстанавливает половину максимального HP. ---
-    variable_struct_set(R, "Resurrection", {
+    // Воскрешение
+    variable_struct_set(effectsRepository, "Resurrection", {
         onInstant: function(effect, caster, targets) {
             if (targets.isPuppet) return
             if (!targets.isKO()) return // воскрешают только павшего
@@ -70,30 +62,26 @@ function initEffectRegistry() {
         },
     })
 
-    // --- Мгновенные эффекты OnActions. ---
-    variable_struct_set(R, "AddEnergy", {
+    // OnActions
+    variable_struct_set(effectsRepository, "AddEnergy", {
         onPlay: function(effect, caster, targets) { targets.energy += effect.value },
     })
-    variable_struct_set(R, "CopyCard", {
-        // Сама копия обрабатывается в playCard (флаг copyNextCard) — здесь noop.
+    variable_struct_set(effectsRepository, "CopyCard", {
         onPlay: function(effect, caster, targets) {},
     })
-    variable_struct_set(R, "ShuffleDeck", {
-        // with(Battle): хук — метод структуры (self=структура), а selectedCharacter —
-        // переменная контроллера Battle. with переключает self на контроллер.
+    variable_struct_set(effectsRepository, "ShuffleDeck", {
         onPlay: function(effect, caster, targets) {
             with (Battle) { shuffleDeckAndTake4(selectedCharacter) }
         },
     })
-    variable_struct_set(R, "CreatePuppet", {
+    variable_struct_set(effectsRepository, "CreatePuppet", {
         onPlay: function(effect, caster, targets) {
             with (Battle) { spawnPuppet(effect.puppetCategory, caster) }
         },
     })
 
-    // --- BossClone: ЭКСКЛЮЗИВНАЯ карта. Клонирует кастера во все
-    //     свободные слоты его команды. Вся уникальная логика — здесь. ---
-    variable_struct_set(R, "BossClone", {
+    // Клоинирование
+    variable_struct_set(effectsRepository, "BossClone", {
         onPlay: function(effect, caster, targets) {
             with (Battle) {
                 var team = caster.isEnemy ? enemies : heroes
@@ -109,8 +97,8 @@ function initEffectRegistry() {
         },
     })
 
-    // --- Steal: крадёт бафф у цели (и копьё Сафара, если помечена). ---
-    variable_struct_set(R, "Steal", {
+    // Кража
+    variable_struct_set(effectsRepository, "Steal", {
         onInstant: function(effect, caster, targets) {
             var t = is_array(targets) ? (array_length(targets) > 0 ? targets[0] : noone) : targets
             if (t == noone) return
@@ -132,28 +120,27 @@ function initEffectRegistry() {
         },
     })
 
-    // --- Пассивные модификаторы: только иконка (поведение читают расчёты). ---
-    variable_struct_set(R, "Buff", { iconFor: function(e) { return buffIcon(e, true) } })
-    variable_struct_set(R, "Debuff", { iconFor: function(e) { return buffIcon(e, false) } })
-    variable_struct_set(R, "Stun", { icon: noone })
-    variable_struct_set(R, "Weakening", { icon: noone })
-    variable_struct_set(R, "IgnoreWeakness", { icon: noone })
-    variable_struct_set(R, "CreateTemporaryWeakness", { icon: noone })
+    // Модификаторы
+    variable_struct_set(effectsRepository, "Buff", { iconFor: function(e) { return buffIcon(e, true) } })
+    variable_struct_set(effectsRepository, "Debuff", { iconFor: function(e) { return buffIcon(e, false) } })
+    variable_struct_set(effectsRepository, "Stun", { icon: noone })
+    variable_struct_set(effectsRepository, "Weakening", { icon: noone })
+    variable_struct_set(effectsRepository, "IgnoreWeakness", { icon: noone })
+    variable_struct_set(effectsRepository, "CreateTemporaryWeakness", { icon: noone })
 
     global.effectRegistry = R
 }
 
-//// ----- Поиск обработчика -----
+//// Поиск обработчика
 
-// Ключ реестра для эффекта
+// Ключ репозитория для эффекта
 function effectKind(effect) {
     if (variable_instance_exists(effect, "kind")) return effect.kind
     if (!variable_instance_exists(effect, "type")) return undefined
     return effectKindFromType(effect.type)
 }
 
-// EffectTypes -> строковый ключ реестра (без пробелов, в отличие от
-// effectTypeToString, который для UI)
+// EffectTypes -> строковый ключ реестра 
 function effectKindFromType(type) {
     switch (type) {
         case EffectTypes.Damage: return "Damage"
@@ -186,7 +173,7 @@ function effectHasHook(handler, hookName) {
     return handler != undefined && variable_struct_exists(handler, hookName)
 }
 
-//// ----- Обобщённый запуск хуков (вызывается из тех же мест, что старые switch) -----
+//// Обобщённый запуск хуков
 
 function runInstant(effect, caster, targets) {
     var h = effectHandler(effect)
@@ -297,7 +284,6 @@ function cloneDeckFrom(src) {
 
 ////  Конструкторы эффектов
 
-// --- Урон ---
 // Мгновенная атака
 // value — число или функция 
 // sprite — визуал попадания на цели,sound — звук эффекта
@@ -324,8 +310,7 @@ function StunEffect(duration, chance) {
     return StatusEffect(EffectTypes.Stun, StatusNames.Stun, duration, chance, Timing.Overtime)
 }
 
-// Шок (от молнии): пропуск хода как стан, но отдельный статус Shock
-// (своя иконка + снимается картой removeShock)
+// Шок (от молнии)
 function ShockEffect(duration, chance) {
     return StatusEffect(EffectTypes.Stun, StatusNames.Shock, duration, chance, Timing.Overtime)
 }
