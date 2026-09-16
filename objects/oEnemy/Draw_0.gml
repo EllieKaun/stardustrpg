@@ -8,3 +8,10 @@ draw_sprite_stretched(
 )
 
 draw_self()
+
+if (carriesSpear) {
+    var spr = spearSprite()
+    if (spr != noone) {
+        draw_sprite_ext(spr, 0, (bbox_left + bbox_right) * 0.5, bbox_top, 1, 1, 0, c_white, 1)
+    }
+}

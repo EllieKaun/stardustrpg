@@ -70,12 +70,10 @@ function drawVictoryScreen() {
     // координаты GUI/окна — бой рисуется без матрицы (см. Battle Draw GUI)
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()
-    var s  = sw / guiBaseWidth()
+    var s  = guiScale()
 
     // Затемнение
-    draw_set_color(c_black); draw_set_alpha(0.5)
-    draw_rectangle(0, 0, sw, sh, false)
-    draw_set_alpha(1)
+    drawScreenDim(0.5)
 
     // Надпись победы
     draw_set_color(c_white)
@@ -89,7 +87,8 @@ function drawVictoryScreen() {
     // Если нет наград
     if (count == 0) {
         drawUiText(sw / 2, sh / 2, "No rewards — press Enter", sh * 0.04)
-        draw_set_halign(fa_left); draw_set_valign(fa_top)
+        draw_set_halign(fa_left)
+        draw_set_valign(fa_top)
         return
     }
 
@@ -131,7 +130,7 @@ function drawVictoryScreen() {
 
 // Рисование описания наградной карты
 function drawRewardDescription(card, px, py, pw, ph) {
-    draw_sprite_stretched(box6, 0, px, py, pw, ph) // Бэк
+    draw_sprite_stretched(box, 0, px, py, pw, ph) // Бэк
     if (card == undefined) return
 
     var s = display_get_gui_width() / guiBaseWidth()
@@ -200,12 +199,9 @@ function drawGameOverScreen() {
     // координаты GUI/окна — бой рисуется без матрицы (см. Battle Draw GUI)
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()
-    var s  = sw / guiBaseWidth()
+    var s  = guiScale()
 
-    draw_set_color(c_black)
-    draw_set_alpha(0.6)
-    draw_rectangle(0, 0, sw, sh, false) // Затемнение
-    draw_set_alpha(1)
+    drawScreenDim(0.6) // Затемнение
 
     draw_set_color(c_white)
     draw_set_halign(fa_center)

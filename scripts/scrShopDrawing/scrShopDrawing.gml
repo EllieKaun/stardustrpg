@@ -1,10 +1,7 @@
 enum ShopCategory { Cards, OtherItems }
 
-#macro SHOP_CARD_PRICE 100 // цена карты
-#macro SHOP_SLOT_BASE 100 // базовая цена расширения слота деки
-
 // Модель товара магазина
-// kind: "card" или "slot"
+// kind: ShopItemKind.Card или ShopItemKind.Slot
 function ShopItem(_kind, _price) constructor {
     kind = _kind
     price = _price
@@ -17,7 +14,7 @@ function ShopItem(_kind, _price) constructor {
 // Цена следующего расширения слота деки x1.5
 function deckSlotUpgradePrice() {
     var purchased = deckOf(Characters.Lana).unlocked - DECK_DEFAULT_UNLOCKED
-    return floor(SHOP_SLOT_BASE * power(1.5, max(0, purchased)))
+    return floor(SHOP_SLOT_BASE * power(SHOP_SLOT_GROWTH, max(0, purchased)))
 }
 
 // Список товаров для категории
@@ -30,7 +27,7 @@ function buildShopItems(category) {
         for (var i = 0; i < array_length(refs); i++) {
             var card = cardFromRef(refs[i])
             if (card == undefined) continue
-            var it = new ShopItem("card", SHOP_CARD_PRICE)
+            var it = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)
             it.card = card
             it.ref = { id: refs[i].id, rarity: refs[i].rarity }
             array_push(items, it)
@@ -38,7 +35,7 @@ function buildShopItems(category) {
     } else {
         // Расширение слотов деки 
         if (deckOf(Characters.Lana).unlocked < DECK_CAPACITY) {
-            var it = new ShopItem("slot", deckSlotUpgradePrice())
+            var it = new ShopItem(ShopItemKind.Slot, deckSlotUpgradePrice())
             it.label = "New deck slot"
             array_push(items, it)
         }
@@ -50,7 +47,7 @@ function buildShopItems(category) {
 function shopItemLines(item) {
     var lines = []
 
-    if (item.kind == "slot") {
+    if (item.kind == ShopItemKind.Slot) {
         array_push(lines, item.label)
         array_push(lines, "Adds a deck card slot")
         array_push(lines, "for both heroes")
@@ -86,7 +83,7 @@ function drawShopItem(item, rect, uiScale) {
     var textTop = rect.sy + pad
 
     // карта слева
-    if (item.kind == "card" && item.card != undefined) {
+    if (item.kind == ShopItemKind.Card && item.card != undefined) {
         var cardH = contentH
         var cardW = cardH * 2 / 3
         drawCardFace(item.card, rect.sx + pad + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0)

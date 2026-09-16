@@ -177,12 +177,11 @@ function cardAnimState(card) {
     }
 }
 
-// Спрайт каста при призыве марионетки (по её категории), иначе noone
-// Позволяет мастеру играть свою анимацию призыва под конкретную марионетку
+// Спрайт каста при призыве марионетки (по её категории)
 function cardCastSpriteOverride(card) {
     for (var i = 0; i < array_length(card.effects); i++) {
         var e = card.effects[i]
-        if (e.type == EffectTypes.CreatePuppet) {
+        if (variable_struct_exists(e, "type") && e.type == EffectTypes.CreatePuppet) {
             switch (e.puppetCategory) {
                 case CardCategory.Attack: return MasterPuppetCreateAtc
                 case CardCategory.Magic: return MasterPuppetCreateMgc

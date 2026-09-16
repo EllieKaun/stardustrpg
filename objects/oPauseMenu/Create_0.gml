@@ -12,6 +12,13 @@ close = function() {
     instance_destroy()
 }
 
+toMainMenu = function() {
+    global.gamePaused = false
+    global.uiModal = false
+    room_goto(MainMenuRoom)
+    instance_destroy()
+}
+
 backLayers = [
     new MenuLayer(noone, { alpha: 0.55, placeholderColor: make_color_rgb(6, 8, 14) })
 ]
@@ -22,10 +29,11 @@ itemsAboveForeground = true
 
 menu = new Menu([
     new MenuItem("Resume", noone, noone, method(id, function(it) { close() })),
-    new MenuItem("Settings", noone, noone, function(it) { 
+    new MenuItem("Settings", noone, noone, function(it) {
         visible = false
-        instance_create_layer(0, 0, "Instances", oSettingsMenu) 
+        instance_create_layer(0, 0, "Instances", oSettingsMenu)
     }),
+    new MenuItem("Main Menu", noone, noone, method(id, function(it) { toMainMenu() })),
     new MenuItem("Quit", noone, noone, function(it) { game_end() })
 ], {
     anchorX: 0.6, startY: 0.5, spacing: 0.12, textH: 0.06, halign: fa_center

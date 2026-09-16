@@ -334,8 +334,7 @@ function drawFitTextInArea(
     areaWidth,
     areaHeight
 ) {
-    var fonts = [fnUI_48, fnUI_32, fnUI_24, fnUI_16,
-                 fnUI_14, fnUI_12, fnUI_10, fnUI_9, fnUI_8, fnUI_7]
+    var fonts = UI_FONT_STACK
 
     for (var i = 0; i < array_length(fonts); i++) {
         draw_set_font(fonts[i])
@@ -514,5 +513,88 @@ function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, co
     return size
 }
 
+// Показать окно награды с одной картой (оверворлд). cardStruct — структура карты.
+function showCardReward(cardStruct, title = "New card!") {
+    if (cardStruct == undefined) return
+    if (!instance_exists(oCardReward)) instance_create_depth(0, 0, -20000, oCardReward)
+    with (oCardReward) {
+        card = cardStruct
+        rewardTitle = title
+        active = true
+        inputGuard = 2
+    }
+    global.uiModal = true
+}
 
+// Панели информации о персонажах партии — снизу слева.
+// База: портрет, полоса HP, полоса MP, кружки энергии (макс 2).
+function drawPartyPanels(party, activeChar) {
+    var sw = display_get_gui_width()
+    var sh = display_get_gui_height()
+
+    var members = []
+    for (var i = 0; i < array_length(party); i++) {
+        if (!party[i].isPuppet) array_push(members, party[i])
+    }
+
+    var panelW = sw * 0.24
+    var panelH = sh * 0.09
+    var gap    = sh * 0.012
+    var mx     = sw * 0.012
+    var my     = sh * 0.02
+
+    for (var i = 0; i < array_length(members); i++) {
+        var py = sh - my - panelH - i * (panelH + gap)
+        drawPartyPanel(mx, py, panelW, panelH, members[i], members[i] == activeChar)
+    }
+}
+
+function drawPartyPanel(px, py, w, h, m, active) {
+    draw_sprite_stretched(box, 0, px, py, w, h)
+    if (active) {
+        draw_set_color(merge_color(c_white, c_yellow, 0.4))
+        draw_rectangle(px, py, px + w, py + h, true)
+        draw_set_color(c_white)
+    }
+
+    var pad = h * 0.14
+    var portraitS = h - pad * 2
+    if (variable_instance_exists(m, "portrait") && sprite_exists(m.portrait)) {
+        draw_sprite_stretched(m.portrait, 0, px + pad, py + pad, portraitS, portraitS)
+    }
+
+    var maxE = min(2, max(1, m.maxEnergy))
+    var circleR = h * 0.13
+    var circleColW = circleR * 2 + pad
+    var barX = px + pad + portraitS + pad
+    var barW = (px + w - pad - circleColW) - barX
+    var hpH = h * 0.30
+    var mpGap = h * 0.06
+    var mpH = h * 0.24
+    var hpY = py + pad
+
+    drawHealthBar(barX, hpY, barW, hpH, m.hp, m.maxHp)
+
+    var mpY = hpY + hpH + mpGap
+    draw_sprite_stretched(healthbar, 0, barX, mpY, barW, mpH)
+    if (m.maxMana > 0) {
+        var mpPct = clamp(m.mana / m.maxMana, 0, 1)
+        draw_set_color(make_color_rgb(70, 150, 235))
+        draw_rectangle(barX + 1, mpY + 1, barX + 1 + (barW - 3) * mpPct, mpY + mpH - 2, false)
+        draw_set_color(c_white)
+    }
+
+    var cx = px + w - pad - circleR
+    var totalCH = maxE * (circleR * 2) + (maxE - 1) * (h * 0.06)
+    var cy0 = py + (h - totalCH) * 0.5 + circleR
+    for (var e = 0; e < maxE; e++) {
+        var cy = cy0 + e * (circleR * 2 + h * 0.06)
+        var filled = (e < min(m.energy, maxE))
+        draw_set_color(filled ? make_color_rgb(95, 195, 245) : make_color_rgb(40, 50, 70))
+        draw_circle(cx, cy, circleR, false)
+        draw_set_color(c_black)
+        draw_circle(cx, cy, circleR, true)
+        draw_set_color(c_white)
+    }
+}
 

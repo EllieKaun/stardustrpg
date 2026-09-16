@@ -52,6 +52,7 @@ function cardIdsInit() {
         copyNextPlayedCard: "copyNextPlayedCard",
         addEnergy: "addEnergy",
         shuffleDeck: "shuffleDeck",
+        stealCard: "stealCard",
         removeShock: "removeShock",
         removeBurn: "removeBurn",
         removeFreeze: "removeFreeze",
@@ -138,6 +139,7 @@ function cardRegistryInit() {
     registerCard(C.addEnergy, false, CardCategory.Special, function(_r) { return createAddEnergyCard() })
     registerCard(C.shuffleDeck, false, CardCategory.Special, function(_r) { return createShuffleDeckCard() })
     registerCard(C.ignoreWeaknessSingleTarget, true, CardCategory.Special, function(_r) { return createCardIgnoreWeaknessSingleTarget() })
+    registerCard(C.stealCard, false, CardCategory.Special, function(_r) { return createStealCard() })
 }
 
 // Проверка существования карты по ид (чекает регистратор)

@@ -19,6 +19,23 @@ if (global.cutsceneActive) {
     exit
 }
 
+if (variable_global_exists("introPendingWalk") && global.introPendingWalk) {
+    if (!instance_exists(oDialogManager) || !oDialogManager.active) {
+        global.introPendingWalk = false
+        startTutorialIntro()
+    }
+}
+
+if (global.deckTutStage == DeckTutStage.Dialog) {
+    if (!instance_exists(oDialogManager) || !oDialogManager.active) {
+        global.deckTutStage = DeckTutStage.AwaitOpen
+    }
+} else if (global.deckTutStage == DeckTutStage.AwaitOpen) {
+    if (instance_exists(oDeckBuilder) && oDeckBuilder.open) {
+        global.deckTutStage = DeckTutStage.Steps
+    }
+}
+
 // F11 - на весь экран
 if (keyboard_check_pressed(vk_f11)) {
     setDisplayMode(!global.displayFullscreen)

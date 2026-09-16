@@ -12,32 +12,61 @@ foreLayers = [
 ]
 itemsAboveForeground = true
 
-var hasSave = file_exists(PLAYER_SAVE_FILE)
+hasSave = file_exists(PLAYER_SAVE_FILE)
+confirmPrompt = ""
+menuCooldown = 0
 
-menu = new Menu([
-    new MenuItem("New Game", noone, noone, function(it) { 
-        global.startNewGame = true
-        room_goto(DemoWorld) 
-    }),
-    new MenuItem("Continue", noone, noone, function(it) { 
-        global.startNewGame = false
-        room_goto(DemoWorld) 
-    }),
-    new MenuItem("Settings", noone, noone, function(it) { 
-        visible = false
-        instance_create_layer(0, 0, "Instances", oSettingsMenu) 
-    }),
-    new MenuItem("Quit", noone, noone, function(it) { game_end() })
-], {
-    anchorX: 0.75, startY: 0.45, spacing: 0.11, textH: 0.055, halign: fa_center
-})
+menuConfig = { anchorX: 0.75, startY: 0.45, spacing: 0.11, textH: 0.055, halign: fa_center }
 
-menu.items[1].enabled = hasSave
+startNewGameNow = function() {
+    global.startNewGame = true
+    room_goto(DemoWorld)
+}
+startContinue = function() {
+    global.startNewGame = false
+    room_goto(DemoWorld)
+}
+openSettings = function() {
+    visible = false
+    instance_create_layer(0, 0, "Instances", oSettingsMenu)
+}
+
+buildMainMenu = function() {
+    var items = []
+    if (hasSave) {
+        array_push(items, new MenuItem("Continue", noone, noone, function(it) { startContinue() }))
+    }
+    array_push(items, new MenuItem("New Game", noone, noone, function(it) {
+        if (hasSave) {
+            confirmPrompt = "Overwrite your save?"
+            menu = buildConfirmMenu()
+            menuCooldown = 2
+        } else {
+            startNewGameNow()
+        }
+    }))
+    array_push(items, new MenuItem("Settings", noone, noone, function(it) { openSettings() }))
+    array_push(items, new MenuItem("Quit", noone, noone, function(it) { game_end() }))
+    return new Menu(items, menuConfig)
+}
+
+buildConfirmMenu = function() {
+    return new Menu([
+        new MenuItem("No, keep playing", noone, noone, function(it) {
+            confirmPrompt = ""
+            menu = buildMainMenu()
+            menuCooldown = 2
+        }),
+        new MenuItem("Yes, start new game", noone, noone, function(it) {
+            startNewGameNow()
+        })
+    ], menuConfig)
+}
+
+menu = buildMainMenu()
 
 playMusicNamed("MainMenuMusic") // музыка меню
 
 // для детекта движения мыши
 mouseLastX = -1
 mouseLastY = -1
-
-menuCooldown = 0

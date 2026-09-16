@@ -4,6 +4,12 @@ if (variable_global_exists("cutsceneActive") && global.cutsceneActive) exit
 
 depth = -bbox_bottom
 
+if (!carriesSpear && questSpearState() == QuestSpearState.Active && !global.spearCarrierExists) {
+    carriesSpear = true
+    global.spearCarrierExists = true
+    if (spearSprite() == noone) image_blend = c_yellow
+}
+
 var leader = oGameController.selected_character
 if (!instance_exists(leader)) exit
 
@@ -34,6 +40,11 @@ if (place_meeting(x, y, leader)) {
         triggered = true
         global.fightEnemy = id
         global.returningFromBattle = true
+        global.battleNoFlee = false
+        if (carriesSpear) {
+            global.battleHasSpear = true
+            global.spearCarrierExists = false
+        }
         global.battleSection = spawnSection
         global.battleEncounter = getEncounter()
         global.returnRoom = room
@@ -58,5 +69,8 @@ if (place_meeting(x, y, leader)) {
 } else {
     var d = point_distance(x, y, leader.x, leader.y)
     if (triggered && d > rearmDistance) triggered = false
-    if (spawnedDynamically && d > oSpawnerManager.spawnDistance) instance_destroy()
+    if (spawnedDynamically && d > oSpawnerManager.spawnDistance) {
+        if (carriesSpear) global.spearCarrierExists = false
+        instance_destroy()
+    }
 }

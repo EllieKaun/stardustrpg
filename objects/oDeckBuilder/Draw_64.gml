@@ -12,3 +12,7 @@ if (!open) exit
 layoutPanels()
 collectionPanel.draw()
 deckPanel.draw()
+
+if (global.deckTutStage == DeckTutStage.Steps && deckTutorial.isActive()) {
+    deckTutorial.draw()
+}

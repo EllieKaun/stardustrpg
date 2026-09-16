@@ -7,11 +7,7 @@ var screenHeight = display_get_gui_height()
 var margin = screenWidth * 0.012
 
 // Фон магазина
-draw_set_alpha(0.5)
-draw_set_color(c_black) 
-draw_rectangle(0, 0, screenWidth, screenHeight, false)
-draw_set_color(c_white)
-draw_set_alpha(1)
+drawScreenDim(0.5)
 draw_sprite_stretched(ShopBg1, 0, 0, 0, screenWidth, screenHeight)
 draw_sprite_stretched(ShopBg2, 0, 0, 0, screenWidth, screenHeight)
 

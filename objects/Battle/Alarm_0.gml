@@ -58,7 +58,7 @@ for (var i = 0; i < array_length(aliveEnemies); i++) {
 var cardToPlay = noone
 var target = noone
 
-// ЕслиЕ есть хил и есть раненый союзник, значит лечим самого раненого
+// Если есть хил и есть раненый союзник, значит лечим самого раненого
 if (healChoice != noone && woundedAlly != noone) {
     target = enemyResolveTarget(healChoice, currentEnemy, aliveHeroes, aliveEnemies, woundedAlly, noone)
     if (target != noone) cardToPlay = healChoice

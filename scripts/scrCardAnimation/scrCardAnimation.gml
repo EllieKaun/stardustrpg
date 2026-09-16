@@ -323,7 +323,7 @@ function cardDeskGeometry() {
     // координаты GUI/окна — та же геометрия, что в Battle Draw GUI
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
-    var s = screenWidth / guiBaseWidth()
+    var s = guiScale()
 
     var deskH = screenHeight / 3
     var cardSpacing = 6 * s
@@ -413,7 +413,7 @@ function handSlotTransform(i, n) {
 function deckPileTopCenter(deckCount) {
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
-    var s = screenWidth / guiBaseWidth()
+    var s = guiScale()
     var cardDeskHeight = screenHeight / 3
     var deckH = cardDeskHeight * 0.7
     var deckScale = deckH / sprite_get_height(CardBack)

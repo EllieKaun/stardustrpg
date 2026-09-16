@@ -1,5 +1,7 @@
 
 if (global.gamePaused) exit // на паузе спавн полностью остановлен
+if (variable_global_exists("introWalk") && global.introWalk) exit
+if (variable_global_exists("deckTutStage") && global.deckTutStage != DeckTutStage.Inactive && global.deckTutStage != DeckTutStage.Done) exit
 
 for (var i = ds_list_size(enemyList) - 1; i >= 0; i--) {
     if (!instance_exists(enemyList[| i])) {

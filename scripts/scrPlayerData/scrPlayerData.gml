@@ -19,6 +19,29 @@ function playerDataInit() {
         playerGrantStarterCards()
         playerDataSave()
     }
+
+    if (!variable_struct_exists(global.playerData, "tutorialDone")) {
+        global.playerData.tutorialDone = !global.isNewGame
+    }
+    if (!variable_struct_exists(global.playerData, "deckTutorialDone")) {
+        global.playerData.deckTutorialDone = !global.isNewGame
+    }
+    if (!variable_struct_exists(global.playerData, "wins")) {
+        global.playerData.wins = 0
+    }
+    if (!variable_struct_exists(global.playerData, "questSafarSpear")) {
+        var joined = variable_global_exists("safarJoined") && global.safarJoined
+        global.playerData.questSafarSpear = joined ? QuestSpearState.Completed : QuestSpearState.Inactive
+    }
+    // Миграция старых строковых сейвов -> enum
+    if (is_string(global.playerData.questSafarSpear)) {
+        var qs = global.playerData.questSafarSpear
+        var mapped = QuestSpearState.Inactive
+        if (qs == "active") mapped = QuestSpearState.Active
+        else if (qs == "spearObtained") mapped = QuestSpearState.SpearObtained
+        else if (qs == "completed") mapped = QuestSpearState.Completed
+        global.playerData.questSafarSpear = mapped
+    }
 }
 
 // Начать новую игру: свежие данные, стартовые карты, флаг новой игры
@@ -55,7 +78,11 @@ function playerGrantStarterCards() {
 function playerDataDefault() {
     return {
         version: 1,
-        gold: 0, // золото 
+        gold: 0, // золото
+        tutorialDone: false,
+        deckTutorialDone: false,
+        questSafarSpear: QuestSpearState.Inactive,
+        wins: 0,
         collection: {}, // key "id@rarity" -> { id, rarity, count }
         decks: {
             lana: { unlocked: DECK_DEFAULT_UNLOCKED, cards: [] },  // cards: [{slot,id,rarity}]
@@ -85,6 +112,87 @@ function spendGold(amount) {
     global.playerData.gold = getGold() - amount
     playerDataSave()
     return true
+}
+
+function getWins() {
+    if (!variable_struct_exists(global.playerData, "wins")) global.playerData.wins = 0
+    return global.playerData.wins
+}
+
+function addWin() {
+    global.playerData.wins = getWins() + 1
+    playerDataSave()
+    return global.playerData.wins
+}
+
+function enemyStatBonus() {
+    return floor(getWins() / ENEMY_WIN_INTERVAL) * ENEMY_WIN_BONUS
+}
+
+function chestGoldAmount() {
+    return CHEST_GOLD_MIN + irandom(CHEST_GOLD_RANGE)
+}
+
+function spearSprite() {
+    var s = asset_get_index("sprSpear")
+    return sprite_exists(s) ? s : noone
+}
+
+function spearBattleBonus() {
+    return SPEAR_BATTLE_BONUS
+}
+
+function questSpearState() {
+    if (!variable_struct_exists(global.playerData, "questSafarSpear")) global.playerData.questSafarSpear = QuestSpearState.Inactive
+    return global.playerData.questSafarSpear
+}
+
+function questSetSpearState(s) {
+    global.playerData.questSafarSpear = s
+    playerDataSave()
+}
+
+function questAcceptSpear() {
+    questSetSpearState(QuestSpearState.Active)
+    unlockCard(global.CardId.stealCard, CardsRarity.Default, 1)
+    var slot = firstFreeDeckSlot(Characters.Lana)
+    if (slot >= 0) setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default)
+    playerDataSave()
+    showCardReward(cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default }), "New card: Steal")
+}
+
+function questGrantSpear() {
+    if (questSpearState() == QuestSpearState.Active) {
+        questSetSpearState(QuestSpearState.SpearObtained)
+    }
+    if (variable_global_exists("spearCarrierExists")) global.spearCarrierExists = false
+    if (variable_global_exists("battleHasSpear")) global.battleHasSpear = false
+}
+
+function questCompleteSpear() {
+    questSetSpearState(QuestSpearState.Completed)
+    global.safarJoined = true
+    playerDataSave()
+}
+
+function tutorialIsDone() {
+    if (!variable_struct_exists(global.playerData, "tutorialDone")) return true
+    return global.playerData.tutorialDone
+}
+
+function markTutorialDone() {
+    global.playerData.tutorialDone = true
+    playerDataSave()
+}
+
+function deckTutorialIsDone() {
+    if (!variable_struct_exists(global.playerData, "deckTutorialDone")) return true
+    return global.playerData.deckTutorialDone
+}
+
+function markDeckTutorialDone() {
+    global.playerData.deckTutorialDone = true
+    playerDataSave()
 }
 
 // Сохранить данные о пользователе на устройство

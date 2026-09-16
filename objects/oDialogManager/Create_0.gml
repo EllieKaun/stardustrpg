@@ -4,6 +4,13 @@ lineIndex = 0
 charProgress = 0
 charsPerStep = 0.8
 onComplete = undefined
+selectedOption = 0
+
+currentOptions = function() {
+    var line = lines[lineIndex]
+    if (variable_struct_exists(line, "options")) return line.options
+    return undefined
+}
 
 boxFont = fnUI_14
 nameFont = fnUI_14
@@ -19,6 +26,7 @@ startDialog = function(_lines, _onComplete = undefined) {
     lines = _lines
     lineIndex = 0
     charProgress = 0
+    selectedOption = 0
     onComplete = _onComplete
     active = true
     global.uiModal = true
@@ -53,6 +61,7 @@ advance = function() {
         endDialog()
     } else {
         charProgress = 0
+        selectedOption = 0
         runLineEnter()
     }
 }

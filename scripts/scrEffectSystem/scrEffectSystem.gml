@@ -109,6 +109,29 @@ function initEffectRegistry() {
         },
     })
 
+    // --- Steal: крадёт бафф у цели (и копьё Сафара, если помечена). ---
+    variable_struct_set(R, "Steal", {
+        onInstant: function(effect, caster, targets) {
+            var t = is_array(targets) ? (array_length(targets) > 0 ? targets[0] : noone) : targets
+            if (t == noone) return
+
+            if (variable_instance_exists(t, "hasSpear") && t.hasSpear) {
+                t.hasSpear = false
+                t.image_blend = c_white
+                questGrantSpear()
+            } else {
+                var hand = t.getCardsInHand()
+                if (array_length(hand) > 0) {
+                    var picked = hand[irandom(array_length(hand) - 1)]
+                    array_push(caster.deck.cardsInHand, picked)
+                }
+            }
+
+            if (variable_instance_exists(t, "showEffectNotification"))
+                t.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
+        },
+    })
+
     // --- Пассивные модификаторы: только иконка (поведение читают расчёты). ---
     variable_struct_set(R, "Buff", { iconFor: function(e) { return buffIcon(e, true) } })
     variable_struct_set(R, "Debuff", { iconFor: function(e) { return buffIcon(e, false) } })
@@ -193,6 +216,32 @@ function statusNameIcon(effect) {
         case StatusNames.Shock: return ShockIcon
     }
     return noone
+}
+
+// Иконка слабости по сырому значению StatusNames (для инфы о враге)
+function weaknessIcon(sn) {
+    switch (sn) {
+        case StatusNames.Stun: return StunIcon
+        case StatusNames.Burn: return BurnIcon
+        case StatusNames.Bleeding: return BleedIcon
+        case StatusNames.Freeze: return FreezeIcon
+        case StatusNames.Shock: return ShockIcon
+    }
+    return noone
+}
+
+function weaknessLabel(sn) {
+    switch (sn) {
+        case StatusNames.Stun: return "Stun"
+        case StatusNames.Burn: return "Burn"
+        case StatusNames.Freeze: return "Freeze"
+        case StatusNames.Bleeding: return "Bleed"
+        case StatusNames.Shock: return "Shock"
+        case StatusNames.Bomb: return "Bomb"
+        case StatusNames.Vampirism: return "Vampirism"
+        case StatusNames.Weakening: return "Weaken"
+    }
+    return "?"
 }
 
 function buffIcon(effect, isBuff) {
@@ -371,4 +420,8 @@ function IgnoreWeaknessEffect(duration) {
 
 function BossClone(maxSlots) {
     return { kind: "BossClone", timing: Timing.OnActions, maxSlots: maxSlots }
+}
+
+function StealEffect() {
+    return { kind: "Steal", timing: Timing.Instant, sprite: attackEffect }
 }

@@ -1,3 +1,60 @@
+// Реестр анимаций персонажа
+// state -> { поле спрайта, сбрасывать кадр,
+// дёргать ли callback по завершении, следующее состояние }
+function initStarriorAnimationsRegistry() {
+    var starriorsAnimations = array_create(7, undefined)
+    starriorsAnimations[StarriorStates.Idle] = { 
+        sprField: "spriteActionIdle", 
+        resetImage: false, 
+        firesCallback: false, 
+        next: undefined 
+    }
+    starriorsAnimations[StarriorStates.Attack] = { 
+        sprField: "spriteActionAttack", 
+        resetImage: true, 
+        firesCallback: true, 
+        next: StarriorStates.Idle 
+    }
+    starriorsAnimations[StarriorStates.Cast] = { 
+        sprField: "spriteActionCast", 
+        resetImage: true, 
+        firesCallback: true, 
+        next: StarriorStates.Idle 
+    }
+    starriorsAnimations[StarriorStates.Spell] = { 
+        sprField: "spriteActionSpell", 
+        resetImage: true, 
+        firesCallback: true, 
+        next: StarriorStates.Idle 
+    }
+    starriorsAnimations[StarriorStates.Spawn] = { 
+        sprField: "spriteActionSpawn",
+        resetImage: true, 
+        firesCallback: false, 
+        next: StarriorStates.Idle 
+    }
+    starriorsAnimations[StarriorStates.Dance] = { 
+        sprField: "spriteActionDance", 
+        resetImage: true, 
+        firesCallback: false, 
+        next: undefined 
+    }
+    starriorsAnimations[StarriorStates.KnockOut] = { 
+        sprField: "spriteActionKO", 
+        resetImage: true, 
+        firesCallback: false, 
+        next: undefined, 
+        koStyle: true 
+    }
+    global.starriorAnimReg = starriorsAnimations
+}
+
+function starriorAnimSpec(state) {
+    if (!variable_global_exists("starriorAnimReg")) initStarriorAnimationsRegistry()
+    if (state < 0 || state >= array_length(global.starriorAnimReg)) return undefined
+    return global.starriorAnimReg[state]
+}
+
 function generateLevel(zoneH, screenW, spacing, encounter) {
     initStarriorsFromEncounter(encounter)
     initStarriorsPositions(zoneH, screenW, spacing)
@@ -6,16 +63,56 @@ function generateLevel(zoneH, screenW, spacing, encounter) {
 }
 
 function initStarriorsFromEncounter(encounter) {
-    heroes  = [createLana(), createViv()];
-    if (variable_global_exists("safarJoined") && global.safarJoined) array_push(heroes, createSafar());
-    enemies = [];
-    var creators = encounter.enemyCreators;
-    for (var i = 0; i < array_length(creators); i++) array_push(enemies, creators[i]());
+    heroes = [createLana(), createViv()]
+    if (variable_global_exists("safarJoined") && global.safarJoined) {
+        array_push(heroes, createSafar())
+    }
+    enemies = []
+    var creators = encounter.enemyCreators
+    for (var i = 0; i < array_length(creators); i++) {
+        array_push(enemies, creators[i]())
+    }
 
-    array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes));
-    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies));
-    for (var i = 0; i < array_length(playOrder); i++) shuffleDeckAndTake4(playOrder[i]);
-    for (var i = 0; i < array_length(enemies); i++) enemies[i].isEnemy = true;
+    array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes))
+    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies))
+    for (var i = 0; i < array_length(playOrder); i++) {
+        shuffleDeckAndTake4(playOrder[i])
+    }
+    
+    var bonus = enemyStatBonus()
+    for (var i = 0; i < array_length(enemies); i++) {
+        var e = enemies[i]
+        e.isEnemy = true
+        e.hasSpear = false
+        if (enemyIgniteRoll()) {
+            igniteEnemy(e)
+        } else {
+            applyEnemyStatBonus(e, bonus)
+        }
+    }
+
+    if (variable_global_exists("battleHasSpear") 
+        && global.battleHasSpear 
+        && array_length(enemies) > 0) {
+        var spearIdx = irandom(array_length(enemies) - 1)
+        enemies[spearIdx].hasSpear = true
+        if (spearSprite() == noone) enemies[spearIdx].image_blend = c_yellow
+
+        var db = spearBattleBonus()
+        for (var i = 0; i < array_length(enemies); i++) {
+            applyEnemyStatBonus(enemies[i], db)
+        }
+        global.battleHasSpear = false
+    }
+}
+
+function igniteEnemy(e) {
+    e.strength = e.strength * 10
+    e.hp = e.hp * 6
+    e.maxHp = e.maxHp * 6
+    e.isIgnited = true
+    e.igniteEffectChance = 0.1
+    e.name = "Ignite " + e.name
 }
 
 function createStarrior(

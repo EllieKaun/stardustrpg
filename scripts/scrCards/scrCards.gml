@@ -195,49 +195,75 @@ function applyCost(caster, card) {
     }
 }
 
-function playCard(card, caster, targets) {
-    caster.pendingCard = card
-    caster.pendingTargets = targets 
-    applyCost(caster, card)
-    if checkIfHasEffectType(selectedCharacter, EffectTypes.CopyCard) { 
-        copyNextCard = true
-        reduceOrRemoveEffectType(selectedCharacter, EffectTypes.CopyCard)
-    }
-    
-    removeCardFromHand(caster, card)
-    playPendingCaster = caster
-    show_debug_message("play card: " + card.name)
-    caster.changeActionState(cardAnimState(card), function() {
-        var caster = playPendingCaster
-        var card = caster.pendingCard
-        var effects = card.effects
-        var targets = caster.pendingTargets
-        for(var i = 0; i < array_length(effects); i++) {
-            var effect = effects[i]
-            show_debug_message("processing effect: " + (variable_struct_exists(effect, "kind") ? string(effect.kind) : effectTypeToString(effect.type)))
-            switch (effect.timing) {
-                case Timing.Instant: 
-                    executeEffect(effect, caster, targets)
-                break    
-                case Timing.EndOfTurn:
-                    effectApplyStatus(effect, caster, targets)
-                break 
-                case Timing.Overtime:
-                    effectApplyStatus(effect, caster, targets)
-                break
-                case Timing.OnActions:
-                    runOnPlay(effect, caster, targets)
-                    targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
-                break
+// Розыгрыш карты как последовательность стадий (см. SequenceRunner):
+//   1) каст-анимация (эффекты срабатывают по её концу)
+//   2) применение эффектов
+//   3) проверки после розыгрыша
+// Вставить стадию (реакция цели, задержка, тряска) = добавить элемент в массив.
+function cardPlaySequence(card, caster, targets) {
+    return [
+        {
+            start: function(ctx) {
+                with (Battle) {
+                    var c = ctx.caster
+                    applyCost(c, ctx.card)
+                    if (checkIfHasEffectType(selectedCharacter, EffectTypes.CopyCard)) {
+                        copyNextCard = true
+                        reduceOrRemoveEffectType(selectedCharacter, EffectTypes.CopyCard)
+                    }
+                    removeCardFromHand(c, ctx.card)
+                    ctx.animEnded = false
+                    c.changeActionState(
+                        cardAnimState(ctx.card),
+                        method(ctx, function() { self.animEnded = true }),
+                        cardCastSpriteOverride(ctx.card)
+                    )
+                }
+            },
+            update: function(ctx) { return ctx.animEnded }
+        },
+        {
+            start: function(ctx) {
+                with (Battle) {
+                    var effects = ctx.card.effects
+                    for (var i = 0; i < array_length(effects); i++) {
+                        var effect = effects[i]
+                        switch (effect.timing) {
+                            case Timing.Instant:
+                                executeEffect(effect, ctx.caster, ctx.targets)
+                            break
+                            case Timing.EndOfTurn:
+                                effectApplyStatus(effect, ctx.caster, ctx.targets)
+                            break
+                            case Timing.Overtime:
+                                effectApplyStatus(effect, ctx.caster, ctx.targets)
+                            break
+                            case Timing.OnActions:
+                                runOnPlay(effect, ctx.caster, ctx.targets)
+                                ctx.targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
+                            break
+                        }
+                    }
+                    selectedCharacter.energy -= ctx.card.energy
+                    if (copyNextCard) {
+                        copyNextCard = false
+                        array_push(selectedCharacter.deck.cardsInHand, ctx.card)
+                    }
+                }
             }
+        },
+        {
+            start: function(ctx) { with (Battle) { afterPlayChecks() } }
         }
-        selectedCharacter.energy -= card.energy
-        if copyNextCard {
-            copyNextCard = false
-            array_push(selectedCharacter.deck.cardsInHand, card)
-        }
-        afterPlayChecks()
-    }, cardCastSpriteOverride(card))
+    ]
+}
+
+function playCard(card, caster, targets) {
+    var runner = new SequenceRunner()
+    runner.play(cardPlaySequence(card, caster, targets), {
+        card: card, caster: caster, targets: targets, animEnded: false
+    })
+    array_push(activeSequences, runner)
 }
 
 // Конец хода. Для каждого EndOfTurn-эффекта вызываем
@@ -315,12 +341,28 @@ function effectChanceFor(target, effect) {
     return clamp(c, 0, 1)
 }
 
+function casterIsIgnited(caster) {
+    if (caster == undefined || caster == noone) return false
+    if (!variable_instance_exists(caster, "isIgnited")) return false
+    return caster.isIgnited && variable_instance_exists(caster, "igniteEffectChance")
+}
+
+function effectChanceForCaster(caster, target, effect) {
+    if (!variable_instance_exists(effect, "chance")) return 1
+    var base = casterIsIgnited(caster) ? caster.igniteEffectChance : effect.chance
+    if (checkIfHasWeaknesses(target, effect)) base += WEAKNESS_STATUS_CHANCE_BONUS
+    return clamp(base, 0, 1)
+}
+
 function effectApplyStatus(effect, caster, targets) {
     var prob = random(1)
+    var ignited = variable_instance_exists(effect, "chance") && casterIsIgnited(caster)
+    var anyProc = false
 
     if (is_array(targets)) {
         for(var i = 0; i < array_length(targets); i++) {
-            if (prob <= effectChanceFor(targets[i], effect)) {
+            if (prob <= effectChanceForCaster(caster, targets[i], effect)) {
+                anyProc = true
                 var applied = refreshOrPushEffect(targets[i], effect)
                 runOnApply(applied, caster, targets[i])
                 if variable_instance_exists(targets[i], "showEffectNotification") {
@@ -329,13 +371,18 @@ function effectApplyStatus(effect, caster, targets) {
             }
         }
     } else {
-        if (prob <= effectChanceFor(targets, effect)) {
+        if (prob <= effectChanceForCaster(caster, targets, effect)) {
+            anyProc = true
             var applied = refreshOrPushEffect(targets, effect)
             runOnApply(applied, caster, targets)
             if variable_instance_exists(targets, "showEffectNotification") {
                 targets.showEffectNotification(applied, EffectVisualizerType.TimeBased, 1)
             }
         }
+    }
+
+    if (ignited) {
+        caster.igniteEffectChance = anyProc ? 0.1 : min(1, caster.igniteEffectChance * 1.5)
     }
 }
 

@@ -1,7 +1,7 @@
 function createCrackerNut() { 
     return createStarrior("CrackerNut",
         sprCrackerNutIdle, sprCrackerNutHit, sprCrackerNutCast, sprCrackerNutCast, sprCrackerNutIdle, noone,
-        16, 16,  0, 0,  1, 1, /*str*/9, /*int*/3, /*aura*/3, /*guts*/3,
+        10, 10,  0, 0,  1, 1, /*str*/2, /*int*/0, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
             createPhysicalDamageStunChanseSingleTargetCard(),
@@ -13,7 +13,7 @@ function createCrackerNut() {
 function createLeaf() {
     return createStarrior("Leaf",
         HealLeafIdle, HealLeafAtk, HealLeafCast, HealLeafCast, HealLeafIdle, noone,
-        20, 20,  0, 0,  1, 1,  /*str*/6, /*int*/6, /*aura*/3, /*guts*/3,
+        12, 12,  0, 0,  1, 1,  /*str*/1, /*int*/1, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
             createPhysicalDamageWeakeningChanseSingleTargetCard(),
@@ -25,7 +25,7 @@ function createLeaf() {
 function createMushroom() {
     return createStarrior("Mushroom",
         sprMushroomIdle, sprMushroomAttack, sprMushroomCast, sprMushroomCast, sprMushroomIdle, noone,
-        12, 12,  0, 0,  1, 1,  /*str*/10, /*int*/3, /*aura*/3, /*guts*/3,
+        8, 8,  0, 0,  1, 1,  /*str*/3, /*int*/0, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
             createPhysicalDamageVampirismChanseSingleTargetCard(),
@@ -37,7 +37,7 @@ function createMushroom() {
 function createFlower() {
     return createStarrior("Flower",
         sprPowerFlowerIdle, sprPowerFlowerAttack, sprPowerFlowerSpell, sprPowerFlowerCast, sprPowerFlowerIdle, noone,
-        12, 12,  0, 0,  1, 1,  /*str*/6, /*int*/10, /*aura*/3, /*guts*/3,
+        8, 8,  0, 0,  1, 1,  /*str*/1, /*int*/3, /*aura*/0, /*guts*/0,
         [
             createPhysicalDamageSingleTargetCard(),
             createMagicalDamageStunChanseSingleTargetCard(),

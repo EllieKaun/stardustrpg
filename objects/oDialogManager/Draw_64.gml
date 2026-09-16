@@ -5,11 +5,7 @@ var screenHeight = display_get_gui_height()
 var line = lines[lineIndex]
 
 // Оверлэй
-draw_set_color(c_black)
-draw_set_alpha(0.6)
-draw_rectangle(0, 0, screenWidth, screenHeight, false)
-draw_set_alpha(1)
-draw_set_color(c_white)
+drawScreenDim(0.6)
 
 // Верстка портретов
 var margin = 8
@@ -36,19 +32,43 @@ if (line.portrait != undefined && sprite_exists(line.portrait)) {
 }
 
 // Текст
-var pMidY = portraitY + pSize / 2
-var shown = string_copy(currentText(), 1, floor(charProgress))
-draw_set_font(boxFont)
+var full = currentText()
+var textAreaH = boxH - pad * 2
+var maxLineH = boxH * 0.16
+var fontLadder = [fnUI_14, fnUI_12, fnUI_10, fnUI_9, fnUI_8, fnUI_7]
+var chosenFont = fontLadder[array_length(fontLadder) - 1]
+for (var fi = 0; fi < array_length(fontLadder); fi++) {
+    draw_set_font(fontLadder[fi])
+    var lh = string_height("Ay")
+    if (lh <= maxLineH && string_height_ext(full, round(lh * 1.15), textW) <= textAreaH) {
+        chosenFont = fontLadder[fi]
+        break
+    }
+}
+
+draw_set_font(chosenFont)
+var lineSep = round(string_height("Ay") * 1.15)
+var fullH = string_height_ext(full, lineSep, textW)
+var opts = currentOptions()
+var drawY = (opts != undefined) ? textY : textY + max(0, (textAreaH - fullH) * 0.5)
+var shown = string_copy(full, 1, floor(charProgress))
 draw_set_color(c_white)
 draw_set_halign(fa_left)
-draw_set_valign(fa_middle)
-draw_text_ext(textX, pMidY, shown, 12, textW) 
-
 draw_set_valign(fa_top)
+draw_text_ext(textX, drawY, shown, lineSep, textW)
 
-// Продолжить 
-if (fullyRevealed()) {
-    var iy = boxY + boxH - 12 + floor(2 * sin(current_time / 200))  
+if (opts != undefined && fullyRevealed()) {
+    var optH = min(maxLineH, boxH * 0.14)
+    var oy = drawY + fullH + optH * 0.5
+    for (var i = 0; i < array_length(opts); i++) {
+        var sel = (i == selectedOption)
+        draw_set_color(sel ? c_yellow : c_white)
+        var prefix = sel ? "> " : "   "
+        drawUiText(textX, oy + i * (optH * 1.35), prefix + opts[i].text, optH)
+    }
+    draw_set_color(c_white)
+} else if (fullyRevealed()) {
+    var iy = boxY + boxH - 12 + floor(2 * sin(current_time / 200))
     draw_sprite(sPointer, 0, boxX + boxW - 16, iy)
 }
 
