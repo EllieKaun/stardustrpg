@@ -33,8 +33,6 @@ function computeCardCost(rarity, effects) {
     if (effectsCount == 0) return 0
 
     var effect = effects[0]
-    // У эффекта может не быть type (kind-only эффекты вроде BossClone) —
-    // тогда уходим в ветку по умолчанию.
     var effectType = variable_struct_exists(effect, "type") ? effect.type : undefined
     if (effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Physical) {
         if (effectsCount > 1) {
@@ -262,11 +260,10 @@ function playCard(card, caster, targets) {
     runner.play(cardPlaySequence(card, caster, targets), {
         card: card, caster: caster, targets: targets, animEnded: false
     })
-    array_push(activeSequences, runner)
+    array_push(actionsQueue, runner)
 }
 
-// Конец хода. Для каждого EndOfTurn-эффекта вызываем
-// onEndOfTurn его обработчика
+// Конец хода. Для каждого EndOfTurn-эффекта вызываем onEndOfTurn его обработчика
 function executeEndOfTurn(character) {
     var effects = character.effects
     for(var i = array_length(effects) - 1; i >= 0; i--) {
@@ -284,8 +281,7 @@ function executeEndOfTurn(character) {
     }
 }
 
-// Поверхностная копия эффекта. Нужна, чтобы у каждой цели был свой
-// экземпляр, а не общая ссылка на эффект карты
+// Копия эффекта
 function cloneEffect(effect) {
     var copy = {}
     var names = variable_struct_get_names(effect)
@@ -302,7 +298,7 @@ function effectField(effect, fieldName) {
         : undefined
 }
 
-// Считаем эффекты "одинаковыми", если совпадает тип и уточняющие признаки:
+// Считаем эффекты одинаковыми, если совпадает тип и уточнения:
 // статус (Burn/Freeze...), модификатор баффа/дебаффа, цель временной слабости
 function effectsMatch(a, b) {
     if (effectField(a, "type") != effectField(b, "type")) return false

@@ -54,17 +54,44 @@ function changeActionState(state, callback, spriteOverride = noone) {
     actionState = state
     actionCallback = callback
 
-    var spec = starriorAnimSpec(state)
-    if (spec != undefined) {
-        sprite_index = variable_instance_get(id, spec.sprField)
-        if (spec.resetImage) {
+    switch (actionState) {
+        case StarriorStates.Idle:
+            sprite_index = spriteActionIdle
+        break
+        case StarriorStates.Attack:
+            sprite_index = spriteActionAttack
             image_index = 0
-            if (variable_struct_exists(spec, "koStyle") && spec.koStyle) {
-                image_speed = (image_number > 1) ? 1 : 0
-            } else {
+            image_speed = 1
+        break
+        case StarriorStates.Cast:
+            sprite_index = spriteActionCast
+            image_index = 0
+            image_speed = 1
+        break
+        case StarriorStates.Spell:
+            sprite_index = spriteActionSpell
+            image_index = 0
+            image_speed = 1
+        break
+        case StarriorStates.Spawn:
+            sprite_index = spriteActionSpawn
+            image_index = 0
+            image_speed = 1
+        break
+        case StarriorStates.Dance:
+            sprite_index = spriteActionDance
+            image_index = 0
+            image_speed = 1
+        break
+        case StarriorStates.KnockOut:
+            sprite_index = spriteActionKO
+            image_index = 0;
+            if image_number > 1 {
                 image_speed = 1
+            } else {
+                image_speed = 0
             }
-        }
+        break
     }
 
     if (spriteOverride != noone) {

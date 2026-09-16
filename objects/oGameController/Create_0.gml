@@ -21,7 +21,6 @@ setDisplayMode = function(fullscreen) {
 initDisplaySettings()
 uiFontInit() // кэш UI-шрифта и высоты строки
 initEffectRegistry() // регистрация эффектов
-initStarriorAnimRegistry() // регистрация анимаций персонажа
 cardIdsInit() // инициализация карт ид
 cardRegistryInit() // регистация карт  
 if (variable_global_exists("startNewGame") && global.startNewGame) {
@@ -62,12 +61,21 @@ generateChests = function() {
             var t = trees[irandom(array_length(trees) - 1)]
             if (!instance_exists(t)) continue
             cx = t.x
-            cy = t.y - 4
+            cy = t.bbox_bottom + 8 // у основания дерева, на проходимой земле
         } else {
             cx = 96 + random(room_width - 192)
             cy = 96 + random(room_height - 192)
         }
-        if (collision_point(cx, cy, oWall, false, true)) continue
+        if (cx < 48 || cy < 48 || cx > room_width - 48 || cy > room_height - 48) continue
+
+        // Позиция должна быть проходимой — иначе герой не наступит и коллизия не сработает
+        if (collision_point(cx, cy, oWall,   false, true) != noone
+         || collision_point(cx, cy, oTree1,  false, true) != noone
+         || collision_point(cx, cy, oTree2,  false, true) != noone
+         || collision_point(cx, cy, oTree3,  false, true) != noone
+         || collision_point(cx, cy, oTree4,  false, true) != noone
+         || collision_point(cx, cy, oTree5,  false, true) != noone
+         || collision_point(cx, cy, oStump,  false, true) != noone) continue
 
         var tooClose = false
         for (var i = 0; i < array_length(global.chests); i++) {

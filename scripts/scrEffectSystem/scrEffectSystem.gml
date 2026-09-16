@@ -128,7 +128,7 @@ function initEffectRegistry() {
     variable_struct_set(effectsRepository, "IgnoreWeakness", { icon: noone })
     variable_struct_set(effectsRepository, "CreateTemporaryWeakness", { icon: noone })
 
-    global.effectRegistry = R
+    global.effectRegistry = effectsRepository
 }
 
 //// Поиск обработчика

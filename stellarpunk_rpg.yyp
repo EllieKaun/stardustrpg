@@ -365,6 +365,8 @@
     {"id":{"name":"SpecialBtn","path":"sprites/SpecialBtn/SpecialBtn.yy",},},
     {"id":{"name":"sPointer","path":"sprites/sPointer/sPointer.yy",},},
     {"id":{"name":"sprCardSelected","path":"sprites/sprCardSelected/sprCardSelected.yy",},},
+    {"id":{"name":"sprChest","path":"sprites/sprChest/sprChest.yy",},},
+    {"id":{"name":"sprChestOpen","path":"sprites/sprChestOpen/sprChestOpen.yy",},},
     {"id":{"name":"sprCrackerNutCast","path":"sprites/sprCrackerNutCast/sprCrackerNutCast.yy",},},
     {"id":{"name":"sprCrackerNutHit","path":"sprites/sprCrackerNutHit/sprCrackerNutHit.yy",},},
     {"id":{"name":"sprCrackerNutIdle","path":"sprites/sprCrackerNutIdle/sprCrackerNutIdle.yy",},},
