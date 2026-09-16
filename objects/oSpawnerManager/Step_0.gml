@@ -9,8 +9,7 @@ for (var i = ds_list_size(enemyList) - 1; i >= 0; i--) {
     }
 } // чистка массива на случай если удалились объекты с экрана
 
-// Стартовый флоу: на новой игре первого врага показываем сразу в зоне видимости.
-// Пока он не появился — обычный спавн не запускаем.
+// Стартовый флоу: на новой игре первого врага показываем сразу в зоне видимости
 if (!tutorialSpawnDone) {
     if (ds_list_size(enemyList) < maxEnemies && trySpawnEnemy(tutorialMinDist, tutorialMaxDist)) {
         tutorialSpawnDone = true

@@ -125,7 +125,7 @@ startTutorialIntro = function() {
     global.introWalk = true
 }
 
-// Катсцена появления босса (инстанс-состояние; флаги — в initGameGlobals)
+// Катсцена появления босса
 cutsceneSprite = noone
 cutsceneFrame = 0
 cutsceneTargetRoom = noone

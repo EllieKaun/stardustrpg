@@ -510,7 +510,7 @@ function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, co
     return size
 }
 
-// Показать окно награды с одной картой (оверворлд). cardStruct — структура карты.
+// Показать окно награды с одной картой 
 function showCardReward(cardStruct, title = "New card!") {
     if (cardStruct == undefined) return
     if (!instance_exists(oCardReward)) instance_create_depth(0, 0, -20000, oCardReward)
@@ -523,7 +523,7 @@ function showCardReward(cardStruct, title = "New card!") {
     global.uiModal = true
 }
 
-// Панели информации о персонажах партии 
+// Панели информации о персонажах  
 function drawPartyPanels(party, activeChar) {
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()

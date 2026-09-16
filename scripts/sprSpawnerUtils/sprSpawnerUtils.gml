@@ -142,9 +142,7 @@ function rewardPoolForSection(section) {
     return { ids: ids, rarities: rarities }
 }
 
-// Единый пул наград «лес» (демо): объединение пулов всех секций.
-// Редкости — обычная/необычная. Враги остаются по секциям, а награда — общая.
-// Пока не выдаём в наградах карты с уроном по всем врагам (цель AllEnemies)
+// Единый пул наград демо
 function rewardIdAllowed(id) {
     if (!cardExists(id)) return false
     var card = cardFromRef({ id: id, rarity: CardsRarity.Default })
