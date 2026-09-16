@@ -179,17 +179,16 @@ function forestCompositions() {
     return _all
 }
 
-// Конфиг зоны: враги, лимитированный враг (максимум один), тиры сложности.
-// Добавить зону = добавить такой конфиг и выбирать его по текущей зоне.
+// Конфиг зоны
 function forestZoneConfig() {
     return {
         enemyPool: [createCrackerNut, createMushroom, createFlower],
-        limitedEnemy: createLeaf,   // максимум один на бой
-        limitedChance: 3,           // irandom(limitedChance) == 0
+        limitedEnemy: createLeaf, // максимум один на бой
+        limitedChance: 3, // irandom(limitedChance) == 0
         tiers: [
-            { winsUnder: 5,       mn: 1, mx: 2 },
-            { winsUnder: 10,      mn: 2, mx: 4 },
-            { winsUnder: 20,      mn: 3, mx: 5 },
+            { winsUnder: 5, mn: 1, mx: 2 },
+            { winsUnder: 10, mn: 2, mx: 4 },
+            { winsUnder: 20, mn: 3, mx: 5 },
             { winsUnder: 1000000, mn: 4, mx: 5 }
         ]
     }
