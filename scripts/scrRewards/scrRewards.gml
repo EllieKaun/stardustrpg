@@ -1,4 +1,4 @@
-// Полный список кандидатов (id,rarity) из спека
+// Полный список наград (id,rarity)
 function rewardCandidateRefs(spec) {
     var out = []
     for (var i = 0; i < array_length(spec.ids); i++) {
@@ -13,10 +13,10 @@ function rewardCandidateRefs(spec) {
     return out
 }
 
-// Вес карты в награде: чем больше копий уже есть, тем реже выпадает.
-// 0 копий -> 1, 1 -> 0.5, 2 -> 0.25, ... (falloff = 0.5, крутится тут)
+// Вес карты при выборе награды. чем больше копий есть, тем реже выпадает
+// 0 копий -> 1, 1 -> 0.5, 2 -> 0.25 и тд
 function rewardWeight(ref) {
-    return power(REWARD_DUP_FALLOFF, getOwnedCount(ref.id, ref.rarity))
+    return power(REWARD_DUPLICATE_FALLOFF, getOwnedCount(ref.id, ref.rarity))
 }
 
 // Взвешенная случайная награда
@@ -25,7 +25,9 @@ function rollOneReward(spec) {
     if (array_length(cands) == 0) return { id: spec.ids[0], rarity: CardsRarity.Default }
 
     var total = 0
-    for (var i = 0; i < array_length(cands); i++) total += rewardWeight(cands[i])
+    for (var i = 0; i < array_length(cands); i++) {
+        total += rewardWeight(cands[i])
+    }
 
     var roll = random(total)
     for (var i = 0; i < array_length(cands); i++) {
@@ -66,14 +68,14 @@ function rollRewardChoices(spec, count = 3) {
             array_push(choices, c)
         }
     }
-    return choices;
+    return choices
 }
 
 // Награды после победы
 function grantBattleRewards() {
     addWin()
 
-    // Золото за победу: 6 за каждого побеждённого врага
+    // Золото за победу 6 за каждого побеждённого врага
     addGold(GOLD_PER_ENEMY * array_length(enemies))
 
     var spec = global.battleEncounter.reward;

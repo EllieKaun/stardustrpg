@@ -13,6 +13,6 @@ layoutPanels()
 collectionPanel.draw()
 deckPanel.draw()
 
-if (global.deckTutStage == DeckTutStage.Steps && deckTutorial.isActive()) {
+if (global.deckTutorialStage == DeckTutorialStage.Steps && deckTutorial.isActive()) {
     deckTutorial.draw()
 }

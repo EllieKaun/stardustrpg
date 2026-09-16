@@ -125,8 +125,6 @@ function createSummonBuffPuppetCard() {
     return createSummonPuppetCard(CardCategory.Buff, "Buff Puppet", puppetBuff)
 }
 
-// Эксклюзивная карта босса: клонирует себя во все свободные слоты команды.
-// Вся логика — в обработчике "BossClone" реестра (scrEffectSystem).
 function createBossCloneCard() {
     return new Card(
         "Mirror Legion", CardsRarity.Epic,

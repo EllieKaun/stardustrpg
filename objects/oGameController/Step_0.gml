@@ -26,13 +26,13 @@ if (variable_global_exists("introPendingWalk") && global.introPendingWalk) {
     }
 }
 
-if (global.deckTutStage == DeckTutStage.Dialog) {
+if (global.deckTutorialStage == DeckTutorialStage.Dialog) {
     if (!instance_exists(oDialogManager) || !oDialogManager.active) {
-        global.deckTutStage = DeckTutStage.AwaitOpen
+        global.deckTutorialStage = DeckTutorialStage.AwaitOpen
     }
-} else if (global.deckTutStage == DeckTutStage.AwaitOpen) {
+} else if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
     if (instance_exists(oDeckBuilder) && oDeckBuilder.open) {
-        global.deckTutStage = DeckTutStage.Steps
+        global.deckTutorialStage = DeckTutorialStage.Steps
     }
 }
 

@@ -1,14 +1,14 @@
 if (!open) exit
 layoutPanels()
 
-if (global.deckTutStage == DeckTutStage.Steps) {
+if (global.deckTutorialStage == DeckTutorialStage.Steps) {
     if (!deckTutStarted) {
         deckTutorial.reset()
         deckTutStarted = true
     }
     if (deckTutorial.step()) {
         markDeckTutorialDone()
-        global.deckTutStage = DeckTutStage.Done
+        global.deckTutorialStage = DeckTutorialStage.Done
     }
     exit
 }

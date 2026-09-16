@@ -1,4 +1,4 @@
-if (global.deckTutStage == DeckTutStage.AwaitOpen) {
+if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
     var hw = display_get_gui_width()
     var hh = display_get_gui_height()
     var msg = "Press TAB to open your deck"

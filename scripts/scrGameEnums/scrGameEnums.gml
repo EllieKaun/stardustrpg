@@ -1,16 +1,16 @@
-enum ChestKind {
+enum ChestKind { // Вид сундука
     Gold,
     Card,
     Enemy
 }
 
-enum ChestState {
+enum ChestState { // Состояние сундука
     Closed,
     Opening,
     Done
 }
 
-enum DeckTutStage {
+enum DeckTutorialStage { // Стадии прохождения туториала
     Inactive,
     Dialog,
     AwaitOpen,
@@ -18,14 +18,14 @@ enum DeckTutStage {
     Done
 }
 
-enum QuestSpearState {
+enum QuestSpearState { // Состояние квеста копья
     Inactive,
     Active,
     SpearObtained,
     Completed
 }
 
-enum ShopItemKind {
+enum ShopItemKind { // Виды товаров в магазине
     Card,
     Slot
 }

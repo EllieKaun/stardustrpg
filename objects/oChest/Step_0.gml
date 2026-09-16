@@ -1,7 +1,7 @@
 if (global.gamePaused || global.uiModal) exit
 if (variable_global_exists("cutsceneActive") && global.cutsceneActive) exit
 if (variable_global_exists("introWalk") && global.introWalk) exit
-if (variable_global_exists("deckTutStage") && global.deckTutStage != DeckTutStage.Inactive && global.deckTutStage != DeckTutStage.Done) exit
+if (variable_global_exists("deckTutorialStage") && global.deckTutorialStage != DeckTutorialStage.Inactive && global.deckTutorialStage != DeckTutorialStage.Done) exit
 
 if (chestState == ChestState.Done) exit
 

@@ -1,4 +1,4 @@
-// Обработка состояния победы (чтение с клавиатуры)
+// Обработка ввода на экране победы
 function stepVictoryScreen() {
     var mx = device_mouse_x_to_gui(0)
     var my = device_mouse_y_to_gui(0)
@@ -65,12 +65,12 @@ function stepGameOverScreen() {
     }
 }
 
-// Отобразить победный скрин
+// Отобразить победный экран
 function drawVictoryScreen() {
-    // координаты GUI/окна — бой рисуется без матрицы (см. Battle Draw GUI)
+    // координаты GUI 
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()
-    var s  = guiScale()
+    var s = guiScale()
 
     // Затемнение
     drawScreenDim(0.5)
@@ -196,7 +196,7 @@ function drawRewardDescription(card, px, py, pw, ph) {
 
 // Рисование экрана поражения
 function drawGameOverScreen() {
-    // координаты GUI/окна — бой рисуется без матрицы (см. Battle Draw GUI)
+    // координаты GUI
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()
     var s  = guiScale()

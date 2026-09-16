@@ -8,11 +8,11 @@ function tutorialOverworldLines() {
     ]
 }
 
-// Прогон обучающих шагов. Шаг: { text, speaker, portrait,
-//   getRect()   -> прямоугольник подсветки (или undefined = полное затемнение),
+// Проигрывание шагов тутоирала. 
+//Шаг: { text, speaker, portrait,
+//   getRect() -> прямоугольник подсветки (или undefined полное затемнение),
 //   advanceWhen() -> когда продвигаться (по умолчанию uiConfirmPressed),
-//   onEnter()   -> опционально при входе в шаг }.
-// getRect/advanceWhen задаёт хост как замыкания — новые шаги без enum/switch.
+//   onEnter() -> опционально при входе в шаг }.
 function TutorialRunner(_steps) constructor {
     self.steps = _steps
     self.index = 0
@@ -30,7 +30,7 @@ function TutorialRunner(_steps) constructor {
         self.runOnEnter()
     }
 
-    // Обработка ввода. Возвращает true, когда обучение только что завершилось.
+    // Обработка ввода
     self.step = function() {
         if (self.index >= array_length(self.steps)) return false
         var s = self.steps[self.index]

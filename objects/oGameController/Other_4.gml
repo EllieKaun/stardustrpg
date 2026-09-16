@@ -41,8 +41,8 @@ if (global.isNewGame && !tutorialIsDone()) {
     }
 }
 
-if (tutorialIsDone() && !deckTutorialIsDone() && global.deckTutStage == DeckTutStage.Inactive) {
-    global.deckTutStage = DeckTutStage.Dialog
+if (tutorialIsDone() && !deckTutorialIsDone() && global.deckTutorialStage == DeckTutorialStage.Inactive) {
+    global.deckTutorialStage = DeckTutorialStage.Dialog
     if (instance_exists(oDialogManager)) {
         say(deckTutorialIntroLines())
     }

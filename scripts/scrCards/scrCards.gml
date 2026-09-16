@@ -332,10 +332,9 @@ function refreshOrPushEffect(target, effect) {
     return applied
 }
 
-// Эффективный шанс наложения статуса на цель: базовый + бонус, если цель слаба
-// к этому статусу 
+// шанс наложения статуса на цель: базовый + бонус, если цель слаба к этому статусу 
 function effectChanceFor(target, effect) {
-    if (!variable_instance_exists(effect, "chance")) return 1   // без шанса — всегда
+    if (!variable_instance_exists(effect, "chance")) return 1 
     var c = effect.chance
     if (checkIfHasWeaknesses(target, effect)) c += WEAKNESS_STATUS_CHANCE_BONUS
     return clamp(c, 0, 1)
@@ -423,7 +422,7 @@ function checkIfHasWeaknesses(target, effect) {
     return false
 }
 
-// Находится ли цель в состоянии, к которому она слаба?
+// Находится ли цель в состоянии, к которому она слаба
 function checkIfWeakStateActive(target) {
     if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) return false
     var effects = target.effects
