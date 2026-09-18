@@ -70,7 +70,7 @@ function createViv(){
         sprVivBattleSpell,
         sprVivBattleCast,
         sprVivBattleKO,
-        noone,
+        sprVivBattleDance,
         70,
         70,
         30,

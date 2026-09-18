@@ -32,8 +32,8 @@ stepScriptedApproach = function() {
 stepControlled = function() {
     path_end()
 
-    var h = keyboard_check(ord("D")) - keyboard_check(ord("A"))
-    var v = keyboard_check(ord("S")) - keyboard_check(ord("W"))
+    var h = (keyboard_check(ord("D")) || keyboard_check(vk_right)) - (keyboard_check(ord("A")) || keyboard_check(vk_left))
+    var v = (keyboard_check(ord("S")) || keyboard_check(vk_down)) - (keyboard_check(ord("W")) || keyboard_check(vk_up))
     var mx = h * spdWalk
     var my = v * spdWalk
 

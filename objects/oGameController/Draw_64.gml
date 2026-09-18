@@ -1,8 +1,5 @@
+// Туториал, сообщение о нажатии таба и показе декбилдера
 if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
-    // Оверворлд держит GUI в размер камеры (320x180) — при таком мелком GUI
-    // nine-slice стандартного бокса не влезает и рамку растягивает. На время
-    // показа подсказки поднимаем GUI до кризового, как это делает декбилдер,
-    // и рисуем обычный box в нормальном масштабе.
     setCrispGui(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
 
     var hw = display_get_gui_width()
@@ -26,7 +23,7 @@ if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
     draw_set_color(c_white)
 }
 
-// Катсцена появления босса — спрайт на весь экран поверх мира
+// Катсцена появления босса 
 if (global.cutsceneActive && sprite_exists(cutsceneSprite)) {
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()

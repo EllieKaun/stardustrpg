@@ -259,7 +259,7 @@ function Shop(_config) constructor {
     static enterFromRight = function(row) { enterFromLeft(row) }
 
     static step = function() {
-        if (!focused) return
+        if (!focused) { return } 
         stepKeyboard()
     }
 

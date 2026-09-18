@@ -37,9 +37,9 @@ if (isActive) {
 } 
 draw_self()
 if (variable_instance_exists(id, "hasSpear") && hasSpear) {
-    var spearSpr = spearSprite()
+    var spearSpr = spearBattleSprite()
     if (spearSpr != noone) {
-        draw_sprite_ext(spearSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top, 1, 1, 0, c_white, 1)
+        draw_sprite_ext(spearSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 2, 1, 1, 90, c_white, 1)
     }
 }
 if (isActive) {

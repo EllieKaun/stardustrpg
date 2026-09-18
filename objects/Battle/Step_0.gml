@@ -107,8 +107,8 @@ switch (battleState) {
     break
     case BattleStates.EnemyTargetSelection: // Выбрать цель для карты: Противник
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left)
-        var rightPressed = keyboard_check_pressed(vk_right)
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
+        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         var changeIndex = leftPressed - rightPressed
         if changeIndex != 0 { 
             if changeIndex < 0 {
@@ -126,8 +126,8 @@ switch (battleState) {
     break    
     case BattleStates.AllyTargetSelection: // Выбрать цель для карты: Союзник
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left)
-        var rightPressed = keyboard_check_pressed(vk_right)
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
+        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         var changeIndex = leftPressed - rightPressed
         if changeIndex != 0 { 
             if changeIndex < 0 {
@@ -145,8 +145,8 @@ switch (battleState) {
     break 
     case BattleStates.CharacterPlay: // Переключение стрелками между режимами: дека или меню, а также переключение между картами и опциями
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left)
-        var rightPressed = keyboard_check_pressed(vk_right)
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
+        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
 
         if (keyboard_check_pressed(ord("R"))) { 
             doMenuAction("Run")
@@ -195,8 +195,8 @@ switch (battleState) {
     break
     case BattleStates.EnemyInfoSelection: // Менюшка выбора секции информации о враге
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left)
-        var rightPressed = keyboard_check_pressed(vk_right)
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
+        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         if (leftPressed) selectPreviousTarget()
         if (rightPressed) selectNextTarget()
         

@@ -82,7 +82,7 @@ function createStealCard() {
         0,
         [ StealEffect() ],
         mgcCard,
-        cardCopy,
+        steal,
         commonBorder,
         hpCostToken,
         "copy a card from the enemy's hand"

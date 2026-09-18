@@ -56,6 +56,7 @@ changeChestState = function(newState) {
 
     switch (chestState) {
         case ChestState.Opening:
+            playChestOpenSound()
             sprite_index = sprChestOpen
             if (chestIndex >= 0 && chestIndex < array_length(global.chests)) {
                 global.chests[chestIndex].opened = true

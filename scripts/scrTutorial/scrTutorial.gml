@@ -105,10 +105,7 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
     var panelX = margin
     var panelW = sw - margin * 2
 
-    // Подсказку размещаем так, чтобы не перекрывать подсвеченную область:
-    // по умолчанию сверху; если верхняя полоса пересекает подсветку — снизу;
-    // если подсветка занимает всю высоту (панели декбилдера) — уводим вбок,
-    // на противоположную от неё сторону.
+    // Подсказки за пределеами выделенной области 
     if (avoidRect != undefined) {
         var topHit = (panelY < avoidRect.y + avoidRect.h) && (panelY + panelH > avoidRect.y)
         if (topHit) {

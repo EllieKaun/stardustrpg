@@ -10,8 +10,8 @@ if (opts != undefined) {
         if (confirm) charProgress = string_length(currentText())
     } else {
         var n = array_length(opts)
-        if (keyboard_check_pressed(vk_up))   selectedOption = (selectedOption - 1 + n) mod n
-        if (keyboard_check_pressed(vk_down)) selectedOption = (selectedOption + 1) mod n
+        if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) selectedOption = (selectedOption - 1 + n) mod n
+        if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) selectedOption = (selectedOption + 1) mod n
         if (confirm) {
             var cb = opts[selectedOption].onSelect
             endDialog()

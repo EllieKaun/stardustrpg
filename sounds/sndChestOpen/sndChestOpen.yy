@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sndChestOpen",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.62503403,
+  "exportDir":"",
+  "name":"sndChestOpen",
+  "parent":{
+    "name":"Actions",
+    "path":"folders/BattleDomain/Sounds/Actions.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sndChestOpen.mp3",
+  "volume":1.0,
+}

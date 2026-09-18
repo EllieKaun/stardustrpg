@@ -39,7 +39,7 @@ function initStarriorsFromEncounter(encounter) {
         && array_length(enemies) > 0) {
         var spearIdx = irandom(array_length(enemies) - 1)
         enemies[spearIdx].hasSpear = true
-        if (spearSprite() == noone) enemies[spearIdx].image_blend = c_yellow
+        if (spearBattleSprite() == noone) enemies[spearIdx].image_blend = c_yellow
 
         var db = spearBattleBonus()
         for (var i = 0; i < array_length(enemies); i++) {

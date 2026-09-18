@@ -48,7 +48,7 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType)),
-            StunEffect(1, 1.0)
+            StunEffect(1, 0.1)
         ],
         atcCard,
         stunSingleTarget,
@@ -70,7 +70,7 @@ function createPhysicalDamageStunChanseMultipleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType)),
-            StunEffect(1, 1.0)
+            StunEffect(1, 0.1)
         ],
         atcCard,
         stunGroup,
@@ -92,7 +92,7 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), slice),
-            Bleeding(2, 1, 1.0)
+            Bleeding(2, 1, 0.1)
         ],
         atcCard,
         bleedSingleTarget,
@@ -114,7 +114,7 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), slice),
-            Bleeding(2, 1, 1.0)
+            Bleeding(2, 1, 0.1)
         ],
         atcCard,
         bleedGroup,
@@ -136,7 +136,7 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), bombEffect),
-            BombEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), 1.0)
+            BombEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), 0.1)
         ],
         atcCard,
         bombSingleTarget,
@@ -158,7 +158,7 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), bombEffect),
-            BombEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), 1.0)
+            BombEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), 0.1)
         ],
         atcCard,
         bombGroup,
@@ -180,7 +180,7 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType)),
-            WeakeningEffect(1, 1.0, Timing.Overtime)
+            WeakeningEffect(1, 0.1, Timing.Overtime)
         ],
         atcCard,
         exhSingleTarget,
@@ -202,7 +202,7 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType)),
-            WeakeningEffect(1, 1.0, Timing.EndOfTurn)
+            WeakeningEffect(1, 0.1, Timing.EndOfTurn)
         ],
         atcCard,
         exhGroup,
@@ -222,7 +222,7 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
         targetType,
         StarriorStates.Attack,
         1,
-        [ VampirismEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), 1.0) ],
+        [ VampirismEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), 0.1) ],
         atcCard,
         vampSingleTarget,
         commonBorder,
@@ -241,7 +241,7 @@ function createPhysicalDamageVampirismChanceMultipleTargetCard() {
         targetType,
         StarriorStates.Attack,
         1,
-        [ VampirismEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), 1.0) ],
+        [ VampirismEffect(DamageTypes.Physical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), 0.1) ],
         atcCard,
         vampGroup,
         commonBorder,

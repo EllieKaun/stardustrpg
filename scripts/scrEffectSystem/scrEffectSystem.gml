@@ -385,7 +385,7 @@ function RemoveStatusEffect(statusName, sprite) {
              timing: Timing.Instant, sprite: sprite }
 }
 function ResurrectionEffect(sprite) {
-    return { type: EffectTypes.Resurrection, timing: Timing.Instant, sprite: sprite }
+    return { type: EffectTypes.Resurrection, timing: Timing.Instant, sprite: sprite, sprite: resurection  }
 }
 function CreatePuppetEffect(category) {
     return { type: EffectTypes.CreatePuppet, timing: Timing.OnActions, puppetCategory: category }

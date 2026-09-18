@@ -130,7 +130,12 @@ function chestGoldAmount() {
 }
 
 function spearSprite() {
-    var s = asset_get_index("sprSpear")
+    var s = asset_get_index("spear")
+    return sprite_exists(s) ? s : noone
+}
+
+function spearBattleSprite() {
+    var s = asset_get_index("bigSpear")
     return sprite_exists(s) ? s : noone
 }
 
