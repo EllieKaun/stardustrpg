@@ -20,7 +20,7 @@ function TutorialRunner(_steps) constructor {
     self.isActive = function() { return self.index < array_length(self.steps) }
 
     self.runOnEnter = function() {
-        if (self.index >= array_length(self.steps)) return
+        if (self.index >= array_length(self.steps)) { return }
         var s = self.steps[self.index]
         if (variable_struct_exists(s, "onEnter") && s.onEnter != undefined) s.onEnter()
     }
@@ -32,25 +32,25 @@ function TutorialRunner(_steps) constructor {
 
     // Обработка ввода
     self.step = function() {
-        if (self.index >= array_length(self.steps)) return false
+        if (self.index >= array_length(self.steps)) { return false }
         var s = self.steps[self.index]
         var adv = variable_struct_exists(s, "advanceWhen") ? s.advanceWhen() : uiConfirmPressed()
         if (adv) {
             self.index++
-            if (self.index >= array_length(self.steps)) return true
+            if (self.index >= array_length(self.steps)) { return true }
             self.runOnEnter()
         }
         return false
     }
 
     self.draw = function() {
-        if (self.index >= array_length(self.steps)) return
+        if (self.index >= array_length(self.steps)) { return }
         var s = self.steps[self.index]
         var rect = variable_struct_exists(s, "getRect") ? s.getRect() : undefined
         if (rect != undefined) drawTutorialSpotlight(rect)
         else drawScreenDim(0.55)
         var portrait = variable_struct_exists(s, "portrait") ? s.portrait : noone
-        drawTutorialPanel(s.speaker, s.text, portrait)
+        drawTutorialPanel(s.speaker, s.text, portrait, rect)
         draw_set_halign(fa_left)
         draw_set_valign(fa_top)
         draw_set_color(c_white)
@@ -95,7 +95,7 @@ function drawTutorialSpotlight(rect) {
     draw_set_color(c_white)
 }
 
-function drawTutorialPanel(speaker, text, portrait) {
+function drawTutorialPanel(speaker, text, portrait, avoidRect) {
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()
 
@@ -104,6 +104,34 @@ function drawTutorialPanel(speaker, text, portrait) {
     var panelY = sh * 0.03
     var panelX = margin
     var panelW = sw - margin * 2
+
+    // Подсказку размещаем так, чтобы не перекрывать подсвеченную область:
+    // по умолчанию сверху; если верхняя полоса пересекает подсветку — снизу;
+    // если подсветка занимает всю высоту (панели декбилдера) — уводим вбок,
+    // на противоположную от неё сторону.
+    if (avoidRect != undefined) {
+        var topHit = (panelY < avoidRect.y + avoidRect.h) && (panelY + panelH > avoidRect.y)
+        if (topHit) {
+            var botY = sh - sh * 0.03 - panelH
+            var botHit = (botY < avoidRect.y + avoidRect.h) && (botY + panelH > avoidRect.y)
+            if (!botHit) {
+                panelY = botY
+            } else {
+                var gapL = avoidRect.x
+                var gapR = sw - (avoidRect.x + avoidRect.w)
+                var onRight = (gapR >= gapL)
+                var gap = onRight ? gapR : gapL
+                panelH = sh * 0.32
+                panelY = (sh - panelH) * 0.5
+                panelW = clamp(gap - margin * 1.2, sw * 0.22, sw * 0.46)
+                if (onRight) {
+                    panelX = (avoidRect.x + avoidRect.w) + (gap - panelW) * 0.5
+                } else {
+                    panelX = (gap - panelW) * 0.5
+                }
+            }
+        }
+    }
 
     draw_sprite_stretched(box, 0, panelX, panelY, panelW, panelH)
 

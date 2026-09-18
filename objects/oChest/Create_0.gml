@@ -5,7 +5,7 @@ depth = -y
 openTimer = 0
 chestState = ChestState.Closed
 image_speed = 1
-// Взаимодействие заблокировано (мир заморожен / скриптовый подход героя)
+
 chestBlocked = function() {
     if (global.gamePaused || global.uiModal) return true
     if (variable_global_exists("cutsceneActive") && global.cutsceneActive) return true
@@ -13,7 +13,6 @@ chestBlocked = function() {
     return false
 }
 
-// Выдача награды / старт боя по типу сундука
 doChestAction = function() {
     switch (chestKind) {
         case ChestKind.Gold:
@@ -51,20 +50,20 @@ doChestAction = function() {
     }
 }
 
-// Стейт-машина сундука: смена состояния + действия на входе
 changeChestState = function(newState) {
     if (chestState == newState) { return } 
     chestState = newState
 
     switch (chestState) {
         case ChestState.Opening:
-            openTimer = 0
+            sprite_index = sprChestOpen
             if (chestIndex >= 0 && chestIndex < array_length(global.chests)) {
                 global.chests[chestIndex].opened = true
             }
         break
 
         case ChestState.Done:
+            image_speed = 0
             doChestAction()
         break
     }

@@ -13,8 +13,9 @@ if (global.uiModal || !can_move) {
 if (selected) {
     if (global.introWalk) stepScriptedApproach()
     else stepControlled()
-} else stepFollowing()
-
+} else { 
+    stepFollowing()
+} 
 var movedX = x - xPrev, movedY = y - yPrev
 var moving = (movedX != 0 || movedY != 0)
 if (selected) updateWalkSound(moving)

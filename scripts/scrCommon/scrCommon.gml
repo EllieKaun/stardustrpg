@@ -87,7 +87,7 @@ function SequenceRunner() constructor {
             guard++
             var s = self.steps[self.i]
             var done = (variable_struct_exists(s, "update") && s.update != undefined) ? s.update(self.ctx) : true
-            if (!done) break
+            if (!done) { break }
             self.i++
             if (self.i >= array_length(self.steps)) {
                 self.running = false
