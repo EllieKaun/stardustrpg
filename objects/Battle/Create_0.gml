@@ -23,10 +23,6 @@ idleDanceTimer = 0 // тики простоя выбранного персон�
 // Анимация розыгрыша карты (см. scrCardAnimation)
 activeCardAnims = []
 animatingCard = noone // карта, которая сейчас летит (прячем её в руке)
-animPendingCard = noone
-animPendingCaster = noone
-animPendingTargets = noone
-drawPendingCard = noone
 
 // Очередь анимаций и действий, следующих за ними
 actionsQueue = []
@@ -109,6 +105,30 @@ rewardChoices  = [] // Победные карты
 rewardCursor   = 0 // Выбранная победная карта
 rewardSelected = false // Выбрана ли награда
 gameOverCursor = 0 // 0 = Retry, 1 = Exit
+
+changeBattleState = function(newState) {
+    if (battleState == newState) { return }
+    battleState = newState
+
+    switch (newState) {
+        case BattleStates.EnemyTargetSelection:
+            initTargetSelection(enemies)
+        break
+        case BattleStates.EnemyInfoSelection:
+            initTargetSelection(enemies)
+        break
+        case BattleStates.EnemysTurn:
+            alarm_set(ENEMYS_TURN, game_get_speed(gamespeed_fps) * 2)
+        break
+        case BattleStates.PuppetTurn:
+            alarm_set(PUPPET_TURN, game_get_speed(gamespeed_fps) * 2)
+        break
+        case BattleStates.GameOver:
+            addGold(-GOLD_DEFEAT_PENALTY)
+            gameOverCursor = 0
+        break
+    }
+}
 
 // Расчет позиций героев и врагов
 var screenWidth = camera_get_view_width(view_camera[0])

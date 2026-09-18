@@ -142,3 +142,10 @@ function initGameGlobals() {
         global.chests = []
     }
 }
+
+function startTransition(targetRoom) {
+    with (oTransition) {
+        target_room = targetRoom
+        state = "fade_out"
+    }
+}

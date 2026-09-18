@@ -15,9 +15,7 @@ function afterPlayChecks() {
     
     // Проверка на поражение
     if checkIfAllDead(heroes) {
-        addGold(-GOLD_DEFEAT_PENALTY) // штраф за поражение
-        gameOverCursor = 0
-        battleState = BattleStates.GameOver
+        changeBattleState(BattleStates.GameOver)
         return
     }
     // Проверка на победу
@@ -43,7 +41,7 @@ function startTurnFor(character) {
     for (var i = 0; i < array_length(effects); i++) effects[i].justApplied = false
 
     if (canDrawCardForTurn(character)) {
-        battleState = BattleStates.CardAnimating
+        changeBattleState(BattleStates.CardAnimating)
         alarm_set(HERO_DRAW_DELAY, game_get_speed(gamespeed_fps))
     } else {
         beginTurnFor(character)
@@ -57,13 +55,11 @@ function beginTurnFor(character) {
     }
 
     if (character.isPuppet) { // Ход куклы
-        battleState = BattleStates.PuppetTurn
-        alarm_set(PUPPET_TURN, game_get_speed(gamespeed_fps) * 2)
+        changeBattleState(BattleStates.PuppetTurn)
     } else if (character.isEnemy) { // Ход врага
-        battleState = BattleStates.EnemysTurn
-        alarm_set(ENEMYS_TURN, game_get_speed(gamespeed_fps) * 2)
+        changeBattleState(BattleStates.EnemysTurn)
     } else { // Ход героя
-        battleState = BattleStates.CharacterPlay
+        changeBattleState(BattleStates.CharacterPlay)
     }
 }
 
@@ -106,7 +102,7 @@ function updateOvertime(character) {
 // Пропуск хода
 function skipTurn() {
     selectedCharacter.energy = 0
-    battleState = BattleStates.AfterPlayChecks
+    changeBattleState(BattleStates.AfterPlayChecks)
     afterPlayChecks()
 }
 
@@ -209,14 +205,10 @@ function doMenuAction(name) {
         case "Run":
             if (variable_global_exists("battleNoFlee") && global.battleNoFlee) break
             addGold(-GOLD_RUN_PENALTY) // штраф за побег
-            with (oTransition) {
-                target_room = global.returnRoom
-                state = "fade_out"
-            }
+            startTransition(global.returnRoom)
         break
         case "Info":
-            battleState = BattleStates.EnemyInfoSelection
-            initTargetSelection(enemies)
+            changeBattleState(BattleStates.EnemyInfoSelection)
         break
     }
 }
@@ -309,18 +301,12 @@ function filterNotKO(targets) {
 
 // Возвращение в мир
 function returnToOverworld() {
-    with (oTransition) { 
-        target_room = global.returnRoom
-        state = "fade_out"
-    }
+    startTransition(global.returnRoom)
 }
 
 // Начать заново
 function retryBattle() {
-    with (oTransition) { 
-        target_room = BattleRoom
-        state = "fade_out"
-    }
+    startTransition(BattleRoom)
 }
 
 // Удалить из массива

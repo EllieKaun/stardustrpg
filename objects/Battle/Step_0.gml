@@ -83,7 +83,7 @@ if (cancelPressed
      || battleState == BattleStates.AllyTargetSelection
      || battleState == BattleStates.EnemyInfoSelection
      || battleState == BattleStates.EnemyInfoDisplay)) {
-    battleState = BattleStates.CharacterPlay
+    changeBattleState(BattleStates.CharacterPlay)
     unselectTargets()
     restoreSelection()
     mouseConfirm = false
@@ -105,44 +105,26 @@ switch (battleState) {
     case BattleStates.CharacterPreparing:
         
     break
-    case BattleStates.EnemyTargetSelection: // Выбрать цель для карты: Противник
+    case BattleStates.EnemyTargetSelection:
+    case BattleStates.AllyTargetSelection:
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
         var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         var changeIndex = leftPressed - rightPressed
-        if changeIndex != 0 { 
+        if changeIndex != 0 {
             if changeIndex < 0 {
                 selectNextTarget()
             } else {
                 selectPreviousTarget()
             }
         }
-        if (enterPressed) { // Когда выбрали - энтер и продолжаем игровой процесс
-            battleState = BattleStates.PlayProcess
+        if (enterPressed) {
+            changeBattleState(BattleStates.PlayProcess)
             unselectTargets()
             var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
             playCardAnimated(currentCard, selectedCharacter, selectedTarget)
         }
-    break    
-    case BattleStates.AllyTargetSelection: // Выбрать цель для карты: Союзник
-        var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
-        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
-        var changeIndex = leftPressed - rightPressed
-        if changeIndex != 0 { 
-            if changeIndex < 0 {
-                selectNextTarget()
-            } else {
-                selectPreviousTarget()
-            }
-        }
-        if (enterPressed) { // Когда выбрали - энтер и продолжаем игровой процесс
-            battleState = BattleStates.PlayProcess
-            unselectTargets()
-            var currentCard = selectedCharacter.getCardsInHand()[selectedCard]
-            playCardAnimated(currentCard, selectedCharacter, selectedTarget)
-        }
-    break 
+    break
     case BattleStates.CharacterPlay: // Переключение стрелками между режимами: дека или меню, а также переключение между картами и опциями
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
@@ -177,10 +159,9 @@ switch (battleState) {
                 var check = checkIfCanPlayCard(selectedCharacter, currentCard)
                 if !check { return }
                 if currentCard.target == TargetTypes.SingleEnemyTarget {
-                    battleState = BattleStates.EnemyTargetSelection
-                    initTargetSelection(enemies)
+                    changeBattleState(BattleStates.EnemyTargetSelection)
                 } else if currentCard.target == TargetTypes.SingleAllyTarget {
-                    battleState = BattleStates.AllyTargetSelection
+                    changeBattleState(BattleStates.AllyTargetSelection)
                     if (cardIsResurrection(currentCard)) initTargetSelectionKO(heroes)
                     else initTargetSelection(heroes)
                 } else if currentCard.target == TargetTypes.AllEnemies {
@@ -201,13 +182,13 @@ switch (battleState) {
         if (rightPressed) selectNextTarget()
         
         if (enterPressed) {
-            battleState = BattleStates.EnemyInfoDisplay // Отображение конкретной информации
+            changeBattleState(BattleStates.EnemyInfoDisplay) // Отображение конкретной информации
         }
     break
     case BattleStates.EnemyInfoDisplay: // Менюшка информации о враге
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         if (enterPressed) {
-            battleState = BattleStates.CharacterPlay
+            changeBattleState(BattleStates.CharacterPlay)
             unselectTargets()
             restoreSelection()
         }
