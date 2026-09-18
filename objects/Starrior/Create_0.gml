@@ -55,9 +55,9 @@ function changeActionState(state, callback, spriteOverride = noone) {
     actionCallback = callback
 
     switch (actionState) {
-        case StarriorStates.Idle: 
+        case StarriorStates.Idle:
             sprite_index = spriteActionIdle
-        break 
+        break
         case StarriorStates.Attack:
             sprite_index = spriteActionAttack
             image_index = 0

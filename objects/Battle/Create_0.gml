@@ -9,12 +9,13 @@ selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false
 
-// Хит-боксы для управления мышью (заполняются в Draw GUI, читаются в Step)
+// Хит-боксы для управления мышью
 cardHitRects = []
 menuHitRects = []
 rewardHitRects = [] // карты награды на экране победы
-gameOverHitRects = [] // кнопки RETRY/EXIT на экране поражения
+gameOverHitRects = [] // кнопки RETRY и EXIT на экране поражения
 infoCloseRect = undefined
+cancelHitRect = undefined
 mouseLastX = -1 // для детекта движения мыши
 mouseLastY = -1
 idleDanceTimer = 0 // тики простоя выбранного персонажа (для танца)
@@ -26,9 +27,11 @@ animPendingCard = noone
 animPendingCaster = noone
 animPendingTargets = noone
 drawPendingCard = noone
-playPendingCaster = noone
 
-maxEnemiesCount = 5
+// Очередь анимаций и действий, следующих за ними
+actionsQueue = []
+
+maxEnemiesCount = 6
 spacingBetweenStarriors = 16
 
 cards = []
@@ -43,6 +46,63 @@ selectedTargetNumber = -1
 targetOptions = []
 
 battleState = BattleStates.Preparing
+
+tutorialActive = !tutorialIsDone()
+tutorialCardsRect = undefined
+
+// Размеры бейджа меню персонажа по названию 
+menuRectNamed = function(nm) {
+    for (var i = 0; i < array_length(menuHitRects); i++) {
+        if (menuHitRects[i].name == nm) return menuHitRects[i]
+    }
+    return undefined
+}
+
+// Туториал
+var lana = asset_get_index("placeholderLana")
+tutorial = new TutorialRunner([
+    { 
+        speaker: "Lana",
+        portrait: lana, 
+        text: "These are your cards. Each one is an action you can play on your turn.",
+        getRect: function() { 
+            var r = undefined
+            with (Battle) {
+                r = tutorialCardsRect
+            }
+            return r 
+        } 
+    },
+    { 
+        speaker: "Lana", 
+        portrait: lana, 
+        text: "This is INFO - use it to inspect an enemy's stats before you act.",
+        getRect: function() { 
+            var r = undefined; 
+            with (Battle) {
+                r = menuRectNamed("Info")
+            }
+            return r 
+        } 
+    },
+    { 
+        speaker: "Lana", 
+        portrait: lana,
+        text: "This is SHUFFLE - it redraws your whole hand for this turn.",
+        getRect: function() { 
+            var r = undefined;
+            with (Battle) {
+                r = menuRectNamed("Shuffle"); 
+                return r 
+            }
+        } 
+    },
+    { 
+        speaker: "Lana", 
+        portrait: lana, 
+        text: "That's everything. Now defeat this Starrior on your own. Good luck!"
+    }
+])
 
 // ДЛЯ ХРАНЕНИЯ ДАННЫХ В КОНЦЕ ИГРЫ
 rewardChoices  = [] // Победные карты
@@ -64,7 +124,12 @@ posScreenWidth = screenWidth
 posSpacing = spacingBetweenStarriors
 
 // генерация уровня
-generateLevel(starriorsZoneHeight, screenWidth, spacingBetweenStarriors, global.battleEncounter)
+generateLevel(
+    starriorsZoneHeight, 
+    screenWidth, 
+    spacingBetweenStarriors, 
+    global.battleEncounter
+)
 
 playMusicNamed("BattleMusic")
 stopAmbient()

@@ -15,7 +15,7 @@ function afterPlayChecks() {
     
     // Проверка на поражение
     if checkIfAllDead(heroes) {
-        addGold(-10) // штраф за поражение
+        addGold(-GOLD_DEFEAT_PENALTY) // штраф за поражение
         gameOverCursor = 0
         battleState = BattleStates.GameOver
         return
@@ -67,7 +67,7 @@ function beginTurnFor(character) {
     }
 }
 
-// Проверка: есть ли на персонаже наложенный эффект типа effectType
+// Есть ли на персонаже наложенный эффект типа effectType
 function checkIfHasEffectType(character, effectType) {
     var effects = character.effects 
     for(var i = 0; i < array_length(effects); i++) {
@@ -76,7 +76,7 @@ function checkIfHasEffectType(character, effectType) {
     return false
 }
 
-// Проверка: есть ли на персонаже бафф определенного модификатор 
+// Есть ли на персонаже бафф определенного модификатор 
 function checkIfHasBuff(character, effectType, modifierToBuff) {
     var effects = character.effects 
     for(var i = 0; i < array_length(effects); i++) {
@@ -91,7 +91,7 @@ function updateOvertime(character) {
     var effects = character.effects
     for (var i = array_length(effects) - 1; i >= 0; i--) {
         if (effects[i].timing == Timing.Overtime) {
-            // Наложен в этом же ходу, значит пропускаем
+            // Наложен в этом ходу, значит пропускаем
             if (variable_instance_exists(effects[i], "justApplied") && effects[i].justApplied) {
                 continue
             }
@@ -159,9 +159,9 @@ function enemyResolveTarget(card, caster, foes, allies, preferAlly, preferFoe) {
 // Выбор следующего персонажа
 function selectNextCharacter() {
     var count = array_length(playOrder)
-    if (count == 0) return; // если игроков нет - выход 
+    if (count == 0) return // если игроков нет - выход 
     
-    var startIndex = (selectedCharacterNumber + 1) % count;
+    var startIndex = (selectedCharacterNumber + 1) % count
     
     for (var i = 0; i < count; i++) {
         var currentIndex = (startIndex + i) % count
@@ -207,7 +207,8 @@ function doMenuAction(name) {
             skipTurn()
         break
         case "Run":
-            addGold(-5) // штраф за побег
+            if (variable_global_exists("battleNoFlee") && global.battleNoFlee) break
+            addGold(-GOLD_RUN_PENALTY) // штраф за побег
             with (oTransition) {
                 target_room = global.returnRoom
                 state = "fade_out"
@@ -279,7 +280,7 @@ function unselectTargets() {
     }
 }
 
-// Навести цель мышью: если под курсором (мировые координаты) есть цель из
+// Навести цель мышью: если под курсором есть цель из
 // targetOptions — выбрать её. Возвращает true, если цель под курсором найдена.
 function selectTargetAtMouse() {
     for (var i = 0; i < array_length(targetOptions); i++) {

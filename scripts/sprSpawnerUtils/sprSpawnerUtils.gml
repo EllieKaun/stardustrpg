@@ -142,14 +142,22 @@ function rewardPoolForSection(section) {
     return { ids: ids, rarities: rarities }
 }
 
-// Единый пул наград «лес» (демо): объединение пулов всех секций.
-// Редкости — обычная/необычная. Враги остаются по секциям, а награда — общая.
+// Единый пул наград демо
+function rewardIdAllowed(id) {
+    if (!cardExists(id)) return false
+    var card = cardFromRef({ id: id, rarity: CardsRarity.Default })
+    if (card == undefined) return false
+    return card.target != TargetTypes.AllEnemies
+}
+
 function forestRewardPool() {
     var ids = []
     var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
     for (var i = 0; i < array_length(sections); i++) {
         var pool = rewardPoolForSection(sections[i])
-        for (var j = 0; j < array_length(pool.ids); j++) array_push(ids, pool.ids[j])
+        for (var j = 0; j < array_length(pool.ids); j++) {
+            if (rewardIdAllowed(pool.ids[j])) array_push(ids, pool.ids[j])
+        }
     }
     return { ids: ids, rarities: [CardsRarity.Default, CardsRarity.Unusual] }
 }
@@ -171,11 +179,62 @@ function forestCompositions() {
     return _all
 }
 
-// создание битвы для рандомного врага 
+// Конфиг зоны
+function forestZoneConfig() {
+    return {
+        enemyPool: [createCrackerNut, createMushroom, createFlower],
+        limitedEnemy: createLeaf, // максимум один на бой
+        limitedChance: 3, // irandom(limitedChance) == 0
+        tiers: [
+            { winsUnder: 5, mn: 1, mx: 2 },
+            { winsUnder: 10, mn: 2, mx: 4 },
+            { winsUnder: 20, mn: 3, mx: 5 },
+            { winsUnder: 1000000, mn: 4, mx: 5 }
+        ]
+    }
+}
+
+function winTierEnemyRange() {
+    var tiers = forestZoneConfig().tiers
+    var w = getWins()
+    for (var i = 0; i < array_length(tiers); i++) {
+        if (w < tiers[i].winsUnder) return { mn: tiers[i].mn, mx: tiers[i].mx }
+    }
+    var last = tiers[array_length(tiers) - 1]
+    return { mn: last.mn, mx: last.mx }
+}
+
+function enemyIgniteRoll() {
+    var w = getWins()
+    if (w >= 25) return true
+    if (w >= 10) return (irandom(9) < 4)
+    return false
+}
+
+function winScaledComposition() {
+    var cfg = forestZoneConfig()
+    var range = winTierEnemyRange()
+    var n = range.mn + irandom(range.mx - range.mn)
+    var comp = []
+    var leafUsed = false
+    for (var i = 0; i < n; i++) {
+        if (!leafUsed && irandom(cfg.limitedChance) == 0) {
+            array_push(comp, cfg.limitedEnemy)
+            leafUsed = true
+        } else {
+            array_push(comp, cfg.enemyPool[irandom(array_length(cfg.enemyPool) - 1)])
+        }
+    }
+    return comp
+}
+
+// создание битвы для рандомного врага
 function randomSectionEncounter(section) {
-    var comps = forestCompositions()
-    var comp = comps[irandom(array_length(comps) - 1)]
-    return makeEncounter(comp, forestRewardPool())
+    return makeEncounter(winScaledComposition(), forestRewardPool())
+}
+
+function tutorialEncounter() {
+    return makeEncounter([createLeaf], forestRewardPool())
 }
 
 // создание битвы для босса Марионетки

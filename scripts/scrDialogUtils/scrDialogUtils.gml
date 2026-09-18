@@ -10,3 +10,9 @@ function say(lines, onComplete = undefined) {
 function dialogLine(speaker, portrait, side, text, onEnter = undefined) {
     return { speaker: speaker, portrait: portrait, side: side, text: text, onEnter: onEnter }
 }
+
+// Диалоговая строка с выбором ответа.
+// options — массив { text, onSelect }
+function dialogChoice(speaker, portrait, side, text, options) {
+    return { speaker: speaker, portrait: portrait, side: side, text: text, onEnter: undefined, options: options }
+}

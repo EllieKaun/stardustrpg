@@ -1,6 +1,14 @@
 updateCardAnims() // Анимации карт
 
-// Управление мышью 
+// ВЫполнение очереди из действий
+for (var action = array_length(actionsQueue) - 1; action >= 0; action--) {
+    actionsQueue[action].update()
+    if (!actionsQueue[action].isRunning()) {
+        array_delete(actionsQueue, action, 1)
+    }
+}
+
+// Управление мышью
 var mbx = device_mouse_x_to_gui(0)
 var mby = device_mouse_y_to_gui(0)
 var mouseMoved = (mbx != mouseLastX || mby != mouseLastY)
@@ -8,6 +16,19 @@ mouseLastX = mbx
 mouseLastY = mby
 var mClick = mouse_check_button_pressed(mb_left)
 var mouseConfirm = false
+
+if (tutorialActive) {
+    if (battleState == BattleStates.Victory || battleState == BattleStates.GameOver) {
+        tutorialActive = false
+        markTutorialDone()
+    } else if (battleState == BattleStates.CharacterPlay) {
+        if (tutorial.step()) {
+            tutorialActive = false
+            markTutorialDone()
+        }
+        exit
+    }
+}
 
 switch (battleState) {
     case BattleStates.CharacterPlay:
@@ -54,7 +75,9 @@ switch (battleState) {
 }
 
 // Отмена выбранной карты
-var cancelPressed = mouse_check_button_pressed(mb_right) || keyboard_check_pressed(ord("C"))
+var cancelClicked = (mClick && cancelHitRect != undefined
+    && pointInRect(mbx, mby, cancelHitRect.x, cancelHitRect.y, cancelHitRect.w, cancelHitRect.h))
+var cancelPressed = mouse_check_button_pressed(mb_right) || keyboard_check_pressed(ord("C")) || cancelClicked
 if (cancelPressed
     && (battleState == BattleStates.EnemyTargetSelection
      || battleState == BattleStates.AllyTargetSelection
@@ -63,6 +86,7 @@ if (cancelPressed
     battleState = BattleStates.CharacterPlay
     unselectTargets()
     restoreSelection()
+    mouseConfirm = false
 }
 
 switch (battleState) {
@@ -83,8 +107,8 @@ switch (battleState) {
     break
     case BattleStates.EnemyTargetSelection: // Выбрать цель для карты: Противник
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left)
-        var rightPressed = keyboard_check_pressed(vk_right)
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
+        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         var changeIndex = leftPressed - rightPressed
         if changeIndex != 0 { 
             if changeIndex < 0 {
@@ -102,8 +126,8 @@ switch (battleState) {
     break    
     case BattleStates.AllyTargetSelection: // Выбрать цель для карты: Союзник
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left)
-        var rightPressed = keyboard_check_pressed(vk_right)
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
+        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         var changeIndex = leftPressed - rightPressed
         if changeIndex != 0 { 
             if changeIndex < 0 {
@@ -121,8 +145,8 @@ switch (battleState) {
     break 
     case BattleStates.CharacterPlay: // Переключение стрелками между режимами: дека или меню, а также переключение между картами и опциями
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left)
-        var rightPressed = keyboard_check_pressed(vk_right)
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
+        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
 
         if (keyboard_check_pressed(ord("R"))) { 
             doMenuAction("Run")
@@ -171,8 +195,8 @@ switch (battleState) {
     break
     case BattleStates.EnemyInfoSelection: // Менюшка выбора секции информации о враге
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed = keyboard_check_pressed(vk_left)
-        var rightPressed = keyboard_check_pressed(vk_right)
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
+        var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         if (leftPressed) selectPreviousTarget()
         if (rightPressed) selectNextTarget()
         
@@ -203,7 +227,7 @@ switch (battleState) {
     break
 }
 
-// Танец простоя 
+// Танец  
 if (battleState == BattleStates.CharacterPlay && instance_exists(selectedCharacter)) {
     if (mClick || keyboard_check_pressed(vk_anykey)) {
         idleDanceTimer = 0

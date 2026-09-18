@@ -4,8 +4,7 @@ display_set_gui_size(dbBaseW, dbBaseH)
 
 activePanel = 0 // 0 = коллекция всех карт, 1 = дека
 
-var tabFonts = [fnUI_48, fnUI_32, fnUI_24, fnUI_16,
-                 fnUI_14, fnUI_12, fnUI_10,  fnUI_8]
+var tabFonts = UI_TAB_FONT_STACK
 
 // Смена фокуса панели на определнную строку
 switchFocusTo = function(target, row) {
@@ -209,6 +208,16 @@ collectionPanel.enterFromLeft(0)
 activePanel = Panels.Collection
 
 open = false
+
+deckTutStarted = false
+var lana = asset_get_index("placeholderLana")
+deckTutorial = new TutorialRunner([
+    { speaker: "Lana", portrait: lana, text: "This is your collection - every card you own. Cards already used in a deck are marked with an owner icon.",
+      getRect: function() { var r = undefined; with (oDeckBuilder) r = { x: collectionPanel.x, y: collectionPanel.y, w: collectionPanel.w, h: collectionPanel.h }; return r } },
+    { speaker: "Lana", portrait: lana, text: "These are your decks. Select a card here to take it back out of the deck.",
+      getRect: function() { var r = undefined; with (oDeckBuilder) r = { x: deckPanel.x, y: deckPanel.y, w: deckPanel.w, h: deckPanel.h }; return r } },
+    { speaker: "Lana", portrait: lana, text: "That's it - build your deck however you like. Press Tab to close it." }
+])
 
 openBuilder = function() {
     setCrispGui(dbBaseW, dbBaseH)

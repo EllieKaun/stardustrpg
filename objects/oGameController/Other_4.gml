@@ -1,4 +1,6 @@
-// Инициализация сетки MP 
+display_set_gui_size(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
+
+// Инициализация сетки MP
 var cell = 16
 var cols = ceil(room_width  / cell)
 var rows = ceil(room_height / cell)
@@ -18,6 +20,7 @@ playAmbientNamed("ForestAmbience")
 // Возврат из боя
 if (global.returningFromBattle) {
     global.returningFromBattle = false
+    global.introWalk = false
     if (instance_exists(selected_character)) {
         selected_character.can_move = true
         selected_character.x = global.returnX
@@ -28,3 +31,25 @@ if (global.returningFromBattle) {
     }
     global.fightEnemy = noone
 }
+
+if (global.isNewGame && !tutorialIsDone()) {
+    global.isNewGame = false
+    with (oSpawnerManager) tutorialSpawnDone = true
+    global.introPendingWalk = true
+    if (instance_exists(oDialogManager)) {
+        say(tutorialOverworldLines())
+    }
+}
+
+if (tutorialIsDone() && !deckTutorialIsDone() && global.deckTutorialStage == DeckTutorialStage.Inactive) {
+    global.deckTutorialStage = DeckTutorialStage.Dialog
+    if (instance_exists(oDialogManager)) {
+        say(deckTutorialIntroLines())
+    }
+}
+
+if (!global.chestsGenerated) {
+    generateChests()
+    global.chestsGenerated = true
+}
+spawnChests()

@@ -5,7 +5,7 @@ switch (actionState) {
             actionCallback = undefined
         }
         changeActionState(StarriorStates.Idle, undefined)
-    break     
+    break
 	case StarriorStates.Cast:
         if (!is_undefined(actionCallback)) {
             actionCallback()

@@ -1,6 +1,18 @@
 if (!open) exit
 layoutPanels()
 
+if (global.deckTutorialStage == DeckTutorialStage.Steps) {
+    if (!deckTutStarted) {
+        deckTutorial.reset()
+        deckTutStarted = true
+    }
+    if (deckTutorial.step()) {
+        markDeckTutorialDone()
+        global.deckTutorialStage = DeckTutorialStage.Done
+    }
+    exit
+}
+
 // Мышь: наведение, а также клик по табам/слотам
 collectionPanel.stepMouse()
 deckPanel.stepMouse()

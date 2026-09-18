@@ -2,12 +2,13 @@ setCrispGui(guiBaseWidth(), guiBaseHeight())
 
 var screenWidth  = display_get_gui_width()
 var screenHeight = display_get_gui_height()
-var scaleToGui = screenWidth / guiBaseWidth()
+var scaleToGui = guiScale()
 
 // Хит-боксы для мыши
 cardHitRects = []
 menuHitRects = []
 infoCloseRect = undefined
+cancelHitRect = undefined
 
 var cardDeskHeight = screenHeight / 3
 var topSpacing = (3 + 2) * scaleToGui
@@ -20,6 +21,7 @@ var cardWidth = cardHeight * 2 / 3
 var cardDeskWidth = cardWidth * maxCardsOnDeskNumber + cardSpacing * (maxCardsOnDeskNumber + 1)
 var cardDeskStartX = (screenWidth - cardDeskWidth) / 2
 var cardDeskStartY = screenHeight - cardDeskHeight
+tutorialCardsRect = { x: cardDeskStartX, y: cardDeskStartY, w: cardDeskWidth, h: cardDeskHeight }
 
 if (battleState == BattleStates.CharacterPlay && selectedCharacter != noone) {
     var badgeScale = scaleToGui
@@ -47,10 +49,25 @@ if (battleState == BattleStates.CharacterPlay && selectedCharacter != noone) {
     drawMenuBadge(infoX, infoY, badgeScale, "INFO", "I", true, colMain, colPanel)
     array_push(menuHitRects, { x: infoX, y: infoY, w: infoSize.w, h: infoSize.h, name: "Info" })
 
-    var runX = leftEdge - runSize.w
-    var runY = centerY - runSize.h * 0.5
-    drawMenuBadge(runX, runY, badgeScale, "RUN", "R", false, colMain, colPanel)
-    array_push(menuHitRects, { x: runX, y: runY, w: runSize.w, h: runSize.h, name: "Run" })
+    if (!(variable_global_exists("battleNoFlee") && global.battleNoFlee)) {
+        var runX = leftEdge - runSize.w
+        var runY = centerY - runSize.h * 0.5
+        drawMenuBadge(runX, runY, badgeScale, "RUN", "R", false, colMain, colPanel)
+        array_push(menuHitRects, { x: runX, y: runY, w: runSize.w, h: runSize.h, name: "Run" })
+    }
+}
+
+if ((battleState == BattleStates.EnemyTargetSelection
+  || battleState == BattleStates.AllyTargetSelection)
+  && selectedCharacter != noone) {
+    var cBadgeScale = scaleToGui
+    var cColMain = selectedCharacter.themeColor
+    var cancelSize = menuBadgeSize("CANCEL", cBadgeScale)
+    var charCenterX = (selectedCharacter.bbox_left + selectedCharacter.bbox_right) * 0.5 * scaleToGui
+    var cancelX = charCenterX - cancelSize.w * 0.5
+    var cancelY = selectedCharacter.bbox_bottom * scaleToGui + 6 * scaleToGui
+    drawMenuBadge(cancelX, cancelY, cBadgeScale, "CANCEL", "C", true, cColMain, c_white)
+    cancelHitRect = { x: cancelX, y: cancelY, w: cancelSize.w, h: cancelSize.h }
 }
 
 // Рисуем карты
@@ -178,11 +195,35 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     drawUiText(statsX, statsY + lineH * 3, "Aura: " + string(selectedTarget.aura), popupTextH)
     drawUiText(statsX, statsY + lineH * 4, "Guts: " + string(selectedTarget.guts), popupTextH)
 
-    // Close Button (Positioned below the popup)
+    // Слабости врага
+    var wy = statsY + lineH * 5
+    draw_set_halign(fa_left)
+    var lblScale = drawUiText(statsX, wy, "Weakness:", popupTextH)
+    var wx = statsX + string_width("Weakness:") * lblScale + 6 * scaleToGui
+    var wlist = variable_instance_exists(selectedTarget, "weaknesses") ? selectedTarget.weaknesses : []
+    if (array_length(wlist) == 0) {
+        drawUiText(wx, wy, "None", popupTextH)
+    } else {
+        var wIconSize = popupTextH
+        for (var wi = 0; wi < array_length(wlist); wi++) {
+            var sn = wlist[wi]
+            var ic = weaknessIcon(sn)
+            if (ic != noone) {
+                draw_sprite_stretched(ic, 0, wx, wy, wIconSize, wIconSize)
+                wx += wIconSize + 3 * scaleToGui
+            }
+            var nm = weaknessLabel(sn)
+            var nsc = drawUiText(wx, wy, nm, popupTextH)
+            wx += string_width(nm) * nsc + 8 * scaleToGui
+        }
+    }
+    draw_set_color(c_white)
+
+    // Close Button
     var btnWidth = 48 * scaleToGui
     var btnHeight = 16 * scaleToGui
     var btnX = floor(popupX + popupWidth / 2 - btnWidth / 2)
-    var btnY = floor(popupY + popupHeight + 4 * scaleToGui) // 4 pixels below the popup
+    var btnY = floor(popupY + popupHeight + 4 * scaleToGui) 
 
     draw_sprite_stretched(box, 0, btnX, btnY, btnWidth, btnHeight)
     draw_set_halign(fa_center)
@@ -196,10 +237,18 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     draw_sprite_ext(sPointer, 0, btnX - 12 * scaleToGui, btnY + btnHeight / 2, scaleToGui, scaleToGui, 0, c_white, 1)
 }
 
+if (battleState != BattleStates.Victory && battleState != BattleStates.GameOver) {
+    drawPartyPanels(heroes, selectedCharacter)
+}
+
 if (battleState == BattleStates.Victory) drawVictoryScreen()
 if (battleState == BattleStates.GameOver) drawGameOverScreen()
 
-// Летящие карты — поверх всего интерфейса
+// Летящие карты
 for (var i = 0; i < array_length(activeCardAnims); i++) {
     activeCardAnims[i].draw()
+}
+
+if (tutorialActive && battleState == BattleStates.CharacterPlay && tutorial.isActive()) {
+    tutorial.draw()
 }

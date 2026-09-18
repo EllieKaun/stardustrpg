@@ -48,7 +48,7 @@ function createMagicalDamageStunChanseSingleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), lightningStrike, LightningMagic),
-            ShockEffect(1, 1.0)
+            ShockEffect(1, 0.1)
         ],
         mgcCard,
         lightningSingleTarget,
@@ -70,7 +70,7 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), lightningStrike, LightningMagic),
-            ShockEffect(1, 1.0)
+            ShockEffect(1, 0.1)
         ],
         mgcCard,
         lightningGroup,
@@ -92,7 +92,7 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), flameStrike, FireMagic),
-            Burn(2, 1, 1.0)
+            Burn(2, 1, 0.1)
         ],
         mgcCard,
         fireballSingleTarget,
@@ -114,7 +114,7 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), flameStrike, FireMagic),
-            Burn(2, 1, 1.0)
+            Burn(2, 1, 0.1)
         ],
         mgcCard,
         fireballGroup,
@@ -135,7 +135,7 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), iceStrike, IceMagic),
-            FreezeEffect(1, 1.0)
+            FreezeEffect(1, 0.1)
         ],
         mgcCard,
         iceSingleTarget,
@@ -157,7 +157,7 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         1,
         [
             DamageEffect(DamageTypes.Magical, getDamageMultiplierOnRarityAndTarget(rarity, targetType), iceStrike, IceMagic),
-            FreezeEffect(1, 1.0)
+            FreezeEffect(1, 0.1)
         ],
         mgcCard,
         iceGroup,

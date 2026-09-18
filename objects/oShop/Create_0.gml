@@ -4,7 +4,7 @@ dbBaseH = camera_get_view_height(view_camera[0])
 open = false
 coins = getGold() // баланс
 
-var tabFonts = [fnUI_48, fnUI_32, fnUI_24, fnUI_16, fnUI_14, fnUI_12, fnUI_10, fnUI_8]
+var tabFonts = UI_TAB_FONT_STACK
 
 categoryForTab = function(tab) {
     switch (tab) {
@@ -40,11 +40,11 @@ shopPanel = new Shop({
             var item = panel.slots[slotIndex]
             if (getGold() < item.price) return // не хватает золота
 
-            if (item.kind == "card") {
+            if (item.kind == ShopItemKind.Card) {
                 if (spendGold(item.price)) {
                     unlockCard(item.ref.id, item.ref.rarity, 1) // добавляем копию карты
                 }
-            } else if (item.kind == "slot") {
+            } else if (item.kind == ShopItemKind.Slot) {
                 if (spendGold(item.price)) {
                     // расширяем деку обоим героям, держим в синхроне
                     unlockDeckSlot(Characters.Lana, 1)
