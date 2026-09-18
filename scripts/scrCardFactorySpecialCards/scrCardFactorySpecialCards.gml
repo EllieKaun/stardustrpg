@@ -72,6 +72,23 @@ function createCardIgnoreWeaknessSingleTarget() {
     )
 }
 
+// Крадёт бафф у врага (и копьё Сафара, если враг его несёт)
+function createStealCard() {
+    return new Card(
+        "Steal",
+        CardsRarity.Default,
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        0,
+        [ StealEffect() ],
+        mgcCard,
+        steal,
+        commonBorder,
+        hpCostToken,
+        "copy a card from the enemy's hand"
+    )
+}
+
 // Создать марионетку базовый метод
 function createSummonPuppetCard(category, name, sprite) {
     return new Card(
@@ -108,8 +125,6 @@ function createSummonBuffPuppetCard() {
     return createSummonPuppetCard(CardCategory.Buff, "Buff Puppet", puppetBuff)
 }
 
-// Эксклюзивная карта босса: клонирует себя во все свободные слоты команды.
-// Вся логика — в обработчике "BossClone" реестра (scrEffectSystem).
 function createBossCloneCard() {
     return new Card(
         "Mirror Legion", CardsRarity.Epic,

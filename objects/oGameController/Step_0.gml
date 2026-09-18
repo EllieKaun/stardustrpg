@@ -19,14 +19,35 @@ if (global.cutsceneActive) {
     exit
 }
 
+if (variable_global_exists("introPendingWalk") && global.introPendingWalk) {
+    if (!instance_exists(oDialogManager) || !oDialogManager.active) {
+        global.introPendingWalk = false
+        startTutorialIntro()
+    }
+}
+
+if (global.deckTutorialStage == DeckTutorialStage.Dialog) {
+    if (!instance_exists(oDialogManager) || !oDialogManager.active) {
+        global.deckTutorialStage = DeckTutorialStage.AwaitOpen
+    }
+} else if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
+    if (instance_exists(oDeckBuilder) && oDeckBuilder.open) {
+        global.deckTutorialStage = DeckTutorialStage.Steps
+    }
+}
+
 // F11 - на весь экран
 if (keyboard_check_pressed(vk_f11)) {
     setDisplayMode(!global.displayFullscreen)
 }
 
-// Esc - переключатель паузы 
+// Esc - закрыть открытое окно (декбилдер/магазин), иначе переключатель паузы
 if (keyboard_check_pressed(vk_escape)) {
-    if (instance_exists(oPauseMenu)) {
+    if (instance_exists(oDeckBuilder) && oDeckBuilder.open) {
+        oDeckBuilder.closeBuilder()
+    } else if (instance_exists(oShop) && oShop.open) {
+        oShop.closeShop()
+    } else if (instance_exists(oPauseMenu)) {
         with (oPauseMenu) close()
     } else if (!global.uiModal) {
         instance_create_layer(0, 0, "Instances", oPauseMenu)

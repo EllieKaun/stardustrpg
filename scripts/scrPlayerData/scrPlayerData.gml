@@ -9,8 +9,7 @@ function playerDataInit() {
     // global.playerData - свойство для хранения структуры пользователя для сохранения
     if (!playerDataLoad()) global.playerData = playerDataDefault()
 
-    // Флаг новой игры: нужен стартовому флоу (первого врага показываем сразу
-    // в зоне видимости игрока). По умолчанию false — загруженная игра.
+    // Флаг новой игры
     global.isNewGame = false
 
     // Если пусто, значит новая игра и иницилазируем базовые карты
@@ -18,6 +17,29 @@ function playerDataInit() {
         global.isNewGame = true
         playerGrantStarterCards()
         playerDataSave()
+    }
+
+    if (!variable_struct_exists(global.playerData, "tutorialDone")) {
+        global.playerData.tutorialDone = !global.isNewGame
+    }
+    if (!variable_struct_exists(global.playerData, "deckTutorialDone")) {
+        global.playerData.deckTutorialDone = !global.isNewGame
+    }
+    if (!variable_struct_exists(global.playerData, "wins")) {
+        global.playerData.wins = 0
+    }
+    if (!variable_struct_exists(global.playerData, "questSafarSpear")) {
+        var joined = variable_global_exists("safarJoined") && global.safarJoined
+        global.playerData.questSafarSpear = joined ? QuestSpearState.Completed : QuestSpearState.Inactive
+    }
+    // Миграция старых строковых сейвов в enum
+    if (is_string(global.playerData.questSafarSpear)) {
+        var qs = global.playerData.questSafarSpear
+        var mapped = QuestSpearState.Inactive
+        if (qs == "active") mapped = QuestSpearState.Active
+        else if (qs == "spearObtained") mapped = QuestSpearState.SpearObtained
+        else if (qs == "completed") mapped = QuestSpearState.Completed
+        global.playerData.questSafarSpear = mapped
     }
 }
 
@@ -29,23 +51,20 @@ function playerDataNewGame() {
     playerDataSave()
 }
 
-// Иницилазиация базовых карт и стартовых дек героев.
-// На старте у каждого героя ровно 3 карты обычной редкости.
+// Иницилазиация базовых карт и стартовых дек героев
 function playerGrantStarterCards() {
     var C = global.CardId;
 
-    // Открываем базовые карты. Количество = сколько нужно на стартовые деки обоих героев.
-    unlockCard(C.physicalDamageSingleTarget, CardsRarity.Default, 2)      // Вив: 2 атакующие
-    unlockCard(C.magicalDamageSingleTarget)                              // Лана: магическая
-    unlockCard(C.instantHealSingleTarget)                               // Лана: лечащая
-    unlockCard(C.buffPhysicalDamageSingleTarget, CardsRarity.Default, 2) // Лана + Вив: усиливающая
+    // Открываем базовые карты
+    unlockCard(C.physicalDamageSingleTarget, CardsRarity.Default, 2) // Вив: 2 атакующие
+    unlockCard(C.magicalDamageSingleTarget) // Лана: магическая
+    unlockCard(C.instantHealSingleTarget) // Лана: лечащая
+    unlockCard(C.buffPhysicalDamageSingleTarget, CardsRarity.Default, 2) // Лана и Вив усиливающая
 
-    // Лана: 1 магическая, 1 усиливающая, 1 лечащая
     setDeckSlot(Characters.Lana, 0, C.magicalDamageSingleTarget)
     setDeckSlot(Characters.Lana, 1, C.buffPhysicalDamageSingleTarget)
     setDeckSlot(Characters.Lana, 2, C.instantHealSingleTarget)
 
-    // Вив: 2 атакующие, 1 усиливающая
     setDeckSlot(Characters.Viv, 0, C.physicalDamageSingleTarget)
     setDeckSlot(Characters.Viv, 1, C.physicalDamageSingleTarget)
     setDeckSlot(Characters.Viv, 2, C.buffPhysicalDamageSingleTarget)
@@ -55,7 +74,11 @@ function playerGrantStarterCards() {
 function playerDataDefault() {
     return {
         version: 1,
-        gold: 0, // золото 
+        gold: 0, // золото
+        tutorialDone: false,
+        deckTutorialDone: false,
+        questSafarSpear: QuestSpearState.Inactive,
+        wins: 0,
         collection: {}, // key "id@rarity" -> { id, rarity, count }
         decks: {
             lana: { unlocked: DECK_DEFAULT_UNLOCKED, cards: [] },  // cards: [{slot,id,rarity}]
@@ -87,6 +110,92 @@ function spendGold(amount) {
     return true
 }
 
+function getWins() {
+    if (!variable_struct_exists(global.playerData, "wins")) global.playerData.wins = 0
+    return global.playerData.wins
+}
+
+function addWin() {
+    global.playerData.wins = getWins() + 1
+    playerDataSave()
+    return global.playerData.wins
+}
+
+function enemyStatBonus() {
+    return floor(getWins() / ENEMY_WIN_INTERVAL) * ENEMY_WIN_BONUS
+}
+
+function chestGoldAmount() {
+    return CHEST_GOLD_MIN + irandom(CHEST_GOLD_RANGE)
+}
+
+function spearSprite() {
+    var s = asset_get_index("spear")
+    return sprite_exists(s) ? s : noone
+}
+
+function spearBattleSprite() {
+    var s = asset_get_index("bigSpear")
+    return sprite_exists(s) ? s : noone
+}
+
+function spearBattleBonus() {
+    return SPEAR_BATTLE_BONUS
+}
+
+function questSpearState() {
+    if (!variable_struct_exists(global.playerData, "questSafarSpear")) global.playerData.questSafarSpear = QuestSpearState.Inactive
+    return global.playerData.questSafarSpear
+}
+
+function questSetSpearState(s) {
+    global.playerData.questSafarSpear = s
+    playerDataSave()
+}
+
+function questAcceptSpear() {
+    questSetSpearState(QuestSpearState.Active)
+    unlockCard(global.CardId.stealCard, CardsRarity.Default, 1)
+    var slot = firstFreeDeckSlot(Characters.Lana)
+    if (slot >= 0) setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default)
+    playerDataSave()
+    showCardReward(cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default }), "New card: Steal")
+}
+
+function questGrantSpear() {
+    if (questSpearState() == QuestSpearState.Active) {
+        questSetSpearState(QuestSpearState.SpearObtained)
+    }
+    if (variable_global_exists("spearCarrierExists")) global.spearCarrierExists = false
+    if (variable_global_exists("battleHasSpear")) global.battleHasSpear = false
+}
+
+function questCompleteSpear() {
+    questSetSpearState(QuestSpearState.Completed)
+    global.safarJoined = true
+    playerDataSave()
+}
+
+function tutorialIsDone() {
+    if (!variable_struct_exists(global.playerData, "tutorialDone")) return true
+    return global.playerData.tutorialDone
+}
+
+function markTutorialDone() {
+    global.playerData.tutorialDone = true
+    playerDataSave()
+}
+
+function deckTutorialIsDone() {
+    if (!variable_struct_exists(global.playerData, "deckTutorialDone")) return true
+    return global.playerData.deckTutorialDone
+}
+
+function markDeckTutorialDone() {
+    global.playerData.deckTutorialDone = true
+    playerDataSave()
+}
+
 // Сохранить данные о пользователе на устройство
 function playerDataSave() {
     var stringPlayerData = json_stringify(global.playerData)
@@ -113,7 +222,7 @@ function playerDataLoad() {
 
 //// Вспомогательные методы для конвертации в удобный для экспорта вид
 
-// Мапим персонажей в строку
+// Мап персонажей в строку
 function characterKey(character) {
     switch (character) {
         case Characters.Lana: return "lana"
@@ -123,7 +232,7 @@ function characterKey(character) {
 }
 
 // Нужно мапить айди карты и редкость карты в одну строку, чтобы потом восстанавливать карты как структуры 
-// и не создавать дофига айдишек для каждой редкости
+// и не создавать много айдишек для каждой редкости
 function collectionKey(cardIdentifier, rarity) {
     return cardIdentifier + "@" + string(rarity)
 }

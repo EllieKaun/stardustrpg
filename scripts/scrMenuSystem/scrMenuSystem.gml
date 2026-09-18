@@ -84,7 +84,7 @@ function MenuLayer(spr = noone, params = {}) constructor {
     }
 }
 
-// ---- Контроллер меню --------------------------------------------------------
+// Контроллер меню 
 // items — массив MenuItem. config (опц.): расположение/вид в ДОЛЯХ экрана:
 //   anchorX — точка привязки по X (0..1)
 //   startY — верх списка по Y (0..1)
@@ -110,7 +110,7 @@ function Menu(items, config = {}) constructor {
 
     self.hitRects = []   // { x, y, w, h, index } в GUI-координатах, заполняется в draw
 
-    // --- навигация ---
+    // навигация
     self.moveBy = function(dir) {
         var n = array_length(self.items)
         if (n == 0) return
@@ -135,7 +135,7 @@ function Menu(items, config = {}) constructor {
         return true
     }
 
-    // Ввод: клавиатура (вверх/вниз/enter/space) + мышь (наведение/клик по hitRects).
+    // Ввод: клавиатура (вверх/вниз/enter/space) + мышь (наведение/клик по hitRects) 
     // Возвращает true, если пункт подтверждён.
     self.handleInput = function(mx, my, mouseMoved, mouseClicked) {
         if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) self.movePrev()
@@ -156,9 +156,6 @@ function Menu(items, config = {}) constructor {
         }
         return confirmed
     }
-
-    // Отрисовка пунктов в GUI. Заполняет hitRects. Иконка слева от текста. группа
-    // "иконка текст" выравнивается по halign относительно anchorX.
     self.draw = function(gw, gh) {
         self.hitRects = []
 

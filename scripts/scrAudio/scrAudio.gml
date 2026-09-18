@@ -80,6 +80,7 @@ function playAmbientNamed(name) {
 
 #macro SND_CARD_SELECT CardSelect // смена выбранной карты 
 #macro SND_CARD_PLAY CardFly // начало розыгрыша карты
+#macro SND_CHEST_OPEN sndChestOpen // открытие сундука
 
 function playCardSelectSound() {
     playSfx(SND_CARD_SELECT, 8, false)
@@ -87,4 +88,8 @@ function playCardSelectSound() {
 
 function playCardPlaySound() {
     playSfx(SND_CARD_PLAY, 8, false)
+}
+
+function playChestOpenSound() {
+    playSfx(SND_CHEST_OPEN, 8, false)
 }

@@ -13,16 +13,31 @@ distanceToStopFollowing = 24
 sprIdle = sViv
 sprWalk = sVivWalk
 
+introSpeed = 0.9
+
+stepScriptedApproach = function() {
+    path_end()
+    if (!instance_exists(global.introTarget)) {
+        global.introWalk = false
+        return
+    }
+    var obstacles = worldObstacles()
+    var stepX = clamp(global.introTarget.x - x, -introSpeed, introSpeed)
+    var stepY = clamp(global.introTarget.y - y, -introSpeed, introSpeed)
+    if (!place_meeting(x + stepX, y, obstacles)) x += stepX
+    if (!place_meeting(x, y + stepY, obstacles)) y += stepY
+}
+
 // Движение выбранного персонажа
 stepControlled = function() {
     path_end()
 
-    var h = keyboard_check(ord("D")) - keyboard_check(ord("A"))
-    var v = keyboard_check(ord("S")) - keyboard_check(ord("W"))
+    var h = (keyboard_check(ord("D")) || keyboard_check(vk_right)) - (keyboard_check(ord("A")) || keyboard_check(vk_left))
+    var v = (keyboard_check(ord("S")) || keyboard_check(vk_down)) - (keyboard_check(ord("W")) || keyboard_check(vk_up))
     var mx = h * spdWalk
     var my = v * spdWalk
 
-    var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump]
+    var obstacles = worldObstacles()
     
     if (!place_meeting(x + mx, y, obstacles)) { 
         x += mx
@@ -47,7 +62,7 @@ stepFollowing = function() {
         return
     }
 
-    var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump]
+    var obstacles = worldObstacles()
 
     // Прямая линия до лидера 
     if (collision_line(x, y, leader.x, leader.y, obstacles, true, true) == noone) {

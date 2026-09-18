@@ -1,4 +1,4 @@
-// Враг Повержен
+// Если у вага нет хп
 if (gone) exit
 
 // Анимация исчезновения
@@ -36,6 +36,12 @@ if (isActive) {
     drawSpriteOutline(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_yellow)
 } 
 draw_self()
+if (variable_instance_exists(id, "hasSpear") && hasSpear) {
+    var spearSpr = spearBattleSprite()
+    if (spearSpr != noone) {
+        draw_sprite_ext(spearSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 2, 1, 1, 90, c_white, 1)
+    }
+}
 if (isActive) {
     draw_sprite(selectionArrow,
     0,
@@ -68,7 +74,6 @@ if !isKO() {
         drawHealthBarMana(bbox_left, bbox_top - 6, bbox_right - bbox_left, 6, displayHp, maxHp, displayMana, maxMana)
     }
 }
-
 
 // Рисование наложенных эффектов
 var statusIcons = []
