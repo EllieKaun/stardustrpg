@@ -2,6 +2,7 @@ triggered = false
 my_spawner = noone
 spawnedDynamically = false
 carriesSpear = false
+canCarrySpear = true // может ли передавать копье
 rearmDistance = 48 // на сколько отойти, чтобы снова можно было драться
 
 shouldWalk = true

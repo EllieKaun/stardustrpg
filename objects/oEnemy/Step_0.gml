@@ -4,7 +4,7 @@ if (variable_global_exists("cutsceneActive") && global.cutsceneActive) exit
 
 depth = -bbox_bottom
 
-if (!carriesSpear && questSpearState() == QuestSpearState.Active && !global.spearCarrierExists) {
+if (canCarrySpear && !carriesSpear && questSpearState() == QuestSpearState.Active && !global.spearCarrierExists) {
     carriesSpear = true
     global.spearCarrierExists = true
     if (spearSprite() == noone) image_blend = c_yellow

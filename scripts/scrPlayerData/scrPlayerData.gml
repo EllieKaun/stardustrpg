@@ -1,8 +1,9 @@
 enum Characters { Lana, Viv }
 
 #macro PLAYER_SAVE_FILE "player_data.json"
-#macro DECK_DEFAULT_UNLOCKED 5
-#macro DECK_CAPACITY 12
+#macro DECK_DEFAULT_UNLOCKED 4 // слотов деки открыто с начала игры
+#macro DECK_CAPACITY 12 // максимум слотов деки
+#macro ZONE_DECK_SLOT_LIMITS [6] // сколько слотов деки можно открыть максимум в зоне
 
 // Инициализация пользователя (каждый раз на старте)
 function playerDataInit() {
@@ -93,6 +94,12 @@ function playerDataDefault() {
 function getGold() {
     if (!variable_struct_exists(global.playerData, "gold")) global.playerData.gold = 0
     return global.playerData.gold
+}
+
+// Отнять все деньги
+function loseAllGold() {
+    global.playerData.gold = 0
+    playerDataSave()
 }
 
 // Изменить баланс на amount
@@ -203,6 +210,48 @@ function playerDataSave() {
     buffer_write(bufPlayerData, buffer_string, stringPlayerData)
     buffer_save(bufPlayerData, PLAYER_SAVE_FILE)
     buffer_delete(bufPlayerData)
+}
+
+//// Автосохранение
+
+#macro AUTOSAVE_INTERVAL_SECONDS 180 // раз в 3 минуты игры
+#macro AUTOSAVE_ICON_SECONDS 2.5 // сколько показывать иконку Ланы
+
+// Вызывать каждый шаг в комнатах, где идёт игра
+function autosaveUpdate() {
+    if (!variable_global_exists("playerData")) return
+    if (!variable_global_exists("autosavePlayTime")) {
+        global.autosavePlayTime = 0
+        global.autosaveIconStart = -1
+    }
+    global.autosavePlayTime += min(delta_time, 100000) / 1000000
+    if (global.autosavePlayTime < AUTOSAVE_INTERVAL_SECONDS) return
+
+    global.autosavePlayTime = 0
+    playerDataSave()
+    global.autosaveIconStart = current_time
+}
+
+function autosaveDrawIcon() {
+    if (!variable_global_exists("autosaveIconStart") || global.autosaveIconStart < 0) return
+    var elapsedSeconds = (current_time - global.autosaveIconStart) / 1000
+    if (elapsedSeconds >= AUTOSAVE_ICON_SECONDS) return
+
+    var fadeInSeconds = 0.3
+    var fadeOutSeconds = 0.6
+    var alpha = min(1, elapsedSeconds / fadeInSeconds, (AUTOSAVE_ICON_SECONDS - elapsedSeconds) / fadeOutSeconds)
+
+    var guiHeight = display_get_gui_height()
+    var guiPerScreenPixel = guiHeight / window_get_height()
+    var screenScale = max(1, round(window_get_height() * 0.09 / sprite_get_height(LanaIcon)))
+    var iconScale = screenScale * guiPerScreenPixel
+    var margin = guiHeight * 0.03
+    var bobOffset = sin(current_time / 200) * screenScale * guiPerScreenPixel * 2
+
+    draw_sprite_ext(LanaIcon, 0,
+        margin + sprite_get_xoffset(LanaIcon) * iconScale,
+        margin + sprite_get_yoffset(LanaIcon) * iconScale + bobOffset,
+        iconScale, iconScale, 0, c_white, alpha)
 }
 
 // Загрузить данные о пользователе с устройства
@@ -367,7 +416,18 @@ function firstFreeDeckSlot(character) {
 // Разблокировать слот в деке персонажа
 function unlockDeckSlot(character, _count = 1) {
     var deck = deckOf(character)
-    deck.unlocked = min(DECK_CAPACITY, deck.unlocked + _count)
+    deck.unlocked = min(deckSlotLimit(), deck.unlocked + _count)
+}
+
+// Индекс текущей зоны. Пока в игре одна зона
+function currentZoneIndex() {
+    return 0
+}
+
+// Максимум слотов деки, которые можно открыть в текущей зоне
+function deckSlotLimit() {
+    var limits = ZONE_DECK_SLOT_LIMITS
+    return min(DECK_CAPACITY, limits[min(currentZoneIndex(), array_length(limits) - 1)])
 }
 
 // Очистить деку персонажа 

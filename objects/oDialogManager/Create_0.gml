@@ -1,4 +1,8 @@
 active = false
+prevGuiW = display_get_gui_width() // GUI до диалога, вернём в endDialog
+prevGuiH = display_get_gui_height()
+dialogBaseW = camera_get_view_width(view_camera[0])
+dialogBaseH = camera_get_view_height(view_camera[0])
 lines = []
 lineIndex = 0
 charProgress = 0
@@ -14,7 +18,6 @@ currentOptions = function() {
 
 boxFont = fnUI_14
 nameFont = fnUI_14
-portraitSize = 96
 
 // Начать диалог
 // Нужно передать список диалоговых строк из структуры
@@ -23,6 +26,14 @@ startDialog = function(_lines, _onComplete = undefined) {
     if (array_length(_lines) == 0) {
         return
     }
+    if (!active) {
+        prevGuiW = display_get_gui_width()
+        prevGuiH = display_get_gui_height()
+    }
+    dialogBaseW = camera_get_view_width(view_camera[0])
+    dialogBaseH = camera_get_view_height(view_camera[0])
+    setCrispGui(dialogBaseW, dialogBaseH)
+
     lines = _lines
     lineIndex = 0
     charProgress = 0
@@ -70,8 +81,10 @@ advance = function() {
 endDialog = function() {
     active = false
     global.uiModal = false
+    display_set_gui_size(prevGuiW, prevGuiH)
     var callback = onComplete
     onComplete = undefined
-    if (callback != undefined) 
+    if (callback != undefined) {
         callback()
+    }
 }

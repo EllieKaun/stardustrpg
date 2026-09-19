@@ -7,69 +7,92 @@ var line = lines[lineIndex]
 // Оверлэй
 drawScreenDim(0.6)
 
-// Верстка портретов
-var margin = 8
-var boxH = floor(screenHeight * 0.28)
-var boxY = screenHeight - boxH
-var boxX = margin
+// Доска с диалогом
+var margin = round(screenWidth * 0.02)
+var boxH = floor(screenHeight * 0.30)
 var boxW = screenWidth - margin * 2
+var boxX = margin
+var boxY = screenHeight - boxH - margin
+var pad = boxH * 0.12 // отступ текста от рамки
+var pointerScale = max(1, floor(screenWidth / dialogBaseW * 0.5)) // указатель 
 
-// Координаты портрета
-var pSize = portraitSize
+var hasPortrait = (line.portrait != undefined && sprite_exists(line.portrait))
 var onLeft = (line.side != "right")
-var portraitX = onLeft ? margin : (screenWidth - margin - pSize)
-var portraitY = boxY + boxH - pSize
 
-// Координаты и размеры текста
-var pad = 8
-var textX = boxX + pad + (onLeft ? pSize : 0)
-var textW = boxW - pad * 2 - pSize
-var textY = boxY + pad
-
-// Рисуем портрет
-if (line.portrait != undefined && sprite_exists(line.portrait)) {
-    draw_sprite_stretched(line.portrait, 0, portraitX, portraitY, pSize, pSize)
+// Портрет
+if (hasPortrait) {
+    var portraitH = floor(screenHeight * 0.36)
+    var portraitSc = portraitH / sprite_get_height(line.portrait)
+    if (portraitSc >= 1) portraitSc = floor(portraitSc) 
+    var portraitW = sprite_get_width(line.portrait) * portraitSc
+    portraitH = sprite_get_height(line.portrait) * portraitSc
+    var portraitInset = pad * 1.5
+    var portraitLeft = onLeft ? (boxX + portraitInset) : (boxX + boxW - portraitInset - portraitW)
+    var portraitTop = boxY + boxH * 0.03 - portraitH
+    draw_sprite_ext(line.portrait, 0,
+        portraitLeft + sprite_get_xoffset(line.portrait) * portraitSc,
+        portraitTop + sprite_get_yoffset(line.portrait) * portraitSc,
+        portraitSc, portraitSc, 0, c_white, 1)
 }
 
+// Доска рисуется поверх низа портрета
+draw_sprite_stretched(box, 0, boxX, boxY, boxW, boxH)
+
+// Координаты и размеры текста
+var padX = pad * 1.5
+var padY = pad
+var textX = boxX + padX
+var textW = boxW - padX * 2
+var textY = boxY + padY
+
 // Текст
-var full = currentText()
-var textAreaH = boxH - pad * 2
-var maxLineH = boxH * 0.16
-var fontLadder = [fnUI_14, fnUI_12, fnUI_10, fnUI_9, fnUI_8, fnUI_7]
+var fullText = currentText()
+var textAreaH = boxH - padY * 2
+var maxLineH = boxH * 0.2
+var answerOptions = currentOptions()
+var fontLadder = UI_FONT_STACK
 var chosenFont = fontLadder[array_length(fontLadder) - 1]
-for (var fi = 0; fi < array_length(fontLadder); fi++) {
-    draw_set_font(fontLadder[fi])
-    var lh = string_height("Ay")
-    if (lh <= maxLineH && string_height_ext(full, round(lh * 1.15), textW) <= textAreaH) {
-        chosenFont = fontLadder[fi]
+for (var fontIndex = 0; fontIndex < array_length(fontLadder); fontIndex++) {
+    draw_set_font(fontLadder[fontIndex])
+    var fontLineHeight = string_height("Ay")
+    var fontLineSep = round(fontLineHeight * 1.15)
+    var neededHeight = string_height_ext(fullText, fontLineSep, textW)
+    if (answerOptions != undefined) { // варианты ответа тем же шрифтом, что и текст диалога
+        neededHeight += fontLineSep * 0.5
+        for (var optionIndex = 0; optionIndex < array_length(answerOptions); optionIndex++) neededHeight += string_height_ext("> " + answerOptions[optionIndex].text, fontLineSep, textW)
+    }
+    if (fontLineHeight <= maxLineH && neededHeight <= textAreaH) {
+        chosenFont = fontLadder[fontIndex]
         break
     }
 }
 
 draw_set_font(chosenFont)
 var lineSep = round(string_height("Ay") * 1.15)
-var fullH = string_height_ext(full, lineSep, textW)
-var opts = currentOptions()
-var drawY = (opts != undefined) ? textY : textY + max(0, (textAreaH - fullH) * 0.5)
-var shown = string_copy(full, 1, floor(charProgress))
+var fullH = string_height_ext(fullText, lineSep, textW)
+var drawY = (answerOptions != undefined) ? textY : textY + max(0, (textAreaH - fullH) * 0.5)
+// Без портрета
+var drawX = hasPortrait ? textX : boxX + (boxW - string_width_ext(fullText, lineSep, textW)) * 0.5
+var shown = string_copy(fullText, 1, floor(charProgress))
 draw_set_color(c_white)
 draw_set_halign(fa_left)
 draw_set_valign(fa_top)
-draw_text_ext(textX, drawY, shown, lineSep, textW)
+draw_text_ext(drawX, drawY, shown, lineSep, textW)
 
-if (opts != undefined && fullyRevealed()) {
-    var optH = min(maxLineH, boxH * 0.14)
-    var oy = drawY + fullH + optH * 0.5
-    for (var i = 0; i < array_length(opts); i++) {
-        var sel = (i == selectedOption)
-        draw_set_color(sel ? c_yellow : c_white)
-        var prefix = sel ? "> " : "   "
-        drawUiText(textX, oy + i * (optH * 1.35), prefix + opts[i].text, optH)
+if (answerOptions != undefined && fullyRevealed()) {
+    // Варианты ответа
+    var optionY = drawY + fullH + lineSep * 0.5
+    for (var i = 0; i < array_length(answerOptions); i++) {
+        var isSelected = (i == selectedOption)
+        draw_set_color(isSelected ? c_yellow : c_white)
+        var optStr = (isSelected ? "> " : "   ") + answerOptions[i].text
+        draw_text_ext(textX, optionY, optStr, lineSep, textW)
+        optionY += string_height_ext(optStr, lineSep, textW)
     }
     draw_set_color(c_white)
 } else if (fullyRevealed()) {
-    var iy = boxY + boxH - 12 + floor(2 * sin(current_time / 200))
-    draw_sprite(sPointer, 0, boxX + boxW - 16, iy)
+    var pointerY = boxY + boxH - padY - pointerScale * 2 + floor(pointerScale * 2 * sin(current_time / 200))
+    draw_sprite_ext(sPointer, 0, boxX + boxW - padX, pointerY, pointerScale, pointerScale, 0, c_white, 1)
 }
 
 draw_set_halign(fa_left)

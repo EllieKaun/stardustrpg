@@ -1,3 +1,5 @@
+autosaveUpdate()
+
 // Катсцена босса
 if (global.cutsceneActive) {
     var csSpd = sprite_get_speed(cutsceneSprite)
@@ -62,9 +64,9 @@ if (keyboard_check_pressed(vk_tab) && instance_exists(oDeckBuilder)) {
         oDeckBuilder.openBuilder()
     }
 //    say([
-//    dialogLine("Lana", placeholderLana, "left",
+//    dialogLine("Lana", placeholderLana,
 //        "Hey hey"),
-//    dialogLine("Viv", placeholderViv, "right",
+//    dialogLine("Viv", placeholderViv,
 //        "Yeh yeh")
 //], function() {
 //    show_debug_message("dialog finished")

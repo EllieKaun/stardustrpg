@@ -204,9 +204,9 @@ function cardPlaySequence(card, caster, targets) {
                 with (Battle) {
                     var c = ctx.caster
                     applyCost(c, ctx.card)
-                    if (checkIfHasEffectType(selectedCharacter, EffectTypes.CopyCard)) {
+                    if (checkIfHasEffectType(c, EffectTypes.CopyCard)) {
                         copyNextCard = true
-                        reduceOrRemoveEffectType(selectedCharacter, EffectTypes.CopyCard)
+                        reduceOrRemoveEffectType(c, EffectTypes.CopyCard)
                     }
                     removeCardFromHand(c, ctx.card)
                     ctx.animEnded = false
@@ -241,10 +241,10 @@ function cardPlaySequence(card, caster, targets) {
                             break
                         }
                     }
-                    selectedCharacter.energy -= ctx.card.energy
+                    ctx.caster.energy -= ctx.card.energy
                     if (copyNextCard) {
                         copyNextCard = false
-                        array_push(selectedCharacter.deck.cardsInHand, ctx.card)
+                        array_push(ctx.caster.deck.cardsInHand, ctx.card)
                     }
                 }
             }
@@ -385,7 +385,7 @@ function executeEffect(effect, caster, targets) {
     runInstant(effect, caster, targets)
     selectedTargetNumber = -1
     selectedTarget = noone
-    battleState = BattleStates.AfterPlayChecks
+    changeBattleState(BattleStates.AfterPlayChecks)
 }
 
 // Сила к стихии/статусу входящего эффекта

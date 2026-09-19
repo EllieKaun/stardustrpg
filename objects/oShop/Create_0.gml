@@ -85,8 +85,8 @@ layoutPanels = function() {
     var leftX  = bannerX - headInset - headW * 0.5 - gap // левее левой головы
     var rightX = bannerX + bannerW + headInset + headW * 0.5 + gap // правее правой головы
     shopPanel.tabRects = [
-        { tx: leftX - tabWd, ty: tabYy, tw: tabWd, th: tabHt }, // CARDS слева
-        { tx: rightX, ty: tabYy, tw: tabWd, th: tabHt }  // OTHER справа
+        { left: leftX - tabWd, top: tabYy, width: tabWd, height: tabHt }, // CARDS слева
+        { left: rightX, top: tabYy, width: tabWd, height: tabHt }  // OTHER справа
     ]
 
     // Панель списка

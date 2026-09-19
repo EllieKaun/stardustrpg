@@ -2,7 +2,7 @@ function generateLevel(zoneH, screenW, spacing, encounter) {
     initStarriorsFromEncounter(encounter)
     initStarriorsPositions(zoneH, screenW, spacing)
     selectNextCharacter()
-    battleState = BattleStates.CharacterPlay
+    changeBattleState(BattleStates.CharacterPlay)
 }
 
 function initStarriorsFromEncounter(encounter) {

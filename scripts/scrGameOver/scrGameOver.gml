@@ -110,8 +110,6 @@ function drawVictoryScreen() {
         drawCard(rewardChoices[i], cx, dy, cardW, cardH)
 
         if (isSel) {
-            draw_set_color(c_yellow)
-            draw_rectangle(cx - 1, dy - 1, cx + cardW + 1, dy + cardH + 1, true)
             draw_sprite_ext(sPointer, 0, floor(cx - 10 * s), floor(dy + cardH / 2), s, s, 0, c_white, 1)
         }
     }
@@ -226,8 +224,6 @@ function drawGameOverScreen() {
         drawUiText(bx + btnW / 2, btnY + btnH / 2, labels[i], btnH * 0.55)
 
         if (isSel) {
-            draw_set_color(c_yellow)
-            draw_rectangle(bx, btnY, bx + btnW, btnY + btnH, true)
             draw_sprite_ext(sPointer, 0, floor(bx - 10 * s), floor(btnY + btnH / 2), s, s, 0, c_white, 1)
         }
     }

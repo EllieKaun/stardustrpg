@@ -89,5 +89,5 @@ function grantBattleRewards() {
     }
     rewardCursor = 0
     rewardSelected = false
-    battleState = BattleStates.Victory  
+    changeBattleState(BattleStates.Victory)
 }

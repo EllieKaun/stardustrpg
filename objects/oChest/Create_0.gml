@@ -16,18 +16,18 @@ chestBlocked = function() {
 doChestAction = function() {
     switch (chestKind) {
         case ChestKind.Gold:
-            var amt = chestGoldAmount()
-            addGold(amt)
-            say([ dialogLine("Chest", noone, "left", "You found " + string(amt) + " gold!") ])
+            var goldAmount = chestGoldAmount()
+            addGold(goldAmount)
+            say([ dialogLine("Chest", noone, "You found " + string(goldAmount) + " gold!") ])
             instance_destroy()
         break
 
         case ChestKind.Card:
-            var ref = rollOneReward(forestRewardPool())
-            unlockCard(ref.id, ref.rarity, 1)
-            var card = cardFromRef(ref)
-            var cname = (card != undefined && variable_struct_exists(card, "name")) ? card.name : "a card"
-            say([ dialogLine("Chest", noone, "left", "You found a card: " + cname + "!") ])
+            var rewardRef = rollOneReward(forestRewardPool())
+            unlockCard(rewardRef.id, rewardRef.rarity, 1)
+            var card = cardFromRef(rewardRef)
+            var cardName = (card != undefined && variable_struct_exists(card, "name")) ? card.name : "a card"
+            say([ dialogLine("Chest", noone, "You found a card: " + cardName + "!") ])
             instance_destroy()
         break
 

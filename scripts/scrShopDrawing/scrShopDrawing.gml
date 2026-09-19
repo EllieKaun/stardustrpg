@@ -27,17 +27,17 @@ function buildShopItems(category) {
         for (var i = 0; i < array_length(refs); i++) {
             var card = cardFromRef(refs[i])
             if (card == undefined) continue
-            var it = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)
-            it.card = card
-            it.ref = { id: refs[i].id, rarity: refs[i].rarity }
-            array_push(items, it)
+            var shopItem = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)
+            shopItem.card = card
+            shopItem.ref = { id: refs[i].id, rarity: refs[i].rarity }
+            array_push(items, shopItem)
         }
     } else {
         // Расширение слотов деки 
-        if (deckOf(Characters.Lana).unlocked < DECK_CAPACITY) {
-            var it = new ShopItem(ShopItemKind.Slot, deckSlotUpgradePrice())
-            it.label = "New deck slot"
-            array_push(items, it)
+        if (deckOf(Characters.Lana).unlocked < deckSlotLimit()) {
+            var shopItem = new ShopItem(ShopItemKind.Slot, deckSlotUpgradePrice())
+            shopItem.label = "New deck slot"
+            array_push(items, shopItem)
         }
     }
     return items
@@ -72,22 +72,22 @@ function shopItemLines(item) {
     return lines
 }
 
-// Отрисовка одной строки-товара в прямоугольнике rect {sx,sy,sw,sh}
+// Отрисовка одной строки-товара в прямоугольнике rect {left,top,width,height}
 function drawShopItem(item, rect, uiScale) {
     // рамка товара
-    draw_sprite_stretched(box, 0, rect.sx, rect.sy, rect.sw, rect.sh)
+    draw_sprite_stretched(ItemShadow, 0, rect.left, rect.top, rect.width, rect.height)
 
-    var pad = rect.sh * 0.12
-    var contentH = rect.sh - pad * 2
-    var textX = rect.sx + pad
-    var textTop = rect.sy + pad
+    var pad = rect.height * 0.12
+    var contentH = rect.height - pad * 2
+    var textX = rect.left + pad
+    var textTop = rect.top + pad
 
     // карта слева
     if (item.kind == ShopItemKind.Card && item.card != undefined) {
         var cardH = contentH
         var cardW = cardH * 2 / 3
-        drawCardFace(item.card, rect.sx + pad + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0)
-        textX = rect.sx + pad + cardW + pad
+        drawCardFace(item.card, rect.left + pad + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0)
+        textX = rect.left + pad + cardW + pad
     }
 
     // описание
@@ -102,17 +102,17 @@ function drawShopItem(item, rect, uiScale) {
     }
 
     // цена
-    var coinH = rect.sh * 0.34
+    var coinH = rect.height * 0.34
     var coinScale = coinH / sprite_get_height(CoinIcon)
     var coinW = sprite_get_width(CoinIcon) * coinScale
-    var coinCX = rect.sx + rect.sw - pad - coinW * 0.5
-    var coinCY = rect.sy + rect.sh * 0.5
+    var coinCX = rect.left + rect.width - pad - coinW * 0.5
+    var coinCY = rect.top + rect.height * 0.5
 
     var priceStr = string(item.price)
     draw_set_halign(fa_right)
     draw_set_valign(fa_middle)
     draw_set_color(c_white)
-    var priceScale = uiTextScale(priceStr, coinH * 0.9, rect.sw * 0.2)
+    var priceScale = uiTextScale(priceStr, coinH * 0.9, rect.width * 0.2)
     draw_text_transformed(coinCX - coinW * 0.5 - pad * 0.4, coinCY, priceStr, priceScale, priceScale, 0)
 
     draw_sprite_ext(CoinIcon, 0, coinCX, coinCY, coinScale, coinScale, 0, c_white, 1)
@@ -173,13 +173,13 @@ function Shop(_config) constructor {
     }
 
     static rowPitch = function() {
-        var l = computeLayout()
-        return l.rowH + l.gapY
+        var layout = computeLayout()
+        return layout.rowH + layout.gapY
     }
 
     static scrollMax = function() {
-        var l = computeLayout()
-        var contentBottom = l.gridY + (array_length(slots) - 1) * (l.rowH + l.gapY) + l.rowH
+        var layout = computeLayout()
+        var contentBottom = layout.gridY + (array_length(slots) - 1) * (layout.rowH + layout.gapY) + layout.rowH
         var visibleBottom = y + h - padding
         return max(0, contentBottom - visibleBottom)
     }
@@ -192,11 +192,11 @@ function Shop(_config) constructor {
 
     static scrollToRow = function(row) {
         if (!scrollable) return
-        var l = computeLayout()
-        var pitch = l.rowH + l.gapY
-        var rowTop = l.gridY + row * pitch
-        var rowBottom = rowTop + l.rowH
-        var visTop = l.gridY
+        var layout = computeLayout()
+        var pitch = layout.rowH + layout.gapY
+        var rowTop = layout.gridY + row * pitch
+        var rowBottom = rowTop + layout.rowH
+        var visTop = layout.gridY
         var visBottom = y + h - padding
         if (rowTop - scrollY < visTop) scrollY = rowTop - visTop
         else if (rowBottom - scrollY > visBottom) scrollY = rowBottom - visBottom
@@ -204,9 +204,9 @@ function Shop(_config) constructor {
     }
 
     static getSlotRect = function(index) {
-        var l = computeLayout()
-        var slotY = l.gridY + index * (l.rowH + l.gapY) - scrollY
-        return { sx: l.gridX, sy: slotY, sw: l.rowW, sh: l.rowH }
+        var layout = computeLayout()
+        var slotY = layout.gridY + index * (layout.rowH + layout.gapY) - scrollY
+        return { left: layout.gridX, top: slotY, width: layout.rowW, height: layout.rowH }
     }
 
     // Вкладки
@@ -216,30 +216,30 @@ function Shop(_config) constructor {
         var total = 0
         var prevFont = draw_get_font()
         for (var i = 0; i < tabsCount; i++) {
-            var spr = tabs[i][$ "sprite"]
-            var sc = uiTextScale(tabs[i].name, tabH * 0.8, 1000000)
-            var textNeed = string_width(tabs[i].name) * sc + tabPadding * 2
-            var tabWidth = (spr != undefined)
-                ? max(textNeed, tabH * sprite_get_width(spr) / sprite_get_height(spr))
+            var tabSprite = tabs[i][$ "sprite"]
+            var tabNameScale = uiTextScale(tabs[i].name, tabH * 0.8, 1000000)
+            var textNeed = string_width(tabs[i].name) * tabNameScale + tabPadding * 2
+            var tabWidth = (tabSprite != undefined)
+                ? max(textNeed, tabH * sprite_get_width(tabSprite) / sprite_get_height(tabSprite))
                 : textNeed
             widths[i] = tabWidth
             total += tabWidth
         }
         draw_set_font(prevFont)
         var avail = w - tabGap * max(0, tabsCount - 1)
-        var k = (total > avail && total > 0) ? avail / total : 1
-        return { widths: widths, k: k }
+        var shrinkFactor = (total > avail && total > 0) ? avail / total : 1
+        return { widths: widths, shrink: shrinkFactor }
     }
 
     static getTabRect = function(index) {
         if (tabRects != undefined && index < array_length(tabRects)) return tabRects[index]
 
         var tabsCount = array_length(tabs)
-        if (tabsCount == 0) return { tx: x, ty: y - tabH, tw: 0, th: tabH }
-        var tw = getTabWidths()
+        if (tabsCount == 0) return { left: x, top: y - tabH, width: 0, height: tabH }
+        var tabWidths = getTabWidths()
         var tabX = x
-        for (var i = 0; i < index; i++) tabX += tw.widths[i] * tw.k + tabGap
-        return { tx: tabX, ty: y - tabH, tw: tw.widths[index] * tw.k, th: tabH }
+        for (var i = 0; i < index; i++) tabX += tabWidths.widths[i] * tabWidths.shrink + tabGap
+        return { left: tabX, top: y - tabH, width: tabWidths.widths[index] * tabWidths.shrink, height: tabH }
     }
 
     // Фокус
@@ -308,24 +308,24 @@ function Shop(_config) constructor {
 
     static stepMouse = function() {
         hoverSlot = -1
-        var mx = device_mouse_x_to_gui(0)
-        var my = device_mouse_y_to_gui(0)
-        var moved = (mx != mouseLastX || my != mouseLastY) // мышь двигается?
-        mouseLastX = mx
-        mouseLastY = my
+        var mouseX = device_mouse_x_to_gui(0)
+        var mouseY = device_mouse_y_to_gui(0)
+        var moved = (mouseX != mouseLastX || mouseY != mouseLastY) // мышь двигается?
+        mouseLastX = mouseX
+        mouseLastY = mouseY
         var clicked = mouse_check_button_pressed(mb_left)
 
         // Вкладки 
-        for (var t = 0; t < array_length(tabs); t++) {
-            var tr = getTabRect(t)
-            if (pointInRect(mx, my, tr.tx, tr.ty, tr.tw, tr.th)) {
-                if (clicked) { focused = true; onTabRow = true; activeTab = t; if (onTabClick != undefined) onTabClick(self, t) }
+        for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {
+            var tabRect = getTabRect(tabIndex)
+            if (pointInRect(mouseX, mouseY, tabRect.left, tabRect.top, tabRect.width, tabRect.height)) {
+                if (clicked) { focused = true; onTabRow = true; activeTab = tabIndex; if (onTabClick != undefined) onTabClick(self, tabIndex) }
                 return true
             }
         }
 
         // в пределах панели списка
-        if (!pointInRect(mx, my, x, y, w, h)) return false
+        if (!pointInRect(mouseX, mouseY, x, y, w, h)) return false
 
         if (scrollable) {
             var wheelStep = rowPitch() * 0.5
@@ -335,8 +335,8 @@ function Shop(_config) constructor {
 
         // товары
         for (var i = 0; i < array_length(slots); i++) {
-            var sr = getSlotRect(i)
-            if (pointInRect(mx, my, sr.sx, sr.sy, sr.sw, sr.sh)) {
+            var slotRect = getSlotRect(i)
+            if (pointInRect(mouseX, mouseY, slotRect.left, slotRect.top, slotRect.width, slotRect.height)) {
                 hoverSlot = i
                 if (moved) {
                     selectedSlot = i
@@ -367,41 +367,29 @@ function Shop(_config) constructor {
         // Клип списка по прямоугольнику контейнера
         var prevScissor = gpu_get_scissor()
         var padTop = padding
-        gpu_set_scissor(floor(x + padding), floor(y + padTop),
-                        ceil(w - padding * 2), ceil(h - padTop - padding))
+        guiSetScissor(x + padding, y + padTop, w - padding * 2, h - padTop - padding)
 
         for (var i = 0; i < array_length(slots); i++) {
             drawShopItem(slots[i], getSlotRect(i), uiScale)
         }
 
-        // Обводка выделенного товара
-        if (selectedSlot >= 0 && selectedSlot < array_length(slots)) {
-            var sr = getSlotRect(selectedSlot)
-            var ow = max(2, round(uiScale * 3)) // толщина обводки
-            draw_set_color(c_yellow)
-            for (var k = 0; k < ow; k++) {
-                draw_rectangle(sr.sx + k, sr.sy + k, sr.sx + sr.sw - 1 - k, sr.sy + sr.sh - 1 - k, true)
-            }
-            draw_set_color(c_white)
-        }
-
         gpu_set_scissor(prevScissor)
 
         // Вкладки 
-        for (var ti = 0; ti < array_length(tabs); ti++) {
-            var tab = tabs[ti]
-            var tr = getTabRect(ti)
-            var isActive = (ti == activeTab)
+        for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {
+            var tab = tabs[tabIndex]
+            var tabRect = getTabRect(tabIndex)
+            var isActive = (tabIndex == activeTab)
 
             if (tab[$ "sprite"] != undefined) {
-                var sub = min(isActive ? 1 : 0, sprite_get_number(tab.sprite) - 1)
+                var subimage = min(isActive ? 1 : 0, sprite_get_number(tab.sprite) - 1)
                 draw_set_alpha(isActive ? 1.0 : 0.6)
-                draw_sprite_stretched(tab.sprite, sub, tr.tx, tr.ty, tr.tw, tr.th)
+                draw_sprite_stretched(tab.sprite, subimage, tabRect.left, tabRect.top, tabRect.width, tabRect.height)
                 draw_set_alpha(1.0)
             } else {
                 draw_set_color(tab[$ "color"] ?? c_gray)
                 draw_set_alpha(isActive ? 1.0 : 0.6)
-                draw_rectangle(tr.tx, tr.ty, tr.tx + tr.tw - 1, tr.ty + tr.th - 1, false)
+                draw_rectangle(tabRect.left, tabRect.top, tabRect.left + tabRect.width - 1, tabRect.top + tabRect.height - 1, false)
                 draw_set_alpha(1.0)
             }
 
@@ -409,8 +397,8 @@ function Shop(_config) constructor {
             draw_set_color(tab[$ "textColor"] ?? c_white)
             draw_set_halign(fa_center)
             draw_set_valign(fa_middle)
-            var labelScale = uiTextScale(tab.name, tr.th * 0.55, tr.tw - tabPadding * 2)
-            draw_text_transformed(tr.tx + tr.tw / 2, tr.ty + tr.th / 2, tab.name, labelScale, labelScale, 0)
+            var labelScale = uiTextScale(tab.name, tabRect.height * 0.55, tabRect.width - tabPadding * 2)
+            draw_text_transformed(tabRect.left + tabRect.width / 2, tabRect.top + tabRect.height / 2, tab.name, labelScale, labelScale, 0)
             draw_set_halign(fa_left)
             draw_set_valign(fa_top)
         }

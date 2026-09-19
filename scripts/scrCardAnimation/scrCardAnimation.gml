@@ -11,9 +11,6 @@
 //    c.dur = 60 
 //    playCardAnimated(card, caster, targets, c)
 
-// ------------------------------------------------------------
-//  Стратегии ПУТИ: (from, to, p, opts) -> {x, y}.  p в [0..1]
-// ------------------------------------------------------------
 
 function pathArc(from, to, p, opts) { // дуга вверх
     var cx = (from.x + to.x) * 0.5
@@ -184,7 +181,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
                 done = true
                 if (onDone != undefined && !effectFired) {
                     effectFired = true
-                    onDone()
+                    onDone(self)
                 }
                 if (cfg.playOverlay && sprite_exists(playSpr)) playing = true
                 else playDone = true
@@ -349,34 +346,38 @@ function selectedCardTransform() {
     }
 }
 
+// Общий запуск анимации карты: from — стартовый transform {x, y, angle, w, h}
+function spawnCardAnim(card, from, cfg, onDone) {
+    cfg.particles.color = categoryColor(cardCategoryOf(card))
+    cfg.particles.draw  = drawStarSparkle
+
+    changeBattleState(BattleStates.CardAnimating)
+    animatingCard = card
+
+    var anim = new CardPlayAnim(
+        card,
+        from.x,
+        from.y,
+        from.angle,
+        from.w,
+        from.h,
+        onDone,
+        cfg
+    )
+    array_push(activeCardAnims, anim)
+    return anim
+}
+
 // Запускает анимацию выбранной карты перед тем как начать разыгрывание
 function playCardAnimated(card, caster, targets, cfg) {
     playCardPlaySound() // звук начала розыгрыша карты
     if (cfg == undefined) cfg = defaultCardAnimConfig()
-    // след из звёзд цвета категории карты
-    cfg.particles.color = categoryColor(cardCategoryOf(card))
-    cfg.particles.draw  = drawStarSparkle
-    var transform = selectedCardTransform()
 
-    animPendingCard = card
-    animPendingCaster = caster
-    animPendingTargets = targets
-    animatingCard = card
-    battleState = BattleStates.CardAnimating
-
-    var anim = new CardPlayAnim(
-        card, 
-        transform.x, 
-        transform.y, 
-        transform.angle, 
-        transform.w, 
-        transform.h, 
-        function() {
-            playCard(animPendingCard, animPendingCaster, animPendingTargets)
-        }, 
-        cfg
-    )
-    array_push(activeCardAnims, anim)
+    var anim = spawnCardAnim(card, selectedCardTransform(), cfg, function(anim) {
+        playCard(anim.card, anim.caster, anim.targets)
+    })
+    anim.caster = caster
+    anim.targets = targets
 }
 
 function handSlotTransform(i, n) {
@@ -429,7 +430,6 @@ function beginDrawCardAnim(character) {
     var hand = character.getCardsInHand()
     var pileCountBefore = array_length(pile)
     var card = array_shift(pile)
-    drawPendingCard = card
 
     var newHandSize = array_length(hand) + 1
     var slot = handSlotTransform(newHandSize - 1, newHandSize)
@@ -439,26 +439,12 @@ function beginDrawCardAnim(character) {
     cfg.toX = slot.x
     cfg.toY = slot.y
     cfg.toAngle = slot.angle
-    cfg.particles.color = categoryColor(cardCategoryOf(card))
-    cfg.particles.draw = drawStarSparkle
 
-    battleState = BattleStates.CardAnimating
-    animatingCard = card
-
-    var anim = new CardPlayAnim(
-        card,
-        src.x, 
-        src.y,
-        0,
-        slot.w,
-        slot.h,
-        function() {
-            array_push(selectedCharacter.getCardsInHand(), drawPendingCard)
-            beginTurnFor(selectedCharacter)
-        },
-        cfg
-    )
-    array_push(activeCardAnims, anim)
+    var from = { x: src.x, y: src.y, angle: 0, w: slot.w, h: slot.h }
+    spawnCardAnim(card, from, cfg, function(anim) {
+        array_push(selectedCharacter.getCardsInHand(), anim.card)
+        beginTurnFor(selectedCharacter)
+    })
 }
 
 // Обновление всех активных анимаций (вызывать каждый шаг)
