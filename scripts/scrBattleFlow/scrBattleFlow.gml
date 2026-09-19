@@ -49,8 +49,9 @@ function startTurnFor(character) {
 }
 
 function beginTurnFor(character) {
-    if (!character.isPuppet && checkIfHasEffectType(character, EffectTypes.Stun)) { // если стан - пропускаем ход
-        skipTurn()
+    if (!character.isPuppet && checkIfHasEffectType(character, EffectTypes.Stun)) {
+        // Стан
+        changeBattleState(BattleStates.StunnedTurn)
         return
     }
 
@@ -215,7 +216,7 @@ function doMenuAction(name) {
 
 // Инициализация выборки - отбор персонажей для выбора (исключение ko)
 function initTargetSelection(targets) {
-    unselectionToAll()
+    // isActive не снимаем: обводка ходящего персонажа остаётся на выборе цели и в анимациях
     var aliveTargets = []
     for(var i = 0; i < array_length(targets); i++) {
         if !targets[i].isKO() array_push(aliveTargets, targets[i])
@@ -227,7 +228,6 @@ function initTargetSelection(targets) {
 
 // Выбор целей ТОЛЬКО среди павших (не-кукол) — для воскрешения
 function initTargetSelectionKO(targets) {
-    unselectionToAll()
     var pool = []
     for(var i = 0; i < array_length(targets); i++) {
         if (targets[i].isKO() && !targets[i].isPuppet) array_push(pool, targets[i])
@@ -276,12 +276,12 @@ function unselectTargets() {
 // targetOptions — выбрать её. Возвращает true, если цель под курсором найдена.
 function selectTargetAtMouse() {
     for (var i = 0; i < array_length(targetOptions); i++) {
-        var t = targetOptions[i]
-        if (instance_exists(t) && position_meeting(mouse_x, mouse_y, t)) {
-            if (selectedTarget != t) {
+        var targetOption = targetOptions[i]
+        if (instance_exists(targetOption) && position_meeting(mouse_x, mouse_y, targetOption)) {
+            if (selectedTarget != targetOption) {
                 unselectTargets()
                 selectedTargetNumber = i
-                selectedTarget = t
+                selectedTarget = targetOption
                 selectedTarget.isTarget = true
             }
             return true
@@ -292,11 +292,11 @@ function selectTargetAtMouse() {
 
 // Фильтрация целей не в ауте
 function filterNotKO(targets) {
-    var r = []
+    var aliveTargets = []
     for (var i = 0; i < array_length(targets); i++) {
-        if (!targets[i].isKO()) array_push(r, targets[i])
+        if (!targets[i].isKO()) array_push(aliveTargets, targets[i])
     }
-    return r
+    return aliveTargets
 }
 
 // Возвращение в мир
@@ -310,10 +310,10 @@ function retryBattle() {
 }
 
 // Удалить из массива
-function removeFromArray(arr, item) {
-    for (var i = array_length(arr) - 1; i >= 0; i--)
-        if (arr[i] == item) { 
-            array_delete(arr, i, 1)
+function removeFromArray(sourceArray, itemToRemove) {
+    for (var i = array_length(sourceArray) - 1; i >= 0; i--)
+        if (sourceArray[i] == itemToRemove) { 
+            array_delete(sourceArray, i, 1)
             return
         }
 }
@@ -321,15 +321,15 @@ function removeFromArray(arr, item) {
 // Удалить мертвых марионеток
 function removeDeadPuppets() {
     for (var i = array_length(playOrder) - 1; i >= 0; i--) {
-        var c = playOrder[i]
-        if (c.isPuppet && c.isKO()) {
-            removeFromArray(heroes,  c)
-            removeFromArray(enemies, c)
+        var puppet = playOrder[i]
+        if (puppet.isPuppet && puppet.isKO()) {
+            removeFromArray(heroes,  puppet)
+            removeFromArray(enemies, puppet)
             array_delete(playOrder, i, 1)
 
             if (i <= selectedCharacterNumber) selectedCharacterNumber--
 
-            instance_destroy(c)
+            instance_destroy(puppet)
         }
     }
     initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)  

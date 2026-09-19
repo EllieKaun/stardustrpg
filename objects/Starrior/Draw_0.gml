@@ -36,13 +36,8 @@ if (isActive) {
     drawSpriteOutline(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_yellow)
 } 
 draw_self()
-if (variable_instance_exists(id, "hasSpear") && hasSpear) {
-    var spearSpr = spearBattleSprite()
-    if (spearSpr != noone) {
-        draw_sprite_ext(spearSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 2, 1, 1, 90, c_white, 1)
-    }
-}
-if (isActive) {
+// Стрелка над активным врагом
+if (isActive && isEnemy) {
     draw_sprite(selectionArrow,
     0,
     bbox_left - sprite_get_width(selectionArrow) / 2, 
@@ -67,11 +62,21 @@ if (!hpBarReady) {
     if (abs(displayMana - mana) < 0.5) displayMana = mana
 }
 
-if !isKO() {
+// ХП и Мана у врагов
+var showHealthBar = (isEnemy || isPuppet)
+if (showHealthBar && !isKO()) {
     if maxMana <= 0 {
         drawHealthBar(bbox_left, bbox_top - 4, bbox_right - bbox_left, 4, displayHp, maxHp)
     } else {
         drawHealthBarMana(bbox_left, bbox_top - 6, bbox_right - bbox_left, 6, displayHp, maxHp, displayMana, maxMana)
+    }
+}
+
+// Копье
+if (variable_instance_exists(id, "hasSpear") && hasSpear) {
+    var spearSpr = spearBattleSprite()
+    if (spearSpr != noone) {
+        draw_sprite_ext(spearSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top + 2, 1, 1, 90, c_white, 1)
     }
 }
 
@@ -82,26 +87,27 @@ for (var i = 0; i < array_length(effects); i++) { // ищем иконки
     var icon = statusIconFor(effects[i])
     if (icon == noone) continue;
 
-    var key = string(icon)
-    if (variable_struct_exists(seenIcons, key)) continue
-    seenIcons[$ key] = true
+    var iconKey = string(icon)
+    if (variable_struct_exists(seenIcons, iconKey)) continue
+    seenIcons[$ iconKey] = true
 
     array_push(statusIcons, icon)
     if (array_length(statusIcons) >= 3) break
 }
 
-var n = array_length(statusIcons)
-if (n > 0) {
+var iconCount = array_length(statusIcons)
+if (iconCount > 0) {
     var iconSize = 12
     var iconGap  = 2
 
-    var barTop = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6)
+    var barTop = bbox_top
+    if (showHealthBar) barTop = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6)
     var rowY = barTop - iconSize - 2
 
     var startX = bbox_left
 
-    for (var i = 0; i < n; i++) {
-        var ix = startX + i * (iconSize + iconGap)
-        draw_sprite_stretched(statusIcons[i], 0, ix, rowY, iconSize, iconSize)
+    for (var i = 0; i < iconCount; i++) {
+        var iconX = startX + i * (iconSize + iconGap)
+        draw_sprite_stretched(statusIcons[i], 0, iconX, rowY, iconSize, iconSize)
     }
 }

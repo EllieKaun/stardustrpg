@@ -10,6 +10,9 @@ maxMana = 0
 energy = 0
 maxEnergy = 0
 
+// Танец при афк
+idleDanceTimer = 0
+
 // Плавная анимация полосок хп и маны
 displayHp = 0
 displayMana = 0
@@ -151,7 +154,7 @@ function applyMana(value) {
     mana += gained
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
-    drawDamageNumber(spawnX, spawnY, gained, c_blue)
+    drawDamageNumber(spawnX, spawnY, gained, MANA_COLOR)
 }
 
 function isKO() {
@@ -163,14 +166,14 @@ function showEffectNotification(effect, dismissMode, duration) {
         playSfx(effect.sound, 1, false)
     }
     if !variable_instance_exists(effect, "sprite") { return }
-    var inst = instance_create_depth(x, y, depth - 1, oEffectVisualizer)
-    inst.sprite_index = effect.sprite
-    inst.image_speed = 1
-    inst.image_index = 0
-    inst.dismissMode = dismissMode
-    inst.target = id
+    var visualizer = instance_create_depth(x, y, depth - 1, oEffectVisualizer)
+    visualizer.sprite_index = effect.sprite
+    visualizer.image_speed = 1
+    visualizer.image_index = 0
+    visualizer.dismissMode = dismissMode
+    visualizer.target = id
     
     if (dismissMode == EffectVisualizerType.TimeBased) {
-        inst.alarm[0] = duration * game_get_speed(gamespeed_fps)
+        visualizer.alarm[0] = duration * game_get_speed(gamespeed_fps)
     }
 }

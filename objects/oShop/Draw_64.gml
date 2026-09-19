@@ -23,8 +23,8 @@ draw_set_halign(fa_center)
 draw_set_valign(fa_middle)
 draw_set_color(c_white)
 
-var titleScale = uiTextScale("TURNSTAR's SHOP", signHeight * 0.4, bannerW * 0.62)
-draw_text_transformed(bannerX + bannerW * 0.5, bannerY + signHeight * 0.45, "TURNSTAR's SHOP", titleScale, titleScale, 0)
+var titleScale = uiTextScale("STORE", signHeight * 0.6, bannerW * 0.7)
+draw_text_transformed(bannerX + bannerW * 0.5, bannerY + signHeight * 0.47, "STORE", titleScale, titleScale, 0)
 
 // Головы
 var headCY = bannerY + signHeight * 0.5

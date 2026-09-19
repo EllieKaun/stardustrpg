@@ -1,5 +1,8 @@
 enum Panels { Collection, Deck }
 
+// Индексы слотов что рисуются с паутиной
+#macro EMPTY_WEB_SLOT_INDICES [6, 9, 11]
+
 // Конструктор слотов, который используется для отрисовки в дек билдере
 function Slot(_state, _card = undefined) constructor {
     state = _state // "empty" | "locked" | "filled"
@@ -42,6 +45,8 @@ function Panel(_config) constructor {
     bgSprite = _config[$ "bgSprite"]
     slotSpriteEmpty = _config[$ "slotSpriteEmpty"]
     slotSpriteLocked = _config[$ "slotSpriteLocked"]
+    slotSpriteEmptyWeb = _config[$ "slotSpriteEmptyWeb"] // вместо пустого слота для слотов из webSlotIndices
+    webSlotIndices = _config[$ "webSlotIndices"] ?? [] // индексы слотов (с нуля), у которых пустой слот в паутине
     selectSprite = _config[$ "selectSprite"]
     pointerSprite = _config[$ "pointerSprite"]
 
@@ -446,8 +451,9 @@ function Panel(_config) constructor {
                             slotRect.sh)
                     break
                 case "empty":
-                    if (slotSpriteEmpty != undefined) 
-                        draw_sprite_stretched(slotSpriteEmpty, 
+                    var emptySprite = (slotSpriteEmptyWeb != undefined && array_contains(webSlotIndices, i)) ? slotSpriteEmptyWeb : slotSpriteEmpty
+                    if (emptySprite != undefined) 
+                        draw_sprite_stretched(emptySprite, 
                             0, 
                             slotRect.sx,
                             slotRect.sy, 
@@ -483,17 +489,6 @@ function Panel(_config) constructor {
                 var pointerY = slotRect.sy + (slotRect.sh) / 2
                 draw_sprite_ext(pointerSprite, 0, pointerX, pointerY, uiScale, uiScale, 0, c_white, 1)
             }
-        }
-
-        // Подсветка слота под курсором мыши
-        if (hoverSlot >= first && hoverSlot < last && hoverSlot != selectedSlot) {
-            var hoverRect = getSlotRect(hoverSlot)
-            draw_set_color(c_yellow)
-            draw_set_alpha(0.6)
-            draw_rectangle(hoverRect.sx - 1, hoverRect.sy - 1,
-                hoverRect.sx + hoverRect.sw, hoverRect.sy + hoverRect.sh, true)
-            draw_set_alpha(1)
-            draw_set_color(c_white)
         }
 
         // конец клипа сетки
@@ -550,11 +545,6 @@ function Panel(_config) constructor {
             }
             draw_set_halign(fa_left)
             draw_set_valign(fa_top)
-
-            if (onTabRow && focused && isActive) {
-                draw_set_color(c_yellow)
-                draw_rectangle(tabRow.tx, tabRow.ty, tabRow.tx + tabRow.tw - 1, tabRow.ty + tabRow.th - 1, true)
-            }
         }
 
         draw_set_color(c_white)

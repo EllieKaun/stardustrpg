@@ -2,7 +2,6 @@
 
 // Золото
 #macro GOLD_PER_ENEMY 6 // награда за одного врага
-#macro GOLD_DEFEAT_PENALTY 10 // штраф за поражение
 #macro GOLD_RUN_PENALTY 5 // штраф за побег
 
 // Магазин
@@ -24,6 +23,12 @@
 #macro ENEMY_WIN_BONUS 5 // рост силы врагов
 #macro ENEMY_WIN_INTERVAL 5 // сколько побед нужно чтобы сложность выросла
 #macro SPEAR_BATTLE_BONUS 15  // сложность врагов с капьем
+
+// Бой
+#macro BATTLE_BACKGROUND_DIM 0.1 // затемнение фона боя
+
+// Цвет маны
+#macro MANA_COLOR make_color_rgb(77, 179, 203)
 
 // Шрифты
 

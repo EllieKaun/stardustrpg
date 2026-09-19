@@ -1,48 +1,3 @@
-function drawBorderAroundCard(
-    cardCurrentX,
-    drawY,
-    selectedBorderWidth, 
-    cardWidth, 
-    cardHeight
-){
-    draw_line_width_colour(
-        cardCurrentX - 1, 
-        drawY - selectedBorderWidth, 
-        cardCurrentX - 1 + cardWidth, 
-        drawY - selectedBorderWidth, 
-        selectedBorderWidth, 
-        c_yellow, 
-        c_yellow
-    )
-     draw_line_width_colour(
-        cardCurrentX - selectedBorderWidth, 
-        drawY - 1, 
-        cardCurrentX - selectedBorderWidth , 
-        drawY + cardHeight - 1, 
-        selectedBorderWidth, 
-        c_yellow, 
-        c_yellow
-    )
-     draw_line_width_colour(
-        cardCurrentX + cardWidth - 1, 
-        drawY - 1, 
-        cardCurrentX + cardWidth - 1, 
-        drawY + cardHeight - 1, 
-        selectedBorderWidth , 
-        c_yellow, 
-        c_yellow
-    )
-    draw_line_width_colour(
-        cardCurrentX - 1, 
-        drawY + cardHeight - 1, 
-        cardCurrentX + cardWidth - 1, 
-        drawY + cardHeight -1  , 
-        selectedBorderWidth, 
-        c_yellow, 
-        c_yellow
-    )
-}
-
 //// Battle high-res GUI helpers
 // The battle draws its UI in the "logical" base resolution (global.guiBaseW/H)
 // and scales it up into a higher-resolution GUI buffer with a world matrix.
@@ -53,75 +8,84 @@ function guiBaseHeight() { return variable_global_exists("guiBaseH") ? global.gu
 // Ставит GUI-слой в 16:9 аспекте
 function setCrispGui(baseW, baseH) {
     var scale = max(1, min(window_get_width() / baseW, window_get_height() / baseH))
-    var gw = round(baseW * scale)
-    var gh = round(baseH * scale)
-    if (display_get_gui_width() != gw || display_get_gui_height() != gh) {
-        display_set_gui_size(gw, gh)
+    var guiWidth = round(baseW * scale)
+    var guiHeight = round(baseH * scale)
+    if (display_get_gui_width() != guiWidth || display_get_gui_height() != guiHeight) {
+        display_set_gui_size(guiWidth, guiHeight)
     }
 }
 
-// Попадание точки в повёрнутый прямоугольник (центр cx,cy; размер w,h; угол angle)
-function pointInRotatedRect(px, py, cx, cy, w, h, angle) {
-    var c = dcos(angle), s = dsin(angle)
-    var dx = px - cx, dy = py - cy
-    var lx = c * dx - s * dy // точка в локальных координатах карты
-    var ly = s * dx + c * dy
-    return (abs(lx) <= w * 0.5 && abs(ly) <= h * 0.5)
+// Scissor по прямоугольнику в GUI-координатах
+function guiSetScissor(areaX, areaY, areaWidth, areaHeight) {
+    var windowToGuiX = window_get_width() / display_get_gui_width()
+    var windowToGuiY = window_get_height() / display_get_gui_height()
+    var scissorX = floor(areaX * windowToGuiX)
+    var scissorY = floor(areaY * windowToGuiY)
+    gpu_set_scissor(scissorX, scissorY, ceil((areaX + areaWidth) * windowToGuiX) - scissorX, ceil((areaY + areaHeight) * windowToGuiY) - scissorY)
+}
+
+// Попадание точки в повёрнутый прямоугольник (центр centerX,centerY; размер rectWidth,rectHeight; угол angle)
+function pointInRotatedRect(pointX, pointY, centerX, centerY, rectWidth, rectHeight, angle) {
+    var cosAngle = dcos(angle), sinAngle = dsin(angle)
+    var offsetX = pointX - centerX, offsetY = pointY - centerY
+    var localX = cosAngle * offsetX - sinAngle * offsetY // точка в локальных координатах карты
+    var localY = sinAngle * offsetX + cosAngle * offsetY
+    return (abs(localX) <= rectWidth * 0.5 && abs(localY) <= rectHeight * 0.5)
 }
 
 // Turn an internal card id ("PhysicalDamageSingleTargetCard") into a
 // human label ("Physical Damage Single Target"). Display-only.
-function prettifyCardName(nm) {
-    nm = string(nm)
-    var len = string_length(nm)
-    if (len > 4 && string_copy(nm, len - 3, 4) == "Card") {
-        nm = string_copy(nm, 1, len - 4)
-        len -= 4
+function prettifyCardName(rawName) {
+    rawName = string(rawName)
+    var nameLength = string_length(rawName)
+    if (nameLength > 4 && string_copy(rawName, nameLength - 3, 4) == "Card") {
+        rawName = string_copy(rawName, 1, nameLength - 4)
+        nameLength -= 4
     }
-    var out = ""
-    for (var i = 1; i <= len; i++) {
-        var ch = string_char_at(nm, i)
+    var prettyName = ""
+    for (var i = 1; i <= nameLength; i++) {
+        var currentChar = string_char_at(rawName, i)
         if (i > 1) {
-            var prev     = string_char_at(nm, i - 1)
-            var chUpper  = (ch != string_lower(ch)) // uppercase letter
-            var prevLow  = (prev != string_upper(prev)) // lowercase letter
-            if (chUpper && prevLow) out += " "
+            var previousChar     = string_char_at(rawName, i - 1)
+            var chUpper  = (currentChar != string_lower(currentChar)) // uppercase letter
+            var prevLow  = (previousChar != string_upper(previousChar)) // lowercase letter
+            if (chUpper && prevLow) prettyName += " "
         }
-        out += ch
+        prettyName += currentChar
     }
-    return out
+    return prettyName
 }
 
 // Card's headline numbers for the compact on-card display.
 // { kind:"dmg"|"heal"|"none", minNum, maxNum, effectName, costType, costValue }
 function cardDisplayStats(card) {
-    var st = {
+    var stats = {
         kind: "none", minNum: 1, maxNum: 0, effectName: "",
         costType: card.costType(), costValue: card.costValue()
     }
     var isAll = (card.target == TargetTypes.AllEnemies || card.target == TargetTypes.AllAllies)
 
     for (var i = 0; i < array_length(card.effects); i++) {
-        var e = card.effects[i]
-        if (e.type == EffectTypes.Damage || e.type == EffectTypes.Heal) {
-            st.kind = (e.type == EffectTypes.Damage) ? "dmg" : "heal"
+        var effect = card.effects[i]
+        if (effect.type == EffectTypes.Damage || effect.type == EffectTypes.Heal) {
+            stats.kind = (effect.type == EffectTypes.Damage) ? "dmg" : "heal"
             switch (card.rarity) {
-                case CardsRarity.Default: st.maxNum = isAll ? 2 : 4;  break
-                case CardsRarity.Unusual: st.maxNum = isAll ? 4 : 6;  break
-                case CardsRarity.Rare: st.maxNum = isAll ? 6 : 8;  break
-                case CardsRarity.Epic: st.maxNum = isAll ? 8 : 12; break
+                case CardsRarity.Default: stats.maxNum = isAll ? 2 : 4;  break
+                case CardsRarity.Unusual: stats.maxNum = isAll ? 4 : 6;  break
+                case CardsRarity.Rare: stats.maxNum = isAll ? 6 : 8;  break
+                case CardsRarity.Epic: stats.maxNum = isAll ? 8 : 12; break
             }
-            return st
+            return stats
         }
     }
     for (var i = 0; i < array_length(card.effects); i++) {
-        var e = card.effects[i]
-        if (e.type != EffectTypes.Damage && e.type != EffectTypes.Heal) {
-            st.effectName = effectTypeToString(e.type)
+        var effect = card.effects[i]
+        if (effect.type != EffectTypes.Damage && effect.type != EffectTypes.Heal) {
+            stats.effectName = effectTypeToString(effect.type)
             break
         }
     }
-    return st
+    return stats
 }
 
 //// Детальное описание карты
@@ -132,33 +96,33 @@ function cardDisplayStats(card) {
 
 // Ручной перенос строк под ширину maxW текущим шрифтом
 function wrapTextToWidth(text, maxW) {
-    var out = ""
-    var cur = ""
+    var wrappedText = ""
+    var currentLine = ""
     var word = ""
-    var n = string_length(text)
-    for (var i = 1; i <= n + 1; i++) {
-        var ch = (i <= n) ? string_char_at(text, i) : "\n" 
-        if (ch == " " || ch == "\n") {
+    var textLength = string_length(text)
+    for (var i = 1; i <= textLength + 1; i++) {
+        var currentChar = (i <= textLength) ? string_char_at(text, i) : "\n" 
+        if (currentChar == " " || currentChar == "\n") {
             if (word != "") {
-                var cand = (cur == "") ? word : cur + " " + word
-                if (cur != "" && string_width(cand) > maxW) {
-                    out += cur + "\n"
-                    cur = word
+                var candidateLine = (currentLine == "") ? word : currentLine + " " + word
+                if (currentLine != "" && string_width(candidateLine) > maxW) {
+                    wrappedText += currentLine + "\n"
+                    currentLine = word
                 } else {
-                    cur = cand
+                    currentLine = candidateLine
                 }
                 word = ""
             }
-            if (ch == "\n") {
-                out += cur
-                if (i <= n) out += "\n"
-                cur = ""
+            if (currentChar == "\n") {
+                wrappedText += currentLine
+                if (i <= textLength) wrappedText += "\n"
+                currentLine = ""
             }
         } else {
-            word += ch
+            word += currentChar
         }
     }
-    return out
+    return wrappedText
 }
 
 // Подбор шрифта под область
@@ -171,14 +135,14 @@ function fitWrappedText(text, areaW, areaH) {
     for (var i = 0; i < array_length(ladder); i++) {
         draw_set_font(ladder[i].font)
         var wrapped = wrapTextToWidth(text, areaW)
-        var tw = string_width(wrapped)
-        var th = string_height(wrapped)
-        var sc = min(areaW / max(1, tw), areaH / max(1, th))
-        var effective = sc * ladder[i].lineH // итоговая высота строки на экране
+        var textWidth = string_width(wrapped)
+        var textHeight = string_height(wrapped)
+        var fitScale = min(areaW / max(1, textWidth), areaH / max(1, textHeight))
+        var effective = fitScale * ladder[i].lineH // итоговая высота строки на экране
        
         if (effective >= bestSize) {
             bestSize = effective
-            best = { font: ladder[i].font, scale: sc, text: wrapped }
+            best = { font: ladder[i].font, scale: fitScale, text: wrapped }
         }
     }
     draw_set_font(prevFont)
@@ -190,8 +154,8 @@ function fitWrappedText(text, areaW, areaH) {
 
 function cardFaceLayout(card) {
     if (!variable_global_exists("cardFaceLayouts")) global.cardFaceLayouts = {}
-    var key = string(card.name) + "|" + string(card.rarity)
-    if (variable_struct_exists(global.cardFaceLayouts, key)) return global.cardFaceLayouts[$ key]
+    var cacheKey = string(card.name) + "|" + string(card.rarity)
+    if (variable_struct_exists(global.cardFaceLayouts, cacheKey)) return global.cardFaceLayouts[$ cacheKey]
 
     var prevFont = draw_get_font()
     var refW = sprite_get_width(card.cardBaseSpr) * CARD_FACE_SCALE
@@ -200,53 +164,52 @@ function cardFaceLayout(card) {
     var areaH = (CARD_DESC_Y2 - CARD_DESC_Y1) * CARD_FACE_SCALE
     // ручное описание с карты (card.description)
     var descText = variable_struct_exists(card, "description") ? card.description : ""
-    var fit = fitWrappedText(descText, areaW, areaH)
+    var fittedText = fitWrappedText(descText, areaW, areaH)
 
     var costTxt = string(card.costValue())
     var costScale = uiTextScale(costTxt, refH * 0.16, refW * 0.24) // ставит шрифт
-    var lay = {
+    var layout = {
         refW: refW, refH: refH,
-        descFont: fit.font, descScale: fit.scale, descText: fit.text,
+        descFont: fittedText.font, descScale: fittedText.scale, descText: fittedText.text,
         costTxt: costTxt, costFont: draw_get_font(), costScale: costScale
     }
     draw_set_font(prevFont)
-    global.cardFaceLayouts[$ key] = lay
-    return lay
+    global.cardFaceLayouts[$ cacheKey] = layout
+    return layout
 }
 
 // Рисуем полностью карту (спрайты + описание + стоимость)
-// центр cx,cy, целевой размер w,h, поворот angle
-function drawCardFace(card, cx, cy, w, h, angle, scale = 1, alpha = 1, isSelected = false) {
+// центр centerX,centerY, целевой размер cardWidth,cardHeight, поворот angle
+function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scale = 1, alpha = 1, isSelected = false) {
     var baseW = sprite_get_width(card.cardBaseSpr)
     var baseH = sprite_get_height(card.cardBaseSpr)
-    var sx = (w / baseW) * scale
-    var sy = (h / baseH) * scale
-    draw_sprite_ext(card.cardBaseSpr, 0, cx, cy, sx, sy, angle, c_white, alpha)
-    draw_sprite_ext(card.cardIllustrationSpr, 0, cx, cy, sx, sy, angle, c_white, alpha)
-    draw_sprite_ext(card.cardBorderSpr, 0, cx, cy, sx, sy, angle, c_white, alpha)
-    draw_sprite_ext(card.cardTokenSpr, 0, cx, cy, sx, sy, angle, c_white, alpha)
+    var spriteScaleX = (cardWidth / baseW) * scale
+    var spriteScaleY = (cardHeight / baseH) * scale
+    draw_sprite_ext(card.cardBaseSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
+    draw_sprite_ext(card.cardIllustrationSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
+    draw_sprite_ext(card.cardBorderSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
+    draw_sprite_ext(card.cardTokenSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
 
-    var lay = cardFaceLayout(card)
-    var k = min(w * scale / lay.refW, h * scale / lay.refH)
+    var layout = cardFaceLayout(card)
+    var layoutScale = min(cardWidth * scale / layout.refW, cardHeight * scale / layout.refH)
     var prevFont = draw_get_font()
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
 
     // описание
-    if (lay.descText != "") {
-        draw_set_font(lay.descFont)
-        var descLx = w * scale * ((CARD_DESC_X1 + CARD_DESC_X2) * 0.5 / baseW - 0.5)
-        var descLy = h * scale * ((CARD_DESC_Y1 + CARD_DESC_Y2) * 0.5 / baseH - 0.5)
-        var descPt = cardLocalToScreen(cx, cy, descLx, descLy, angle)
-        var descScale = lay.descScale * k
-        draw_text_transformed_colour(descPt.x, descPt.y, lay.descText,
-            descScale, descScale, angle, c_black, c_black, c_black, c_black, alpha)
+    if (layout.descText != "") {
+        draw_set_font(layout.descFont)
+        var descLocalX = cardWidth * scale * ((CARD_DESC_X1 + CARD_DESC_X2) * 0.5 / baseW - 0.5)
+        var descLocalY = cardHeight * scale * ((CARD_DESC_Y1 + CARD_DESC_Y2) * 0.5 / baseH - 0.5)
+        var descPoint = cardLocalToScreen(centerX, centerY, descLocalX, descLocalY, angle)
+        var descScale = layout.descScale * layoutScale
+        drawTextBold(descPoint.x, descPoint.y, layout.descText, descScale, angle, c_black, alpha)
     }
 
     // стоимость
-    draw_set_font(lay.costFont)
-    drawCardStatText(cx, cy, w * scale * 0.28, -h * scale * 0.36, angle,
-        lay.costTxt, c_white, lay.costScale * k)
+    draw_set_font(layout.costFont)
+    drawCardStatText(centerX, centerY, cardWidth * scale * 0.28, -cardHeight * scale * 0.36, angle,
+        layout.costTxt, c_white, layout.costScale * layoutScale)
 
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
@@ -254,35 +217,35 @@ function drawCardFace(card, cx, cy, w, h, angle, scale = 1, alpha = 1, isSelecte
     draw_set_font(prevFont)
     
     if (isSelected) {
-        draw_sprite_ext(sprCardSelected, 0, cx, cy, sx, sy, angle, c_white, 1)
+        draw_sprite_ext(sprCardSelected, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, 1)
     }
 }
 
-// Map a card-local point (lx right, ly down; origin = card centre) to
+// Map a card-local point (localX right, localY down; origin = card centre) to
 // screen space for a card drawn with draw_sprite_ext(angle).
-function cardLocalToScreen(cx, cy, lx, ly, angle) {
+function cardLocalToScreen(centerX, centerY, localX, localY, angle) {
     return {
-        x: cx + lx * dcos(angle) + ly * dsin(angle),
-        y: cy - lx * dsin(angle) + ly * dcos(angle)
+        x: centerX + localX * dcos(angle) + localY * dsin(angle),
+        y: centerY - localX * dsin(angle) + localY * dcos(angle)
     }
 }
 
 function uiFontInit() {
     var candidates = ["fnUI_7","fnUI_8", "fnUI_9", "fnUI_10", "fnUI_12", "fnUI_14", "fnUI_15", "fnUI_16", "fnUI_17", "fnUI_18", "fnUI_20", "fnUI_24", "fnUI_28", "fnUI_32", "fnUI_40", "fnUI_48", "fnUI"]
     var ladder = []
-    var prev = draw_get_font()
+    var prevFont = draw_get_font()
     for (var i = 0; i < array_length(candidates); i++) {
-        var f = asset_get_index(candidates[i])
-        if (f >= 0 && font_exists(f)) {
-            draw_set_font(f)
-            array_push(ladder, { font: f, lineH: max(1, string_height("0")) })
+        var fontAsset = asset_get_index(candidates[i])
+        if (fontAsset >= 0 && font_exists(fontAsset)) {
+            draw_set_font(fontAsset)
+            array_push(ladder, { font: fontAsset, lineH: max(1, string_height("0")) })
         }
     }
     if (array_length(ladder) == 0) {
         draw_set_font(fnUI_24)
         array_push(ladder, { font: fnUI_24, lineH: max(1, string_height("0")) })
     }
-    if (prev >= 0) draw_set_font(prev)
+    if (prevFont >= 0) draw_set_font(prevFont)
     array_sort(ladder, function(a, b) { return a.lineH - b.lineH })
     global.uiFontLadder = ladder
     global.uiFontCurrent = ladder[array_length(ladder) - 1].font
@@ -293,7 +256,7 @@ function uiFont() {
     return global.uiFontCurrent
 }
 
-function uiTextScale(txt, targetH, maxW) {
+function uiTextScale(text, targetH, maxW) {
     if (!variable_global_exists("uiFontLadder")) uiFontInit()
     var ladder = global.uiFontLadder
     var pick = ladder[0]
@@ -302,27 +265,34 @@ function uiTextScale(txt, targetH, maxW) {
     }
     global.uiFontCurrent = pick.font
     draw_set_font(pick.font)
-    var sc = targetH / pick.lineH
-    var tw = string_width(txt) * sc
-    if (tw > maxW) sc *= maxW / max(1, tw)
-    return sc
+    var textScale = targetH / pick.lineH
+    var textWidth = string_width(text) * textScale
+    if (textWidth > maxW) textScale *= maxW / max(1, textWidth)
+    return textScale
 }
 
-function drawUiText(xx, yy, str, pxH) {
-    var sc = uiTextScale(str, pxH, 1000000)
-    draw_text_transformed(xx, yy, str, sc, sc, 0)
-    return sc
+function drawUiText(textX, textY, text, targetHeight) {
+    var textScale = uiTextScale(text, targetHeight, 1000000)
+    draw_text_transformed(textX, textY, text, textScale, textScale, 0)
+    return textScale
 }
 
 // Draw short text at a card-local point with a clean one-pixel drop
 // shadow, rotated to the card angle. Uses the current font & given scale.
-function drawCardStatText(cx, cy, lx, ly, angle, txt, col, scale) {
-    if (txt == "") return
-    var off = max(1, scale)
-    var main = cardLocalToScreen(cx, cy, lx, ly, angle)
-    var _shadow = cardLocalToScreen(cx, cy, lx + off, ly + off, angle)
-    draw_text_transformed_colour(_shadow.x, _shadow.y, txt, scale, scale, angle, c_black, c_black, c_black, c_black, 0.6)
-    draw_text_transformed_colour(main.x, main.y, txt, scale, scale, angle, col, col, col, col, 1)
+function drawCardStatText(centerX, centerY, localX, localY, angle, text, color, scale) {
+    if (text == "") return
+    var shadowOffset = max(1, scale)
+    var mainPoint = cardLocalToScreen(centerX, centerY, localX, localY, angle)
+    var shadowPoint = cardLocalToScreen(centerX, centerY, localX + shadowOffset, localY + shadowOffset, angle)
+    draw_text_transformed_colour(shadowPoint.x, shadowPoint.y, text, scale, scale, angle, c_black, c_black, c_black, c_black, 0.6)
+    drawTextBold(mainPoint.x, mainPoint.y, text, scale, angle, color, 1)
+}
+
+// Чуть более жирный текст: рисуем дважды со смещением вдоль оси X карты
+function drawTextBold(textX, textY, text, scale, angle, color, alpha) {
+    var boldOffset = max(1, round(scale * 0.4))
+    draw_text_transformed_colour(textX, textY, text, scale, scale, angle, color, color, color, color, alpha)
+    draw_text_transformed_colour(textX + dcos(angle) * boldOffset, textY - dsin(angle) * boldOffset, text, scale, scale, angle, color, color, color, color, alpha)
 }
 
 function drawFitTextInArea(
@@ -345,69 +315,70 @@ function drawFitTextInArea(
     }
 }
 
-function drawHealthBar(xx, yy, width, height, hp, maxHp) {
+function drawHealthBar(barX, barY, width, height, hp, maxHp) {
     var percent = clamp(hp / maxHp, 0, 1)
     var borderThickness = 1
-    draw_sprite_stretched(healthbar, 0, xx, yy, width, height)
+    draw_sprite_stretched(healthbar, 0, barX, barY, width, height)
 
-    var col;
+    var barColor;
 
     if (percent >= 0.5) {
-        var total = (percent - 0.5) / 0.5
-        col = merge_colour(c_yellow, c_lime, total)
+        var blend = (percent - 0.5) / 0.5
+        barColor = merge_colour(c_yellow, c_lime, blend)
     } else {
-        var t = percent / 0.5
-        col = merge_colour(c_red, c_yellow, t)
+        var blend = percent / 0.5
+        barColor = merge_colour(c_red, c_yellow, blend)
     }
-    draw_set_color(col)
+    draw_set_color(barColor)
     
-    var inner_x1 = xx + borderThickness
-    var inner_y1 = yy + borderThickness
+    var inner_x1 = barX + borderThickness
+    var inner_y1 = barY + borderThickness
     
     var inner_x2 = inner_x1 + (width - borderThickness * 2 - 1 ) * percent
-    var inner_y2 = yy + height - borderThickness * 2
+    var inner_y2 = barY + height - borderThickness * 2
     
     draw_rectangle(inner_x1, inner_y1, inner_x2, inner_y2, false)
 }
 
-function drawHealthBarMana(xx, yy, width, height, hp, maxHp, mana, maxMana) {
+// pixelScale — во сколько раз увеличены пиксели арта
+function drawHealthBarMana(barX, barY, width, height, hp, maxHp, mana, maxMana, pixelScale = 1) {
     var percentHp = clamp(hp / maxHp, 0, 1)
-    var percentMana = clamp(mana / maxMana, 0, 1)
-    var borderThickness = 1
-    
-    draw_sprite_stretched(healthmanabar, 0, xx, yy, width, height)
-    
-    var col;
+    var percentMana = (maxMana > 0) ? clamp(mana / maxMana, 0, 1) : 0
+    var borderThickness = pixelScale
+
+    draw_sprite_stretched(healthmanabar, 0, barX, barY, width, height)
+
+    var barColor;
     if (percentHp >= 0.5) {
-        var t = (percentHp - 0.5) / 0.5
-        col = merge_colour(c_yellow, c_lime, t)
+        var blend = (percentHp - 0.5) / 0.5
+        barColor = merge_colour(c_yellow, c_lime, blend)
     } else {
-        var t = percentHp / 0.5
-        col = merge_colour(c_red, c_yellow, t)
+        var blend = percentHp / 0.5
+        barColor = merge_colour(c_red, c_yellow, blend)
     }
-    draw_set_color(col)
-    
-    var innerX1 = xx + borderThickness
-    var innerY1 = yy + borderThickness
+    draw_set_color(barColor)
+
+    // Границы строк округляются, чтобы при дробном pixelScale заливка совпадала со спрайтом
+    var healthRows = height / pixelScale - 4 // минус две рамки, разделитель и строка маны
+    var innerX1 = floor(barX + borderThickness)
     var innerWidth = width - borderThickness * 2
-    var healthHeight = height - 2 - borderThickness * 2 
-    
-    var innerX2 = innerX1 + innerWidth * percentHp - 1
-    var innerY2 = innerY1 + healthHeight - 1
-    
-    draw_rectangle(innerX1, innerY1, innerX2, innerY2, false)
-    
-    draw_set_color(c_blue) 
-    
-    var manaY = innerY2 + 2  
-    var manaX2 = innerX1 + innerWidth * percentMana - 1
-    
-    draw_rectangle(innerX1, manaY, manaX2, manaY, false) 
+    var healthTop = floor(barY + pixelScale)
+    var healthBottom = floor(barY + (1 + healthRows) * pixelScale) - 1
+    var manaTop = floor(barY + (2 + healthRows) * pixelScale) // после разделителя
+    var manaBottom = floor(barY + (3 + healthRows) * pixelScale) - 1
+
+    var innerX2 = floor(innerX1 + innerWidth * percentHp) - 1
+    draw_rectangle(innerX1, healthTop, innerX2, healthBottom, false)
+
+    draw_set_color(MANA_COLOR)
+
+    var manaX2 = floor(innerX1 + innerWidth * percentMana) - 1
+    draw_rectangle(innerX1, manaTop, manaX2, manaBottom, false)
 }
 
 
-function drawDamageNumber(xx, yy, value, color) {
-    var instance = instance_create_depth(xx, yy, depth - 1, oDamageNumber)
+function drawDamageNumber(numberX, numberY, value, color) {
+    var instance = instance_create_depth(numberX, numberY, depth - 1, oDamageNumber)
     instance.value = value
     instance.color = color
 }
@@ -418,46 +389,46 @@ function statusIconFor(effect) {
 }
 
 // returns {x, y, angle, scale} for card i of n, centered under the screen
-function handCardTransform(i, n, hoveredIndex) {
+function handCardTransform(cardIndex, handSize, hoveredIndex) {
     // tunables
     var spread  = 40 // px between card centers
     var arcLift = 3 // px each card dips toward the ends
     var arcTilt = 4 // degrees rotation per step from center
 
-    var mid = (n - 1) / 2
-    var off = i - mid // signed distance from the middle card
+    var middleIndex = (handSize - 1) / 2
+    var offsetFromMiddle = cardIndex - middleIndex // signed distance from the middle card
 
     var baseX = display_get_gui_width() / 2
     var baseY = display_get_gui_height() - 70
 
-    var t = {
-        x: baseX + off * spread,
-        y: baseY + abs(off) * arcLift, // ends dip down → arc
-        angle: -off * arcTilt, // fan rotation
+    var transform = {
+        x: baseX + offsetFromMiddle * spread,
+        y: baseY + abs(offsetFromMiddle) * arcLift, // ends dip down → arc
+        angle: -offsetFromMiddle * arcTilt, // fan rotation
         scale: 1
     }
 
     // hovered/selected card overrides: lift, straighten, enlarge
-    if (i == hoveredIndex) {
-        t.y -= 20
-        t.angle = 0
-        t.scale = 1.25
+    if (cardIndex == hoveredIndex) {
+        transform.y -= 20
+        transform.angle = 0
+        transform.scale = 1.25
     }
 
-    return t
+    return transform
 }
 
-function drawCardTransformed(card, cx, cy, w, h, angle, scale, alpha = 1) {
-    drawCardFace(card, cx, cy, w, h, angle, scale, alpha)
+function drawCardTransformed(card, centerX, centerY, cardWidth, cardHeight, angle, scale, alpha = 1) {
+    drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scale, alpha)
 }
 
-function drawSpriteOutline(spr, sub, xx, yy, xs, ys, ang, col) {
-    gpu_set_fog(true, col, 0, 0)
-    draw_sprite_ext(spr, sub, xx - 1, yy, xs, ys, ang, c_white, 1)
-    draw_sprite_ext(spr, sub, xx + 1, yy, xs, ys, ang, c_white, 1)
-    draw_sprite_ext(spr, sub, xx, yy - 1, xs, ys, ang, c_white, 1)
-    draw_sprite_ext(spr, sub, xx, yy + 1, xs, ys, ang, c_white, 1)
-    gpu_set_fog(false, col, 0, 0)
+function drawSpriteOutline(sprite, subimage, drawX, drawY, xScale, yScale, angle, outlineColor) {
+    gpu_set_fog(true, outlineColor, 0, 0)
+    draw_sprite_ext(sprite, subimage, drawX - 1, drawY, xScale, yScale, angle, c_white, 1)
+    draw_sprite_ext(sprite, subimage, drawX + 1, drawY, xScale, yScale, angle, c_white, 1)
+    draw_sprite_ext(sprite, subimage, drawX, drawY - 1, xScale, yScale, angle, c_white, 1)
+    draw_sprite_ext(sprite, subimage, drawX, drawY + 1, xScale, yScale, angle, c_white, 1)
+    gpu_set_fog(false, outlineColor, 0, 0)
 }
 
 // Высота бейджа
@@ -466,12 +437,12 @@ function drawSpriteOutline(spr, sub, xx, yy, xs, ys, ang, col) {
 function menuBadgeSize(label, badgeScale) {
     var aspect = sprite_get_width(ActionButtnBackground) / sprite_get_height(ActionButtnBackground)
     var base = MENU_BADGE_H * badgeScale
-    var bh = base
+    var badgeHeight = base
     var textH = base * 0.9
     var padX = 4 * badgeScale
-    var sc = uiTextScale(label, textH, 100000)
-    var bw = max(base * aspect, string_width(label) * sc + padX * 2)
-    return { w: bw, h: bh, textH: textH, scale: sc }
+    var textScale = uiTextScale(label, textH, 100000)
+    var badgeWidth = max(base * aspect, string_width(label) * textScale + padX * 2)
+    return { w: badgeWidth, h: badgeHeight, textH: textH, scale: textScale }
 }
 
 function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, colorMain, colorPanel) {
@@ -480,14 +451,18 @@ function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, co
     var badgeHeight = size.h
     var scale = size.scale
     var flip = ballOnLeft ? 1 : -1
-    var cx = badgeX + badgeWidth * 0.5
-    var cy = badgeY + badgeHeight * 0.5
-    var bgSx = badgeWidth / sprite_get_width(ActionButtnBackground)
-    var bgSy = badgeHeight / sprite_get_height(ActionButtnBackground)
-    var fgSx = badgeWidth / sprite_get_width(ActionButtonForeground)
-    var fgSy = badgeHeight / sprite_get_height(ActionButtonForeground)
-    draw_sprite_ext(ActionButtnBackground, 0, cx, cy, bgSx * flip, bgSy, 0, colorMain, 1)
-    draw_sprite_ext(ActionButtonForeground, 0, cx, cy, fgSx * flip, fgSy, 0, colorPanel, 1)
+    var centerX = badgeX + badgeWidth * 0.5
+    var centerY = badgeY + badgeHeight * 0.5
+    var backgroundScaleX = badgeWidth / sprite_get_width(ActionButtnBackground)
+    var backgroundScaleY = badgeHeight / sprite_get_height(ActionButtnBackground)
+    var foregroundScaleX = badgeWidth / sprite_get_width(ActionButtonForeground)
+    var foregroundScaleY = badgeHeight / sprite_get_height(ActionButtonForeground)
+    // Рамку и шарик красим через fog в плоский colorMain: спрайты уже окрашены (#c70997), и image_blend
+    // умножал бы их цвет на colorMain, из-за чего рамка выходила темнее текста, окрашенного тем же colorMain
+    gpu_set_fog(true, colorMain, 0, 0)
+    draw_sprite_ext(ActionButtnBackground, 0, centerX, centerY, backgroundScaleX * flip, backgroundScaleY, 0, c_white, 1)
+    gpu_set_fog(false, c_white, 0, 0)
+    draw_sprite_ext(ActionButtonForeground, 0, centerX, centerY, foregroundScaleX * flip, foregroundScaleY, 0, colorPanel, 1)
 
     var textShift = (ballOnLeft ? 1 : -1) * 2 * badgeScale
     draw_set_halign(fa_center)
@@ -498,11 +473,13 @@ function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, co
     var ballCenterX = ballOnLeft ? badgeX : badgeX + badgeWidth
     var ballCenterY = badgeY + badgeHeight * 0.5
     var ballScale = badgeHeight / sprite_get_height(ActionButtonCircle)
-    draw_sprite_ext(ActionButtonCircle, 0, ballCenterX, ballCenterY, ballScale, ballScale, 0, colorMain, 1)
+    gpu_set_fog(true, colorMain, 0, 0)
+    draw_sprite_ext(ActionButtonCircle, 0, ballCenterX, ballCenterY, ballScale, ballScale, 0, c_white, 1)
+    gpu_set_fog(false, c_white, 0, 0)
 
     draw_set_color(colorPanel)
-    var ksc = uiTextScale(hotkey, size.textH, badgeHeight * 0.6)
-    draw_text_transformed(ballCenterX, ballCenterY, hotkey, ksc, ksc, 0)
+    var hotkeyScale = uiTextScale(hotkey, size.textH, badgeHeight * 0.6)
+    draw_text_transformed(ballCenterX, ballCenterY, hotkey, hotkeyScale, hotkeyScale, 0)
 
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
@@ -523,74 +500,140 @@ function showCardReward(cardStruct, title = "New card!") {
     global.uiModal = true
 }
 
-// Панели информации о персонажах  
+//// Панели героев
+// Спрайты подключаются по имени:
+//   sprCharacterPanelContent - панель, у выбранного героя красится его themeColor
+//   sprCharacterPanelBorder - рамка поверх панели
+//   sprCharacterPanelEnergy / sprCharacterPanelEnergyEmpty - шарик энергии: есть / нет
+// У каждого героя голова - member.portrait
+//
+// Панель нарисована с пикселем в 4 раза крупнее пикселя арта боя, поэтому масштаб панели = guiScale() / 4,
+// так она занимает на экране ту же долю, что в макете. Все размеры PARTY_PANEL_* ниже - в пикселях
+// спрайта панели (212x80). Панели идут сверху вниз в порядке отряда и прижаты к левому нижнему углу
+
+#macro PARTY_PANEL_SPRITE_PIXEL 4 // пикселей спрайта панели на один пиксель арта боя
+#macro PARTY_PANEL_SIZE_BOOST 1.2 // во сколько раз панели крупнее, чем по макету
+#macro PARTY_PANEL_DEFAULT_WIDTH 212 // размер панели без спрайта (как у sprCharacterPanelContent)
+#macro PARTY_PANEL_DEFAULT_HEIGHT 80
+#macro PARTY_PANEL_GAP 5 // между панелями
+#macro PARTY_PANEL_MARGIN_BOTTOM 14
+#macro PARTY_PANEL_HEAD_X 6 // левый край головы
+#macro PARTY_PANEL_HEAD_BOTTOM 69 // низ головы (подбородок), выше головы выходят над панелью
+#macro PARTY_PANEL_BAR_X 69 // левый край хп-маны бара
+#macro PARTY_PANEL_BAR_CENTER_Y 50
+#macro PARTY_PANEL_ENERGY_X 191 // центр шариков энергии
+#macro PARTY_PANEL_ENERGY_Y 19 // центр верхнего шарика
+#macro PARTY_PANEL_ENERGY_STEP 32 // расстояние между шариками
+#macro PARTY_PANEL_ENERGY_SLOTS 2
+#macro PARTY_PANEL_INACTIVE_ALPHA 0.8
+
+function assetSpriteOrNoone(assetName) {
+    var asset = asset_get_index(assetName)
+    return (asset >= 0 && sprite_exists(asset)) ? asset : noone
+}
+
+function partyPanelSprites() {
+    if (!variable_global_exists("partyPanelSpriteCache")) {
+        global.partyPanelSpriteCache = {
+            panel: assetSpriteOrNoone("sprCharacterPanelContent"),
+            frame: assetSpriteOrNoone("sprCharacterPanelBorder"),
+            energyFull: assetSpriteOrNoone("sprCharacterPanelEnergy"),
+            energyEmpty: assetSpriteOrNoone("sprCharacterPanelEnergyEmpty")
+        }
+    }
+    return global.partyPanelSpriteCache
+}
+
+// Спрайт целиком по центру
+function drawSpriteCentered(sprite, centerX, centerY, scale) {
+    var left = centerX - sprite_get_width(sprite) * scale * 0.5
+    var top = centerY - sprite_get_height(sprite) * scale * 0.5
+    draw_sprite_ext(sprite, 0, left + sprite_get_xoffset(sprite) * scale, top + sprite_get_yoffset(sprite) * scale,
+        scale, scale, 0, c_white, 1)
+}
+
 function drawPartyPanels(party, activeChar) {
-    var sw = display_get_gui_width()
-    var sh = display_get_gui_height()
+    var sprites = partyPanelSprites()
 
     var members = []
     for (var i = 0; i < array_length(party); i++) {
         if (!party[i].isPuppet) array_push(members, party[i])
     }
 
-    var panelW = sw * 0.24
-    var panelH = sh * 0.09
-    var gap = sh * 0.012
-    var mx = sw * 0.012
-    var my = sh * 0.02
+    var panelScale = guiScale() / PARTY_PANEL_SPRITE_PIXEL * PARTY_PANEL_SIZE_BOOST
+    var panelWidth = ((sprites.panel != noone) ? sprite_get_width(sprites.panel) : PARTY_PANEL_DEFAULT_WIDTH) * panelScale
+    var panelHeight = ((sprites.panel != noone) ? sprite_get_height(sprites.panel) : PARTY_PANEL_DEFAULT_HEIGHT) * panelScale
+    var panelStep = panelHeight + PARTY_PANEL_GAP * panelScale
+    var panelX = 0
+    var lastPanelY = display_get_gui_height() - PARTY_PANEL_MARGIN_BOTTOM * panelScale - panelHeight
+    var firstPanelY = lastPanelY - (array_length(members) - 1) * panelStep
 
+    // Сначала все панели, потом головы: голова может выходить на соседнюю панель
     for (var i = 0; i < array_length(members); i++) {
-        var py = sh - my - panelH - i * (panelH + gap)
-        drawPartyPanel(mx, py, panelW, panelH, members[i], members[i] == activeChar)
+        var panelY = floor(firstPanelY + i * panelStep)
+        drawPartyPanelBody(panelX, panelY, panelWidth, panelHeight, panelScale, members[i], members[i] == activeChar, sprites)
+    }
+    for (var i = 0; i < array_length(members); i++) {
+        var panelY = floor(firstPanelY + i * panelStep)
+        drawPartyPanelHead(panelX, panelY, panelScale, members[i])
     }
 }
 
-function drawPartyPanel(px, py, w, h, m, active) {
-    draw_sprite_stretched(box, 0, px, py, w, h)
-    if (active) {
-        draw_set_color(merge_color(c_white, c_yellow, 0.4))
-        draw_rectangle(px, py, px + w, py + h, true)
-        draw_set_color(c_white)
-    }
-
-    var pad = h * 0.14
-    var portraitS = h - pad * 2
-    if (variable_instance_exists(m, "portrait") && sprite_exists(m.portrait)) {
-        draw_sprite_stretched(m.portrait, 0, px + pad, py + pad, portraitS, portraitS)
-    }
-
-    var maxE = min(2, max(1, m.maxEnergy))
-    var circleR = h * 0.13
-    var circleColW = circleR * 2 + pad
-    var barX = px + pad + portraitS + pad
-    var barW = (px + w - pad - circleColW) - barX
-    var hpH = h * 0.30
-    var mpGap = h * 0.06
-    var mpH = h * 0.24
-    var hpY = py + pad
-
-    drawHealthBar(barX, hpY, barW, hpH, m.hp, m.maxHp)
-
-    var mpY = hpY + hpH + mpGap
-    draw_sprite_stretched(healthbar, 0, barX, mpY, barW, mpH)
-    if (m.maxMana > 0) {
-        var mpPct = clamp(m.mana / m.maxMana, 0, 1)
-        draw_set_color(make_color_rgb(70, 150, 235))
-        draw_rectangle(barX + 1, mpY + 1, barX + 1 + (barW - 3) * mpPct, mpY + mpH - 2, false)
-        draw_set_color(c_white)
-    }
-
-    var cx = px + w - pad - circleR
-    var totalCH = maxE * (circleR * 2) + (maxE - 1) * (h * 0.06)
-    var cy0 = py + (h - totalCH) * 0.5 + circleR
-    for (var e = 0; e < maxE; e++) {
-        var cy = cy0 + e * (circleR * 2 + h * 0.06)
-        var filled = (e < min(m.energy, maxE))
-        draw_set_color(filled ? make_color_rgb(95, 195, 245) : make_color_rgb(40, 50, 70))
-        draw_circle(cx, cy, circleR, false)
-        draw_set_color(c_black)
-        draw_circle(cx, cy, circleR, true)
-        draw_set_color(c_white)
-    }
+function drawPartyPanelHead(panelX, panelY, panelScale, member) {
+    if (!variable_instance_exists(member, "portrait") || !sprite_exists(member.portrait)) return
+    var head = member.portrait
+    var headLeft = panelX + PARTY_PANEL_HEAD_X * panelScale
+    var headTop = panelY + (PARTY_PANEL_HEAD_BOTTOM - sprite_get_height(head)) * panelScale
+    draw_sprite_ext(head, 0,
+        headLeft + sprite_get_xoffset(head) * panelScale,
+        headTop + sprite_get_yoffset(head) * panelScale,
+        panelScale, panelScale, 0, c_white, 1)
 }
 
+function drawPartyPanelBody(panelX, panelY, panelWidth, panelHeight, panelScale, member, isActive, sprites) {
+    // Выбранный персонаж: панель цвета персонажа
+    var panelColor = isActive ? member.themeColor : c_white
+    var panelAlpha = isActive ? 1 : PARTY_PANEL_INACTIVE_ALPHA
+    if (sprites.panel != noone) {
+        draw_sprite_stretched_ext(sprites.panel, 0, panelX, panelY, panelWidth, panelHeight, panelColor, panelAlpha)
+    } else {
+        var cornerRadius = panelHeight * 0.2
+        draw_set_alpha(panelAlpha)
+        draw_set_color(isActive ? merge_color(c_white, member.themeColor, 0.55) : c_white)
+        draw_roundrect_ext(panelX, panelY, panelX + panelWidth - 1, panelY + panelHeight - 1, cornerRadius, cornerRadius, false)
+        draw_set_color(merge_color(member.themeColor, c_black, 0.5))
+        draw_roundrect_ext(panelX, panelY, panelX + panelWidth - 1, panelY + panelHeight - 1, cornerRadius, cornerRadius, true)
+        draw_set_alpha(1)
+        draw_set_color(c_white)
+    }
+    if (sprites.frame != noone) {
+        draw_sprite_stretched(sprites.frame, 0, panelX, panelY, panelWidth, panelHeight)
+    }
+
+    // Хп и мана одним спрайтом healthmanabar, под головой. Пиксель бара - тот же, что у арта боя
+    var barPixelScale = PARTY_PANEL_SPRITE_PIXEL * panelScale
+    var barWidth = sprite_get_width(healthmanabar) * barPixelScale
+    var barHeight = sprite_get_height(healthmanabar) * barPixelScale
+    var barX = floor(panelX + PARTY_PANEL_BAR_X * panelScale)
+    var barY = floor(panelY + PARTY_PANEL_BAR_CENTER_Y * panelScale - barHeight * 0.5)
+    drawHealthBarMana(barX, barY, barWidth, barHeight, member.displayHp, member.maxHp,
+        member.displayMana, member.maxMana, barPixelScale)
+
+    // Энергия
+    var energyX = panelX + PARTY_PANEL_ENERGY_X * panelScale
+    for (var slotIndex = 0; slotIndex < PARTY_PANEL_ENERGY_SLOTS; slotIndex++) {
+        var energyY = panelY + (PARTY_PANEL_ENERGY_Y + slotIndex * PARTY_PANEL_ENERGY_STEP) * panelScale
+        var hasEnergy = (slotIndex < member.energy)
+        var energySprite = hasEnergy ? sprites.energyFull : sprites.energyEmpty
+        if (energySprite != noone) {
+            drawSpriteCentered(energySprite, energyX, energyY, panelScale)
+        } else {
+            var ballRadius = 14 * panelScale
+            draw_set_color(hasEnergy ? make_color_rgb(95, 195, 245) : make_color_rgb(40, 50, 70))
+            draw_circle(energyX, energyY, ballRadius, false)
+            draw_set_color(c_black)
+            draw_circle(energyX, energyY, ballRadius, true)
+            draw_set_color(c_white)
+        }
+    }
+}

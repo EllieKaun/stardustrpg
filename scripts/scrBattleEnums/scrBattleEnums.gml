@@ -1,6 +1,13 @@
 #macro ENEMYS_TURN 0
 #macro PUPPET_TURN 1
 #macro HERO_DRAW_DELAY 2
+#macro STUN_TURN 3 // alarm конца хода оглушённого персонажа
+
+// Сколько секунд ход оглушённого персонажа виден до передачи следующему
+#macro STUN_TURN_SECONDS 3
+
+// Через сколько секунд простоя выбранный герой начинает танцевать
+#macro IDLE_DANCE_SECONDS 5
 #macro MAX_PUPPETS 3
 
 #macro MAX_STARRIORS_PER_SIDE 5
@@ -122,7 +129,8 @@ enum BattleStates {
     GameOver,
     PuppetTurn,
     CardAnimating,
-    BossIntro
+    BossIntro,
+    StunnedTurn
 }
 
 enum StarriorStates {
@@ -155,8 +163,8 @@ enum CardCategory { Attack, Magic, Heal, Buff, Special }
 // Категория карты — данные реестра
 function cardCategoryOf(_card) {
     if (is_struct(_card) && variable_struct_exists(_card, "cardId") && cardExists(_card.cardId)) {
-        var def = global.cardRegistry[$ _card.cardId]
-        if (variable_struct_exists(def, "category")) return def.category
+        var cardDefinition = global.cardRegistry[$ _card.cardId]
+        if (variable_struct_exists(cardDefinition, "category")) return cardDefinition.category
     }
 
     if (!is_struct(_card) || !variable_struct_exists(_card, "cardBaseSpr")) return CardCategory.Attack
@@ -180,9 +188,9 @@ function cardAnimState(card) {
 // Спрайт каста при призыве марионетки (по её категории)
 function cardCastSpriteOverride(card) {
     for (var i = 0; i < array_length(card.effects); i++) {
-        var e = card.effects[i]
-        if (variable_struct_exists(e, "type") && e.type == EffectTypes.CreatePuppet) {
-            switch (e.puppetCategory) {
+        var effect = card.effects[i]
+        if (variable_struct_exists(effect, "type") && effect.type == EffectTypes.CreatePuppet) {
+            switch (effect.puppetCategory) {
                 case CardCategory.Attack: return MasterPuppetCreateAtc
                 case CardCategory.Magic: return MasterPuppetCreateMgc
                 case CardCategory.Heal: return MasterPuppetCreateHeal

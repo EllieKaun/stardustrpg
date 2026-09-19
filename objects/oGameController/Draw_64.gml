@@ -33,3 +33,5 @@ if (global.cutsceneActive && sprite_exists(cutsceneSprite)) {
     var frame = min(floor(cutsceneFrame), sprite_get_number(cutsceneSprite) - 1)
     draw_sprite_stretched(cutsceneSprite, frame, 0, 0, sw, sh)
 }
+
+autosaveDrawIcon()

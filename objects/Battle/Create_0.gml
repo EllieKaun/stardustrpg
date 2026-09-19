@@ -5,6 +5,12 @@ menuItems = ["Run", "Shuffle", "Info"]
 global.guiBaseW = camera_get_view_width(view_camera[0])
 global.guiBaseH = camera_get_view_height(view_camera[0])
 setCrispGui(global.guiBaseW, global.guiBaseH)
+
+// Затемняем фон боя
+var backgroundLayer = layer_get_id("Background")
+if (backgroundLayer != -1) {
+    layer_background_blend(layer_background_get_id(backgroundLayer), merge_color(c_white, c_black, BATTLE_BACKGROUND_DIM))
+}
 selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false
@@ -18,11 +24,10 @@ infoCloseRect = undefined
 cancelHitRect = undefined
 mouseLastX = -1 // для детекта движения мыши
 mouseLastY = -1
-idleDanceTimer = 0 // тики простоя выбранного персонажа (для танца)
 
 // Анимация розыгрыша карты (см. scrCardAnimation)
 activeCardAnims = []
-animatingCard = noone // карта, которая сейчас летит (прячем её в руке)
+animatingCard = noone // карта, которая сейчас летит 
 
 // Очередь анимаций и действий, следующих за ними
 actionsQueue = []
@@ -43,13 +48,18 @@ targetOptions = []
 
 battleState = BattleStates.Preparing
 
+// Можно ли танцевать при афк
+allowsIdleDance = function() {
+    return battleState == BattleStates.CharacterPlay && !tutorialActive
+}
+
 tutorialActive = !tutorialIsDone()
 tutorialCardsRect = undefined
 
 // Размеры бейджа меню персонажа по названию 
-menuRectNamed = function(nm) {
+menuRectNamed = function(menuName) {
     for (var i = 0; i < array_length(menuHitRects); i++) {
-        if (menuHitRects[i].name == nm) return menuHitRects[i]
+        if (menuHitRects[i].name == menuName) return menuHitRects[i]
     }
     return undefined
 }
@@ -62,11 +72,11 @@ tutorial = new TutorialRunner([
         portrait: lana, 
         text: "These are your cards. Each one is an action you can play on your turn.",
         getRect: function() { 
-            var r = undefined
+            var highlightRect = undefined
             with (Battle) {
-                r = tutorialCardsRect
+                highlightRect = tutorialCardsRect
             }
-            return r 
+            return highlightRect 
         } 
     },
     { 
@@ -74,11 +84,11 @@ tutorial = new TutorialRunner([
         portrait: lana, 
         text: "This is INFO - use it to inspect an enemy's stats before you act.",
         getRect: function() { 
-            var r = undefined; 
+            var highlightRect = undefined; 
             with (Battle) {
-                r = menuRectNamed("Info")
+                highlightRect = menuRectNamed("Info")
             }
-            return r 
+            return highlightRect 
         } 
     },
     { 
@@ -86,10 +96,10 @@ tutorial = new TutorialRunner([
         portrait: lana,
         text: "This is SHUFFLE - it redraws your whole hand for this turn.",
         getRect: function() { 
-            var r = undefined;
+            var highlightRect = undefined;
             with (Battle) {
-                r = menuRectNamed("Shuffle"); 
-                return r 
+                highlightRect = menuRectNamed("Shuffle"); 
+                return highlightRect 
             }
         } 
     },
@@ -107,8 +117,12 @@ rewardSelected = false // Выбрана ли награда
 gameOverCursor = 0 // 0 = Retry, 1 = Exit
 
 changeBattleState = function(newState) {
-    if (battleState == newState) { return }
+    var startsTimedTurn = (newState == BattleStates.EnemysTurn
+        || newState == BattleStates.PuppetTurn
+        || newState == BattleStates.StunnedTurn)
+    if (battleState == newState && !startsTimedTurn) { return }
     battleState = newState
+    show_debug_message("battle state -> " + string(newState))
 
     switch (newState) {
         case BattleStates.EnemyTargetSelection:
@@ -123,8 +137,12 @@ changeBattleState = function(newState) {
         case BattleStates.PuppetTurn:
             alarm_set(PUPPET_TURN, game_get_speed(gamespeed_fps) * 2)
         break
+        case BattleStates.StunnedTurn:
+            alarm_set(STUN_TURN, game_get_speed(gamespeed_fps) * STUN_TURN_SECONDS)
+            with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, "STUNNED", c_yellow)
+        break
         case BattleStates.GameOver:
-            addGold(-GOLD_DEFEAT_PENALTY)
+            loseAllGold() 
             gameOverCursor = 0
         break
     }

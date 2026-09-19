@@ -60,77 +60,76 @@ if (battleState == BattleStates.CharacterPlay && selectedCharacter != noone) {
 if ((battleState == BattleStates.EnemyTargetSelection
   || battleState == BattleStates.AllyTargetSelection)
   && selectedCharacter != noone) {
-    var cBadgeScale = scaleToGui
-    var cColMain = selectedCharacter.themeColor
-    var cancelSize = menuBadgeSize("CANCEL", cBadgeScale)
+    var cancelBadgeScale = scaleToGui
+    var cancelColMain = selectedCharacter.themeColor
+    var cancelSize = menuBadgeSize("CANCEL", cancelBadgeScale)
     var charCenterX = (selectedCharacter.bbox_left + selectedCharacter.bbox_right) * 0.5 * scaleToGui
     var cancelX = charCenterX - cancelSize.w * 0.5
     var cancelY = selectedCharacter.bbox_bottom * scaleToGui + 6 * scaleToGui
-    drawMenuBadge(cancelX, cancelY, cBadgeScale, "CANCEL", "C", true, cColMain, c_white)
+    drawMenuBadge(cancelX, cancelY, cancelBadgeScale, "CANCEL", "C", true, cancelColMain, c_white)
     cancelHitRect = { x: cancelX, y: cancelY, w: cancelSize.w, h: cancelSize.h }
 }
 
 // Рисуем карты
-var selectedBorderWidth = max(1, 1 * scaleToGui)
-
-if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn) {
+if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn || battleState == BattleStates.StunnedTurn) {
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    drawUiText(cardDeskStartX + cardDeskWidth / 2, cardDeskStartY + cardDeskHeight / 2, "Waiting...", cardDeskHeight * 0.18)
+    var waitLabel = (battleState == BattleStates.StunnedTurn) ? selectedCharacter.name + " is stunned..." : "Waiting..."
+    drawUiText(cardDeskStartX + cardDeskWidth / 2, cardDeskStartY + cardDeskHeight / 2, waitLabel, cardDeskHeight * 0.18)
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
 } else {
     if (selectedCharacter != noone) {
         var hand = selectedCharacter.getCardsInHand()
-        var n = min(array_length(hand), maxCardsOnDeskNumber)
+        var handSize = min(array_length(hand), maxCardsOnDeskNumber)
 
-        var vPad = 8 * scaleToGui
-        var drawCardH = cardDeskHeight - vPad * 2
+        var verticalPadding = 8 * scaleToGui
+        var drawCardH = cardDeskHeight - verticalPadding * 2
         var drawCardW = drawCardH * 2 / 3
 
         var handCenterX = cardDeskStartX + cardDeskWidth / 2
         var handCenterY = cardDeskStartY + cardDeskHeight / 2 + cardDeskHeight * 0.08
-        var spread = min(drawCardW * 0.8, (cardDeskWidth - drawCardW) / max(1, n))
-        var mid = (n - 1) / 2
+        var spread = min(drawCardW * 0.8, (cardDeskWidth - drawCardW) / max(1, handSize))
+        var middleIndex = (handSize - 1) / 2
 
         var arcLift = 2 * scaleToGui
         var arcTilt = 5 // поворот
 
         // Рисуем карты в две фазы, невыбранные, затем выбранная, чтобы поверх рисовать выбранную
         for (var pass = 0; pass < 2; pass++) {
-            for (var i = 0; i < n; i++) {
+            for (var i = 0; i < handSize; i++) {
                 var isSelected = (selectedCard == i)
                 if ((pass == 0) == isSelected) continue 
 
                 var card = hand[i]
                 if (animatingCard != noone && card == animatingCard) continue // летит — не рисуем в руке
-                var off  = i - mid
+                var offsetFromMiddle  = i - middleIndex
 
                 // сначала расчет оффсетов и поворотов, потом по выделению оффсет, потом скейлим к ui 
-                var cx = handCenterX + off * spread
-                var cy = handCenterY - abs(off) * arcLift
-                var angle = -off * arcTilt
+                var cardCenterX = handCenterX + offsetFromMiddle * spread
+                var cardCenterY = handCenterY - abs(offsetFromMiddle) * arcLift
+                var angle = -offsetFromMiddle * arcTilt
                 var scale = 1
 
                 if (isSelected) { 
-                    cy -= 6 * scaleToGui
+                    cardCenterY -= 6 * scaleToGui
                     scale = 1.12 
                     angle = 0
                 }
                 
-                drawCardFace(card, cx, cy, drawCardW, drawCardH, angle, scale, 1, isSelected)
+                drawCardFace(card, cardCenterX, cardCenterY, drawCardW, drawCardH, angle, scale, 1, isSelected)
 
                 // хит-бокс карты для мыши (координаты окна, с учётом наклона)
                 array_push(cardHitRects, {
-                    x: cx, y: cy,
+                    x: cardCenterX, y: cardCenterY,
                     w: drawCardW * scale, h: drawCardH * scale,
                     angle: angle, index: i
                 })
 
                 if (isSelected && focusArea == FocusArea.Deck) {
-                    var bw = drawCardW * scale
-                    draw_sprite_ext(sPointer, 0, cx - bw / 2, cy, scaleToGui, scaleToGui, 0, c_white, 1)
+                    var selectedCardWidth = drawCardW * scale
+                    draw_sprite_ext(sPointer, 0, cardCenterX - selectedCardWidth / 2, cardCenterY, scaleToGui, scaleToGui, 0, c_white, 1)
                 }
             }
         }
@@ -149,9 +148,9 @@ if (selectedCharacter != noone) {
         var deckBottomY = screenHeight - deckMargin
 
         for (var i = 0; i < deckCount; i++) {
-            var dx = deckX - i * deckStep
-            var dy = deckBottomY - deckH - i * deckStep
-            draw_sprite_stretched(CardBack, 0, dx, dy, deckW, deckH)
+            var deckCardX = deckX - i * deckStep
+            var deckCardY = deckBottomY - deckH - i * deckStep
+            draw_sprite_stretched(CardBack, 0, deckCardX, deckCardY, deckW, deckH)
         }
     }
 }
@@ -174,9 +173,9 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     draw_rectangle(spriteBoxX, spriteBoxY, spriteBoxX + spriteBoxSize, spriteBoxY + spriteBoxSize, false)
 
     if (sprite_exists(selectedTarget.sprite_index)) {
-        var sw = sprite_get_width(selectedTarget.sprite_index)
-        var sh = sprite_get_height(selectedTarget.sprite_index)
-        var spriteScale = min(spriteBoxSize / sw, spriteBoxSize / sh)
+        var spriteWidth = sprite_get_width(selectedTarget.sprite_index)
+        var spriteHeight = sprite_get_height(selectedTarget.sprite_index)
+        var spriteScale = min(spriteBoxSize / spriteWidth, spriteBoxSize / spriteHeight)
         draw_sprite_ext(selectedTarget.sprite_index, 0,
             spriteBoxX + spriteBoxSize / 2,
             spriteBoxY + spriteBoxSize / 2,
@@ -196,25 +195,25 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     drawUiText(statsX, statsY + lineH * 4, "Guts: " + string(selectedTarget.guts), popupTextH)
 
     // Слабости врага
-    var wy = statsY + lineH * 5
+    var weaknessY = statsY + lineH * 5
     draw_set_halign(fa_left)
-    var lblScale = drawUiText(statsX, wy, "Weakness:", popupTextH)
-    var wx = statsX + string_width("Weakness:") * lblScale + 6 * scaleToGui
-    var wlist = variable_instance_exists(selectedTarget, "weaknesses") ? selectedTarget.weaknesses : []
-    if (array_length(wlist) == 0) {
-        drawUiText(wx, wy, "None", popupTextH)
+    var lblScale = drawUiText(statsX, weaknessY, "Weakness:", popupTextH)
+    var weaknessX = statsX + string_width("Weakness:") * lblScale + 6 * scaleToGui
+    var weaknessList = variable_instance_exists(selectedTarget, "weaknesses") ? selectedTarget.weaknesses : []
+    if (array_length(weaknessList) == 0) {
+        drawUiText(weaknessX, weaknessY, "None", popupTextH)
     } else {
         var wIconSize = popupTextH
-        for (var wi = 0; wi < array_length(wlist); wi++) {
-            var sn = wlist[wi]
-            var ic = weaknessIcon(sn)
-            if (ic != noone) {
-                draw_sprite_stretched(ic, 0, wx, wy, wIconSize, wIconSize)
-                wx += wIconSize + 3 * scaleToGui
+        for (var weaknessIndex = 0; weaknessIndex < array_length(weaknessList); weaknessIndex++) {
+            var statusName = weaknessList[weaknessIndex]
+            var statusIcon = weaknessIcon(statusName)
+            if (statusIcon != noone) {
+                draw_sprite_stretched(statusIcon, 0, weaknessX, weaknessY, wIconSize, wIconSize)
+                weaknessX += wIconSize + 3 * scaleToGui
             }
-            var nm = weaknessLabel(sn)
-            var nsc = drawUiText(wx, wy, nm, popupTextH)
-            wx += string_width(nm) * nsc + 8 * scaleToGui
+            var statusLabel = weaknessLabel(statusName)
+            var labelScale = drawUiText(weaknessX, weaknessY, statusLabel, popupTextH)
+            weaknessX += string_width(statusLabel) * labelScale + 8 * scaleToGui
         }
     }
     draw_set_color(c_white)
@@ -252,3 +251,5 @@ for (var i = 0; i < array_length(activeCardAnims); i++) {
 if (tutorialActive && battleState == BattleStates.CharacterPlay && tutorial.isActive()) {
     tutorial.draw()
 }
+
+autosaveDrawIcon()

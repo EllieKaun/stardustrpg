@@ -1,3 +1,4 @@
+autosaveUpdate()
 updateCardAnims() // Анимации карт
 
 // ВЫполнение очереди из действий
@@ -9,12 +10,12 @@ for (var action = array_length(actionsQueue) - 1; action >= 0; action--) {
 }
 
 // Управление мышью
-var mbx = device_mouse_x_to_gui(0)
-var mby = device_mouse_y_to_gui(0)
-var mouseMoved = (mbx != mouseLastX || mby != mouseLastY)
-mouseLastX = mbx
-mouseLastY = mby
-var mClick = mouse_check_button_pressed(mb_left)
+var mouseGuiX = device_mouse_x_to_gui(0)
+var mouseGuiY = device_mouse_y_to_gui(0)
+var mouseMoved = (mouseGuiX != mouseLastX || mouseGuiY != mouseLastY)
+mouseLastX = mouseGuiX
+mouseLastY = mouseGuiY
+var mouseClicked = mouse_check_button_pressed(mb_left)
 var mouseConfirm = false
 
 if (tutorialActive) {
@@ -34,9 +35,9 @@ switch (battleState) {
     case BattleStates.CharacterPlay:
         var hoveredCard = -1
         for (var i = array_length(cardHitRects) - 1; i >= 0; i--) {
-            var r = cardHitRects[i]
-            if (pointInRotatedRect(mbx, mby, r.x, r.y, r.w, r.h, r.angle)) {
-                hoveredCard = r.index
+            var hitRect = cardHitRects[i]
+            if (pointInRotatedRect(mouseGuiX, mouseGuiY, hitRect.x, hitRect.y, hitRect.w, hitRect.h, hitRect.angle)) {
+                hoveredCard = hitRect.index
                 break
             }
         }
@@ -46,12 +47,12 @@ switch (battleState) {
                 if (selectedCard != hoveredCard) playCardSelectSound()
                 selectedCard = hoveredCard
             }
-            if (mClick)     { focusArea = FocusArea.Deck; selectedCard = hoveredCard; mouseConfirm = true }
+            if (mouseClicked)     { focusArea = FocusArea.Deck; selectedCard = hoveredCard; mouseConfirm = true }
         } else {
             for (var i = 0; i < array_length(menuHitRects); i++) {
-                var r = menuHitRects[i]
-                if (pointInRect(mbx, mby, r.x, r.y, r.w, r.h)) {
-                    if (mClick) doMenuAction(r.name)
+                var hitRect = menuHitRects[i]
+                if (pointInRect(mouseGuiX, mouseGuiY, hitRect.x, hitRect.y, hitRect.w, hitRect.h)) {
+                    if (mouseClicked) doMenuAction(hitRect.name)
                     break
                 }
             }
@@ -61,22 +62,22 @@ switch (battleState) {
     case BattleStates.EnemyTargetSelection:
     case BattleStates.AllyTargetSelection:
     case BattleStates.EnemyInfoSelection:
-        if (mouseMoved || mClick) {
+        if (mouseMoved || mouseClicked) {
             var overTarget = selectTargetAtMouse()
-            if (mClick && overTarget) mouseConfirm = true
+            if (mouseClicked && overTarget) mouseConfirm = true
         }
     break
 
     case BattleStates.EnemyInfoDisplay:
-        if (mClick && infoCloseRect != undefined
-            && pointInRect(mbx, mby, infoCloseRect.x, infoCloseRect.y, infoCloseRect.w, infoCloseRect.h))
+        if (mouseClicked && infoCloseRect != undefined
+            && pointInRect(mouseGuiX, mouseGuiY, infoCloseRect.x, infoCloseRect.y, infoCloseRect.w, infoCloseRect.h))
             mouseConfirm = true
     break
 }
 
 // Отмена выбранной карты
-var cancelClicked = (mClick && cancelHitRect != undefined
-    && pointInRect(mbx, mby, cancelHitRect.x, cancelHitRect.y, cancelHitRect.w, cancelHitRect.h))
+var cancelClicked = (mouseClicked && cancelHitRect != undefined
+    && pointInRect(mouseGuiX, mouseGuiY, cancelHitRect.x, cancelHitRect.y, cancelHitRect.w, cancelHitRect.h))
 var cancelPressed = mouse_check_button_pressed(mb_right) || keyboard_check_pressed(ord("C")) || cancelClicked
 if (cancelPressed
     && (battleState == BattleStates.EnemyTargetSelection
@@ -206,26 +207,4 @@ switch (battleState) {
     case BattleStates.BattleOver:
 
     break
-}
-
-// Танец  
-if (battleState == BattleStates.CharacterPlay && instance_exists(selectedCharacter)) {
-    if (mClick || keyboard_check_pressed(vk_anykey)) {
-        idleDanceTimer = 0
-        if (selectedCharacter.actionState == StarriorStates.Dance) {
-            selectedCharacter.changeActionState(StarriorStates.Idle, undefined)
-        }
-    } else {
-        idleDanceTimer += 1
-        if (idleDanceTimer >= 5 * game_get_speed(gamespeed_fps)
-            && selectedCharacter.spriteActionDance != noone
-            && selectedCharacter.actionState == StarriorStates.Idle) {
-            selectedCharacter.changeActionState(StarriorStates.Dance, undefined)
-        }
-    }
-} else {
-    if (instance_exists(selectedCharacter) && selectedCharacter.actionState == StarriorStates.Dance) {
-        selectedCharacter.changeActionState(StarriorStates.Idle, undefined)
-    }
-    idleDanceTimer = 0
 }

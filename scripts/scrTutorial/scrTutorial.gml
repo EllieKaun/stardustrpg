@@ -2,9 +2,9 @@ function tutorialOverworldLines() {
     var lana = asset_get_index("placeholderLana")
     var viv = asset_get_index("placeholderViv")
     return [
-        dialogLine("Lana", lana, "left", "Wait - a wild Starrior! A good chance to learn how to fight."),
-        dialogLine("Viv", viv, "right", "Don't worry, it's easy once you get the hang of the cards."),
-        dialogLine("Lana", lana, "left", "Let's go. I'll walk you through it once the battle starts.")
+        dialogLine("Lana", lana, "Wait - a wild Starrior! A good chance to learn how to fight."),
+        dialogLine("Viv", viv, "Don't worry, it's easy once you get the hang of the cards."),
+        dialogLine("Lana", lana, "Let's go. I'll walk you through it once the battle starts.")
     ]
 }
 
@@ -21,8 +21,8 @@ function TutorialRunner(_steps) constructor {
 
     self.runOnEnter = function() {
         if (self.index >= array_length(self.steps)) { return }
-        var s = self.steps[self.index]
-        if (variable_struct_exists(s, "onEnter") && s.onEnter != undefined) s.onEnter()
+        var tutorialStep = self.steps[self.index]
+        if (variable_struct_exists(tutorialStep, "onEnter") && tutorialStep.onEnter != undefined) tutorialStep.onEnter()
     }
 
     self.reset = function() {
@@ -33,9 +33,9 @@ function TutorialRunner(_steps) constructor {
     // Обработка ввода
     self.step = function() {
         if (self.index >= array_length(self.steps)) { return false }
-        var s = self.steps[self.index]
-        var adv = variable_struct_exists(s, "advanceWhen") ? s.advanceWhen() : uiConfirmPressed()
-        if (adv) {
+        var tutorialStep = self.steps[self.index]
+        var shouldAdvance = variable_struct_exists(tutorialStep, "advanceWhen") ? tutorialStep.advanceWhen() : uiConfirmPressed()
+        if (shouldAdvance) {
             self.index++
             if (self.index >= array_length(self.steps)) { return true }
             self.runOnEnter()
@@ -45,12 +45,12 @@ function TutorialRunner(_steps) constructor {
 
     self.draw = function() {
         if (self.index >= array_length(self.steps)) { return }
-        var s = self.steps[self.index]
-        var rect = variable_struct_exists(s, "getRect") ? s.getRect() : undefined
+        var tutorialStep = self.steps[self.index]
+        var rect = variable_struct_exists(tutorialStep, "getRect") ? tutorialStep.getRect() : undefined
         if (rect != undefined) drawTutorialSpotlight(rect)
         else drawScreenDim(0.55)
-        var portrait = variable_struct_exists(s, "portrait") ? s.portrait : noone
-        drawTutorialPanel(s.speaker, s.text, portrait, rect)
+        var portrait = variable_struct_exists(tutorialStep, "portrait") ? tutorialStep.portrait : noone
+        drawTutorialPanel(tutorialStep.speaker, tutorialStep.text, portrait, rect)
         draw_set_halign(fa_left)
         draw_set_valign(fa_top)
         draw_set_color(c_white)
@@ -61,66 +61,56 @@ function TutorialRunner(_steps) constructor {
 function deckTutorialIntroLines() {
     var lana = asset_get_index("placeholderLana")
     return [
-        dialogLine("Lana", lana, "left", "Nice work! Now let's set up your deck for next time."),
-        dialogLine("Lana", lana, "left", "Press Tab to open the deck builder.")
+        dialogLine("Lana", lana, "Nice work! Now let's set up your deck for next time."),
+        dialogLine("Lana", lana, "Press Tab to open the deck builder.")
     ]
 }
 
 function drawTutorialSpotlight(rect) {
-    var sw = display_get_gui_width()
-    var sh = display_get_gui_height()
-    var pad = max(4, sh * 0.012)
-    var rx0 = rect.x - pad
-    var ry0 = rect.y - pad
-    var rx1 = rect.x + rect.w + pad
-    var ry1 = rect.y + rect.h + pad
+    var screenWidth = display_get_gui_width()
+    var screenHeight = display_get_gui_height()
+    var pad = max(4, screenHeight * 0.012)
+    var spotlightLeft = rect.x - pad
+    var spotlightTop = rect.y - pad
+    var spotlightRight = rect.x + rect.w + pad
+    var spotlightBottom = rect.y + rect.h + pad
 
     draw_set_color(c_black)
     draw_set_alpha(0.62)
-    draw_rectangle(0, 0, sw, ry0, false)
-    draw_rectangle(0, ry1, sw, sh, false)
-    draw_rectangle(0, ry0 + 1, rx0, ry1 - 1, false)
-    draw_rectangle(rx1, ry0 + 1, sw, ry1 - 1, false)
-    draw_set_alpha(1)
-
-    var pulse = 0.4 + 0.6 * (0.5 + 0.5 * sin(current_time / 220))
-    var bw = max(1, sh * 0.004)
-    draw_set_color(merge_color(c_white, c_yellow, 0.45))
-    draw_set_alpha(pulse)
-    draw_rectangle(rx0, ry0, rx1, ry0 + bw, false)
-    draw_rectangle(rx0, ry1 - bw, rx1, ry1, false)
-    draw_rectangle(rx0, ry0, rx0 + bw, ry1, false)
-    draw_rectangle(rx1 - bw, ry0, rx1, ry1, false)
+    draw_rectangle(0, 0, screenWidth, spotlightTop, false)
+    draw_rectangle(0, spotlightBottom, screenWidth, screenHeight, false)
+    draw_rectangle(0, spotlightTop + 1, spotlightLeft, spotlightBottom - 1, false)
+    draw_rectangle(spotlightRight, spotlightTop + 1, screenWidth, spotlightBottom - 1, false)
     draw_set_alpha(1)
     draw_set_color(c_white)
 }
 
 function drawTutorialPanel(speaker, text, portrait, avoidRect) {
-    var sw = display_get_gui_width()
-    var sh = display_get_gui_height()
+    var screenWidth = display_get_gui_width()
+    var screenHeight = display_get_gui_height()
 
-    var margin = sw * 0.05
-    var panelH = sh * 0.17
-    var panelY = sh * 0.03
+    var margin = screenWidth * 0.05
+    var panelH = screenHeight * 0.17
+    var panelY = screenHeight * 0.03
     var panelX = margin
-    var panelW = sw - margin * 2
+    var panelW = screenWidth - margin * 2
 
     // Подсказки за пределеами выделенной области 
     if (avoidRect != undefined) {
         var topHit = (panelY < avoidRect.y + avoidRect.h) && (panelY + panelH > avoidRect.y)
         if (topHit) {
-            var botY = sh - sh * 0.03 - panelH
+            var botY = screenHeight - screenHeight * 0.03 - panelH
             var botHit = (botY < avoidRect.y + avoidRect.h) && (botY + panelH > avoidRect.y)
             if (!botHit) {
                 panelY = botY
             } else {
                 var gapL = avoidRect.x
-                var gapR = sw - (avoidRect.x + avoidRect.w)
+                var gapR = screenWidth - (avoidRect.x + avoidRect.w)
                 var onRight = (gapR >= gapL)
                 var gap = onRight ? gapR : gapL
-                panelH = sh * 0.32
-                panelY = (sh - panelH) * 0.5
-                panelW = clamp(gap - margin * 1.2, sw * 0.22, sw * 0.46)
+                panelH = screenHeight * 0.32
+                panelY = (screenHeight - panelH) * 0.5
+                panelW = clamp(gap - margin * 1.2, screenWidth * 0.22, screenWidth * 0.46)
                 if (onRight) {
                     panelX = (avoidRect.x + avoidRect.w) + (gap - panelW) * 0.5
                 } else {
@@ -133,14 +123,14 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
     draw_sprite_stretched(box, 0, panelX, panelY, panelW, panelH)
 
     var pad = panelH * 0.14
-    var pSize = panelH - pad * 2
+    var portraitSize = panelH - pad * 2
     var portraitX = panelX + pad
     var portraitY = panelY + pad
     if (portrait != undefined && sprite_exists(portrait)) {
-        draw_sprite_stretched(portrait, 0, portraitX, portraitY, pSize, pSize)
+        draw_sprite_stretched(portrait, 0, portraitX, portraitY, portraitSize, portraitSize)
     }
 
-    var textX = portraitX + pSize + pad
+    var textX = portraitX + portraitSize + pad
     var textTop = panelY + pad
     var textW = panelX + panelW - pad - textX
     var textH = panelH - pad * 2
@@ -155,10 +145,10 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
     var bodyTop = textTop + nameH * 1.25
     var bodyH = textH - nameH * 1.25
     var prevFont = draw_get_font()
-    var fit = fitWrappedText(text, textW, bodyH)
-    if (fit != undefined) {
-        draw_set_font(fit.font)
-        draw_text_transformed(textX, bodyTop, fit.text, fit.scale, fit.scale, 0)
+    var fittedText = fitWrappedText(text, textW, bodyH)
+    if (fittedText != undefined) {
+        draw_set_font(fittedText.font)
+        draw_text_transformed(textX, bodyTop, fittedText.text, fittedText.scale, fittedText.scale, 0)
     }
     draw_set_font(prevFont)
 
