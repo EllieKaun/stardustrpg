@@ -65,7 +65,7 @@ menuRectNamed = function(menuName) {
 }
 
 // Туториал
-var lana = asset_get_index("placeholderLana")
+var lana = asset_get_index("portraitLana")
 tutorial = new TutorialRunner([
     { 
         speaker: "Lana",

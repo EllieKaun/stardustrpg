@@ -213,7 +213,7 @@ activePanel = Panels.Collection
 open = false
 
 deckTutStarted = false
-var lana = asset_get_index("placeholderLana")
+var lana = asset_get_index("portraitLana")
 deckTutorial = new TutorialRunner([
     { speaker: "Lana", portrait: lana, text: "This is your collection - every card you own. Cards already used in a deck are marked with an owner icon.",
       getRect: function() { var r = undefined; with (oDeckBuilder) r = { x: collectionPanel.x, y: collectionPanel.y, w: collectionPanel.w, h: collectionPanel.h }; return r } },

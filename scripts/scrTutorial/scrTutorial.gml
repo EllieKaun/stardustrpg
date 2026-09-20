@@ -1,6 +1,6 @@
 function tutorialOverworldLines() {
-    var lana = asset_get_index("placeholderLana")
-    var viv = asset_get_index("placeholderViv")
+    var lana = asset_get_index("portraitLana")
+    var viv = asset_get_index("portraitViv")
     return [
         dialogLine("Lana", lana, "Wait - a wild Starrior! A good chance to learn how to fight."),
         dialogLine("Viv", viv, "Don't worry, it's easy once you get the hang of the cards."),
@@ -59,7 +59,7 @@ function TutorialRunner(_steps) constructor {
 }
 
 function deckTutorialIntroLines() {
-    var lana = asset_get_index("placeholderLana")
+    var lana = asset_get_index("portraitLana")
     return [
         dialogLine("Lana", lana, "Nice work! Now let's set up your deck for next time."),
         dialogLine("Lana", lana, "Press Tab to open the deck builder.")
