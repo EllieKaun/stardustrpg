@@ -169,6 +169,9 @@ function checkIfCanPlayCard(caster, card) {
         if (!hasKO) return false
     }
 
+    // Марионетку не призвать, если команда уже держит максимум
+    if (cardSummonsPuppet(card) && !canSpawnPuppetFor(caster)) return false
+
     if (caster.isEnemy) return true // враги играют бесплатно
 
     if (card.costType() == CostType.Mana) {
@@ -213,7 +216,7 @@ function cardPlaySequence(card, caster, targets) {
                     c.changeActionState(
                         cardAnimState(ctx.card),
                         method(ctx, function() { self.animEnded = true }),
-                        cardCastSpriteOverride(ctx.card)
+                        cardCastSpriteOverride(ctx.card, c)
                     )
                 }
             },

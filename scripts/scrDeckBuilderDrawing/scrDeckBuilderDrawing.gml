@@ -80,6 +80,7 @@ function Panel(_config) constructor {
     onTabRow = false
     justGainedFocus = false
     tag = ""
+    clipSurface = -1
 
     // Шаг между строками карт (высота карты + вертикальный отступ)
     static rowPitch = function() {
@@ -430,11 +431,15 @@ function Panel(_config) constructor {
         // Бэк
         if (bgSprite != undefined) draw_sprite_stretched(bgSprite, 0, x, y, w, h)
 
-        // Клип сетки по прямоугольнику фона 
-        var prevScissor = gpu_get_scissor()
-        gpu_set_scissor(floor(x), floor(y + 16), ceil(w), ceil(h - 32))
+        // Клип сетки по прямоугольнику фона
+        var clipInset = 4 * uiScale
+        var clipX = x
+        var clipY = y + clipInset
+        var clipW = w
+        var clipH = h - clipInset * 2
+        clipSurface = guiClipBegin(clipSurface, clipX, clipY, clipW, clipH)
 
-        // Рисуем все слоты, лишнее обрежет scissor
+        // Рисуем все слоты, лишнее обрежет клип
         var first = 0
         var last  = array_length(slots)
         for (var i = first; i < last; i++) {
@@ -492,7 +497,7 @@ function Panel(_config) constructor {
         }
 
         // конец клипа сетки
-        gpu_set_scissor(prevScissor)
+        guiClipEnd(clipSurface, clipX, clipY)
 
         // Табы
         for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {

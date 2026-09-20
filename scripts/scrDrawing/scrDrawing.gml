@@ -15,13 +15,40 @@ function setCrispGui(baseW, baseH) {
     }
 }
 
-// Scissor по прямоугольнику в GUI-координатах
-function guiSetScissor(areaX, areaY, areaWidth, areaHeight) {
-    var windowToGuiX = window_get_width() / display_get_gui_width()
-    var windowToGuiY = window_get_height() / display_get_gui_height()
-    var scissorX = floor(areaX * windowToGuiX)
-    var scissorY = floor(areaY * windowToGuiY)
-    gpu_set_scissor(scissorX, scissorY, ceil((areaX + areaWidth) * windowToGuiX) - scissorX, ceil((areaY + areaHeight) * windowToGuiY) - scissorY)
+// GUI приводится к нужному размеру
+function guiSyncCrisp() {
+    var cam = view_camera[0]
+    setCrispGui(camera_get_view_width(cam), camera_get_view_height(cam))
+}
+
+// Клип прямоугольником в GUI-координатах через поверхность
+function guiClipBegin(surf, clipX, clipY, clipW, clipH) {
+    clipW = max(1, ceil(clipW))
+    clipH = max(1, ceil(clipH))
+    if (surface_exists(surf) && (surface_get_width(surf) != clipW || surface_get_height(surf) != clipH)) {
+        surface_free(surf)
+    }
+    if (!surface_exists(surf)) surf = surface_create(clipW, clipH)
+
+    surface_set_target(surf)
+    draw_clear_alpha(c_black, 0)
+    matrix_set(matrix_world, matrix_build(-floor(clipX), -floor(clipY), 0, 0, 0, 0, 1, 1, 1))
+    gpu_set_blendmode_ext_sepalpha(bm_src_alpha, bm_inv_src_alpha, bm_one, bm_inv_src_alpha)
+    return surf
+}
+
+function guiClipEnd(surf, clipX, clipY) {
+    gpu_set_blendmode(bm_normal)
+    matrix_set(matrix_world, matrix_build_identity())
+    surface_reset_target()
+
+    gpu_set_blendmode_ext(bm_one, bm_inv_src_alpha)
+    draw_surface(surf, floor(clipX), floor(clipY))
+    gpu_set_blendmode(bm_normal)
+}
+
+function drawButtonFrame(btnX, btnY, btnW, btnH) {
+    draw_sprite_stretched(ShopBtn, 0, btnX, btnY, btnW, btnH)
 }
 
 // Попадание точки в повёрнутый прямоугольник (центр centerX,centerY; размер rectWidth,rectHeight; угол angle)

@@ -1,5 +1,6 @@
 if (!open) exit
 
+guiSyncCrisp()
 layoutPanels()
 
 var screenWidth = display_get_gui_width()

@@ -15,7 +15,6 @@ setDisplayMode = function(fullscreen) {
     resInd = min(resInd, array_length(res) - 1)
 
     applyWindowMode(res[resInd][0], res[resInd][1], fullscreen)
-    display_set_gui_size(res[resInd][0], res[resInd][1])
 }
 // применяем настройки экрана
 initDisplaySettings()

@@ -169,6 +169,9 @@ switch (battleState) {
                     playCardAnimated(currentCard, selectedCharacter, enemies)
                 } else if currentCard.target == TargetTypes.AllAllies {
                     playCardAnimated(currentCard, selectedCharacter, heroes)
+                } else if currentCard.target == TargetTypes.Self {
+                  
+                    playCardAnimated(currentCard, selectedCharacter, selectedCharacter)
                 }
             } else {
                 skipTurn()

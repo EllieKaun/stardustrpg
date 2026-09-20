@@ -73,7 +73,7 @@ function shopItemLines(item) {
 }
 
 // Отрисовка одной строки-товара в прямоугольнике rect {left,top,width,height}
-function drawShopItem(item, rect, uiScale) {
+function drawShopItem(item, rect, uiScale, isSelected = false) {
     // рамка товара
     draw_sprite_stretched(ItemShadow, 0, rect.left, rect.top, rect.width, rect.height)
 
@@ -86,8 +86,13 @@ function drawShopItem(item, rect, uiScale) {
     if (item.kind == ShopItemKind.Card && item.card != undefined) {
         var cardH = contentH
         var cardW = cardH * 2 / 3
-        drawCardFace(item.card, rect.left + pad + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0)
+        drawCardFace(item.card, rect.left + pad + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0, 1, 1, isSelected)
         textX = rect.left + pad + cardW + pad
+    }
+
+    // выделение строки поверх рамки товара
+    if (isSelected) {
+        draw_sprite_stretched(ItemSelected, 0, rect.left, rect.top, rect.width, rect.height)
     }
 
     // описание
@@ -161,6 +166,7 @@ function Shop(_config) constructor {
     focused = true
     onTabRow = false
     justGainedFocus = false
+    clipSurface = -1 // поверхность клипа списка (см. guiClipBegin)
 
     // Раскладка списка
     static computeLayout = function() {
@@ -365,15 +371,20 @@ function Shop(_config) constructor {
         draw_sprite_stretched(box, 0, x, y, w, h)
 
         // Клип списка по прямоугольнику контейнера
-        var prevScissor = gpu_get_scissor()
-        var padTop = padding
-        guiSetScissor(x + padding, y + padTop, w - padding * 2, h - padTop - padding)
+        var clipX = x + padding
+        var clipY = y + padding
+        var clipW = w - padding * 2
+        var clipH = h - padding * 2
+        clipSurface = guiClipBegin(clipSurface, clipX, clipY, clipW, clipH)
 
+        var showSelection = focused && !onTabRow
         for (var i = 0; i < array_length(slots); i++) {
-            drawShopItem(slots[i], getSlotRect(i), uiScale)
+            var slotRect = getSlotRect(i)
+            if (slotRect.top > clipY + clipH || slotRect.top + slotRect.height < clipY) continue
+            drawShopItem(slots[i], slotRect, uiScale, showSelection && i == selectedSlot)
         }
 
-        gpu_set_scissor(prevScissor)
+        guiClipEnd(clipSurface, clipX, clipY)
 
         // Вкладки 
         for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {

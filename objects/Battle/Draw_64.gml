@@ -63,10 +63,11 @@ if ((battleState == BattleStates.EnemyTargetSelection
     var cancelBadgeScale = scaleToGui
     var cancelColMain = selectedCharacter.themeColor
     var cancelSize = menuBadgeSize("CANCEL", cancelBadgeScale)
-    var charCenterX = (selectedCharacter.bbox_left + selectedCharacter.bbox_right) * 0.5 * scaleToGui
-    var cancelX = charCenterX - cancelSize.w * 0.5
-    var cancelY = selectedCharacter.bbox_bottom * scaleToGui + 6 * scaleToGui
-    drawMenuBadge(cancelX, cancelY, cancelBadgeScale, "CANCEL", "C", true, cancelColMain, c_white)
+    var cancelLeftEdge = selectedCharacter.bbox_left * scaleToGui - 11 * scaleToGui
+    var cancelCenterY = (selectedCharacter.bbox_top + selectedCharacter.bbox_bottom) * 0.5 * scaleToGui
+    var cancelX = max(0, cancelLeftEdge - cancelSize.w)
+    var cancelY = cancelCenterY - cancelSize.h * 0.5
+    drawMenuBadge(cancelX, cancelY, cancelBadgeScale, "CANCEL", "C", false, cancelColMain, c_white)
     cancelHitRect = { x: cancelX, y: cancelY, w: cancelSize.w, h: cancelSize.h }
 }
 
@@ -224,7 +225,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     var btnX = floor(popupX + popupWidth / 2 - btnWidth / 2)
     var btnY = floor(popupY + popupHeight + 4 * scaleToGui) 
 
-    draw_sprite_stretched(box, 0, btnX, btnY, btnWidth, btnHeight)
+    drawButtonFrame(btnX, btnY, btnWidth, btnHeight)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
     drawUiText(btnX + btnWidth / 2, btnY + btnHeight / 2, "CLOSE", btnHeight * 0.6)

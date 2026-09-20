@@ -131,6 +131,19 @@ function isEnemysTurn() {
     return array_contains(enemies, selectedCharacter)
 }
 
+// Карты из cards, которые враг может сыграть
+function enemyPlayableCards(enemy, cards) {
+    var playable = []
+    for (var i = 0; i < array_length(cards); i++) {
+        var card = cards[i]
+        if (is_struct(card) && variable_struct_exists(card, "cardBaseSpr") && variable_struct_exists(card, "effects")
+            && checkIfCanPlayCard(enemy, card)) {
+            array_push(playable, card)
+        }
+    }
+    return playable
+}
+
 // Выбор цели для карты. foes — противники кастера, allies — союзники
 // preferAlly/preferFoe — предпочтительная одиночная цель (иначе случайная). noone если цели нет.
 function enemyResolveTarget(card, caster, foes, allies, preferAlly, preferFoe) {

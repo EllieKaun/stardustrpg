@@ -1,6 +1,5 @@
 dbBaseW = camera_get_view_width(view_camera[0])
 dbBaseH = camera_get_view_height(view_camera[0])
-display_set_gui_size(dbBaseW, dbBaseH)
 
 activePanel = 0 // 0 = коллекция всех карт, 1 = дека
 
@@ -224,7 +223,7 @@ deckTutorial = new TutorialRunner([
 ])
 
 openBuilder = function() {
-    setCrispGui(dbBaseW, dbBaseH)
+    guiSyncCrisp()
     layoutPanels()
     open = true
     global.uiModal = true
@@ -244,5 +243,4 @@ openBuilder = function() {
 closeBuilder = function() {
     open = false
     global.uiModal = false
-    display_set_gui_size(dbBaseW, dbBaseH)
 }

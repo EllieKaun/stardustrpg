@@ -1,7 +1,7 @@
+guiSyncCrisp()
+
 // Туториал, сообщение о нажатии таба и показе декбилдера
 if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
-    setCrispGui(camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]))
-
     var hw = display_get_gui_width()
     var hh = display_get_gui_height()
     var msg = "Press TAB to open your deck"

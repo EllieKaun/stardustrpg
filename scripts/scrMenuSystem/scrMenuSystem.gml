@@ -79,7 +79,19 @@ function MenuLayer(spr = noone, params = {}) constructor {
             var eh = gh * self.scale
             var baseX = (gw - ew) * 0.5 + self.ox
             var baseY = (gh - eh) * 0.5 + oy
-            draw_sprite_stretched_ext(self.spr, 0, baseX, baseY, ew, eh, c_white, self.alpha)
+
+            var visLeft = max(baseX, 0)
+            var visTop = max(baseY, 0)
+            var visRight = min(baseX + ew, gw)
+            var visBottom = min(baseY + eh, gh)
+            if (visRight <= visLeft || visBottom <= visTop) return
+
+            var scaleX = ew / sw
+            var scaleY = eh / sh
+            draw_sprite_part_ext(self.spr, 0,
+                (visLeft - baseX) / scaleX, (visTop - baseY) / scaleY,
+                (visRight - visLeft) / scaleX, (visBottom - visTop) / scaleY,
+                visLeft, visTop, scaleX, scaleY, c_white, self.alpha)
         }
     }
 }
@@ -296,7 +308,6 @@ function initDisplaySettings() {
     resInd = min(resInd, array_length(res) - 1)
     if (resInd >= 0) {
         applyWindowMode(res[resInd][0], res[resInd][1], fs)
-        display_set_gui_size(res[resInd][0], res[resInd][1])
     }
     global.displayFullscreen = fs
 }

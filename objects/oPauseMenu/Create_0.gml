@@ -1,5 +1,3 @@
-prevGuiW = display_get_gui_width()
-prevGuiH = display_get_gui_height()
 menuEnsureCrispGui()
 
 global.gamePaused = true
@@ -8,7 +6,6 @@ global.uiModal = true
 close = function() {
     global.gamePaused = false
     global.uiModal = false
-    display_set_gui_size(prevGuiW, prevGuiH)
     instance_destroy()
 }
 

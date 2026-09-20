@@ -13,12 +13,12 @@ if array_length(cards) == 0 { // Если карт нет - замешиваем
     }
 }
 
-var validCards = []
-for (var vi = 0; vi < array_length(cards); vi++) {
-    var vc = cards[vi]
-    if (is_struct(vc) && variable_struct_exists(vc, "cardBaseSpr") && variable_struct_exists(vc, "effects")) {
-        array_push(validCards, vc)
-    }
+// Только карты, которые сейчас можно сыграть
+var validCards = enemyPlayableCards(currentEnemy, cards)
+if (array_length(validCards) == 0) {
+    // если нечего сыграть - перемешиваем
+    shuffleDeckAndTake4(currentEnemy)
+    validCards = enemyPlayableCards(currentEnemy, currentEnemy.getCardsInHand())
 }
 cards = validCards
 if (array_length(cards) == 0) {
@@ -26,7 +26,7 @@ if (array_length(cards) == 0) {
     return
 }
 
-var aliveHeroes  = filterNotKO(heroes) // противники врага
+var aliveHeroes = filterNotKO(heroes) // противники врага
 var aliveEnemies = filterNotKO(enemies) // союзники врага
 
 // Принимаем решение по разыгрыванию карты

@@ -289,6 +289,7 @@
     {"id":{"name":"iceGroup","path":"sprites/iceGroup/iceGroup.yy",},},
     {"id":{"name":"iceSingleTarget","path":"sprites/iceSingleTarget/iceSingleTarget.yy",},},
     {"id":{"name":"iceStrike","path":"sprites/iceStrike/iceStrike.yy",},},
+    {"id":{"name":"ItemSelected","path":"sprites/ItemSelected/ItemSelected.yy",},},
     {"id":{"name":"ItemShadow","path":"sprites/ItemShadow/ItemShadow.yy",},},
     {"id":{"name":"LanaBtn","path":"sprites/LanaBtn/LanaBtn.yy",},},
     {"id":{"name":"LanaIcon","path":"sprites/LanaIcon/LanaIcon.yy",},},
