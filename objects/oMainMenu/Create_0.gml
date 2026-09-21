@@ -30,6 +30,10 @@ openSettings = function() {
     visible = false
     instance_create_layer(0, 0, "Instances", oSettingsMenu)
 }
+openAlbum = function() {
+    visible = false
+    instance_create_layer(0, 0, "Instances", oAlbum)
+}
 
 buildMainMenu = function() {
     var items = []
@@ -45,6 +49,7 @@ buildMainMenu = function() {
             startNewGameNow()
         }
     }))
+    // array_push(items, new MenuItem("Album", noone, noone, function(it) { openAlbum() }))
     array_push(items, new MenuItem("Settings", noone, noone, function(it) { openSettings() }))
     array_push(items, new MenuItem("Quit", noone, noone, function(it) { game_end() }))
     return new Menu(items, menuConfig)

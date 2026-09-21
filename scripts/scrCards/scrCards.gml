@@ -8,7 +8,8 @@ function Card(name,
             cardIllustrationSpr,
             cardBorderSpr,
             cardTokenSpr,
-            description = "") constructor {
+            description = "",
+            cardAlbumSpr = noone) constructor {
     self.name = name
     self.rarity = rarity
     self.target = target
@@ -19,6 +20,7 @@ function Card(name,
     self.cardBorderSpr = cardBorderSpr
     self.cardTokenSpr = cardTokenSpr
     self.description = description // текст на карте
+    self.cardAlbumSpr = cardAlbumSpr
     self.energy = energy
 
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana

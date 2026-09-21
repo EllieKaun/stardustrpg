@@ -67,6 +67,9 @@ function Panel(_config) constructor {
     onTabClick = _config[$ "onTabClick"] ?? undefined
     onPanelSwitch = _config[$ "onPanelSwitch"] ?? undefined
 
+    // Кастомный рендер слота карт (для переиспользования)
+    cardRenderer = _config[$ "cardRenderer"] ?? undefined
+
     scrollY = 0 // пиксельный скролл сетки 
     scrollable = _config[$ "scrollable"] ?? true
     totalRows = ceil(array_length(slots) / cols)
@@ -387,7 +390,7 @@ function Panel(_config) constructor {
             var tr = getTabRect(t)
             if (pointInRect(mx, my, tr.tx, tr.ty, tr.tw, tr.th)) {
                 if (clicked) {
-                    oDeckBuilder.focusPanel(self)
+                    if (instance_exists(oDeckBuilder)) oDeckBuilder.focusPanel(self)
                     onTabRow = true
                     activeTab = t
                     if (onTabClick != undefined) onTabClick(self, t)
@@ -403,7 +406,7 @@ function Panel(_config) constructor {
                 && pointInRect(mx, my, x, y, w, h)) {
                 hoverSlot = i
                 if (clicked) {
-                    oDeckBuilder.focusPanel(self)
+                    if (instance_exists(oDeckBuilder)) oDeckBuilder.focusPanel(self)
                     onTabRow = false
                     cursorRow = i div cols
                     cursorCol = i mod cols
@@ -466,6 +469,10 @@ function Panel(_config) constructor {
                             slotRect.sh)
                     break
                 case "filled":
+                    if (cardRenderer != undefined) {
+                        cardRenderer(slot, slotRect, selectedSlot == i)
+                        break
+                    }
                     if (slotSpriteEmpty != undefined)
                         draw_sprite_stretched(slotSpriteEmpty,
                             0,
