@@ -8,7 +8,8 @@ function Card(name,
             cardIllustrationSpr,
             cardBorderSpr,
             cardTokenSpr,
-            description = "") constructor {
+            description = "",
+            cardAlbumSpr = noone) constructor {
     self.name = name
     self.rarity = rarity
     self.target = target
@@ -19,6 +20,7 @@ function Card(name,
     self.cardBorderSpr = cardBorderSpr
     self.cardTokenSpr = cardTokenSpr
     self.description = description // текст на карте
+    self.cardAlbumSpr = cardAlbumSpr
     self.energy = energy
 
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana
@@ -169,6 +171,9 @@ function checkIfCanPlayCard(caster, card) {
         if (!hasKO) return false
     }
 
+    // Марионетку не призвать, если команда уже держит максимум
+    if (cardSummonsPuppet(card) && !canSpawnPuppetFor(caster)) return false
+
     if (caster.isEnemy) return true // враги играют бесплатно
 
     if (card.costType() == CostType.Mana) {
@@ -213,7 +218,7 @@ function cardPlaySequence(card, caster, targets) {
                     c.changeActionState(
                         cardAnimState(ctx.card),
                         method(ctx, function() { self.animEnded = true }),
-                        cardCastSpriteOverride(ctx.card)
+                        cardCastSpriteOverride(ctx.card, c)
                     )
                 }
             },

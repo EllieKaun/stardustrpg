@@ -1,6 +1,5 @@
 dbBaseW = camera_get_view_width(view_camera[0])
 dbBaseH = camera_get_view_height(view_camera[0])
-display_set_gui_size(dbBaseW, dbBaseH)
 
 activePanel = 0 // 0 = коллекция всех карт, 1 = дека
 
@@ -214,7 +213,7 @@ activePanel = Panels.Collection
 open = false
 
 deckTutStarted = false
-var lana = asset_get_index("placeholderLana")
+var lana = asset_get_index("portraitLana")
 deckTutorial = new TutorialRunner([
     { speaker: "Lana", portrait: lana, text: "This is your collection - every card you own. Cards already used in a deck are marked with an owner icon.",
       getRect: function() { var r = undefined; with (oDeckBuilder) r = { x: collectionPanel.x, y: collectionPanel.y, w: collectionPanel.w, h: collectionPanel.h }; return r } },
@@ -224,7 +223,7 @@ deckTutorial = new TutorialRunner([
 ])
 
 openBuilder = function() {
-    setCrispGui(dbBaseW, dbBaseH)
+    guiSyncCrisp()
     layoutPanels()
     open = true
     global.uiModal = true
@@ -244,5 +243,4 @@ openBuilder = function() {
 closeBuilder = function() {
     open = false
     global.uiModal = false
-    display_set_gui_size(dbBaseW, dbBaseH)
 }

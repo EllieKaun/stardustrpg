@@ -219,7 +219,7 @@ function drawGameOverScreen() {
 
         array_push(gameOverHitRects, { x: bx, y: btnY, w: btnW, h: btnH, index: i })
 
-        draw_sprite_stretched(box, 0, bx, btnY, btnW, btnH)
+        drawButtonFrame(bx, btnY, btnW, btnH)
         draw_set_color(isSel ? c_yellow : c_white)
         drawUiText(bx + btnW / 2, btnY + btnH / 2, labels[i], btnH * 0.55)
 

@@ -67,6 +67,9 @@ function Panel(_config) constructor {
     onTabClick = _config[$ "onTabClick"] ?? undefined
     onPanelSwitch = _config[$ "onPanelSwitch"] ?? undefined
 
+    // Кастомный рендер слота карт (для переиспользования)
+    cardRenderer = _config[$ "cardRenderer"] ?? undefined
+
     scrollY = 0 // пиксельный скролл сетки 
     scrollable = _config[$ "scrollable"] ?? true
     totalRows = ceil(array_length(slots) / cols)
@@ -80,6 +83,7 @@ function Panel(_config) constructor {
     onTabRow = false
     justGainedFocus = false
     tag = ""
+    clipSurface = -1
 
     // Шаг между строками карт (высота карты + вертикальный отступ)
     static rowPitch = function() {
@@ -386,7 +390,7 @@ function Panel(_config) constructor {
             var tr = getTabRect(t)
             if (pointInRect(mx, my, tr.tx, tr.ty, tr.tw, tr.th)) {
                 if (clicked) {
-                    oDeckBuilder.focusPanel(self)
+                    if (instance_exists(oDeckBuilder)) oDeckBuilder.focusPanel(self)
                     onTabRow = true
                     activeTab = t
                     if (onTabClick != undefined) onTabClick(self, t)
@@ -402,7 +406,7 @@ function Panel(_config) constructor {
                 && pointInRect(mx, my, x, y, w, h)) {
                 hoverSlot = i
                 if (clicked) {
-                    oDeckBuilder.focusPanel(self)
+                    if (instance_exists(oDeckBuilder)) oDeckBuilder.focusPanel(self)
                     onTabRow = false
                     cursorRow = i div cols
                     cursorCol = i mod cols
@@ -430,11 +434,15 @@ function Panel(_config) constructor {
         // Бэк
         if (bgSprite != undefined) draw_sprite_stretched(bgSprite, 0, x, y, w, h)
 
-        // Клип сетки по прямоугольнику фона 
-        var prevScissor = gpu_get_scissor()
-        gpu_set_scissor(floor(x), floor(y + 16), ceil(w), ceil(h - 32))
+        // Клип сетки по прямоугольнику фона
+        var clipInset = 4 * uiScale
+        var clipX = x
+        var clipY = y + clipInset
+        var clipW = w
+        var clipH = h - clipInset * 2
+        clipSurface = guiClipBegin(clipSurface, clipX, clipY, clipW, clipH)
 
-        // Рисуем все слоты, лишнее обрежет scissor
+        // Рисуем все слоты, лишнее обрежет клип
         var first = 0
         var last  = array_length(slots)
         for (var i = first; i < last; i++) {
@@ -461,6 +469,10 @@ function Panel(_config) constructor {
                             slotRect.sh)
                     break
                 case "filled":
+                    if (cardRenderer != undefined) {
+                        cardRenderer(slot, slotRect, selectedSlot == i)
+                        break
+                    }
                     if (slotSpriteEmpty != undefined)
                         draw_sprite_stretched(slotSpriteEmpty,
                             0,
@@ -492,7 +504,7 @@ function Panel(_config) constructor {
         }
 
         // конец клипа сетки
-        gpu_set_scissor(prevScissor)
+        guiClipEnd(clipSurface, clipX, clipY)
 
         // Табы
         for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {

@@ -26,6 +26,7 @@ aura = 0
 resistense = 0
 isEnemy = false
 isPuppet = false
+slotIndex = -1 
 effects = []
 weaknesses = []
 strengths = []

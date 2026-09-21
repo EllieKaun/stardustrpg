@@ -2,7 +2,7 @@
 // The battle draws its UI in the "logical" base resolution (global.guiBaseW/H)
 // and scales it up into a higher-resolution GUI buffer with a world matrix.
 // These return that base size, falling back to the raw GUI size outside battle.
-function guiBaseWidth()  { return variable_global_exists("guiBaseW") ? global.guiBaseW : display_get_gui_width()  }
+function guiBaseWidth() { return variable_global_exists("guiBaseW") ? global.guiBaseW : display_get_gui_width()  }
 function guiBaseHeight() { return variable_global_exists("guiBaseH") ? global.guiBaseH : display_get_gui_height() }
 
 // Ставит GUI-слой в 16:9 аспекте
@@ -15,13 +15,40 @@ function setCrispGui(baseW, baseH) {
     }
 }
 
-// Scissor по прямоугольнику в GUI-координатах
-function guiSetScissor(areaX, areaY, areaWidth, areaHeight) {
-    var windowToGuiX = window_get_width() / display_get_gui_width()
-    var windowToGuiY = window_get_height() / display_get_gui_height()
-    var scissorX = floor(areaX * windowToGuiX)
-    var scissorY = floor(areaY * windowToGuiY)
-    gpu_set_scissor(scissorX, scissorY, ceil((areaX + areaWidth) * windowToGuiX) - scissorX, ceil((areaY + areaHeight) * windowToGuiY) - scissorY)
+// GUI приводится к нужному размеру
+function guiSyncCrisp() {
+    var cam = view_camera[0]
+    setCrispGui(camera_get_view_width(cam), camera_get_view_height(cam))
+}
+
+// Клип прямоугольником в GUI-координатах через поверхность
+function guiClipBegin(surf, clipX, clipY, clipW, clipH) {
+    clipW = max(1, ceil(clipW))
+    clipH = max(1, ceil(clipH))
+    if (surface_exists(surf) && (surface_get_width(surf) != clipW || surface_get_height(surf) != clipH)) {
+        surface_free(surf)
+    }
+    if (!surface_exists(surf)) surf = surface_create(clipW, clipH)
+
+    surface_set_target(surf)
+    draw_clear_alpha(c_black, 0)
+    matrix_set(matrix_world, matrix_build(-floor(clipX), -floor(clipY), 0, 0, 0, 0, 1, 1, 1))
+    gpu_set_blendmode_ext_sepalpha(bm_src_alpha, bm_inv_src_alpha, bm_one, bm_inv_src_alpha)
+    return surf
+}
+
+function guiClipEnd(surf, clipX, clipY) {
+    gpu_set_blendmode(bm_normal)
+    matrix_set(matrix_world, matrix_build_identity())
+    surface_reset_target()
+
+    gpu_set_blendmode_ext(bm_one, bm_inv_src_alpha)
+    draw_surface(surf, floor(clipX), floor(clipY))
+    gpu_set_blendmode(bm_normal)
+}
+
+function drawButtonFrame(btnX, btnY, btnW, btnH) {
+    draw_sprite_stretched(ShopBtn, 0, btnX, btnY, btnW, btnH)
 }
 
 // Попадание точки в повёрнутый прямоугольник (центр centerX,centerY; размер rectWidth,rectHeight; угол angle)
@@ -151,6 +178,8 @@ function fitWrappedText(text, areaW, areaH) {
 
 //// Лицо карты с текстом
 #macro CARD_FACE_SCALE 8
+// На сколько пикселей арта приподнять токен стоимости энергии 
+#macro CARD_COST_TOKEN_RAISE_PX 0
 
 function cardFaceLayout(card) {
     if (!variable_global_exists("cardFaceLayouts")) global.cardFaceLayouts = {}
@@ -162,7 +191,7 @@ function cardFaceLayout(card) {
     var refH = sprite_get_height(card.cardBaseSpr) * CARD_FACE_SCALE
     var areaW = (CARD_DESC_X2 - CARD_DESC_X1) * CARD_FACE_SCALE
     var areaH = (CARD_DESC_Y2 - CARD_DESC_Y1) * CARD_FACE_SCALE
-    // ручное описание с карты (card.description)
+    // описание с карты (card.description)
     var descText = variable_struct_exists(card, "description") ? card.description : ""
     var fittedText = fitWrappedText(descText, areaW, areaH)
 
@@ -189,7 +218,11 @@ function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scal
     draw_sprite_ext(card.cardIllustrationSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     draw_sprite_ext(card.cardBorderSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     draw_sprite_ext(card.cardTokenSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
-
+    // Токен стоимости энергии
+    var costToken = (card.energy >= 2) ? sprCostTwoEnergy : sprCostEnergy
+    var tokenRaise = CARD_COST_TOKEN_RAISE_PX * spriteScaleY // 3 пикселя арта с учётом масштаба
+    var tokenPoint = cardLocalToScreen(centerX, centerY, 0, -tokenRaise, angle)
+    draw_sprite_ext(costToken, 0, tokenPoint.x, tokenPoint.y, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     var layout = cardFaceLayout(card)
     var layoutScale = min(cardWidth * scale / layout.refW, cardHeight * scale / layout.refH)
     var prevFont = draw_get_font()

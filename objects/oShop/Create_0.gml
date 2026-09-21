@@ -111,7 +111,7 @@ shopPanel.enterFromLeft(0)
 
 // Открыть магазин
 openShop = function() {
-    setCrispGui(dbBaseW, dbBaseH)
+    guiSyncCrisp()
     layoutPanels()
     open = true
     global.uiModal = true
@@ -127,5 +127,4 @@ openShop = function() {
 closeShop = function() {
     open = false
     global.uiModal = false
-    display_set_gui_size(dbBaseW, dbBaseH)
 }

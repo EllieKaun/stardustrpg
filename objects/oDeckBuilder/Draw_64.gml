@@ -9,6 +9,7 @@ if (a > 0) {
 
 if (!open) exit
 
+guiSyncCrisp()
 layoutPanels()
 collectionPanel.draw()
 deckPanel.draw()

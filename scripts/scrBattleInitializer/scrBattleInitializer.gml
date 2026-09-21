@@ -122,6 +122,42 @@ function playerDeckFor(character) {
     return deck
 }
 
+// Закрепляет за каждым персонажем слот
+function assignStarriorSlots(team) {
+    var used = []
+    for (var i = 0; i < array_length(team); i++) {
+        var slot = team[i].slotIndex
+        if (slot >= 0 && !array_contains(used, slot)) array_push(used, slot)
+        else team[i].slotIndex = -1 // повторный слот - назначим заново
+    }
+    for (var i = 0; i < array_length(team); i++) {
+        if (team[i].slotIndex >= 0) continue
+        var free = 0
+        while (array_contains(used, free)) free++
+        team[i].slotIndex = free
+        array_push(used, free)
+    }
+}
+
+// Порядок ходов по слотам
+function rebuildPlayOrder() {
+    var bySlot = function(a, b) { return a.slotIndex - b.slotIndex }
+    var sortedHeroes  = array_create(array_length(heroes))
+    var sortedEnemies = array_create(array_length(enemies))
+    array_copy(sortedHeroes,  0, heroes,  0, array_length(heroes))
+    array_copy(sortedEnemies, 0, enemies, 0, array_length(enemies))
+    array_sort(sortedHeroes,  bySlot)
+    array_sort(sortedEnemies, bySlot)
+
+    array_resize(playOrder, 0)
+    for (var i = 0; i < array_length(sortedHeroes); i++)  array_push(playOrder, sortedHeroes[i])
+    for (var i = 0; i < array_length(sortedEnemies); i++) array_push(playOrder, sortedEnemies[i])
+
+    // очередь сдвинулась - указатель хода должен остаться на том же персонаже
+    var idx = array_get_index(playOrder, selectedCharacter)
+    if (idx >= 0) selectedCharacterNumber = idx
+}
+
 function initStarriorsPositions(
     starriorsZoneHeight,
     screenWidth,
@@ -142,19 +178,25 @@ function initStarriorsPositions(
     var fitStep  = (halfW - edgeMargin * 2) / (slotCount - 1)
     var step = min(baseStep, fitStep)
 
+    assignStarriorSlots(heroes)
+    assignStarriorSlots(enemies)
+    rebuildPlayOrder()
+
     // Герои — по центру левой половины, заполняются справа налево
     var heroCount  = array_length(heroes)
     var heroStartX = heroesCenterX - (slotCount - 1) * step / 2  // центрируем на 5 слотов
     for (var i = 0; i < heroCount; i++) {
-        heroes[i].x = heroStartX + (slotCount - 1 - i) * step
-        heroes[i].y = startY + (i mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
+        var heroSlot = heroes[i].slotIndex
+        heroes[i].x = heroStartX + (slotCount - 1 - heroSlot) * step
+        heroes[i].y = startY + (heroSlot mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
     }
 
     // Враги — по центру правой половины
     var enemyCount  = array_length(enemies)
     var enemyStartX = enemiesCenterX - (slotCount - 1) * step / 2
     for (var i = 0; i < enemyCount; i++) {
-        enemies[i].x = enemyStartX + i * step
-        enemies[i].y = startY + (i mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
+        var enemySlot = enemies[i].slotIndex
+        enemies[i].x = enemyStartX + enemySlot * step
+        enemies[i].y = startY + (enemySlot mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
     }
 }

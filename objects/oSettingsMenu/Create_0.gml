@@ -102,8 +102,6 @@ menu = new Menu([
         
         applyWindowMode(resolutions[currentResIndex][0], resolutions[currentResIndex][1], currentFullscreen)
 
-        display_set_gui_size(resolutions[currentResIndex][0], resolutions[currentResIndex][1])
-        
         ini_open("settings.ini")
         ini_write_real("Display", "ResolutionIndex", currentResIndex)
         ini_write_real("Display", "Fullscreen", currentFullscreen ? 1 : 0)

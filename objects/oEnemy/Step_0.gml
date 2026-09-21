@@ -1,5 +1,7 @@
 
 if (global.gamePaused) exit
+
+if (global.uiModal) exit
 if (variable_global_exists("cutsceneActive") && global.cutsceneActive) exit
 
 depth = -bbox_bottom

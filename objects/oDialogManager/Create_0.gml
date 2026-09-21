@@ -1,6 +1,4 @@
 active = false
-prevGuiW = display_get_gui_width() // GUI до диалога, вернём в endDialog
-prevGuiH = display_get_gui_height()
 dialogBaseW = camera_get_view_width(view_camera[0])
 dialogBaseH = camera_get_view_height(view_camera[0])
 lines = []
@@ -25,10 +23,6 @@ nameFont = fnUI_14
 startDialog = function(_lines, _onComplete = undefined) {
     if (array_length(_lines) == 0) {
         return
-    }
-    if (!active) {
-        prevGuiW = display_get_gui_width()
-        prevGuiH = display_get_gui_height()
     }
     dialogBaseW = camera_get_view_width(view_camera[0])
     dialogBaseH = camera_get_view_height(view_camera[0])
@@ -81,7 +75,6 @@ advance = function() {
 endDialog = function() {
     active = false
     global.uiModal = false
-    display_set_gui_size(prevGuiW, prevGuiH)
     var callback = onComplete
     onComplete = undefined
     if (callback != undefined) {

@@ -50,10 +50,24 @@ function puppetDeckForCategory(category) {
     return deck
 }
 
+// Карта призывает марионетку
+function cardSummonsPuppet(card) {
+    for (var i = 0; i < array_length(card.effects); i++) {
+        var effect = card.effects[i]
+        if (variable_struct_exists(effect, "type") && effect.type == EffectTypes.CreatePuppet) return true
+    }
+    return false
+}
+
+function canSpawnPuppetFor(caster) {
+    var team = caster.isEnemy ? enemies : heroes
+    return countAlivePuppetsIn(team) < MAX_PUPPETS
+}
+
 function spawnPuppet(category, caster) {
-    var enemySide = caster.isEnemy  
+    var enemySide = caster.isEnemy
     var team      = enemySide ? enemies : heroes
-    if (countAlivePuppetsIn(team) >= MAX_PUPPETS) return
+    if (!canSpawnPuppetFor(caster)) return
 
     var spr = puppetSpritesForCategory(category)
     var p = createStarrior(
@@ -66,6 +80,7 @@ function spawnPuppet(category, caster) {
     p.isEnemy = enemySide
     p.puppetCategory = category
     p.justSummoned   = true
+    p.image_xscale   = enemySide ? 1 : -1 // спрайты марионеток нарисованы лицом влево - у героев зеркалим
     array_push(team, p)
     array_push(playOrder, p)
     shuffleDeckAndTake4(p)

@@ -1,4 +1,5 @@
 if (!open) exit
+guiSyncCrisp() 
 layoutPanels()
 
 if (global.deckTutorialStage == DeckTutorialStage.Steps) {

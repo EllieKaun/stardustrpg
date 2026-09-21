@@ -64,9 +64,9 @@ if (keyboard_check_pressed(vk_tab) && instance_exists(oDeckBuilder)) {
         oDeckBuilder.openBuilder()
     }
 //    say([
-//    dialogLine("Lana", placeholderLana,
+//    dialogLine("Lana", portraitLana,
 //        "Hey hey"),
-//    dialogLine("Viv", placeholderViv,
+//    dialogLine("Viv", portraitViv,
 //        "Yeh yeh")
 //], function() {
 //    show_debug_message("dialog finished")
