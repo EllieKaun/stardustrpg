@@ -20,8 +20,8 @@ shopPanel = new Shop({
     tabFonts: tabFonts,
     rowHeight: 62, // высота строки товара
     tabs: [
-        { name: "CARDS", sprite: ShopBtn, color: #CC8844 },
-        { name: "OTHER", sprite: ShopBtn, color: #CC8844 }
+        { name: loc("shop.tabCards"), sprite: ShopBtn, color: #CC8844 },
+        { name: loc("shop.tabOther"), sprite: ShopBtn, color: #CC8844 }
     ],
     slots: buildShopItems(ShopCategory.Cards),
     onTabClick: function(panel, tabIndex) {
@@ -43,12 +43,14 @@ shopPanel = new Shop({
             if (item.kind == ShopItemKind.Card) {
                 if (spendGold(item.price)) {
                     unlockCard(item.ref.id, item.ref.rarity, 1) // добавляем копию карты
+                    analyticsPurchase(item.ref.id, item.price) // аналитика: покупка карты
                 }
             } else if (item.kind == ShopItemKind.Slot) {
                 if (spendGold(item.price)) {
                     // расширяем деку обоим героям, держим в синхроне
                     unlockDeckSlot(Characters.Lana, 1)
                     unlockDeckSlot(Characters.Viv, 1)
+                    analyticsPurchase("deck_slot", item.price) // аналитика: покупка слота колоды
                     playerDataSave()
                     // цена выросла / могли достичь максимума — пересобираем вкладку
                     panel.slots = buildShopItems(ShopCategory.OtherItems)

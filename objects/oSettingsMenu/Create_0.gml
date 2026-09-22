@@ -48,24 +48,22 @@ previewAudioVolumes = function() {
 }
 
 updateMenuLabels = function() {
-    var resText = "Resolution: < " + string(resolutions[selectedResIndex][0]) + "x" + string(resolutions[selectedResIndex][1]) + " >"
-    var fsText = "Fullscreen: < " + (selectedFullscreen ? "On" : "Off") + " >"
-    var volMasterText = "Master Vol: < " + string(round(selectedVolMaster * 100)) + "% >"
-    var volMusicText = "Music Vol: < " + string(round(selectedVolMusic * 100)) + "% >"
-    var volSoundsText = "Sounds Vol: < " + string(round(selectedVolSounds * 100)) + "% >"
-    
-    menu.items[0].label = resText
-    menu.items[1].label = fsText
-    menu.items[2].label = volMasterText
-    menu.items[3].label = volMusicText
-    menu.items[4].label = volSoundsText
-    
+    menu.items[0].label = loc("menu.resolution") + ": < " + string(resolutions[selectedResIndex][0]) + "x" + string(resolutions[selectedResIndex][1]) + " >"
+    menu.items[1].label = loc("menu.fullscreen") + ": < " + (selectedFullscreen ? loc("menu.on") : loc("menu.off")) + " >"
+    menu.items[2].label = loc("menu.masterVol") + ": < " + string(round(selectedVolMaster * 100)) + "% >"
+    menu.items[3].label = loc("menu.musicVol") + ": < " + string(round(selectedVolMusic * 100)) + "% >"
+    menu.items[4].label = loc("menu.soundsVol") + ": < " + string(round(selectedVolSounds * 100)) + "% >"
+    menu.items[5].label = loc("menu.language") + ": < " + languageNativeName(global.language) + " >"
+    menu.items[6].label = loc("menu.apply")
+    menu.items[7].label = loc("menu.cancel")
+    menu.items[8].label = loc("menu.back")
+
     // Включение/отключение кнопок "Применить" и "Отмена" при наличии изменений
     var hasChanges = (selectedResIndex != currentResIndex) || (selectedFullscreen != currentFullscreen)
     hasChanges = hasChanges || (selectedVolMaster != global.volMaster) || (selectedVolMusic != global.volMusic) || (selectedVolSounds != global.volSounds)
-    menu.items[5].enabled = hasChanges // Применить
-    menu.items[6].enabled = hasChanges // Отмена
-    
+    menu.items[6].enabled = hasChanges // Применить
+    menu.items[7].enabled = hasChanges // Отмена
+
     // Применяем громкость в реальном времени для предпросмотра
     previewAudioVolumes()
 }
@@ -93,6 +91,10 @@ menu = new Menu([
         var snd = audio_play_sound(SND_CARD_SELECT, 8, false)
         audio_sound_gain(snd, selectedVolSounds, 0)
     }),
+    new MenuItem("Language", noone, noone, function(it) {
+        locCycleLanguage()
+        updateMenuLabels()
+    }),
     new MenuItem("Apply", noone, noone, function(it) {
         currentResIndex = selectedResIndex
         currentFullscreen = selectedFullscreen
@@ -115,10 +117,10 @@ menu = new Menu([
         
         // Возвращаемся в предыдущее меню после сохранения
         if (instance_exists(oMainMenu)) {
-            with(oMainMenu) { visible = true; menuCooldown = 2; }
+            with(oMainMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) rebuildMenu() }
         }
         if (instance_exists(oPauseMenu)) {
-            with(oPauseMenu) { visible = true; menuCooldown = 2; }
+            with(oPauseMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) rebuildMenu() }
         }
         instance_destroy()
     }),
@@ -138,10 +140,10 @@ menu = new Menu([
         previewAudioVolumes()
         
         if (instance_exists(oMainMenu)) {
-            with(oMainMenu) { visible = true; menuCooldown = 2; }
+            with(oMainMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) rebuildMenu() }
         }
         if (instance_exists(oPauseMenu)) {
-            with(oPauseMenu) { visible = true; menuCooldown = 2; }
+            with(oPauseMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) rebuildMenu() }
         }
         instance_destroy()
     })

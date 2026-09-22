@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ga_getRemoteConfigsValueAsString",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ga_getRemoteConfigsValueAsString",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

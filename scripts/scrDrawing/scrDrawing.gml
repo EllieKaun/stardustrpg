@@ -182,8 +182,9 @@ function fitWrappedText(text, areaW, areaH) {
 #macro CARD_COST_TOKEN_RAISE_PX 0
 
 function cardFaceLayout(card) {
+    locEnsure()
     if (!variable_global_exists("cardFaceLayouts")) global.cardFaceLayouts = {}
-    var cacheKey = string(card.name) + "|" + string(card.rarity)
+    var cacheKey = string(card.name) + "|" + string(card.rarity) + "|" + global.language
     if (variable_struct_exists(global.cardFaceLayouts, cacheKey)) return global.cardFaceLayouts[$ cacheKey]
 
     var prevFont = draw_get_font()
@@ -192,7 +193,7 @@ function cardFaceLayout(card) {
     var areaW = (CARD_DESC_X2 - CARD_DESC_X1) * CARD_FACE_SCALE
     var areaH = (CARD_DESC_Y2 - CARD_DESC_Y1) * CARD_FACE_SCALE
     // описание с карты (card.description)
-    var descText = variable_struct_exists(card, "description") ? card.description : ""
+    var descText = cardDisplayDesc(card)
     var fittedText = fitWrappedText(descText, areaW, areaH)
 
     var costTxt = string(card.costValue())
@@ -521,7 +522,7 @@ function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, co
 }
 
 // Показать окно награды с одной картой 
-function showCardReward(cardStruct, title = "New card!") {
+function showCardReward(cardStruct, title = loc("ui.newCard")) {
     if (cardStruct == undefined) return
     if (!instance_exists(oCardReward)) instance_create_depth(0, 0, -20000, oCardReward)
     with (oCardReward) {

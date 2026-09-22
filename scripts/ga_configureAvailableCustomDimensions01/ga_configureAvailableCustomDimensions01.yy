@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ga_configureAvailableCustomDimensions01",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ga_configureAvailableCustomDimensions01",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

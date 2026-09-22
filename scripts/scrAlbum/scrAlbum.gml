@@ -34,14 +34,14 @@ function albumDrawCard(slot, rect, isSelected) {
         draw_set_color(c_white)
         if (card != undefined) {
             draw_set_font(uiFont())
-            drawFitTextCentered(card.name,
+            drawFitTextCentered(cardDisplayName(card),
                 rect.sx + rect.sw * 0.08, rect.sy + rect.sh * 0.06,
                 rect.sw * 0.84, rect.sh * 0.28, UI_FONT_STACK)
         }
     }
 
-    // Описание 
-    if (card != undefined && card.description != "") {
+    // Описание
+    if (card != undefined && cardDisplayDesc(card) != "") {
         var bandY = rect.sy + rect.sh * 0.66
         var bandH = rect.sh * 0.30
         draw_set_color(c_black)
@@ -50,7 +50,7 @@ function albumDrawCard(slot, rect, isSelected) {
         draw_set_alpha(1)
         draw_set_color(c_white)
         draw_set_font(uiFont())
-        drawFitTextCentered(card.description,
+        drawFitTextCentered(cardDisplayDesc(card),
             rect.sx + rect.sw * 0.08, bandY,
             rect.sw * 0.84, bandH, UI_FONT_STACK)
     }

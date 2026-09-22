@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ga_setEnabledManualSessionHandling",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ga_setEnabledManualSessionHandling",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

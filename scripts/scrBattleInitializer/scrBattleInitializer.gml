@@ -61,7 +61,6 @@ function igniteEnemy(e) {
     e.maxHp = e.maxHp * 6
     e.isIgnited = true
     e.igniteEffectChance = 0.1
-    e.name = "Ignite " + e.name
 }
 
 function createStarrior(

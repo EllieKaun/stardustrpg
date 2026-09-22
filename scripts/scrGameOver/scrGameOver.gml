@@ -32,6 +32,7 @@ function stepVictoryScreen() {
     if (confirm) { // подтверждение награды
         var picked = rewardChoices[rewardCursor].cardRef
         unlockCard(picked.id, picked.rarity, 1)
+        analyticsReward(picked.id, picked.rarity, "battle") // аналитика: забрал карту-награду за победу
         playerDataSave()
         rewardSelected = true
         returnToOverworld()
@@ -79,14 +80,14 @@ function drawVictoryScreen() {
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    drawUiText(sw / 2, floor(sh * 0.08), "VICTORY", sh * 0.07)
+    drawUiText(sw / 2, floor(sh * 0.08), loc("ui.victory"), sh * 0.07)
 
     var count = array_length(rewardChoices)
     rewardHitRects = []
 
     // Если нет наград
     if (count == 0) {
-        drawUiText(sw / 2, sh / 2, "No rewards — press Enter", sh * 0.04)
+        drawUiText(sw / 2, sh / 2, loc("ui.noRewards"), sh * 0.04)
         draw_set_halign(fa_left)
         draw_set_valign(fa_top)
         return
@@ -142,8 +143,8 @@ function drawRewardDescription(card, px, py, pw, ph) {
     var lh = min(16 * s, ph / 5.5)
     var textH = lh * 0.85
 
-    drawUiText(ix, iy, string(card.name), textH)
-    drawUiText(ix, iy + lh, "Type: " + (card.actionType == StarriorStates.Attack ? "Attack" : "Cast"), textH)
+    drawUiText(ix, iy, cardDisplayName(card), textH)
+    drawUiText(ix, iy + lh, loc("reward.type") + (card.actionType == StarriorStates.Attack ? loc("reward.attack") : loc("reward.cast")), textH)
 
     var cy = iy + lh * 2
 
@@ -170,7 +171,7 @@ function drawRewardDescription(card, px, py, pw, ph) {
                     break
                 }
             }
-            var label = (effect.type == EffectTypes.Damage) ? "Damage: " : "Heal: "
+            var label = (effect.type == EffectTypes.Damage) ? loc("reward.damage") : loc("reward.heal")
             drawUiText(ix, cy, label + "1-" + string(maxNum), textH)
             cy += lh
             break
@@ -184,12 +185,12 @@ function drawRewardDescription(card, px, py, pw, ph) {
             effectStr += effectTypeToString(effect.type) + " "
     }
     if (effectStr != "") {
-        drawUiText(ix, cy, "Effects: " + effectStr, textH)
+        drawUiText(ix, cy, loc("reward.effects") + effectStr, textH)
         cy += lh
     }
 
-    var costLabel = (card.costType() == CostType.Mana) ? "MP" : "HP"
-    drawUiText(ix, cy, "Cost: " + string(card.costValue()) + " " + costLabel, textH)
+    var costLabel = (card.costType() == CostType.Mana) ? loc("reward.mp") : loc("reward.hp")
+    drawUiText(ix, cy, loc("reward.cost") + string(card.costValue()) + " " + costLabel, textH)
 }
 
 // Рисование экрана поражения
@@ -204,9 +205,9 @@ function drawGameOverScreen() {
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    drawUiText(sw / 2, floor(sh * 0.30), "GAME OVER", sh * 0.06) // GameOver надпись
+    drawUiText(sw / 2, floor(sh * 0.30), loc("ui.gameover"), sh * 0.06) // GameOver надпись
 
-    var labels = ["RETRY", "EXIT"]
+    var labels = [loc("ui.retry"), loc("ui.exit")]
     var btnW = 64 * s, btnH = 18 * s, gap = 16 * s
     var totalW = btnW * 2 + gap;
     var startX = (sw - totalW) / 2

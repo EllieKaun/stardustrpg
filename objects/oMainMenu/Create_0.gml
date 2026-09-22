@@ -20,10 +20,12 @@ menuConfig = { anchorX: 0.75, startY: 0.45, spacing: 0.11, textH: 0.055, halign:
 
 startNewGameNow = function() {
     global.startNewGame = true
+    analyticsNewGame() // аналитика: новая игра
     room_goto(DemoWorld)
 }
 startContinue = function() {
     global.startNewGame = false
+    analyticsContinue() // аналитика: продолжить игру
     room_goto(DemoWorld)
 }
 openSettings = function() {
@@ -38,37 +40,39 @@ openAlbum = function() {
 buildMainMenu = function() {
     var items = []
     if (hasSave) {
-        array_push(items, new MenuItem("Continue", noone, noone, function(it) { startContinue() }))
+        array_push(items, new MenuItem(loc("menu.continue"), noone, noone, function(it) { startContinue() }))
     }
-    array_push(items, new MenuItem("New Game", noone, noone, function(it) {
+    array_push(items, new MenuItem(loc("menu.newGame"), noone, noone, function(it) {
         if (hasSave) {
-            confirmPrompt = "Overwrite your save?"
+            confirmPrompt = loc("menu.overwriteSave")
             menu = buildConfirmMenu()
             menuCooldown = 2
         } else {
             startNewGameNow()
         }
     }))
-    array_push(items, new MenuItem("Album", noone, noone, function(it) { openAlbum() }))
-    array_push(items, new MenuItem("Settings", noone, noone, function(it) { openSettings() }))
-    array_push(items, new MenuItem("Quit", noone, noone, function(it) { game_end() }))
+    array_push(items, new MenuItem(loc("menu.album"), noone, noone, function(it) { openAlbum() }))
+    array_push(items, new MenuItem(loc("menu.settings"), noone, noone, function(it) { openSettings() }))
+    array_push(items, new MenuItem(loc("menu.quit"), noone, noone, function(it) { game_end() }))
     return new Menu(items, menuConfig)
 }
 
 buildConfirmMenu = function() {
     return new Menu([
-        new MenuItem("No, keep playing", noone, noone, function(it) {
+        new MenuItem(loc("menu.noKeepPlaying"), noone, noone, function(it) {
             confirmPrompt = ""
             menu = buildMainMenu()
             menuCooldown = 2
         }),
-        new MenuItem("Yes, start new game", noone, noone, function(it) {
+        new MenuItem(loc("menu.yesNewGame"), noone, noone, function(it) {
             startNewGameNow()
         })
     ], menuConfig)
 }
 
 menu = buildMainMenu()
+
+rebuildMenu = function() { menu = buildMainMenu() }
 
 playMusicNamed("MainMenuMusic") // музыка меню
 

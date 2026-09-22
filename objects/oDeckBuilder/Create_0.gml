@@ -53,11 +53,11 @@ collectionPanel = new Panel({
     pointerSprite: sPointer,
     tabFonts: tabFonts,
     tabs: [
-        { name: "MAGIC", sprite: MagicBtn, color: #9944CC },
-        { name: "BUFF", sprite: BuffBtn, color: #CC44CC },
-        { name: "HEAL", sprite: HealBtn, color: #44CC44 },
-        { name: "ATTACK", sprite: AttackBtn, color: #CC4444 },
-        { name: "SPECIAL", sprite: SpecialBtn, color: c_white, textColor: c_black }
+        { name: loc("deck.magic"), sprite: MagicBtn, color: #9944CC },
+        { name: loc("deck.buff"), sprite: BuffBtn, color: #CC44CC },
+        { name: loc("deck.heal"), sprite: HealBtn, color: #44CC44 },
+        { name: loc("deck.attack"), sprite: AttackBtn, color: #CC4444 },
+        { name: loc("deck.special"), sprite: SpecialBtn, color: c_white, textColor: c_black }
     ],
     visibleRows: 3,
     slots: buildCollectionSlots(CardCategory.Magic),
@@ -90,7 +90,8 @@ collectionPanel = new Panel({
             } 
             // Добавление карты в слот и проверка, добавился ли
             if (setDeckSlot(editingCharacter, freeSlot, src.ref.id, src.ref.rarity)) {
-                // Если добавился, обновляем коллекцию сотов текущего персонажа 
+                analyticsAddToDeck(characterKey(editingCharacter), src.ref.id, src.ref.rarity) // аналитика: карта добавлена в колоду
+                // Если добавился, обновляем коллекцию сотов текущего персонажа
                 deckPanel.slots = buildDeckSlots(editingCharacter)
                 refreshCollection() // Обновляем визуал
                 playerDataSave() // Сохраняем все
@@ -117,9 +118,9 @@ deckPanel = new Panel({
         // iconOffsetX — сдвиг иконки
         // btnOffsetX — сдвиг кнопки вправо 
         // textInset — сдвиг текста вправо
-        { name: "LANA", sprite: LanaBtn, icon: LanaIcon, iconOffsetX: 0, btnOffsetX: 0.5,
+        { name: loc("deck.lana"), sprite: LanaBtn, icon: LanaIcon, iconOffsetX: 0, btnOffsetX: 0.5,
           color: #4488CC, textInset: 1.3 },
-        { name: "VIV", sprite: VivBtn, icon: VivIcon, iconOffsetX: 0, btnOffsetX: 0.5,
+        { name: loc("deck.viv"), sprite: VivBtn, icon: VivIcon, iconOffsetX: 0, btnOffsetX: 0.5,
           color: #44CC88, textInset: 1.3 }
     ],
     scrollable: false, 
@@ -215,11 +216,11 @@ open = false
 deckTutStarted = false
 var lana = asset_get_index("portraitLana")
 deckTutorial = new TutorialRunner([
-    { speaker: "Lana", portrait: lana, text: "This is your collection - every card you own. Cards already used in a deck are marked with an owner icon.",
+    { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db1"),
       getRect: function() { var r = undefined; with (oDeckBuilder) r = { x: collectionPanel.x, y: collectionPanel.y, w: collectionPanel.w, h: collectionPanel.h }; return r } },
-    { speaker: "Lana", portrait: lana, text: "These are your decks. Select a card here to take it back out of the deck.",
+    { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db2"),
       getRect: function() { var r = undefined; with (oDeckBuilder) r = { x: deckPanel.x, y: deckPanel.y, w: deckPanel.w, h: deckPanel.h }; return r } },
-    { speaker: "Lana", portrait: lana, text: "That's it - build your deck however you like. Press Tab to close it." }
+    { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db3") }
 ])
 
 openBuilder = function() {

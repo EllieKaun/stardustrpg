@@ -219,16 +219,16 @@ function weaknessIcon(sn) {
 
 function weaknessLabel(sn) {
     switch (sn) {
-        case StatusNames.Stun: return "Stun"
-        case StatusNames.Burn: return "Burn"
-        case StatusNames.Freeze: return "Freeze"
-        case StatusNames.Bleeding: return "Bleed"
-        case StatusNames.Shock: return "Shock"
-        case StatusNames.Bomb: return "Bomb"
-        case StatusNames.Vampirism: return "Vampirism"
-        case StatusNames.Weakening: return "Weaken"
+        case StatusNames.Stun: return loc("weakness.Stun")
+        case StatusNames.Burn: return loc("weakness.Burn")
+        case StatusNames.Freeze: return loc("weakness.Freeze")
+        case StatusNames.Bleeding: return loc("weakness.Bleeding")
+        case StatusNames.Shock: return loc("weakness.Shock")
+        case StatusNames.Bomb: return loc("weakness.Bomb")
+        case StatusNames.Vampirism: return loc("weakness.Vampirism")
+        case StatusNames.Weakening: return loc("weakness.Weakening")
     }
-    return "?"
+    return loc("weakness.Unknown")
 }
 
 function buffIcon(effect, isBuff) {

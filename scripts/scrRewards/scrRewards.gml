@@ -74,6 +74,7 @@ function rollRewardChoices(spec, count = 3) {
 // Награды после победы
 function grantBattleRewards() {
     addWin()
+    analyticsWin() // аналитика: победа в бою
 
     // Золото за победу 6 за каждого побеждённого врага
     addGold(GOLD_PER_ENEMY * array_length(enemies))
