@@ -19,6 +19,5 @@ if (array_length(panel.slots) == 0) {
     drawUiText(gw * 0.5, gh * 0.5, "No cards yet", gh * 0.05)
 }
 
-
 draw_set_halign(fa_left)
 draw_set_valign(fa_top)

@@ -32,21 +32,26 @@ doChestAction = function() {
         break
 
         case ChestKind.Enemy:
-            var leader = oGameController.selected_character
-            global.fightEnemy = noone
-            global.returningFromBattle = true
-            global.battleSection = Section.TopLeft
-            global.battleEncounter = makeEncounter(winScaledComposition(), forestRewardPool())
-            global.battleNoFlee = true
-            global.returnRoom = room
-            global.returnX = leader.x
-            global.returnY = leader.y
-            leader.can_move = false
-            with (oTransition) {
-                target_room = BattleRoom
-                state = "fade_out"
-            }
+            // Сначала показываем, что это ловушка, бой начинается после диалога
+            say([ dialogLine("Chest", noone, "It's a trap!") ], method(id, function() { startChestBattle() }))
         break
+    }
+}
+
+startChestBattle = function() {
+    var leader = oGameController.selected_character
+    global.fightEnemy = noone
+    global.returningFromBattle = true
+    global.battleSection = Section.TopLeft
+    global.battleEncounter = makeEncounter(winScaledComposition(), forestRewardPool())
+    global.battleNoFlee = true
+    global.returnRoom = room
+    global.returnX = leader.x
+    global.returnY = leader.y
+    leader.can_move = false
+    with (oTransition) {
+        target_room = BattleRoom
+        state = "fade_out"
     }
 }
 

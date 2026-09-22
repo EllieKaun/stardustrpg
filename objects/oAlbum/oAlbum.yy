@@ -11,8 +11,8 @@
   "name":"oAlbum",
   "overriddenProperties":[],
   "parent":{
-    "name":"Menu",
-    "path":"folders/Menu.yy",
+    "name":"Album",
+    "path":"folders/Album.yy",
   },
   "parentObjectId":null,
   "persistent":false,

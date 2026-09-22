@@ -1,3 +1,7 @@
+// Пауза не должна перетекать из прошлой комнаты (например, при Retry)
+global.gamePaused = false
+global.uiModal = false
+
 focusArea = FocusArea.Deck
 selectedMenuItem = 0
 menuItems = ["Run", "Shuffle", "Info"]

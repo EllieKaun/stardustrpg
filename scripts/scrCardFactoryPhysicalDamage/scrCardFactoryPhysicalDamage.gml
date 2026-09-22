@@ -13,7 +13,8 @@ function createPhysicalDamageSingleTargetCard() {
         atcSingleTarget,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage (single)"
+        "deals minor physical damage (single)",
+        sprHighResDamageSingleEnemy
     )
 }
 
@@ -32,7 +33,8 @@ function createPhysicalDamageMultipleTargetCard() {
         atcGroup,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage (group)"
+        "deals minor physical damage (group)",
+        sprHighResDamageGroup
     )
 }
 
@@ -54,7 +56,8 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
         stunSingleTarget,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage, may stun (single)"
+        "deals minor physical damage, may stun (single)",
+        sprHighResDamageStunChanseSingleEnemy
     )
 }
 
@@ -76,7 +79,8 @@ function createPhysicalDamageStunChanseMultipleTargetCard() {
         stunGroup,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage, may stun (group)"
+        "deals minor physical damage, may stun (group)",
+        sprHighResDamageStunChanseGroup
     )
 }
 
@@ -98,7 +102,8 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
         bleedSingleTarget,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage, may cause bleeding (single)"
+        "deals minor physical damage, may cause bleeding (single)",
+        sprHighResBleedingChanseSingleTarget
     )
 }
 
@@ -120,7 +125,8 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
         bleedGroup,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage, may cause bleeding (group)"
+        "deals minor physical damage, may cause bleeding (group)",
+        sprHighResDamageBleedingChanseGroup
     )
 }
 
@@ -142,7 +148,8 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
         bombSingleTarget,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage with a bomb blast (single)"
+        "deals minor physical damage with a bomb blast (single)",
+        sprHighResDamageBombChanseSingleTarget
     )
 }
 
@@ -164,7 +171,8 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
         bombGroup,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage with a bomb blast (group)"
+        "deals minor physical damage with a bomb blast (group)",
+        sprHighResDamageBombChanseGroup
     )
 }
 
@@ -186,7 +194,8 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
         exhSingleTarget,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage, may weaken (single)"
+        "deals minor physical damage, may weaken (single)",
+        sprHighResDamageExhaustChanseSIngleTarget
     )
 }
 
@@ -208,7 +217,8 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
         exhGroup,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage, may weaken (group)"
+        "deals minor physical damage, may weaken (group)",
+        sprHighResDamageExhaustChanseSIngleTarget
     )
 }
 
@@ -227,7 +237,8 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
         vampSingleTarget,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage, drains health (single)"
+        "deals minor physical damage, drains health (single)",
+        sprHighResDamageVampireChanseSingleTarget
     )
 }
 
@@ -246,6 +257,7 @@ function createPhysicalDamageVampirismChanceMultipleTargetCard() {
         vampGroup,
         commonBorder,
         hpCostToken,
-        "deals minor physical damage, drains health (group)"
+        "deals minor physical damage, drains health (group)",
+        sprHighResDamageVampireChanseGroup
     )
 }

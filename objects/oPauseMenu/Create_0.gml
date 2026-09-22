@@ -1,4 +1,5 @@
 menuEnsureCrispGui()
+depth = -10000 // поверх интерфейса боя
 
 global.gamePaused = true
 global.uiModal = true

@@ -1,4 +1,5 @@
 menuEnsureCrispGui()
+depth = -10000 // поверх интерфейса боя
 
 resolutions = menuGetResolutions()
 

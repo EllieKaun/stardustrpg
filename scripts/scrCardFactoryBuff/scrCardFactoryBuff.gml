@@ -11,7 +11,8 @@ function createCardBuffPhysicalDamageSingleTarget() {
         strBuff,
         commonBorder,
         hpCostToken,
-        "slightly boosts physical damage (4 turns)"
+        "slightly boosts physical damage (4 turns)",
+        sprHighResBuffPhysicalDamage
     )
 }
 
@@ -28,7 +29,8 @@ function createCardBuffMagicalDamageSingleTarget() {
         magicBuff,
         commonBorder,
         hpCostToken,
-        "slightly boosts magic damage (1 turn)"
+        "slightly boosts magic damage (1 turn)",
+        sprHighResBuffMagicalDamage
     )
 }
 
@@ -48,7 +50,8 @@ function createCardBuffAnyDamageMultipleTarget() {
         strAndMagicBuff,
         commonBorder,
         hpCostToken,
-        "slightly boosts damage (1 turn)"
+        "slightly boosts damage (1 turn)",
+        sprHighResBuffAnyDamage
     )
 }
 
@@ -65,7 +68,8 @@ function createCardBuffPhysicalProtectionSingleTarget() {
         defBuff,
         commonBorder,
         hpCostToken,
-        "slightly boosts physical defense (1 turn)"
+        "slightly boosts physical defense (1 turn)",
+        sprHighResBuffPhysicalProtection
     )
 }
 
@@ -82,7 +86,8 @@ function createCardBuffMagicalProtectionSingleTarget() {
         magicDef,
         commonBorder,
         hpCostToken,
-        "slightly boosts magical defense (1 turn)"
+        "slightly boosts magical defense (1 turn)",
+        sprHighResBuffMagicalProtection
     )
 }
 
@@ -102,7 +107,8 @@ function createCardBuffAnyProtectionMultipleTarget() {
         defAndMagicDefBuff,
         commonBorder,
         hpCostToken,
-        "slightly boosts defense (1 turn)"
+        "slightly boosts defense (1 turn)",
+        sprHighResBuffAnyProtection
     )
 }
 
@@ -119,7 +125,8 @@ function createCardDebuffPhysicalDamageSingleTarget() {
         strengthDebuff,
         commonBorder,
         hpCostToken,
-        "slightly reduces physical damage (1 turn)"
+        "slightly reduces physical damage (1 turn)",
+        sprHighResDebuffPhysicalDamage
     )
 }
 
@@ -136,7 +143,8 @@ function createCardDebuffMagicalDamageSingleTarget() {
         magicDamageDebuff,
         commonBorder,
         hpCostToken,
-        "slightly reduces magic damage (1 turn)"
+        "slightly reduces magic damage (1 turn)",
+        sprHighResDebuffMagicalDamage
     )
 }
 
@@ -153,7 +161,8 @@ function createCardDebuffPhysicalProtectionSingleTarget() {
         defDebuff,
         commonBorder,
         hpCostToken,
-        "slightly reduces physical defense (1 turn)"
+        "slightly reduces physical defense (1 turn)",
+        sprHighResDebuffPhysicalProtection
     )
 }
 
@@ -170,7 +179,8 @@ function createCardDebuffMagicalProtectionSingleTarget() {
         magicDefDebuff,
         commonBorder,
         hpCostToken,
-        "slightly reduces magical defense (1 turn)"
+        "slightly reduces magical defense (1 turn)",
+        sprHighResDebuffMagicalProtection
     )
 }
 
@@ -187,7 +197,8 @@ function createCardCreateTemporaryWeaknessMagicalDamageSingleTarget() {
         magicWeakness,
         commonBorder,
         hpCostToken,
-        "vulnerability to magic damage (1 turn)"
+        "vulnerability to magic damage (1 turn)",
+        sprHighResDamageExhaustChanseSIngleTarget
     )
 }
 
@@ -204,6 +215,7 @@ function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget() {
         strWeakness,
         commonBorder,
         hpCostToken,
-        "vulnerability to physical damage (1 turn)"
+        "vulnerability to physical damage (1 turn)",
+        sprHighResDamageExhaustChanseSIngleTarget
     )
 }

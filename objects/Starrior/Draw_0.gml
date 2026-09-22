@@ -28,7 +28,8 @@ if (disappearing) {
     gpu_set_blendmode(bm_normal)
     surface_reset_target()
 
-    draw_surface(disappearSurf, x - sprite_get_xoffset(currentSprite), y - sprite_get_yoffset(currentSprite))
+    // учитываем зеркалирование (у марионеток героев image_xscale = -1)
+    draw_surface_ext(disappearSurf, x - image_xscale * sprite_get_xoffset(currentSprite), y - image_yscale * sprite_get_yoffset(currentSprite), image_xscale, image_yscale, 0, c_white, 1)
     exit
 }
 

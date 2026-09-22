@@ -342,7 +342,9 @@ function removeDeadPuppets() {
 
             if (i <= selectedCharacterNumber) selectedCharacterNumber--
 
-            instance_destroy(puppet)
+            // Даём марионетке растаять, инстанс удалится сам в конце анимации
+            if (puppet.disappearing) puppet.destroyWhenGone = true
+            else instance_destroy(puppet)
         }
     }
     initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)  

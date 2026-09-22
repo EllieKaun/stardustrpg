@@ -34,8 +34,14 @@ function initStarriorsFromEncounter(encounter) {
         }
     }
 
-    if (variable_global_exists("battleHasSpear") 
-        && global.battleHasSpear 
+    // Копьё в бою только пока квест активен
+    var spearQuestActive = (questSpearState() == QuestSpearState.Active)
+    if (variable_global_exists("battleHasSpear") && global.battleHasSpear && !spearQuestActive) {
+        global.battleHasSpear = false
+    }
+
+    if (variable_global_exists("battleHasSpear")
+        && global.battleHasSpear
         && array_length(enemies) > 0) {
         var spearIdx = irandom(array_length(enemies) - 1)
         enemies[spearIdx].hasSpear = true
