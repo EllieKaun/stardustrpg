@@ -10,8 +10,11 @@ function initStarriorsFromEncounter(encounter) {
         encounter = testBattleEncounter()
         global.battleEncounter = encounter
     }
-    if (variable_struct_exists(encounter, "heroes") && encounter.heroes != undefined) {
-        heroes = buildTestHeroes(encounter.heroes)
+    if (variable_struct_exists(encounter, "heroCreators")) {
+        heroes = []
+        for (var i = 0; i < array_length(encounter.heroCreators); i++) {
+            array_push(heroes, encounter.heroCreators[i]())
+        }
     } else {
         heroes = [createLana(), createViv()]
         if (variable_global_exists("safarJoined") && global.safarJoined) {

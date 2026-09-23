@@ -212,6 +212,7 @@
     {"id":{"name":"scrBattleEnums","path":"scripts/scrBattleEnums/scrBattleEnums.yy",},},
     {"id":{"name":"scrBattleFlow","path":"scripts/scrBattleFlow/scrBattleFlow.yy",},},
     {"id":{"name":"scrBattleInitializer","path":"scripts/scrBattleInitializer/scrBattleInitializer.yy",},},
+    {"id":{"name":"scrTestBattle","path":"scripts/scrTestBattle/scrTestBattle.yy",},},
     {"id":{"name":"scrCardAnimation","path":"scripts/scrCardAnimation/scrCardAnimation.yy",},},
     {"id":{"name":"scrCardFactoryBuff","path":"scripts/scrCardFactoryBuff/scrCardFactoryBuff.yy",},},
     {"id":{"name":"scrCardFactoryHealing","path":"scripts/scrCardFactoryHealing/scrCardFactoryHealing.yy",},},
