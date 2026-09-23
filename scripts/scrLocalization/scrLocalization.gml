@@ -1,3 +1,5 @@
+// Локализация
+// Инициализация
 function locEnsure() {
     if (!variable_global_exists("locStrings")) locInit()
 }
@@ -11,6 +13,7 @@ function locInit() {
     global.language = locLoadLang()
 }
 
+// Уточнение языка
 function locLoadLang() {
     ini_open("settings.ini")
     var saved = ini_read_string("General", "Language", "")
@@ -19,6 +22,7 @@ function locLoadLang() {
     return (os_get_language() == "ru") ? "ru" : "en"
 }
 
+// Установка языка
 function setLanguage(lang) {
     if (!array_contains(global.locLangs, lang)) return
     global.language = lang
@@ -30,23 +34,29 @@ function setLanguage(lang) {
 
 function locCycleLanguage() {
     locEnsure()
-    var idx = 0
+    var index = 0
     for (var i = 0; i < array_length(global.locLangs); i++) {
-        if (global.locLangs[i] == global.language) { idx = i; break }
+        if (global.locLangs[i] == global.language) { 
+            index = i 
+            break 
+        }
     }
-    var next = global.locLangs[(idx + 1) mod array_length(global.locLangs)]
+    var next = global.locLangs[(index + 1) mod array_length(global.locLangs)]
     setLanguage(next)
     return next
 }
 
+// Очистить сохраненные локали
 function locInvalidateCaches() {
     if (variable_global_exists("cardFaceLayouts")) global.cardFaceLayouts = {}
 }
 
+// Достать перевод по ключу
 function loc(key) {
     return locDef(key, key)
 }
 
+// Инициализация переводов
 function locDef(key, def) {
     locEnsure()
     var table = global.locStrings[$ global.language]
@@ -56,6 +66,7 @@ function locDef(key, def) {
     return def
 }
 
+// Инициализация имен карт
 function locBuildCardNameMap() {
     global.locCardNameToId = {}
     if (!variable_global_exists("cardRegistry")) return
@@ -69,12 +80,14 @@ function locBuildCardNameMap() {
     }
 }
 
+// Взять ID из имени
 function locCardIdFromName(rawName) {
     if (!variable_global_exists("cardRegistry")) return ""
     if (!variable_global_exists("locCardNameToId")) locBuildCardNameMap()
     return variable_struct_exists(global.locCardNameToId, rawName) ? global.locCardNameToId[$ rawName] : ""
 }
 
+// Локализация ключа карты
 function locKeyForCard(card) {
     if (is_struct(card) && variable_struct_exists(card, "cardId")) return string(card.cardId)
     if (is_struct(card) && variable_struct_exists(card, "name")) {
@@ -85,24 +98,29 @@ function locKeyForCard(card) {
     return ""
 }
 
+// Имя карты
 function cardDisplayName(card) {
     var fallback = (is_struct(card) && variable_struct_exists(card, "name")) ? card.name : ""
     return locDef("card.name." + locKeyForCard(card), fallback)
 }
 
+// Описание карты
 function cardDisplayDesc(card) {
     var fallback = (is_struct(card) && variable_struct_exists(card, "description")) ? card.description : ""
     return locDef("card.desc." + locKeyForCard(card), fallback)
 }
 
+// Имя игрока
 function unitDisplayName(rawName) {
     return locDef("unit." + string(rawName), string(rawName))
 }
 
+// Имя спискера в диалоге
 function speakerDisplayName(rawName) {
     return locDef("speaker." + string(rawName), string(rawName))
 }
 
+// Название языка
 function languageNativeName(lang) {
     switch (lang) {
         case "en": return "English"
@@ -111,6 +129,7 @@ function languageNativeName(lang) {
     return lang
 }
 
+// Определение английских локалей
 function locDefineEn() {
     var t = {}
 
@@ -388,6 +407,7 @@ function locDefineEn() {
     global.locStrings[$ "en"] = t
 }
 
+// Определение русских локалей
 function locDefineRu() {
     var t = {}
 

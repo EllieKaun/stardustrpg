@@ -30,7 +30,7 @@ selectedVolMaster = global.volMaster
 selectedVolMusic = global.volMusic
 selectedVolSounds = global.volSounds
 
-// Задние слои для отрисовки меню (аналогично меню паузы)
+// Задние слои для отрисовки меню 
 backLayers = [
     new MenuLayer(noone, { alpha: 0.8, placeholderColor: make_color_rgb(10, 15, 20) })
 ]
@@ -140,10 +140,22 @@ menu = new Menu([
         previewAudioVolumes()
         
         if (instance_exists(oMainMenu)) {
-            with(oMainMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) rebuildMenu() }
+            with(oMainMenu) { 
+                visible = true 
+                menuCooldown = 2
+                if (variable_instance_exists(id, "rebuildMenu")) {
+                    rebuildMenu() 
+                }
+            }
         }
         if (instance_exists(oPauseMenu)) {
-            with(oPauseMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) rebuildMenu() }
+            with(oPauseMenu) { 
+                visible = true
+                menuCooldown = 2
+                if (variable_instance_exists(id, "rebuildMenu")) {
+                    rebuildMenu() 
+                }
+            }
         }
         instance_destroy()
     })

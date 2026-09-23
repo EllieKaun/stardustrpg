@@ -36,12 +36,18 @@ if (!triggered && shouldWalk) {
     if (patrolAxis == 0) {
         var nx = x + patrolDir * patrolSpeed
         if (nx < minX || nx > maxX || place_meeting(nx, y, oWall)) patrolDir = -patrolDir
-        else { x = nx; moved = true }
+        else { 
+            x = nx
+            moved = true 
+        }
         image_xscale = (patrolDir < 0) ?  1 : -1
     } else {
         var ny = y + patrolDir * patrolSpeed
         if (ny < minY || ny > maxY || place_meeting(x, ny, oWall)) patrolDir = -patrolDir
-        else { y = ny; moved = true }
+        else { 
+            y = ny
+            moved = true 
+        }
     }
 
     // Упёрлись в обе стороны оси (например, стоим у стены) - пробуем другую ось,

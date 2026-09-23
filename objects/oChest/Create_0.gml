@@ -14,12 +14,12 @@ chestBlocked = function() {
 }
 
 doChestAction = function() {
-    analyticsChestOpen(chestKind) // аналитика: сундук открыт (вид дропа — по chestKind)
+    analyticsChestOpen(chestKind) 
     switch (chestKind) {
         case ChestKind.Gold:
             var goldAmount = chestGoldAmount()
             addGold(goldAmount)
-            analyticsChestGold(goldAmount) // аналитика: из сундука выпало золото
+            analyticsChestGold(goldAmount)
             say([ dialogLine("Chest", noone, loc("chest.goldPre") + string(goldAmount) + loc("chest.goldPost")) ])
             instance_destroy()
         break
@@ -27,7 +27,7 @@ doChestAction = function() {
         case ChestKind.Card:
             var rewardRef = rollOneReward(forestRewardPool())
             unlockCard(rewardRef.id, rewardRef.rarity, 1)
-            analyticsReward(rewardRef.id, rewardRef.rarity, "chest") // аналитика: награда-карта из сундука
+            analyticsReward(rewardRef.id, rewardRef.rarity, "chest")
             var card = cardFromRef(rewardRef)
             var cardName = (card != undefined) ? cardDisplayName(card) : loc("chest.aCard")
             say([ dialogLine("Chest", noone, loc("chest.cardPre") + cardName + loc("chest.cardPost")) ])
@@ -35,7 +35,6 @@ doChestAction = function() {
         break
 
         case ChestKind.Enemy:
-            // Сначала показываем, что это ловушка, бой начинается после диалога
             say([ dialogLine("Chest", noone, loc("chest.trap")) ], method(id, function() { startChestBattle() }))
         break
     }

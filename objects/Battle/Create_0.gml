@@ -174,7 +174,7 @@ generateLevel(
     global.battleEncounter
 )
 
-// GameAnalytics: открываем «сессию боя» — новый id для группировки событий одной битвы
+// новый id для группировки событий одной битвы
 var _gaArea = variable_global_exists("battleSection") ? string(global.battleSection) : "overworld"
 var _gaFoe  = (array_length(enemies) > 0) ? enemies[0].name : "enemy"
 analyticsBattleStart(_gaArea, _gaFoe)

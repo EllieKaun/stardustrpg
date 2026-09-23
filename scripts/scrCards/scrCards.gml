@@ -261,9 +261,7 @@ function cardPlaySequence(card, caster, targets) {
 }
 
 function playCard(card, caster, targets) {
-    // аналитика: логируем только карты, сыгранные героем (не врагом/куклой).
-    // У части карт (токены/призыв) нет поля cardId — оно ставится только в cardBuild,
-    // поэтому читаем защищённо и откатываемся на card.name.
+    // аналитика
     if (!caster.isEnemy && !caster.isPuppet) {
         var _cid = variable_struct_exists(card, "cardId") ? card.cardId : card.name
         analyticsPlayCard(_cid, card.rarity, caster.name)
