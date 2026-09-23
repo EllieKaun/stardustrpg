@@ -6,9 +6,17 @@ function generateLevel(zoneH, screenW, spacing, encounter) {
 }
 
 function initStarriorsFromEncounter(encounter) {
-    heroes = [createLana(), createViv()]
-    if (variable_global_exists("safarJoined") && global.safarJoined) {
-        array_push(heroes, createSafar())
+    if (TEST_BATTLE_ENABLED) {
+        encounter = testBattleEncounter()
+        global.battleEncounter = encounter
+    }
+    if (variable_struct_exists(encounter, "heroes") && encounter.heroes != undefined) {
+        heroes = buildTestHeroes(encounter.heroes)
+    } else {
+        heroes = [createLana(), createViv()]
+        if (variable_global_exists("safarJoined") && global.safarJoined) {
+            array_push(heroes, createSafar())
+        }
     }
     enemies = []
     var creators = encounter.enemyCreators
@@ -22,11 +30,13 @@ function initStarriorsFromEncounter(encounter) {
         shuffleDeckAndTake4(playOrder[i])
     }
     
+    var raw = variable_struct_exists(encounter, "raw") && encounter.raw
     var bonus = enemyStatBonus()
     for (var i = 0; i < array_length(enemies); i++) {
         var e = enemies[i]
         e.isEnemy = true
         e.hasSpear = false
+        if (raw) continue
         if (enemyIgniteRoll()) {
             igniteEnemy(e)
         } else {
@@ -40,7 +50,8 @@ function initStarriorsFromEncounter(encounter) {
         global.battleHasSpear = false
     }
 
-    if (variable_global_exists("battleHasSpear")
+    if (!raw
+        && variable_global_exists("battleHasSpear")
         && global.battleHasSpear
         && array_length(enemies) > 0) {
         var spearIdx = irandom(array_length(enemies) - 1)

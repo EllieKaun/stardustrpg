@@ -248,6 +248,111 @@ function puppetMasterEncounter() {
     )
 }
 
+#macro TEST_BATTLE_ENABLED false
+
+function testBattleConfig() {
+    return {
+        exactStats: true,
+        reward: forestRewardPool(),
+        heroes: [
+            {
+                base: "Lana",
+                hp: 5,
+                cards: [
+                    createResurrectionCard(),
+                    createMagicalDamageSingleTargetCard(),
+                    createInstantHealSingleTargetCard()
+                ]
+            },
+            {
+                base: "Viv",
+                ko: true,
+                cards: [
+                    createPhysicalDamageVampirismChanceMultipleTargetCard()
+                ]
+            }
+        ],
+        enemies: [
+            { name: "Foe1", hp: 3, str: 1, energy: 1, cards: [ createPhysicalDamageSingleTargetCard() ] },
+            { name: "Foe2", hp: 3, str: 1, energy: 1, cards: [ createPhysicalDamageSingleTargetCard() ] },
+            { name: "Foe3", hp: 3, str: 1, energy: 1, cards: [ createPhysicalDamageSingleTargetCard() ] },
+            { name: "Foe4", hp: 3, str: 1, energy: 1, cards: [ createPhysicalDamageSingleTargetCard() ] },
+            { name: "Foe5", hp: 3, str: 1, energy: 1, cards: [ createPhysicalDamageSingleTargetCard() ] }
+        ]
+    }
+}
+
+function buildTestHeroes(specs) {
+    var result = []
+    for (var i = 0; i < array_length(specs); i++) {
+        var s = specs[i]
+        var base = s[$ "base"] ?? "Lana"
+        var h
+        switch (base) {
+            case "Viv":   h = createViv();   break
+            case "Safar": h = createSafar(); break
+            default:      h = createLana();  break
+        }
+        if (variable_struct_exists(s, "cards")) h.deck = new Deck(s.cards)
+        if (variable_struct_exists(s, "maxHp")) h.maxHp = s.maxHp
+        if (variable_struct_exists(s, "hp")) {
+            h.hp = s.hp
+            h.maxHp = max(h.maxHp, s.hp)
+        }
+        if (s[$ "ko"] ?? false) {
+            h.hp = 0
+            h.changeActionState(StarriorStates.KnockOut, undefined)
+        }
+        array_push(result, h)
+    }
+    return result
+}
+
+function buildTestEnemy(spec) {
+    var idle = spec[$ "spriteIdle"]   ?? sprCrackerNutIdle
+    var attack = spec[$ "spriteAttack"] ?? sprCrackerNutHit
+    var spell = spec[$ "spriteSpell"]  ?? sprCrackerNutCast
+    var cast = spec[$ "spriteCast"]   ?? sprCrackerNutCast
+    var ko = spec[$ "spriteKO"]     ?? sprCrackerNutIdle
+    var dance = spec[$ "spriteDance"]  ?? noone
+
+    var hp = spec[$ "hp"] ?? 20
+    var maxHp = spec[$ "maxHp"] ?? hp
+    var mana = spec[$ "mana"] ?? 0
+    var maxMana = spec[$ "maxMana"] ?? mana
+    var energy = spec[$ "energy"] ?? 1
+    var maxEnergy = spec[$ "maxEnergy"] ?? energy
+    var cards = spec[$ "cards"] ?? [ createPhysicalDamageSingleTargetCard() ]
+
+    return createStarrior(
+        spec[$ "name"] ?? "Dummy",
+        idle, attack, spell, cast, ko, dance,
+        hp, maxHp, mana, maxMana, energy, maxEnergy,
+        spec[$ "str"] ?? 0,
+        spec[$ "int"] ?? 0,
+        spec[$ "aura"] ?? 0,
+        spec[$ "guts"] ?? 0,
+        cards,
+        spec[$ "weaknesses"] ?? [],
+        spec[$ "strengths"] ?? []
+    )
+}
+
+function testBattleEncounter() {
+    var cfg = testBattleConfig()
+    var creators = []
+    for (var i = 0; i < array_length(cfg.enemies); i++) {
+        array_push(creators, method({ spec: cfg.enemies[i] }, function() {
+            return buildTestEnemy(spec)
+        }))
+    }
+    var reward = cfg[$ "reward"] ?? forestRewardPool()
+    var enc = makeEncounter(creators, reward)
+    enc.raw = cfg[$ "exactStats"] ?? true
+    enc.heroes = cfg[$ "heroes"]
+    return enc
+}
+
 // Зацикленный звук ходьбы по траве выделенного персонажа.
 function updateWalkSound(active) {
     if (!variable_global_exists("walkSound") || global.walkSound < 0) return

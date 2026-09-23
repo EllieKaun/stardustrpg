@@ -52,6 +52,11 @@ function createPuppetMaster() {
         40, 40,  0, 0,  2, 2,  /*str*/10, /*int*/12, /*aura*/6, /*guts*/6,
         [
             createMagicalDamageSingleTargetCard(),
+            createPhysicalDamageVampirismChanseSingleTargetCard(),
+            createPhysicalDamageSingleTargetCard(),
+            createSummonAttackPuppetCard(),
+            createSummonMagicPuppetCard(),
+            createSummonBuffPuppetCard(),
             createSummonAttackPuppetCard(),
             createSummonHealPuppetCard(),
         ])

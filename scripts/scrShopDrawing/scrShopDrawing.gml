@@ -17,6 +17,19 @@ function deckSlotUpgradePrice() {
     return floor(SHOP_SLOT_BASE * power(SHOP_SLOT_GROWTH, max(0, purchased)))
 }
 
+// Карты, которые нельзя выставлять на продажу в магазине
+function shopNonSellableIds() {
+    return [ global.CardId.stealCard ]
+}
+
+function cardShopSellable(cardId) {
+    var ids = shopNonSellableIds()
+    for (var i = 0; i < array_length(ids); i++) {
+        if (ids[i] == cardId) return false
+    }
+    return true
+}
+
 // Список товаров для категории
 function buildShopItems(category) {
     var items = []
@@ -25,6 +38,7 @@ function buildShopItems(category) {
         // Карты, которые игрок уже открыл
         var refs = getCollectionRefs()
         for (var i = 0; i < array_length(refs); i++) {
+            if (!cardShopSellable(refs[i].id)) continue
             var card = cardFromRef(refs[i])
             if (card == undefined) continue
             var shopItem = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)
