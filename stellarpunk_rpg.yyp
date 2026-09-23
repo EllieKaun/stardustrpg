@@ -255,6 +255,7 @@
     {"id":{"name":"LightningMagic","path":"sounds/LightningMagic/LightningMagic.yy",},},
     {"id":{"name":"MagicBuff","path":"sounds/MagicBuff/MagicBuff.yy",},},
     {"id":{"name":"MainMenuMusic","path":"sounds/MainMenuMusic/MainMenuMusic.yy",},},
+    {"id":{"name":"PhysicaDamage","path":"sounds/PhysicaDamage/PhysicaDamage.yy",},},
     {"id":{"name":"SliceAtc","path":"sounds/SliceAtc/SliceAtc.yy",},},
     {"id":{"name":"sndChestOpen","path":"sounds/sndChestOpen/sndChestOpen.yy",},},
     {"id":{"name":"StarMagic","path":"sounds/StarMagic/StarMagic.yy",},},

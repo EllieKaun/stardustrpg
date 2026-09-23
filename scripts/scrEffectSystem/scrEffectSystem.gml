@@ -287,7 +287,7 @@ function cloneDeckFrom(src) {
 // Мгновенная атака
 // value — число или функция 
 // sprite — визуал попадания на цели,sound — звук эффекта
-function DamageEffect(damageType, value, sprite = attackEffect, sound = noone) {
+function DamageEffect(damageType, value, sprite = attackEffect, sound = PhysicaDamage) {
     return { type: EffectTypes.Damage, damageType: damageType, value: value,
              timing: Timing.Instant, sprite: sprite, sound: sound }
 }

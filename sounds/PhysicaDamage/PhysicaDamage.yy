@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"PhysicaDamage",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":1.2623357,
+  "exportDir":"",
+  "name":"PhysicaDamage",
+  "parent":{
+    "name":"CardEffects",
+    "path":"folders/BattleDomain/Sounds/CardEffects.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"PhysicaDamage.mp3",
+  "volume":1.0,
+}
