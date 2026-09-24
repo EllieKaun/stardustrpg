@@ -168,7 +168,8 @@ function questAcceptSpear() {
     var slot = firstFreeDeckSlot(Characters.Lana)
     if (slot >= 0) setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default)
     playerDataSave()
-    showCardReward(cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default }), "New card: Steal")
+    var rewardCard = cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default })
+    showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
 }
 
 function questGrantSpear() {

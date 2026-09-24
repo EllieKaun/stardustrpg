@@ -15,7 +15,7 @@ draw_sprite_stretched(box, 0, px, py, panelW, panelH)
 draw_set_halign(fa_center)
 draw_set_valign(fa_top)
 draw_set_color(merge_color(c_white, c_yellow, 0.4))
-drawUiText(px + panelW * 0.5, py + panelH * 0.06, rewardTitle, panelH * 0.09)
+drawUiText(px + panelW * 0.5, py + panelH * 0.06, rewardTitle, panelH * 0.09, panelW * 0.9)
 draw_set_color(c_white)
 
 if (card != undefined) {
