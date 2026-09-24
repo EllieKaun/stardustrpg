@@ -1,3 +1,11 @@
+// Геометрия иллюстрации карты (оригинальный размер и поле под текст)
+#macro CARD_ART_W 387
+#macro CARD_ART_H 554
+#macro CARD_TEXT_X 60
+#macro CARD_TEXT_Y 375
+#macro CARD_TEXT_W 258 // 318 - 60
+#macro CARD_TEXT_H 125 // 500 - 375
+
 function Card(name,
             rarity,
             target,
@@ -261,6 +269,11 @@ function cardPlaySequence(card, caster, targets) {
 }
 
 function playCard(card, caster, targets) {
+    // аналитика
+    if (!caster.isEnemy && !caster.isPuppet) {
+        var _cid = variable_struct_exists(card, "cardId") ? card.cardId : card.name
+        analyticsPlayCard(_cid, card.rarity, caster.name)
+    }
     var runner = new SequenceRunner()
     runner.play(cardPlaySequence(card, caster, targets), {
         card: card, caster: caster, targets: targets, animEnded: false

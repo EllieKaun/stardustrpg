@@ -17,6 +17,19 @@ function deckSlotUpgradePrice() {
     return floor(SHOP_SLOT_BASE * power(SHOP_SLOT_GROWTH, max(0, purchased)))
 }
 
+// Карты, которые нельзя выставлять на продажу в магазине
+function shopNonSellableIds() {
+    return [ global.CardId.stealCard ]
+}
+
+function cardShopSellable(cardId) {
+    var ids = shopNonSellableIds()
+    for (var i = 0; i < array_length(ids); i++) {
+        if (ids[i] == cardId) return false
+    }
+    return true
+}
+
 // Список товаров для категории
 function buildShopItems(category) {
     var items = []
@@ -25,6 +38,7 @@ function buildShopItems(category) {
         // Карты, которые игрок уже открыл
         var refs = getCollectionRefs()
         for (var i = 0; i < array_length(refs); i++) {
+            if (!cardShopSellable(refs[i].id)) continue
             var card = cardFromRef(refs[i])
             if (card == undefined) continue
             var shopItem = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)
@@ -36,7 +50,7 @@ function buildShopItems(category) {
         // Расширение слотов деки 
         if (deckOf(Characters.Lana).unlocked < deckSlotLimit()) {
             var shopItem = new ShopItem(ShopItemKind.Slot, deckSlotUpgradePrice())
-            shopItem.label = "New deck slot"
+            shopItem.label = loc("shop.newSlot")
             array_push(items, shopItem)
         }
     }
@@ -49,26 +63,26 @@ function shopItemLines(item) {
 
     if (item.kind == ShopItemKind.Slot) {
         array_push(lines, item.label)
-        array_push(lines, "Adds a deck card slot")
-        array_push(lines, "for both heroes")
+        array_push(lines, loc("shop.slotDesc1"))
+        array_push(lines, loc("shop.slotDesc2"))
         return lines
     }
 
     var card = item.card
-    array_push(lines, "Type: " + (card.actionType == StarriorStates.Attack ? "Atc" : "Cast"))
+    array_push(lines, loc("shop.type") + (card.actionType == StarriorStates.Attack ? loc("shop.typeAtc") : loc("shop.typeCast")))
 
-    var costLabel = (card.costType() == CostType.Mana) ? "mp" : "hp"
-    array_push(lines, "Cost: " + string(card.costValue()) + costLabel)
+    var costLabel = (card.costType() == CostType.Mana) ? loc("shop.mp") : loc("shop.hp")
+    array_push(lines, loc("shop.cost") + string(card.costValue()) + costLabel)
 
     // тип урона (если есть урон)
     for (var i = 0; i < array_length(card.effects); i++) {
         var effect = card.effects[i]
         if (variable_struct_exists(effect, "type") && effect.type == EffectTypes.Damage) {
-            array_push(lines, "Damage Type: " + (effect.damageType == DamageTypes.Magical ? "magical" : "physical"))
+            array_push(lines, loc("shop.damageType") + (effect.damageType == DamageTypes.Magical ? loc("shop.magical") : loc("shop.physical")))
             break
         }
     }
-    array_push(lines, card.description)
+    array_push(lines, cardDisplayDesc(card))
     return lines
 }
 

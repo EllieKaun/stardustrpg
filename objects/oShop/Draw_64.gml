@@ -24,8 +24,9 @@ draw_set_halign(fa_center)
 draw_set_valign(fa_middle)
 draw_set_color(c_white)
 
-var titleScale = uiTextScale("STORE", signHeight * 0.6, bannerW * 0.7)
-draw_text_transformed(bannerX + bannerW * 0.5, bannerY + signHeight * 0.47, "STORE", titleScale, titleScale, 0)
+var shopTitle = loc("shop.title")
+var titleScale = uiTextScale(shopTitle, signHeight * 0.6, bannerW * 0.7)
+draw_text_transformed(bannerX + bannerW * 0.5, bannerY + signHeight * 0.47, shopTitle, titleScale, titleScale, 0)
 
 // Головы
 var headCY = bannerY + signHeight * 0.5

@@ -33,26 +33,26 @@ if (battleState == BattleStates.CharacterPlay && selectedCharacter != noone) {
     var rightEdge = selectedCharacter.bbox_right * scaleToGui + 11 * scaleToGui
     var centerY = (selectedCharacter.bbox_top + selectedCharacter.bbox_bottom) * 0.5 * scaleToGui
 
-    var shuffleSize = menuBadgeSize("SHUFFLE", badgeScale)
-    var infoSize = menuBadgeSize("INFO", badgeScale)
-    var runSize = menuBadgeSize("RUN", badgeScale)
+    var shuffleSize = menuBadgeSize(loc("battle.shuffle"), badgeScale)
+    var infoSize = menuBadgeSize(loc("battle.info"), badgeScale)
+    var runSize = menuBadgeSize(loc("battle.run"), badgeScale)
 
     var rightStackH = shuffleSize.h + badgeGap + infoSize.h
 
     var shuffleX = rightEdge
     var shuffleY = centerY - rightStackH * 0.5
-    drawMenuBadge(shuffleX, shuffleY, badgeScale, "SHUFFLE", "S", true, colMain, colPanel)
+    drawMenuBadge(shuffleX, shuffleY, badgeScale, loc("battle.shuffle"), "S", true, colMain, colPanel)
     array_push(menuHitRects, { x: shuffleX, y: shuffleY, w: shuffleSize.w, h: shuffleSize.h, name: "Shuffle" })
 
     var infoX = rightEdge
     var infoY = shuffleY + shuffleSize.h + badgeGap
-    drawMenuBadge(infoX, infoY, badgeScale, "INFO", "I", true, colMain, colPanel)
+    drawMenuBadge(infoX, infoY, badgeScale, loc("battle.info"), "I", true, colMain, colPanel)
     array_push(menuHitRects, { x: infoX, y: infoY, w: infoSize.w, h: infoSize.h, name: "Info" })
 
     if (!(variable_global_exists("battleNoFlee") && global.battleNoFlee)) {
         var runX = leftEdge - runSize.w
         var runY = centerY - runSize.h * 0.5
-        drawMenuBadge(runX, runY, badgeScale, "RUN", "R", false, colMain, colPanel)
+        drawMenuBadge(runX, runY, badgeScale, loc("battle.run"), "R", false, colMain, colPanel)
         array_push(menuHitRects, { x: runX, y: runY, w: runSize.w, h: runSize.h, name: "Run" })
     }
 }
@@ -62,12 +62,12 @@ if ((battleState == BattleStates.EnemyTargetSelection
   && selectedCharacter != noone) {
     var cancelBadgeScale = scaleToGui
     var cancelColMain = selectedCharacter.themeColor
-    var cancelSize = menuBadgeSize("CANCEL", cancelBadgeScale)
+    var cancelSize = menuBadgeSize(loc("battle.cancel"), cancelBadgeScale)
     var cancelLeftEdge = selectedCharacter.bbox_left * scaleToGui - 11 * scaleToGui
     var cancelCenterY = (selectedCharacter.bbox_top + selectedCharacter.bbox_bottom) * 0.5 * scaleToGui
     var cancelX = max(0, cancelLeftEdge - cancelSize.w)
     var cancelY = cancelCenterY - cancelSize.h * 0.5
-    drawMenuBadge(cancelX, cancelY, cancelBadgeScale, "CANCEL", "C", false, cancelColMain, c_white)
+    drawMenuBadge(cancelX, cancelY, cancelBadgeScale, loc("battle.cancel"), "C", false, cancelColMain, c_white)
     cancelHitRect = { x: cancelX, y: cancelY, w: cancelSize.w, h: cancelSize.h }
 }
 
@@ -76,7 +76,7 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    var waitLabel = (battleState == BattleStates.StunnedTurn) ? selectedCharacter.name + " is stunned..." : "Waiting..."
+    var waitLabel = (battleState == BattleStates.StunnedTurn) ? unitDisplayName(selectedCharacter.name) + loc("battle.stunnedSuffix") : loc("battle.waiting")
     drawUiText(cardDeskStartX + cardDeskWidth / 2, cardDeskStartY + cardDeskHeight / 2, waitLabel, cardDeskHeight * 0.18)
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
@@ -189,20 +189,23 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     var popupTextH = lineH * 0.72
     draw_set_color(c_white)
     draw_set_halign(fa_left)
-    drawUiText(statsX, statsY, "Name: " + string(selectedTarget.name), popupTextH)
-    drawUiText(statsX, statsY + lineH, "HP: " + string(selectedTarget.hp) + "/" + string(selectedTarget.maxHp), popupTextH)
-    drawUiText(statsX, statsY + lineH * 2, "MP: " + string(selectedTarget.mana) + "/" + string(selectedTarget.maxMana), popupTextH)
-    drawUiText(statsX, statsY + lineH * 3, "Aura: " + string(selectedTarget.aura), popupTextH)
-    drawUiText(statsX, statsY + lineH * 4, "Guts: " + string(selectedTarget.guts), popupTextH)
+    var targetName = unitDisplayName(selectedTarget.name)
+    if (variable_instance_exists(selectedTarget, "isIgnited") && selectedTarget.isIgnited) targetName = loc("unit.ignitePrefix") + targetName
+    drawUiText(statsX, statsY, loc("battle.name") + targetName, popupTextH)
+    drawUiText(statsX, statsY + lineH, loc("battle.hp") + string(selectedTarget.hp) + "/" + string(selectedTarget.maxHp), popupTextH)
+    drawUiText(statsX, statsY + lineH * 2, loc("battle.mp") + string(selectedTarget.mana) + "/" + string(selectedTarget.maxMana), popupTextH)
+    drawUiText(statsX, statsY + lineH * 3, loc("battle.aura") + string(selectedTarget.aura), popupTextH)
+    drawUiText(statsX, statsY + lineH * 4, loc("battle.guts") + string(selectedTarget.guts), popupTextH)
 
     // Слабости врага
     var weaknessY = statsY + lineH * 5
     draw_set_halign(fa_left)
-    var lblScale = drawUiText(statsX, weaknessY, "Weakness:", popupTextH)
-    var weaknessX = statsX + string_width("Weakness:") * lblScale + 6 * scaleToGui
+    var weaknessLabelText = loc("battle.weakness")
+    var lblScale = drawUiText(statsX, weaknessY, weaknessLabelText, popupTextH)
+    var weaknessX = statsX + string_width(weaknessLabelText) * lblScale + 6 * scaleToGui
     var weaknessList = variable_instance_exists(selectedTarget, "weaknesses") ? selectedTarget.weaknesses : []
     if (array_length(weaknessList) == 0) {
-        drawUiText(weaknessX, weaknessY, "None", popupTextH)
+        drawUiText(weaknessX, weaknessY, loc("ui.none"), popupTextH)
     } else {
         var wIconSize = popupTextH
         for (var weaknessIndex = 0; weaknessIndex < array_length(weaknessList); weaknessIndex++) {
@@ -228,7 +231,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     drawButtonFrame(btnX, btnY, btnWidth, btnHeight)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    drawUiText(btnX + btnWidth / 2, btnY + btnHeight / 2, "CLOSE", btnHeight * 0.6)
+    drawUiText(btnX + btnWidth / 2, btnY + btnHeight / 2, loc("ui.close"), btnHeight * 0.6)
     draw_set_valign(fa_top)
     draw_set_halign(fa_left)
     infoCloseRect = { x: btnX, y: btnY, w: btnWidth, h: btnHeight }

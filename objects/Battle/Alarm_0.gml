@@ -1,3 +1,8 @@
+// Пауза: откладываем срабатывание таймера
+if (global.gamePaused) {
+    alarm_set(ENEMYS_TURN, 1)
+    exit
+}
 var currentEnemy = selectedCharacter // Ход врага
 if currentEnemy == noone { // Если нет выбранного врага - пропускаем ход
     skipTurn()

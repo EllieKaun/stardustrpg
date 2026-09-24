@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ga_addDesignEvent",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ga_addDesignEvent",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

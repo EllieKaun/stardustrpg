@@ -162,6 +162,7 @@ function questSetSpearState(s) {
 
 function questAcceptSpear() {
     questSetSpearState(QuestSpearState.Active)
+    analyticsStartSafarQuest() // аналитика: начат квест Safar
     unlockCard(global.CardId.stealCard, CardsRarity.Default, 1)
     var slot = firstFreeDeckSlot(Characters.Lana)
     if (slot >= 0) setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default)
@@ -180,6 +181,7 @@ function questGrantSpear() {
 function questCompleteSpear() {
     questSetSpearState(QuestSpearState.Completed)
     global.safarJoined = true
+    analyticsCompleteSafarQuest() // аналитика
     playerDataSave()
 }
 

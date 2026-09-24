@@ -84,6 +84,13 @@ trySpawnEnemy = function(minDist, maxDist) {
             show_debug_message("CREATING ENEMY MONSTER TYPE: " + string(chosenType))
         }
         var enemy = instance_create_layer(sx, sy, "Instances", chosenType) // создаем мини врага
+        var inWall = false
+        with (enemy) inWall = place_meeting(x, y, oWall)
+        if (inWall) { // заспавнился в стене - патрулировать не сможет
+            if (spawnDebug) show_debug_message("CREATING ENEMY ERROR: POINT IS INSIDE A WALL")
+            instance_destroy(enemy)
+            continue
+        }
         enemy.spawnSection = sectionAt(sx, sy) // определение секции
         enemy.spawnedDynamically = true // заспавненный 
         enemy.my_spawner = seg 

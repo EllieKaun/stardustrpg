@@ -67,20 +67,20 @@ enum EffectTypes {
 
 function effectTypeToString(type) {
     switch (type) {
-        case EffectTypes.Damage: return "Damage"
-        case EffectTypes.Heal: return "Heal"
-        case EffectTypes.Stun: return "Stun"
-        case EffectTypes.Buff: return "Buff"
-        case EffectTypes.RemoveEffect: return "Remove Effect"
-        case EffectTypes.ManaGain: return "Mana Gain"
-        case EffectTypes.Weakening: return "Weakening"
-        case EffectTypes.Debuff: return "Debuff"
-        case EffectTypes.CopyCard: return "Copy Card"
-        case EffectTypes.AddEnergy: return "Add Energy"
-        case EffectTypes.ShuffleDeck: return "Shuffle Deck"
-        case EffectTypes.Resurrection: return "Resurrection" 
-        case EffectTypes.CreatePuppet: return "CreatePuppet"
-        default: return "Unknown"
+        case EffectTypes.Damage: return loc("effect.Damage")
+        case EffectTypes.Heal: return loc("effect.Heal")
+        case EffectTypes.Stun: return loc("effect.Stun")
+        case EffectTypes.Buff: return loc("effect.Buff")
+        case EffectTypes.RemoveEffect: return loc("effect.RemoveEffect")
+        case EffectTypes.ManaGain: return loc("effect.ManaGain")
+        case EffectTypes.Weakening: return loc("effect.Weakening")
+        case EffectTypes.Debuff: return loc("effect.Debuff")
+        case EffectTypes.CopyCard: return loc("effect.CopyCard")
+        case EffectTypes.AddEnergy: return loc("effect.AddEnergy")
+        case EffectTypes.ShuffleDeck: return loc("effect.ShuffleDeck")
+        case EffectTypes.Resurrection: return loc("effect.Resurrection")
+        case EffectTypes.CreatePuppet: return loc("effect.CreatePuppet")
+        default: return loc("effect.Unknown")
     }
 }
 

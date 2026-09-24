@@ -6,6 +6,13 @@ if (variable_global_exists("cutsceneActive") && global.cutsceneActive) exit
 
 depth = -bbox_bottom
 
+// Квест не активен (копьё уже украдено / квест завершён) - моб больше не носитель
+if (carriesSpear && questSpearState() != QuestSpearState.Active) {
+    carriesSpear = false
+    image_blend = c_white
+    global.spearCarrierExists = false
+}
+
 if (canCarrySpear && !carriesSpear && questSpearState() == QuestSpearState.Active && !global.spearCarrierExists) {
     carriesSpear = true
     global.spearCarrierExists = true
@@ -25,15 +32,37 @@ if (!triggered && shouldWalk) {
         minY = max(minY, my_spawner.bbox_top) 
         maxY = min(maxY, my_spawner.bbox_bottom)
     }
+    var moved = false
     if (patrolAxis == 0) {
         var nx = x + patrolDir * patrolSpeed
         if (nx < minX || nx > maxX || place_meeting(nx, y, oWall)) patrolDir = -patrolDir
-        else x = nx
+        else { 
+            x = nx
+            moved = true 
+        }
         image_xscale = (patrolDir < 0) ?  1 : -1
     } else {
         var ny = y + patrolDir * patrolSpeed
         if (ny < minY || ny > maxY || place_meeting(x, ny, oWall)) patrolDir = -patrolDir
-        else y = ny
+        else { 
+            y = ny
+            moved = true 
+        }
+    }
+
+    // Упёрлись в обе стороны оси (например, стоим у стены) - пробуем другую ось,
+    // а если и там некуда идти, просто стоим, а не вертимся на месте
+    if (moved) {
+        patrolStuckSteps = 0
+        patrolAxisSwitches = 0
+    } else {
+        patrolStuckSteps++
+        if (patrolStuckSteps >= 2) {
+            patrolStuckSteps = 0
+            patrolAxis = 1 - patrolAxis
+            patrolAxisSwitches++
+            if (patrolAxisSwitches >= 2) shouldWalk = false
+        }
     }
 }
 
@@ -43,10 +72,9 @@ if (place_meeting(x, y, leader)) {
         global.fightEnemy = id
         global.returningFromBattle = true
         global.battleNoFlee = false
-        if (carriesSpear) {
-            global.battleHasSpear = true
-            global.spearCarrierExists = false
-        }
+        // spearCarrierExists не сбрасываем: носитель остаётся на карте, если от него убежали или проиграли.
+        // Флаг сбросит кража копья (questGrantSpear) или удаление носителя (Destroy)
+        if (carriesSpear) global.battleHasSpear = true
         global.battleSection = spawnSection
         global.battleEncounter = getEncounter()
         global.returnRoom = room

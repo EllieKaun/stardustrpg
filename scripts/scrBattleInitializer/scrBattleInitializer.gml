@@ -6,9 +6,20 @@ function generateLevel(zoneH, screenW, spacing, encounter) {
 }
 
 function initStarriorsFromEncounter(encounter) {
-    heroes = [createLana(), createViv()]
-    if (variable_global_exists("safarJoined") && global.safarJoined) {
-        array_push(heroes, createSafar())
+    if (TEST_BATTLE_ENABLED) {
+        encounter = testBattleEncounter()
+        global.battleEncounter = encounter
+    }
+    if (variable_struct_exists(encounter, "heroCreators")) {
+        heroes = []
+        for (var i = 0; i < array_length(encounter.heroCreators); i++) {
+            array_push(heroes, encounter.heroCreators[i]())
+        }
+    } else {
+        heroes = [createLana(), createViv()]
+        if (variable_global_exists("safarJoined") && global.safarJoined) {
+            array_push(heroes, createSafar())
+        }
     }
     enemies = []
     var creators = encounter.enemyCreators
@@ -22,11 +33,13 @@ function initStarriorsFromEncounter(encounter) {
         shuffleDeckAndTake4(playOrder[i])
     }
     
+    var raw = variable_struct_exists(encounter, "raw") && encounter.raw
     var bonus = enemyStatBonus()
     for (var i = 0; i < array_length(enemies); i++) {
         var e = enemies[i]
         e.isEnemy = true
         e.hasSpear = false
+        if (raw) continue
         if (enemyIgniteRoll()) {
             igniteEnemy(e)
         } else {
@@ -34,8 +47,15 @@ function initStarriorsFromEncounter(encounter) {
         }
     }
 
-    if (variable_global_exists("battleHasSpear") 
-        && global.battleHasSpear 
+    // Копьё в бою только пока квест активен
+    var spearQuestActive = (questSpearState() == QuestSpearState.Active)
+    if (variable_global_exists("battleHasSpear") && global.battleHasSpear && !spearQuestActive) {
+        global.battleHasSpear = false
+    }
+
+    if (!raw
+        && variable_global_exists("battleHasSpear")
+        && global.battleHasSpear
         && array_length(enemies) > 0) {
         var spearIdx = irandom(array_length(enemies) - 1)
         enemies[spearIdx].hasSpear = true
@@ -55,7 +75,6 @@ function igniteEnemy(e) {
     e.maxHp = e.maxHp * 6
     e.isIgnited = true
     e.igniteEffectChance = 0.1
-    e.name = "Ignite " + e.name
 }
 
 function createStarrior(

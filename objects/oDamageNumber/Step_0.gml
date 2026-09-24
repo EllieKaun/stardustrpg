@@ -1,3 +1,6 @@
+// Пауза: числа урона замирают
+if (global.gamePaused) exit
+
 y += vspd;
 image_alpha -= 1 / life
 

@@ -1,3 +1,7 @@
+// Пауза не должна перетекать из прошлой комнаты (например, при Retry)
+global.gamePaused = false
+global.uiModal = false
+
 focusArea = FocusArea.Deck
 selectedMenuItem = 0
 menuItems = ["Run", "Shuffle", "Info"]
@@ -70,7 +74,7 @@ tutorial = new TutorialRunner([
     { 
         speaker: "Lana",
         portrait: lana, 
-        text: "These are your cards. Each one is an action you can play on your turn.",
+        text: loc("dlg.tut.battle1"),
         getRect: function() { 
             var highlightRect = undefined
             with (Battle) {
@@ -82,7 +86,7 @@ tutorial = new TutorialRunner([
     { 
         speaker: "Lana", 
         portrait: lana, 
-        text: "This is INFO - use it to inspect an enemy's stats before you act.",
+        text: loc("dlg.tut.battle2"),
         getRect: function() { 
             var highlightRect = undefined; 
             with (Battle) {
@@ -94,7 +98,7 @@ tutorial = new TutorialRunner([
     { 
         speaker: "Lana", 
         portrait: lana,
-        text: "This is SHUFFLE - it redraws your whole hand for this turn.",
+        text: loc("dlg.tut.battle3"),
         getRect: function() { 
             var highlightRect = undefined;
             with (Battle) {
@@ -106,7 +110,7 @@ tutorial = new TutorialRunner([
     { 
         speaker: "Lana", 
         portrait: lana, 
-        text: "That's everything. Now defeat this Starrior on your own. Good luck!"
+        text: loc("dlg.tut.battle4")
     }
 ])
 
@@ -139,11 +143,12 @@ changeBattleState = function(newState) {
         break
         case BattleStates.StunnedTurn:
             alarm_set(STUN_TURN, game_get_speed(gamespeed_fps) * STUN_TURN_SECONDS)
-            with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, "STUNNED", c_yellow)
+            with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow)
         break
         case BattleStates.GameOver:
-            loseAllGold() 
+            loseAllGold()
             gameOverCursor = 0
+            analyticsDefeat() // аналитика: поражение в бою
         break
     }
 }
@@ -168,6 +173,11 @@ generateLevel(
     spacingBetweenStarriors, 
     global.battleEncounter
 )
+
+// новый id для группировки событий одной битвы
+var _gaArea = variable_global_exists("battleSection") ? string(global.battleSection) : "overworld"
+var _gaFoe  = (array_length(enemies) > 0) ? enemies[0].name : "enemy"
+analyticsBattleStart(_gaArea, _gaFoe)
 
 playMusicNamed("BattleMusic")
 stopAmbient()

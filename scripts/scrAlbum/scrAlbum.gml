@@ -8,6 +8,7 @@ function buildAlbumSlots() {
         var ref = refs[i]
         var card = cardFromRef(ref)
         if (card == undefined) continue
+        if (card.cardAlbumSpr == noone || !sprite_exists(card.cardAlbumSpr)) continue
         var s = new Slot("filled", card)
         s.ref = { id: ref.id, rarity: ref.rarity }
         s.count = ref.count
@@ -34,25 +35,21 @@ function albumDrawCard(slot, rect, isSelected) {
         draw_set_color(c_white)
         if (card != undefined) {
             draw_set_font(uiFont())
-            drawFitTextCentered(card.name,
+            drawFitTextCentered(cardDisplayName(card),
                 rect.sx + rect.sw * 0.08, rect.sy + rect.sh * 0.06,
                 rect.sw * 0.84, rect.sh * 0.28, UI_FONT_STACK)
         }
     }
 
-    // Описание 
-    if (card != undefined && card.description != "") {
-        var bandY = rect.sy + rect.sh * 0.66
-        var bandH = rect.sh * 0.30
-        draw_set_color(c_black)
-        draw_set_alpha(0.45)
-        draw_rectangle(rect.sx, bandY, rect.sx + rect.sw, bandY + bandH, false)
-        draw_set_alpha(1)
+    // Описание
+    if (card != undefined && cardDisplayDesc(card) != "") {
+        var textX = rect.sx + rect.sw * (CARD_TEXT_X / CARD_ART_W)
+        var textY = rect.sy + rect.sh * (CARD_TEXT_Y / CARD_ART_H)
+        var textW = rect.sw * (CARD_TEXT_W / CARD_ART_W)
+        var textH = rect.sh * (CARD_TEXT_H / CARD_ART_H)
         draw_set_color(c_white)
         draw_set_font(uiFont())
-        drawFitTextCentered(card.description,
-            rect.sx + rect.sw * 0.08, bandY,
-            rect.sw * 0.84, bandH, UI_FONT_STACK)
+        drawFitTextCentered(cardDisplayDesc(card), textX, textY, textW, textH, UI_FONT_STACK)
     }
 
     gpu_set_tex_filter(prevFilter)

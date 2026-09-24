@@ -13,7 +13,8 @@ function createMagicalDamageSingleTargetCard() {
         starsSingleTarget,
         commonBorder,
         mpCostToken,
-        "deals minor star energy damage (single)"
+        "deals minor star energy damage (single)",
+        sprHighResMagicalDaageSingleTarget
     )
 }
 
@@ -32,7 +33,8 @@ function createMagicalDamageMultipleTargetCard() {
         starsGroup,
         commonBorder,
         mpCostToken,
-        "deals minor star energy damage (group)"
+        "deals minor star energy damage (group)",
+        sprHighResMagicalDamageGroup
     )
 }
 
@@ -54,7 +56,8 @@ function createMagicalDamageStunChanseSingleTargetCard() {
         lightningSingleTarget,
         commonBorder,
         mpCostToken,
-        "deals minor lightning damage (single)"
+        "deals minor lightning damage (single)",
+        sprHighResLightningSingleTarget
     )
 }
 
@@ -76,7 +79,8 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
         lightningGroup,
         commonBorder,
         mpCostToken,
-        "deals minor lightning damage (group)"
+        "deals minor lightning damage (group)",
+        sprHighResLightningGroup
     )
 }
 
@@ -98,7 +102,8 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
         fireballSingleTarget,
         commonBorder,
         mpCostToken,
-        "deals minor fire damage (single)"
+        "deals minor fire damage (single)",
+        sprHighResFireDamageSingleTarget
     )
 }
 
@@ -120,7 +125,8 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
         fireballGroup,
         commonBorder,
         mpCostToken,
-        "deals minor fire damage (group)"
+        "deals minor fire damage (group)",
+        sprHighResFireDamageGroup
     )
 }
 // Атака льдом одного врага - (Имеет шанс заморозить врага. Замороженный враг получает повышенный физ урон х количество ходов)
@@ -141,7 +147,8 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
         iceSingleTarget,
         commonBorder,
         mpCostToken,
-        "deals minor ice damage (single)"
+        "deals minor ice damage (single)",
+        sprHighResIceDamageSingleGroup
     )
 }
 
@@ -163,7 +170,8 @@ function createMagicalDamageFreezingChanceMultipleTargetCard() {
         iceGroup,
         commonBorder,
         mpCostToken,
-        "deals minor ice damage (group)"
+        "deals minor ice damage (group)",
+        sprHighResIceDamageGroup
     )
 }
 

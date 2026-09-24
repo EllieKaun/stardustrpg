@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"util_ga_arrayToJsonString",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"util_ga_arrayToJsonString",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

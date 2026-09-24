@@ -383,6 +383,13 @@ function Panel(_config) constructor {
         // область панели вместе со строкой табов над ней
         if (!pointInRect(mx, my, x, y - tabH, w, h + tabH)) return false
 
+        // Прокрутка колесом
+        if (scrollable) {
+            var wheelStep = rowPitch() * 0.5
+            if (mouse_wheel_down()) scrollY = clamp(scrollY + wheelStep, 0, scrollMax())
+            if (mouse_wheel_up()) scrollY = clamp(scrollY - wheelStep, 0, scrollMax())
+        }
+
         var clicked = mouse_check_button_pressed(mb_left)
 
         // Табы
@@ -418,12 +425,6 @@ function Panel(_config) constructor {
             }
         }
 
-        // Прокрутка колесом
-        if (scrollable) {
-            var wheelStep = rowPitch() * 0.5
-            if (mouse_wheel_down()) scrollY = clamp(scrollY + wheelStep, 0, scrollMax())
-            if (mouse_wheel_up()) scrollY = clamp(scrollY - wheelStep, 0, scrollMax())
-        }
         return true
     }
 

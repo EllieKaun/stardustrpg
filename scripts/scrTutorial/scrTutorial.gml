@@ -2,9 +2,9 @@ function tutorialOverworldLines() {
     var lana = asset_get_index("portraitLana")
     var viv = asset_get_index("portraitViv")
     return [
-        dialogLine("Lana", lana, "Wait - a wild Starrior! A good chance to learn how to fight."),
-        dialogLine("Viv", viv, "Don't worry, it's easy once you get the hang of the cards."),
-        dialogLine("Lana", lana, "Let's go. I'll walk you through it once the battle starts.")
+        dialogLine("Lana", lana, loc("dlg.tut.ow1")),
+        dialogLine("Viv", viv, loc("dlg.tut.ow2")),
+        dialogLine("Lana", lana, loc("dlg.tut.ow3"))
     ]
 }
 
@@ -61,8 +61,8 @@ function TutorialRunner(_steps) constructor {
 function deckTutorialIntroLines() {
     var lana = asset_get_index("portraitLana")
     return [
-        dialogLine("Lana", lana, "Nice work! Now let's set up your deck for next time."),
-        dialogLine("Lana", lana, "Press Tab to open the deck builder.")
+        dialogLine("Lana", lana, loc("dlg.tut.deck1")),
+        dialogLine("Lana", lana, loc("dlg.tut.deck2"))
     ]
 }
 
@@ -139,7 +139,7 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
     draw_set_color(merge_color(c_white, c_yellow, 0.5))
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
-    drawUiText(textX, textTop, speaker, nameH)
+    drawUiText(textX, textTop, speakerDisplayName(speaker), nameH)
 
     draw_set_color(c_white)
     var bodyTop = textTop + nameH * 1.25
@@ -155,7 +155,7 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
     var hintH = nameH * 0.85
     draw_set_halign(fa_right)
     draw_set_color(merge_color(c_white, c_black, 0.35))
-    drawUiText(panelX + panelW - pad, panelY + panelH - pad - hintH, "SPACE >", hintH)
+    drawUiText(panelX + panelW - pad, panelY + panelH - pad - hintH, loc("ui.spaceNext"), hintH)
     draw_set_halign(fa_left)
     draw_set_color(c_white)
 }

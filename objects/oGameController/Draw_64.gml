@@ -4,7 +4,7 @@ guiSyncCrisp()
 if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
     var hw = display_get_gui_width()
     var hh = display_get_gui_height()
-    var msg = "Press TAB to open your deck"
+    var msg = loc("ui.pressTabDeck")
     var boxH = max(hh * 0.12, 84)
     var boxW = hw * 0.6
     var bx = (hw - boxW) * 0.5

@@ -1,5 +1,5 @@
 active = false
 card = undefined
-rewardTitle = "New card!"
+rewardTitle = loc("ui.newCard")
 inputGuard = 0
 depth = -20000

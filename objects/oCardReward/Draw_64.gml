@@ -28,7 +28,7 @@ if (card != undefined) {
 
 draw_set_valign(fa_bottom)
 draw_set_color(merge_color(c_white, c_black, 0.3))
-drawUiText(px + panelW * 0.5, py + panelH - panelH * 0.04, "Click to continue", panelH * 0.05)
+drawUiText(px + panelW * 0.5, py + panelH - panelH * 0.04, loc("ui.clickContinue"), panelH * 0.05)
 
 draw_set_halign(fa_left)
 draw_set_valign(fa_top)

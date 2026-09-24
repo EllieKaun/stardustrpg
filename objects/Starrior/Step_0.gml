@@ -1,3 +1,15 @@
+// Пауза боя: замораживаем анимацию и таймеры
+if (global.gamePaused) {
+    if (!pauseFrozen) {
+        pauseAnimSpeed = image_speed
+        pauseFrozen = true
+    }
+    image_speed = 0
+    exit
+} else if (pauseFrozen) {
+    image_speed = pauseAnimSpeed
+    pauseFrozen = false
+}
 
 if (disappearing) {
     var spriteSpeed = sprite_get_speed(disappearMaskSpr)
@@ -8,7 +20,11 @@ if (disappearing) {
         gone = true
         if (surface_exists(disappearSurf)) { 
             surface_free(disappearSurf)
-            disappearSurf = -1 
+            disappearSurf = -1
+        }
+        if (destroyWhenGone) {
+            instance_destroy()
+            exit
         }
     }
 }

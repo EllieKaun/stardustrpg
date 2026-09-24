@@ -1,0 +1,56 @@
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\util_ga_arrayToJsonString\util_ga_arrayToJsonString.gml
+Converted description /// @description util_ga_arrayToJsonString(array)/// @param array
+String not found: ConversionLog_ConvertedString 16 '"' "\""
+String not found: ConversionLog_ConvertedString 16 '"' "\""
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_configureAvailableCustomDimensions01\ga_configureAvailableCustomDimensions01.gml
+Converted description /// @description ga_configureAvailableCustomDimensions01(array)/// @param array
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_configureAvailableCustomDimensions02\ga_configureAvailableCustomDimensions02.gml
+Converted description /// @description ga_configureAvailableCustomDimensions02(array)/// @param array
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_configureAvailableCustomDimensions03\ga_configureAvailableCustomDimensions03.gml
+Converted description /// @description ga_configureAvailableCustomDimensions03(array)/// @param array
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_configureAvailableResourceCurrencies\ga_configureAvailableResourceCurrencies.gml
+Converted description /// @description ga_configureAvailableResourceCurrencies(array)/// @param array
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_configureAvailableResourceItemTypes\ga_configureAvailableResourceItemTypes.gml
+Converted description /// @description ga_configureAvailableResourceItemTypes(array)/// @param array
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_trace\ga_trace.gml
+Converted description /// @description ga_trace(...)/// @param ...
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_array\ga_array.gml
+Converted description /// @description ga_array(...)/// @param ...
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_initialize\ga_initialize.gml
+Converted description /// @description ga_initialize(key:string, secret:string)/// @param key:string
+/// @param  secret:string
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_addBusinessEvent\ga_addBusinessEvent.gml
+Converted description /// @description ga_addBusinessEvent(...)/// @param ...
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_addProgressionEvent\ga_addProgressionEvent.gml
+Converted description /// @description ga_addProgressionEvent(status:double, progression1:string, progression2:string, progression3:string, ?score:double)/// @param status:double
+/// @param  progression1:string
+/// @param  progression2:string
+/// @param  progression3:string
+/// @param  ?score:double
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_addDesignEvent\ga_addDesignEvent.gml
+Converted description /// @description ga_addDesignEvent(eventId:string, ?value:number)/// @param eventId:string
+/// @param  ?value:number
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_onStop\ga_onStop.gml
+Converted description /// @description ga_onStop()
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_onResume\ga_onResume.gml
+Converted description /// @description ga_onResume()
+
+Converting GML script: C:\Users\user\AppData\Local\GameMakerStudio2\GMS2TEMP\ProjectTool\mvc\gameanalytics_c8c0b970\mvc\scripts\ga_addResourceEvent\ga_addResourceEvent.gml
+Converted description /// @description ga_addResourceEvent(flowType:double, currency:string, amount:double, itemType:string, itemId:string)/// @param flowType:double
+/// @param  currency:string
+/// @param  amount:double
+/// @param  itemType:string
+/// @param  itemId:string

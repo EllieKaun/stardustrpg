@@ -48,17 +48,22 @@ if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
 }
 
 if (keyboard_check_pressed(vk_escape)) {
-    // Ревертим аудио, если вышли через Escape
     selectedVolMaster = global.volMaster
     selectedVolMusic = global.volMusic
     selectedVolSounds = global.volSounds
     previewAudioVolumes()
     
     if (instance_exists(oMainMenu)) {
-        with(oMainMenu) { visible = true; menuCooldown = 2; }
+        with(oMainMenu) { 
+            visible = true
+            menuCooldown = 2
+        }
     }
     if (instance_exists(oPauseMenu)) {
-        with(oPauseMenu) { visible = true; menuCooldown = 2; }
+        with(oPauseMenu) { 
+            visible = true
+            menuCooldown = 2 
+        }
     }
     instance_destroy()
 }

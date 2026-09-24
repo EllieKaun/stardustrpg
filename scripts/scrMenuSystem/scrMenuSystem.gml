@@ -244,7 +244,9 @@ function menuUpdateLayers(backLayers, foreLayers) {
 
 // GUI-слой в аспекте 16:9
 function menuEnsureCrispGui() {
-    setCrispGui(320, 180)
+    // В бою база GUI равна размеру вьюхи, меню поверх боя должно рисоваться в ней же
+    if (instance_exists(Battle)) setCrispGui(guiBaseWidth(), guiBaseHeight())
+    else setCrispGui(320, 180)
 }
 
 // Возвращает список разрешений экрана, не превышающих размер дисплея

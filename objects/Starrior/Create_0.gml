@@ -10,6 +10,10 @@ maxMana = 0
 energy = 0
 maxEnergy = 0
 
+// Заморозка анимации на паузе
+pauseFrozen = false
+pauseAnimSpeed = 1
+
 // Танец при афк
 idleDanceTimer = 0
 
@@ -38,6 +42,7 @@ deck = new Deck([])
 disappearing = false
 disappearTimer = 0
 gone = false
+destroyWhenGone = false // марионетку убрали из боя, удалить после растворения
 disappearSurf = -1
 disappearMaskSpr = sprDisappear 
 
@@ -133,7 +138,8 @@ function applyDamage(value) {
         changeActionState(StarriorStates.KnockOut, undefined)
     }
 
-    if (hp <= 0 && isEnemy && !isPuppet && !disappearing && !gone) {
+    // Враги и марионетки (в том числе героев) растворяются при смерти
+    if (hp <= 0 && (isEnemy || isPuppet) && !disappearing && !gone) {
         disappearing = true
         disappearTimer = 0
     }

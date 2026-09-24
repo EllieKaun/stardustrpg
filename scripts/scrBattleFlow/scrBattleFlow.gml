@@ -214,10 +214,12 @@ function doMenuAction(name) {
     switch (name) {
         case "Shuffle":
             shuffleDeckAndTake4(selectedCharacter)
+            analyticsShuffle() // аналитика: игрок перетасовал колоду
             skipTurn()
         break
         case "Run":
             if (variable_global_exists("battleNoFlee") && global.battleNoFlee) break
+            analyticsRetreat() // аналитика: побег из боя
             addGold(-GOLD_RUN_PENALTY) // штраф за побег
             startTransition(global.returnRoom)
         break
@@ -342,7 +344,9 @@ function removeDeadPuppets() {
 
             if (i <= selectedCharacterNumber) selectedCharacterNumber--
 
-            instance_destroy(puppet)
+            // Даём марионетке растаять, инстанс удалится сам в конце анимации
+            if (puppet.disappearing) puppet.destroyWhenGone = true
+            else instance_destroy(puppet)
         }
     }
     initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)  

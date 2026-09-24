@@ -12,26 +12,26 @@ if (place_meeting(x, y, leader)) {
         var spearState = questSpearState()
         if (spearState == QuestSpearState.Inactive) {
             say([
-                dialogLine("Safar", portraitSafar, "You need a companion on your journey?"),
-                dialogLine("Lana", portraitLana, "Help would be welcome."),
-                dialogLine("Safar", portraitSafar, "Can't help you with that."),
-                dialogLine("Viv", portraitViv, "Then why even ask?!"),
-                dialogLine("Safar", portraitSafar, "Fine - find my spear and I'll join you."),
-                dialogLine("Lana", portraitLana, "And where do we find it?"),
-                dialogLine("Safar", portraitSafar, "A monster ran off with it while I slept. Without it I can't fight them."),
+                dialogLine("Safar", portraitSafar, loc("dlg.safar.q1")),
+                dialogLine("Lana", portraitLana, loc("dlg.safar.q2")),
+                dialogLine("Safar", portraitSafar, loc("dlg.safar.q3")),
+                dialogLine("Viv", portraitViv, loc("dlg.safar.q4")),
+                dialogLine("Safar", portraitSafar, loc("dlg.safar.q5")),
+                dialogLine("Lana", portraitLana, loc("dlg.safar.q6")),
+                dialogLine("Safar", portraitSafar, loc("dlg.safar.q7")),
                 dialogChoice("Lana", portraitLana, "", [
-                    { text: "Alright, we'll find your spear", onSelect: function() { questAcceptSpear() } },
-                    { text: "We're too busy right now", onSelect: undefined }
+                    { text: loc("dlg.safar.optYes"), onSelect: function() { questAcceptSpear() } },
+                    { text: loc("dlg.safar.optNo"), onSelect: undefined }
                 ])
             ])
         } else if (spearState == QuestSpearState.Active) {
             say([
-                dialogLine("Safar", portraitSafar, "Found my spear yet? Use a Steal card on the monster carrying it.")
+                dialogLine("Safar", portraitSafar, loc("dlg.safar.waiting"))
             ])
         } else if (spearState == QuestSpearState.SpearObtained) {
             say([
-                dialogLine("Safar", portraitSafar, ":0 ... you actually all found it."),
-                dialogLine("Safar", portraitSafar, "You can count on my skills now.")
+                dialogLine("Safar", portraitSafar, loc("dlg.safar.done1")),
+                dialogLine("Safar", portraitSafar, loc("dlg.safar.done2"))
             ], function() { questCompleteSpear() })
         }
     }

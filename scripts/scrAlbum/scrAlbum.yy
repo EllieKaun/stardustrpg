@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrAlbum",
   "parent":{
-    "name":"Menu",
-    "path":"folders/Menu.yy",
+    "name":"Album",
+    "path":"folders/Album.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
