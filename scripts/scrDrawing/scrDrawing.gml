@@ -177,29 +177,33 @@ function fitWrappedText(text, areaW, areaH) {
 }
 
 //// Лицо карты с текстом
-#macro CARD_FACE_SCALE 8
+#macro CARD_FACE_BUCKET_PX 6
 // На сколько пикселей арта приподнять токен стоимости энергии 
 #macro CARD_COST_TOKEN_RAISE_PX 0
 
-function cardFaceLayout(card) {
+// faceW,faceH — фактический размер границы карт
+function cardFaceLayout(card, faceW, faceH) {
     locEnsure()
     if (!variable_global_exists("cardFaceLayouts")) global.cardFaceLayouts = {}
-    var cacheKey = string(card.name) + "|" + string(card.rarity) + "|" + global.language
+
+    var bucketH = max(CARD_FACE_BUCKET_PX, round(faceH / CARD_FACE_BUCKET_PX) * CARD_FACE_BUCKET_PX)
+    var cacheKey = string(card.name) + "|" + string(card.rarity) + "|" + global.language + "|" + string(bucketH)
     if (variable_struct_exists(global.cardFaceLayouts, cacheKey)) return global.cardFaceLayouts[$ cacheKey]
 
+    var baseW = sprite_get_width(card.cardBaseSpr)
+    var baseH = sprite_get_height(card.cardBaseSpr)
+    var bucketW = (faceH != 0) ? faceW * bucketH / faceH : faceW
+    var areaW = (CARD_DESC_X2 - CARD_DESC_X1) / baseW * bucketW
+    var areaH = (CARD_DESC_Y2 - CARD_DESC_Y1) / baseH * bucketH
+
     var prevFont = draw_get_font()
-    var refW = sprite_get_width(card.cardBaseSpr) * CARD_FACE_SCALE
-    var refH = sprite_get_height(card.cardBaseSpr) * CARD_FACE_SCALE
-    var areaW = (CARD_DESC_X2 - CARD_DESC_X1) * CARD_FACE_SCALE
-    var areaH = (CARD_DESC_Y2 - CARD_DESC_Y1) * CARD_FACE_SCALE
-    // описание с карты (card.description)
+    // описание с карты 
     var descText = cardDisplayDesc(card)
     var fittedText = fitWrappedText(descText, areaW, areaH)
 
     var costTxt = string(card.costValue())
-    var costScale = uiTextScale(costTxt, refH * 0.16, refW * 0.24) // ставит шрифт
+    var costScale = uiTextScale(costTxt, bucketH * 0.16, bucketW * 0.24)
     var layout = {
-        refW: refW, refH: refH,
         descFont: fittedText.font, descScale: fittedText.scale, descText: fittedText.text,
         costTxt: costTxt, costFont: draw_get_font(), costScale: costScale
     }
@@ -227,8 +231,7 @@ function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scal
         var tokenPoint = cardLocalToScreen(centerX, centerY, 0, -tokenRaise, angle)
         draw_sprite_ext(costToken, 0, tokenPoint.x, tokenPoint.y, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     }
-    var layout = cardFaceLayout(card)
-    var layoutScale = min(cardWidth * scale / layout.refW, cardHeight * scale / layout.refH)
+    var layout = cardFaceLayout(card, cardWidth * scale, cardHeight * scale)
     var prevFont = draw_get_font()
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
@@ -239,14 +242,13 @@ function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scal
         var descLocalX = cardWidth * scale * ((CARD_DESC_X1 + CARD_DESC_X2) * 0.5 / baseW - 0.5)
         var descLocalY = cardHeight * scale * ((CARD_DESC_Y1 + CARD_DESC_Y2) * 0.5 / baseH - 0.5)
         var descPoint = cardLocalToScreen(centerX, centerY, descLocalX, descLocalY, angle)
-        var descScale = layout.descScale * layoutScale
-        drawTextBold(descPoint.x, descPoint.y, layout.descText, descScale, angle, c_black, alpha)
+        drawTextBold(descPoint.x, descPoint.y, layout.descText, layout.descScale, angle, c_black, alpha)
     }
 
     // стоимость
     draw_set_font(layout.costFont)
     drawCardStatText(centerX, centerY, cardWidth * scale * 0.28, -cardHeight * scale * 0.36, angle,
-        layout.costTxt, c_white, layout.costScale * layoutScale)
+        layout.costTxt, c_white, layout.costScale)
 
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)

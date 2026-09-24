@@ -9,9 +9,13 @@
 
 #macro GA_DEBUG true // публиковать лог в консоль
 
+// Отключаем отправку аналитики
+#macro GA_ENABLED false
+
 //// Инициализация
 // Вызывается из Create объекта oAnalytics
 function analyticsInit() {
+    if (!GA_ENABLED) { return } // отправка аналитики отключена
     if (variable_global_exists("gaReady") && global.gaReady) {
         return
     }
@@ -49,7 +53,8 @@ function analyticsInit() {
 }
 
 function analyticsEnsure() {
-    if (!variable_global_exists("gaReady")) { 
+    if (!GA_ENABLED) { return false } // отправка аналитики отключена
+    if (!variable_global_exists("gaReady")) {
         global.gaReady = false
     }
     if (global.gaReady) { 
@@ -148,24 +153,29 @@ function analyticsBattleStart(_area = "overworld", _foe = "enemy") {
 }
 
 function analyticsWin() {
+    if (!analyticsEnsure()) return;
     analyticsProgression(GA_PROGRESSIONSTATUS_COMPLETE, global.gaBattleArea, global.gaBattleFoe, global.gaBattleTag);
     analyticsDesign("battle:win", global.gaBattleId);
 }
 
 function analyticsDefeat() {
+    if (!analyticsEnsure()) return;
     analyticsProgression(GA_PROGRESSIONSTATUS_FAIL, global.gaBattleArea, global.gaBattleFoe, global.gaBattleTag);
     analyticsDesign("battle:defeat", global.gaBattleId);
 }
 
-function analyticsRetreat() { 
+function analyticsRetreat() {
+    if (!analyticsEnsure()) return;
     analyticsDesign("battle:retreat", global.gaBattleId)
 }
 
-function analyticsShuffle() { 
+function analyticsShuffle() {
+    if (!analyticsEnsure()) return;
     analyticsDesign("battle:shuffle", global.gaBattleId)
 }
 
 function analyticsPlayCard(_cardId, _rarity, _character) {
+    if (!analyticsEnsure()) return;
     var ev = "battle:play_card:" + analyticsCharToken(_character)
            + ":" + analyticsRarityName(_rarity)
            + ":" + analyticsToken(_cardId);
@@ -174,6 +184,7 @@ function analyticsPlayCard(_cardId, _rarity, _character) {
 
 // Карты
 function analyticsReward(_cardId, _rarity, _source = "battle") {
+    if (!analyticsEnsure()) return;
     var ev = "reward:" + analyticsToken(_source)
            + ":" + analyticsRarityName(_rarity)
            + ":" + analyticsToken(_cardId);

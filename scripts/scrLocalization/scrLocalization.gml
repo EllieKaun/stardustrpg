@@ -1,7 +1,9 @@
 // Локализация
 // Инициализация
 function locEnsure() {
-    if (!variable_global_exists("locStrings")) locInit()
+    if (!variable_global_exists("locStrings")) {
+        locInit()
+    }
 }
 
 function locInit() {
@@ -24,7 +26,9 @@ function locLoadLang() {
 
 // Установка языка
 function setLanguage(lang) {
-    if (!array_contains(global.locLangs, lang)) return
+    if (!array_contains(global.locLangs, lang)) { 
+        return
+    }
     global.language = lang
     ini_open("settings.ini")
     ini_write_string("General", "Language", lang)

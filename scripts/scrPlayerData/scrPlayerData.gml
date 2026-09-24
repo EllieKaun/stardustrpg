@@ -58,6 +58,7 @@ function playerGrantStarterCards() {
 
     // Открываем базовые карты
     unlockCard(C.physicalDamageSingleTarget, CardsRarity.Default, 2) // Вив: 2 атакующие
+    unlockCard(C.instantManaGainSingleTarget, CardsRarity.Default, 1) // Мана
     unlockCard(C.magicalDamageSingleTarget) // Лана: магическая
     unlockCard(C.instantHealSingleTarget) // Лана: лечащая
     unlockCard(C.buffPhysicalDamageSingleTarget, CardsRarity.Default, 2) // Лана и Вив усиливающая
