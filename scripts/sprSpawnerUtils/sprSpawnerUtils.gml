@@ -101,19 +101,19 @@ function rewardPoolForSection(section) {
     switch (section) {
         case Section.TopLeft: 
             ids = [
-                C.physicalDamageSingleTarget,            // атака одного врага
-                C.physicalDamageMultipleTarget,          // атака группы  
+                C.physicalDamageSingleTarget, // атака одного врага
+                C.physicalDamageMultipleTarget, // атака группы  
                 C.physicalDamageWeakenChanceSingleTarget,// шанс слабости     
-                C.magicalDamageBurnChanceSingleTarget,   // атака огнём     
-                C.buffPhysicalDamageSingleTarget         // усиление физ урона
+                C.magicalDamageBurnChanceSingleTarget, // атака огнём     
+                C.buffPhysicalDamageSingleTarget // усиление физ урона
             ]
         break
         case Section.TopRight:  
             ids = [
                 C.physicalDamageBleedChanceSingleTarget, // шанс кровотечения
-                C.buffPhysicalProtectionSingleTarget,    // усиление физ защиты
-                C.debuffPhysicalDamageSingleTarget,      // снижение физ атаки
-                C.instantManaGainSingleTarget,           // восстановление mp 
+                C.buffPhysicalProtectionSingleTarget, // усиление физ защиты
+                C.debuffPhysicalDamageSingleTarget, // снижение физ атаки
+                C.instantManaGainSingleTarget, // восстановление mp 
                 C.magicalDamageStunChanceSingleTarget    // атака молнией  
             ]
         break
@@ -128,12 +128,12 @@ function rewardPoolForSection(section) {
         break
         case Section.BottomLeft: 
             ids = [
-                C.magicalDamageSingleTarget,             // звёздная энергия  
-                C.magicalDamageStunChanceMultiTarget,    // молния группе   
-                C.magicalDamageBurnChanceMultiTarget,    // огонь группе 
-                C.magicalDamageFreezeChanceMultiTarget,  // лёд группе    
-                C.overtimeHealSingleTarget,              // постепенное hp
-                C.overtimeManaGainSingleTarget           // постепенное mp 
+                C.magicalDamageSingleTarget, // звёздная энергия  
+                C.magicalDamageStunChanceMultiTarget, // молния группе   
+                C.magicalDamageBurnChanceMultiTarget, // огонь группе 
+                C.magicalDamageFreezeChanceMultiTarget, // лёд группе    
+                C.overtimeHealSingleTarget, // постепенное hp
+                C.overtimeManaGainSingleTarget // постепенное mp 
             ]
         break
         default:
@@ -186,9 +186,9 @@ function forestZoneConfig() {
         limitedEnemy: createLeaf, // максимум один на бой
         limitedChance: 3, // irandom(limitedChance) == 0
         tiers: [
-            { winsUnder: 5, mn: 1, mx: 2 },
-            { winsUnder: 10, mn: 2, mx: 4 },
-            { winsUnder: 20, mn: 3, mx: 5 },
+            { winsUnder: 10, mn: 1, mx: 2 },
+            { winsUnder: 25, mn: 2, mx: 4 },
+            { winsUnder: 50, mn: 3, mx: 5 },
             { winsUnder: 1000000, mn: 4, mx: 5 }
         ]
     }
@@ -206,8 +206,8 @@ function winTierEnemyRange() {
 
 function enemyIgniteRoll() {
     var w = getWins()
-    if (w >= 25) return true
-    if (w >= 10) return (irandom(9) < 4)
+    if (w >= 50) return true
+    if (w >= 25) return (irandom(9) < 4)
     return false
 }
 
@@ -240,12 +240,14 @@ function tutorialEncounter() {
 // создание битвы для босса Марионетки
 function puppetMasterEncounter() {
     var C = global.CardId;
-    return makeEncounter(
+    var enc = makeEncounter(
         [createPuppetMaster],
         { ids: [C.summonAttackPuppet, C.buffMagicalDamageSingleTarget, C.magicalDamageStunChanceSingleTarget],
           rarities: [CardsRarity.Rare, CardsRarity.Epic] },
         PuppetMasterCutScene
     )
+    enc.raw = true
+    return enc
 }
 
 // Зацикленный звук ходьбы по траве выделенного персонажа.

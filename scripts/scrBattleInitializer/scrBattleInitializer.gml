@@ -39,7 +39,9 @@ function initStarriorsFromEncounter(encounter) {
         var e = enemies[i]
         e.isEnemy = true
         e.hasSpear = false
-        if (raw) continue
+        if (raw) { 
+            continue
+        }
         if (enemyIgniteRoll()) {
             igniteEnemy(e)
         } else {
