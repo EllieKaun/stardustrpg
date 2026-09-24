@@ -9,7 +9,7 @@
   "canGenerateBitmap":true,
   "charset":0,
   "first":0,
-  "fontName":"Pixeloid Mono",
+  "fontName":"Open Sans",
   "glyphOperations":0,
   "glyphs":{
     "32":{"character":32,"h":15,"offset":0,"shift":3,"w":3,"x":2,"y":2,},
@@ -362,7 +362,7 @@
     "1277":{"character":1277,"h":15,"offset":0,"shift":6,"w":6,"x":174,"y":53,},
     "1278":{"character":1278,"h":15,"offset":0,"shift":6,"w":6,"x":166,"y":53,},
     "1279":{"character":1279,"h":15,"offset":0,"shift":6,"w":6,"x":185,"y":87,},
-    "9647":{"character":9647,"h":15,"offset":2,"shift":11,"w":6,"x":229,"y":172,},
+    "9647":{"character":9647,"h":15,"offset":2,"shift":7,"w":3,"x":229,"y":172,},
   },
   "hinting":0,
   "includeTTF":false,

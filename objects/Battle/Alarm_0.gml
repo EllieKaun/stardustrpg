@@ -69,8 +69,8 @@ if (healChoice != noone && woundedAlly != noone) {
     if (target != noone) cardToPlay = healChoice
 }
 
-// Если есть бафф и кастер ещё не забаффан этим модификаторо, значит баффаем себя
-if (cardToPlay == noone && buffChoice != noone) {
+// Если есть бафф и кастер ещё не забаффан этим модификатором, баффаем себя - но только в 50% случаев
+if (cardToPlay == noone && buffChoice != noone && irandom(1) == 0) {
     var alreadyBuffed = false
     var e0 = buffChoice.effects[0]
     if (variable_struct_exists(e0, "buffType"))
