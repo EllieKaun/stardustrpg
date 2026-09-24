@@ -134,24 +134,23 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
                 }
             }
         }
-    }
-}
 
-if (selectedCharacter != noone) {
-    var deckCount = array_length(selectedCharacter.getShuffeledDeck())
-    if (deckCount > 0) {
-        var deckH = cardDeskHeight * 0.7
-        var deckScale = deckH / sprite_get_height(CardBack)
-        var deckW = sprite_get_width(CardBack) * deckScale
-        var deckMargin = 8 * scaleToGui
-        var deckStep = 2 * scaleToGui
-        var deckX = screenWidth - deckMargin - deckW
-        var deckBottomY = screenHeight - deckMargin
+        // Колода героя справа — только в его ход, вместе с рукой
+        var deckCount = array_length(selectedCharacter.getShuffeledDeck())
+        if (deckCount > 0) {
+            var deckH = cardDeskHeight * 0.7
+            var deckScale = deckH / sprite_get_height(CardBack)
+            var deckW = sprite_get_width(CardBack) * deckScale
+            var deckMargin = 8 * scaleToGui
+            var deckStep = 2 * scaleToGui
+            var deckX = screenWidth - deckMargin - deckW
+            var deckBottomY = screenHeight - deckMargin
 
-        for (var i = 0; i < deckCount; i++) {
-            var deckCardX = deckX - i * deckStep
-            var deckCardY = deckBottomY - deckH - i * deckStep
-            draw_sprite_stretched(CardBack, 0, deckCardX, deckCardY, deckW, deckH)
+            for (var i = 0; i < deckCount; i++) {
+                var deckCardX = deckX - i * deckStep
+                var deckCardY = deckBottomY - deckH - i * deckStep
+                draw_sprite_stretched(CardBack, 0, deckCardX, deckCardY, deckW, deckH)
+            }
         }
     }
 }
