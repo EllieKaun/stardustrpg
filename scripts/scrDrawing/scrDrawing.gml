@@ -164,7 +164,7 @@ function fitWrappedText(text, areaW, areaH) {
         var wrapped = wrapTextToWidth(text, areaW)
         var textWidth = string_width(wrapped)
         var textHeight = string_height(wrapped)
-        var fitScale = min(areaW / max(1, textWidth), areaH / max(1, textHeight))
+        var fitScale = min(1, min(areaW / max(1, textWidth), areaH / max(1, textHeight)))
         var effective = fitScale * ladder[i].lineH // итоговая высота строки на экране
        
         if (effective >= bestSize) {
@@ -310,8 +310,8 @@ function uiTextScale(text, targetH, maxW) {
     return textScale
 }
 
-function drawUiText(textX, textY, text, targetHeight) {
-    var textScale = uiTextScale(text, targetHeight, 1000000)
+function drawUiText(textX, textY, text, targetHeight, maxWidth = 1000000) {
+    var textScale = uiTextScale(text, targetHeight, maxWidth)
     draw_text_transformed(textX, textY, text, textScale, textScale, 0)
     return textScale
 }
@@ -529,7 +529,7 @@ function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, co
 // Показать окно награды с одной картой 
 function showCardReward(cardStruct, title = loc("ui.newCard")) {
     if (cardStruct == undefined) return
-    if (!instance_exists(oCardReward)) instance_create_depth(0, 0, -20000, oCardReward)
+    if (!instance_exists(oCardReward)) instance_create_depth(0, 0, -15000, oCardReward)
     with (oCardReward) {
         card = cardStruct
         rewardTitle = title

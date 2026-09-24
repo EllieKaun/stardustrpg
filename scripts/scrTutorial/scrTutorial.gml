@@ -141,9 +141,11 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
     draw_set_valign(fa_top)
     drawUiText(textX, textTop, speakerDisplayName(speaker), nameH)
 
+    var hintH = nameH * 0.8
+
     draw_set_color(c_white)
     var bodyTop = textTop + nameH * 1.25
-    var bodyH = textH - nameH * 1.25
+    var bodyH = textH - nameH * 1.25 - hintH * 1.4
     var prevFont = draw_get_font()
     var fittedText = fitWrappedText(text, textW, bodyH)
     if (fittedText != undefined) {
@@ -152,7 +154,6 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
     }
     draw_set_font(prevFont)
 
-    var hintH = nameH * 0.85
     draw_set_halign(fa_right)
     draw_set_color(merge_color(c_white, c_black, 0.35))
     drawUiText(panelX + panelW - pad, panelY + panelH - pad - hintH, loc("ui.spaceNext"), hintH)

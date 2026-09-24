@@ -10,7 +10,7 @@
   "compression":0,
   "compressionQuality":4,
   "conversionMode":0,
-  "duration":145.37502,
+  "duration":133.75,
   "exportDir":"",
   "name":"BattleMusic",
   "parent":{
