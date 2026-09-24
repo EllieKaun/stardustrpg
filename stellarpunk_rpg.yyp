@@ -106,9 +106,6 @@
     {"link":"io.gamemaker.sdfshaders-1.0.0","name":"io.gamemaker.sdfshaders-1.0.0","path":"io.gamemaker.sdfshaders-1.0.0.yyp",},
   ],
   "IncludedFiles":[
-    {"$GMIncludedFile":"","%Name":"m3x6.ttf","CopyToMask":-1,"filePath":"datafiles","name":"m3x6.ttf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
-    {"$GMIncludedFile":"","%Name":"PixeloidSans.ttf","CopyToMask":-1,"filePath":"datafiles","name":"PixeloidSans.ttf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
-    {"$GMIncludedFile":"","%Name":"spear.png.zip","CopyToMask":-1,"filePath":"datafiles","name":"spear.png.zip","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],
