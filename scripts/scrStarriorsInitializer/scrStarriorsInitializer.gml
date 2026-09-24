@@ -50,8 +50,8 @@ function createSafar(){
         40,
         1,
         1,
-        7,
-        7,
+        8,
+        8,
         2,
         2,
         safarFixedDeck()
