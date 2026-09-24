@@ -126,7 +126,7 @@ enum BattleStates {
     EnemyInfoSelection,
     EnemyInfoDisplay,
     Victory,
-    GameOver,
+    GameOver,  
     PuppetTurn,
     CardAnimating,
     BossIntro,

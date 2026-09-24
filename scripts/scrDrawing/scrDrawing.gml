@@ -116,10 +116,10 @@ function cardDisplayStats(card) {
 }
 
 //// Детальное описание карты
-#macro CARD_DESC_X1 6
-#macro CARD_DESC_Y1 35
-#macro CARD_DESC_X2 31
-#macro CARD_DESC_Y2 50
+#macro CARD_DESC_X1 32
+#macro CARD_DESC_Y1 140
+#macro CARD_DESC_X2 120
+#macro CARD_DESC_Y2 190
 
 // Ручной перенос строк под ширину maxW текущим шрифтом
 function wrapTextToWidth(text, maxW) {
@@ -231,10 +231,15 @@ function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scal
         var tokenPoint = cardLocalToScreen(centerX, centerY, 0, -tokenRaise, angle)
         draw_sprite_ext(costToken, 0, tokenPoint.x, tokenPoint.y, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     }
-    var layout = cardFaceLayout(card, cardWidth * scale, cardHeight * scale)
+    
+    // Настройка текста
+    var layout = cardFaceLayout(card, cardWidth, cardHeight)
     var prevFont = draw_get_font()
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
+
+    var prevTexFilter = gpu_get_texfilter()
+    gpu_set_texfilter(true)
 
     // описание
     if (layout.descText != "") {
@@ -242,13 +247,14 @@ function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scal
         var descLocalX = cardWidth * scale * ((CARD_DESC_X1 + CARD_DESC_X2) * 0.5 / baseW - 0.5)
         var descLocalY = cardHeight * scale * ((CARD_DESC_Y1 + CARD_DESC_Y2) * 0.5 / baseH - 0.5)
         var descPoint = cardLocalToScreen(centerX, centerY, descLocalX, descLocalY, angle)
-        drawTextBold(descPoint.x, descPoint.y, layout.descText, layout.descScale, angle, c_black, alpha)
+        drawTextBold(descPoint.x, descPoint.y, layout.descText, layout.descScale * scale, angle, c_black, alpha)
     }
 
     // стоимость
     draw_set_font(layout.costFont)
     drawCardStatText(centerX, centerY, cardWidth * scale * 0.28, -cardHeight * scale * 0.36, angle,
-        layout.costTxt, c_white, layout.costScale)
+        layout.costTxt, c_white, layout.costScale * scale)
+    gpu_set_texfilter(prevTexFilter)
 
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)

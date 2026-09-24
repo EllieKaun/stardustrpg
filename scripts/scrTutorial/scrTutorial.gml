@@ -10,9 +10,9 @@ function tutorialOverworldLines() {
 
 // Проигрывание шагов тутоирала. 
 //Шаг: { text, speaker, portrait,
-//   getRect() -> прямоугольник подсветки (или undefined полное затемнение),
-//   advanceWhen() -> когда продвигаться (по умолчанию uiConfirmPressed),
-//   onEnter() -> опционально при входе в шаг }.
+//   getRect() прямоугольник подсветки (или undefined полное затемнение),
+//   advanceWhen() когда продвигаться (по умолчанию uiConfirmPressed),
+//   onEnter() опционально при входе в шаг }.
 function TutorialRunner(_steps) constructor {
     self.steps = _steps
     self.index = 0
