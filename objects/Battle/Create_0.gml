@@ -126,7 +126,7 @@ changeBattleState = function(newState) {
         || newState == BattleStates.StunnedTurn)
     if (battleState == newState && !startsTimedTurn) { return }
     battleState = newState
-    show_debug_message("battle state -> " + string(newState))
+    show_debug_message("battle state " + string(newState))
 
     switch (newState) {
         case BattleStates.EnemyTargetSelection:

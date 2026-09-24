@@ -140,7 +140,7 @@ function effectKind(effect) {
     return effectKindFromType(effect.type)
 }
 
-// EffectTypes -> строковый ключ реестра 
+// EffectTypes строковый ключ реестра 
 function effectKindFromType(type) {
     switch (type) {
         case EffectTypes.Damage: return "Damage"
