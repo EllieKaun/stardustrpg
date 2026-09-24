@@ -4,7 +4,7 @@
   "name":"macOS",
   "option_mac_allow_fullscreen":false,
   "option_mac_allow_incoming_network":false,
-  "option_mac_allow_outgoing_network":false,
+  "option_mac_allow_outgoing_network":true,
   "option_mac_apple_sign_in":false,
   "option_mac_app_category":"Games",
   "option_mac_app_id":"com.company.game",
