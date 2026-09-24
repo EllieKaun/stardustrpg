@@ -529,7 +529,7 @@ function drawMenuBadge(badgeX, badgeY, badgeScale, label, hotkey, ballOnLeft, co
 // Показать окно награды с одной картой 
 function showCardReward(cardStruct, title = loc("ui.newCard")) {
     if (cardStruct == undefined) return
-    if (!instance_exists(oCardReward)) instance_create_depth(0, 0, -20000, oCardReward)
+    if (!instance_exists(oCardReward)) instance_create_depth(0, 0, -15000, oCardReward)
     with (oCardReward) {
         card = cardStruct
         rewardTitle = title
