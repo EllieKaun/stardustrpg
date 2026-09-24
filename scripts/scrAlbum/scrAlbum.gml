@@ -47,9 +47,15 @@ function albumDrawCard(slot, rect, isSelected) {
         var textY = rect.sy + rect.sh * (CARD_TEXT_Y / CARD_ART_H)
         var textW = rect.sw * (CARD_TEXT_W / CARD_ART_W)
         var textH = rect.sh * (CARD_TEXT_H / CARD_ART_H)
+        // Как на лице карты: перенос строк + подбор шрифта под область, тёмный текст (область описания белая)
+        var fit = fitWrappedText(cardDisplayDesc(card), textW, textH)
+        draw_set_font(fit.font)
+        draw_set_halign(fa_center)
+        draw_set_valign(fa_middle)
+        drawTextBold(textX + textW * 0.5, textY + textH * 0.5, fit.text, fit.scale, 0, c_black, 1)
+        draw_set_halign(fa_left)
+        draw_set_valign(fa_top)
         draw_set_color(c_white)
-        draw_set_font(uiFont())
-        drawFitTextCentered(cardDisplayDesc(card), textX, textY, textW, textH, UI_FONT_STACK)
     }
 
     gpu_set_tex_filter(prevFilter)

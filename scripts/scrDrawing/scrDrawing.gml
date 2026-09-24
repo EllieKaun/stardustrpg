@@ -220,10 +220,13 @@ function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scal
     draw_sprite_ext(card.cardBorderSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     draw_sprite_ext(card.cardTokenSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     // Токен стоимости энергии
-    var costToken = (card.energy >= 2) ? sprCostTwoEnergy : sprCostEnergy
-    var tokenRaise = CARD_COST_TOKEN_RAISE_PX * spriteScaleY // 3 пикселя арта с учётом масштаба
-    var tokenPoint = cardLocalToScreen(centerX, centerY, 0, -tokenRaise, angle)
-    draw_sprite_ext(costToken, 0, tokenPoint.x, tokenPoint.y, spriteScaleX, spriteScaleY, angle, c_white, alpha)
+    // У бесплатных карт токена энергии нет
+    if (card.energy > 0) {
+        var costToken = (card.energy >= 2) ? sprCostTwoEnergy : sprCostEnergy
+        var tokenRaise = CARD_COST_TOKEN_RAISE_PX * spriteScaleY // 3 пикселя арта с учётом масштаба
+        var tokenPoint = cardLocalToScreen(centerX, centerY, 0, -tokenRaise, angle)
+        draw_sprite_ext(costToken, 0, tokenPoint.x, tokenPoint.y, spriteScaleX, spriteScaleY, angle, c_white, alpha)
+    }
     var layout = cardFaceLayout(card)
     var layoutScale = min(cardWidth * scale / layout.refW, cardHeight * scale / layout.refH)
     var prevFont = draw_get_font()

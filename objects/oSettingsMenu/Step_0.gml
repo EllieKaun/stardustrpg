@@ -6,6 +6,12 @@ var mouseClicked = mouse_check_button_pressed(mb_left)
 
 menu.handleInput(mx, my, mouseMoved, mouseClicked)
 
+var langKeyPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A")) || keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
+if (menu.index == 5 && langKeyPressed) { // язык переключается стрелками, как остальные пункты со "< >"
+    locCycleLanguage()
+    updateMenuLabels()
+}
+
 if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
     if (menu.index == 0) {
         selectedResIndex = (selectedResIndex - 1 + array_length(resolutions)) mod array_length(resolutions)

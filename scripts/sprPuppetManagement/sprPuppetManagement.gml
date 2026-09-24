@@ -165,14 +165,22 @@ function runPuppetTurn(puppet) {
         if (target != noone) card = healChoice
     }
 
-    // Баффаем себя, если ещё не забаффаны этим модификатором
+    // Баффаем союзника, у которого ещё нет этого модификатора (сначала других, себя - в последнюю очередь)
     if (card == noone && buffChoice != noone) {
-        var alreadyBuffed = false
         var e0 = buffChoice.effects[0]
-        if (variable_struct_exists(e0, "buffType"))
-            alreadyBuffed = !is_undefined(checkIfHasBuff(puppet, EffectTypes.Buff, e0.buffType))
-        if (!alreadyBuffed) {
-            target = enemyResolveTarget(buffChoice, puppet, foes, allies, puppet, noone)
+        var buffTarget = noone
+        for (var i = 0; i < array_length(allies) && buffTarget == noone; i++) {
+            var a = allies[i]
+            if (a == puppet) continue
+            if (variable_struct_exists(e0, "buffType") && !is_undefined(checkIfHasBuff(a, EffectTypes.Buff, e0.buffType))) continue
+            buffTarget = a
+        }
+        if (buffTarget == noone) {
+            var selfBuffed = variable_struct_exists(e0, "buffType") && !is_undefined(checkIfHasBuff(puppet, EffectTypes.Buff, e0.buffType))
+            if (!selfBuffed) buffTarget = puppet
+        }
+        if (buffTarget != noone) {
+            target = enemyResolveTarget(buffChoice, puppet, foes, allies, buffTarget, noone)
             if (target != noone) card = buffChoice
         }
     }
