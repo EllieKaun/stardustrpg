@@ -23,7 +23,33 @@ if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
     draw_set_color(c_white)
 }
 
-// Катсцена появления босса 
+var shopOpen = instance_exists(oShop) && oShop.open
+var deckOpen = instance_exists(oDeckBuilder) && oDeckBuilder.open
+if (!shopOpen && !deckOpen && !global.cutsceneActive) {
+    var gw = display_get_gui_width()
+    var gh = display_get_gui_height()
+    var goldMargin = gh * 0.03
+    var coinH = gh * 0.06
+    var coinScale = coinH / sprite_get_height(CoinIcon)
+    var coinW = sprite_get_width(CoinIcon) * coinScale
+    var coinCX = gw - goldMargin - coinW * 0.5
+    var coinCY = goldMargin + coinH * 0.5
+    draw_sprite_ext(CoinIcon, 0, coinCX, coinCY, coinScale, coinScale, 0, c_white, 1)
+
+    var goldStr = string(getGold())
+    draw_set_halign(fa_right)
+    draw_set_valign(fa_middle)
+    draw_set_color(c_black)
+    var goldScale = uiTextScale(goldStr, coinH * 0.9, gw * 0.15)
+    var goldX = coinCX - coinW * 0.5 - goldMargin * 0.4
+    draw_text_transformed(goldX + goldScale, coinCY + goldScale, goldStr, goldScale, goldScale, 0)
+    draw_set_color(c_white)
+    draw_text_transformed(goldX, coinCY, goldStr, goldScale, goldScale, 0)
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+}
+
+// Катсцена появления босса
 if (global.cutsceneActive && sprite_exists(cutsceneSprite)) {
     var sw = display_get_gui_width()
     var sh = display_get_gui_height()

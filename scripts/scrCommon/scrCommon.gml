@@ -20,7 +20,7 @@
 #macro REWARD_DUPLICATE_FALLOFF 0.5 // падение шанса выпадения дубликата карты как награды
 
 // Сложность врагов
-#macro ENEMY_WIN_BONUS 5 // рост силы врагов
+#macro ENEMY_WIN_BONUS 2 // рост силы врагов
 #macro ENEMY_WIN_INTERVAL 5 // сколько побед нужно чтобы сложность выросла
 #macro SPEAR_BATTLE_BONUS 15  // сложность врагов с капьем
 

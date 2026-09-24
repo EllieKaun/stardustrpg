@@ -6,6 +6,8 @@
 #macro CARD_TEXT_W 258 // 318 - 60
 #macro CARD_TEXT_H 125 // 500 - 375
 
+#macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману (здоровье не трогаем)
+
 function Card(name,
             rarity,
             target,
@@ -32,7 +34,10 @@ function Card(name,
     self.energy = energy
 
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana
+  
+    self.cardTokenSpr = (self.costTypeCached == CostType.Health) ? hpCostToken : mpCostToken
     self.costValueCached = computeCardCost(rarity, effects)
+    if (self.costTypeCached == CostType.Mana) self.costValueCached *= CARD_MANA_COST_MULTIPLIER
     self.costType  = function() { return self.costTypeCached }
     self.costValue = function() { return self.costValueCached }
 }
