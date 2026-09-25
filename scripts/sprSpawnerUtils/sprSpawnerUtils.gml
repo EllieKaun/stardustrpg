@@ -19,67 +19,15 @@ function sectionAt(posX, posY) {
     else { return (offsetX >= 0) ? Section.BottomRight : Section.BottomLeft }
 }
 
-// Типы мини врагов для секции 
+// Типы мини врагов для секции
 function enemyTypesForRegion(zone, section) {
-    return [oCrakerNutSmall, oMushroomSmall, oFlowerSmall, oLeafSmall]
-    switch (zone) {
-        case Zone.Outer:
-            switch (section) {
-                case Section.TopRight: return [oCrakerNutSmall]
-                case Section.TopLeft: return [oCrakerNutSmall]
-                case Section.BottomLeft: return [oCrakerNutSmall, oMushroomSmall]
-                case Section.BottomRight: return [oMushroomSmall]
-            }
-        break;
-        case Zone.Middle:
-            switch (section) {
-                case Section.TopRight: return [oMushroomSmall]
-                case Section.TopLeft: return [oCrakerNutSmall, oMushroomSmall]
-                case Section.BottomLeft: return [oMushroomSmall]
-                case Section.BottomRight: return [oCrakerNutSmall]
-            }
-        break;
-        case Zone.Inner: 
-            return [oMushroomSmall]
-    }
-    return [oCrakerNutSmall]
+    return zoneContent().regionEnemyTypes
 }
 
 // Генерация врагов по секции для внешней зоны (для битвы)
 function sectionCompositions(section) {
-    section = [Section.BottomLeft, Section.BottomRight, Section.TopLeft, Section.TopRight][irandom(3)]
-    switch (section) { 
-        case Section.TopLeft: 
-            return [                                
-            [createCrackerNut, createCrackerNut],
-            [createCrackerNut, createLeaf],
-            [createCrackerNut, createLeaf, createCrackerNut],
-            [createCrackerNut, createCrackerNut, createCrackerNut]
-            ] 
-        case Section.TopRight: 
-            return [                                 
-            [createMushroom, createMushroom],
-            [createMushroom, createFlower],
-            [createMushroom, createLeaf, createFlower],
-            [createMushroom, createMushroom, createMushroom]
-            ]
-        case Section.BottomRight: 
-            return [                         
-            [createFlower, createFlower],
-            [createMushroom, createFlower],
-            [createMushroom, createLeaf, createFlower],
-            [createFlower, createFlower, createFlower]
-            ]
-        case Section.BottomLeft: 
-            return [                            
-            [createCrackerNut, createLeaf, createFlower],
-            [createCrackerNut, createLeaf, createMushroom],
-            [createMushroom, createCrackerNut, createFlower],
-            [createLeaf, createLeaf, createFlower]
-            ]
-        default: 
-            return [[createCrackerNut]]
-    }
+    var s = zoneContent().sections[section]
+    return (s != undefined) ? s.compositions : [[createCrackerNut]]
 }
 
 // создание композиции врагов для битвы для секции для внешней зоны
@@ -95,51 +43,10 @@ function createEncounterForSection(section) {
 
 // создание пула наград для зоны для секции при победе
 function rewardPoolForSection(section) {
-    var cardIds = global.CardId
-    var rarities = [CardsRarity.Default, CardsRarity.Unusual]
-    var ids
-    switch (section) {
-        case Section.TopLeft: 
-            ids = [
-                cardIds.physicalDamageSingleTarget, // атака одного врага
-                cardIds.physicalDamageMultipleTarget, // атака группы  
-                cardIds.physicalDamageWeakenChanceSingleTarget,// шанс слабости     
-                cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём     
-                cardIds.buffPhysicalDamageSingleTarget // усиление физ урона
-            ]
-        break
-        case Section.TopRight:  
-            ids = [
-                cardIds.physicalDamageBleedChanceSingleTarget, // шанс кровотечения
-                cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
-                cardIds.debuffPhysicalDamageSingleTarget, // снижение физ атаки
-                cardIds.instantManaGainSingleTarget, // восстановление mp 
-                cardIds.magicalDamageStunChanceSingleTarget    // атака молнией  
-            ]
-        break
-        case Section.BottomRight:
-            ids = [
-                cardIds.magicalDamageFreezeChanceSingleTarget, // атака льдом    
-                cardIds.weaknessMagicalDamageSingleTarget,     // слабость к маг урону 
-                cardIds.buffMagicalProtectionSingleTarget,     // усиление маг защиты
-                cardIds.debuffMagicalDamageSingleTarget,       // снижение маг атаки
-                cardIds.instantHealMultiTarget                 // восстановление 
-            ]
-        break
-        case Section.BottomLeft: 
-            ids = [
-                cardIds.magicalDamageSingleTarget, // звёздная энергия  
-                cardIds.magicalDamageStunChanceMultiTarget, // молния группе   
-                cardIds.magicalDamageBurnChanceMultiTarget, // огонь группе 
-                cardIds.magicalDamageFreezeChanceMultiTarget, // лёд группе    
-                cardIds.overtimeHealSingleTarget, // постепенное hp
-                cardIds.overtimeManaGainSingleTarget // постепенное mp 
-            ]
-        break
-        default:
-            ids = [cardIds.physicalDamageSingleTarget]
-    }
-    return { ids: ids, rarities: rarities }
+    var content = zoneContent()
+    var s = content.sections[section]
+    var ids = (s != undefined) ? s.rewardIds : [global.CardId.physicalDamageSingleTarget]
+    return { ids: ids, rarities: content.rewardRarities }
 }
 
 // Единый пул наград демо
@@ -151,15 +58,17 @@ function rewardIdAllowed(id) {
 }
 
 function forestRewardPool() {
+    var content = zoneContent()
     var ids = []
-    var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
-    for (var sectionIndex = 0; sectionIndex < array_length(sections); sectionIndex++) {
-        var pool = rewardPoolForSection(sections[sectionIndex])
-        for (var idIndex = 0; idIndex < array_length(pool.ids); idIndex++) {
-            if (rewardIdAllowed(pool.ids[idIndex])) { array_push(ids, pool.ids[idIndex]) }
+    var order = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
+    for (var sectionIndex = 0; sectionIndex < array_length(order); sectionIndex++) {
+        var s = content.sections[order[sectionIndex]]
+        if (s == undefined) { continue }
+        for (var idIndex = 0; idIndex < array_length(s.rewardIds); idIndex++) {
+            if (rewardIdAllowed(s.rewardIds[idIndex])) { array_push(ids, s.rewardIds[idIndex]) }
         }
     }
-    return { ids: ids, rarities: [CardsRarity.Default, CardsRarity.Unusual] }
+    return { ids: ids, rarities: content.rewardRarities }
 }
 
 // итоговое создание битвы из фабрик
@@ -170,11 +79,14 @@ function makeEncounter(enemyCreators, reward, introSprite = undefined) {
 
 // Единый пул композиций врагов в лесу
 function forestCompositions() {
+    var content = zoneContent()
     var allCompositions = []
-    var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
-    for (var sectionIndex = 0; sectionIndex < array_length(sections); sectionIndex++) {
-        var compositions = sectionCompositions(sections[sectionIndex])
-        for (var compositionIndex = 0; compositionIndex < array_length(compositions); compositionIndex++) array_push(allCompositions, compositions[compositionIndex])
+    for (var sectionIndex = 0; sectionIndex < array_length(content.sections); sectionIndex++) {
+        var s = content.sections[sectionIndex]
+        if (s == undefined) { continue }
+        for (var compositionIndex = 0; compositionIndex < array_length(s.compositions); compositionIndex++) {
+            array_push(allCompositions, s.compositions[compositionIndex])
+        }
     }
     return allCompositions
 }

@@ -42,12 +42,11 @@ selected_character = partyMembers[0]
 
 generateChests = function() {
     global.chests = []
-    var trees = []
-    with (oTree1) array_push(trees, id)
-    with (oTree2) array_push(trees, id)
-    with (oTree3) array_push(trees, id)
-    with (oTree4) array_push(trees, id)
-    with (oTree5) array_push(trees, id)
+
+    // Спавним сундуки внутри зон спавна (oSpawner) — как врагов: эти зоны всегда в проходимых местах
+    var spawners = []
+    with (oSpawner) { array_push(spawners, id) }
+    if (array_length(spawners) == 0) { return }
 
     var kinds = [ChestKind.Gold, ChestKind.Card, ChestKind.Enemy]
     var minDist = CHEST_MIN_DISTANCE
@@ -55,19 +54,15 @@ generateChests = function() {
     var attempts = 0
     while (made < CHEST_MAX_COUNT && attempts < 300) {
         attempts++
-        var chestX, chestY
-        if (array_length(trees) > 0 && irandom(1) == 0) {
-            var tree = trees[irandom(array_length(trees) - 1)]
-            if (!instance_exists(tree)) { continue }
-            chestX = tree.x
-            chestY = tree.bbox_bottom + 8 // у основания дерева, на проходимой земле
-        } else {
-            chestX = 96 + random(room_width - 192)
-            chestY = 96 + random(room_height - 192)
-        }
-        if (chestX < 48 || chestY < 48 || chestX > room_width - 48 || chestY > room_height - 48) { continue }
 
-        // Позиция должна быть проходимой — иначе герой не наступит и коллизия не сработает
+        var spawner = spawners[irandom(array_length(spawners) - 1)]
+        var chestX = spawner.bbox_left + random(spawner.bbox_right - spawner.bbox_left)
+        var chestY = spawner.bbox_top  + random(spawner.bbox_bottom - spawner.bbox_top)
+
+        // точка должна быть реально внутри зоны спавна
+        if (!collision_point(chestX, chestY, oSpawner, false, true)) { continue }
+
+        // и не на препятствии — иначе герой не наступит и коллизия не сработает
         if (collision_point(chestX, chestY, oWall,   false, true) != noone
          || collision_point(chestX, chestY, oTree1,  false, true) != noone
          || collision_point(chestX, chestY, oTree2,  false, true) != noone

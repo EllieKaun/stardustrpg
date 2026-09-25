@@ -101,3 +101,79 @@ function enemyCountForLevel(difficulty, level) {
     var last = tiers[array_length(tiers) - 1]
     return { mn: last.mn, mx: last.mx }
 }
+
+function zoneContent(zoneId = undefined) {
+    zoneId = zoneId ?? currentZoneId()
+    var cardIds = global.CardId
+    var sections = array_create(4, undefined) // индекс = enum Section
+    switch (zoneId) {
+        case "forest":
+        default:
+            sections[Section.TopLeft] = {
+                compositions: [
+                    [createCrackerNut, createCrackerNut],
+                    [createCrackerNut, createLeaf],
+                    [createCrackerNut, createLeaf, createCrackerNut],
+                    [createCrackerNut, createCrackerNut, createCrackerNut]
+                ],
+                rewardIds: [
+                    cardIds.physicalDamageSingleTarget, // атака одного врага
+                    cardIds.physicalDamageMultipleTarget, // атака группы
+                    cardIds.physicalDamageWeakenChanceSingleTarget, // шанс слабости
+                    cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
+                    cardIds.buffPhysicalDamageSingleTarget // усиление физ урона
+                ]
+            }
+            sections[Section.TopRight] = {
+                compositions: [
+                    [createMushroom, createMushroom],
+                    [createMushroom, createFlower],
+                    [createMushroom, createLeaf, createFlower],
+                    [createMushroom, createMushroom, createMushroom]
+                ],
+                rewardIds: [
+                    cardIds.physicalDamageBleedChanceSingleTarget, // шанс кровотечения
+                    cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
+                    cardIds.debuffPhysicalDamageSingleTarget, // снижение физ атаки
+                    cardIds.instantManaGainSingleTarget, // восстановление mp
+                    cardIds.magicalDamageStunChanceSingleTarget // атака молнией
+                ]
+            }
+            sections[Section.BottomRight] = {
+                compositions: [
+                    [createFlower, createFlower],
+                    [createMushroom, createFlower],
+                    [createMushroom, createLeaf, createFlower],
+                    [createFlower, createFlower, createFlower]
+                ],
+                rewardIds: [
+                    cardIds.magicalDamageFreezeChanceSingleTarget, // атака льдом
+                    cardIds.weaknessMagicalDamageSingleTarget, // слабость к маг урону
+                    cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
+                    cardIds.debuffMagicalDamageSingleTarget, // снижение маг атаки
+                    cardIds.instantHealMultiTarget // восстановление
+                ]
+            }
+            sections[Section.BottomLeft] = {
+                compositions: [
+                    [createCrackerNut, createLeaf, createFlower],
+                    [createCrackerNut, createLeaf, createMushroom],
+                    [createMushroom, createCrackerNut, createFlower],
+                    [createLeaf, createLeaf, createFlower]
+                ],
+                rewardIds: [
+                    cardIds.magicalDamageSingleTarget, // звёздная энергия
+                    cardIds.magicalDamageStunChanceMultiTarget, // молния группе
+                    cardIds.magicalDamageBurnChanceMultiTarget, // огонь группе
+                    cardIds.magicalDamageFreezeChanceMultiTarget, // лёд группе
+                    cardIds.overtimeHealSingleTarget, // постепенное hp
+                    cardIds.overtimeManaGainSingleTarget // постепенное mp
+                ]
+            }
+            return {
+                rewardRarities: [CardsRarity.Default, CardsRarity.Unusual],
+                regionEnemyTypes: [oCrakerNutSmall, oMushroomSmall, oFlowerSmall, oLeafSmall],
+                sections: sections
+            }
+    }
+}
