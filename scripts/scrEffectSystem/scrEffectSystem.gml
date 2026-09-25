@@ -22,15 +22,15 @@ function initEffectRegistry() {
     variable_struct_set(effectsRepository, "Damage", {
         onInstant: function(effect, caster, targets) {
             if (is_array(targets)) {
-                for (var i = 0; i < array_length(targets); i++)
-                    if (!targets[i].isKO()) { executeDamageEffect(effect, caster, targets[i]) }
+                for (var targetIndex = 0; targetIndex < array_length(targets); targetIndex++)
+                    if (!targets[targetIndex].isKO()) { executeDamageEffect(effect, caster, targets[targetIndex]) }
             } else {
                 if (!targets.isKO()) { executeDamageEffect(effect, caster, targets) }
             }
         },
         onEndOfTurn: function(effect, character) {
-            var raw = is_method(effect.value) ? effect.value() : effect.value
-            character.applyDamage(mitigateDamage(character, effect, raw))
+            var rawValue = is_method(effect.value) ? effect.value() : effect.value
+            character.applyDamage(mitigateDamage(character, effect, rawValue))
         },
     })
 
@@ -85,8 +85,8 @@ function initEffectRegistry() {
         onPlay: function(effect, caster, targets) {
             with (Battle) {
                 var team = caster.isEnemy ? enemies : heroes
-                var free = effect.maxSlots - countAliveOn(team)
-                repeat (free) {
+                var freeSlots = effect.maxSlots - countAliveOn(team)
+                repeat (freeSlots) {
                     var clone = cloneStarrior(caster)
                     array_push(team, clone)
                     array_push(playOrder, clone)
@@ -100,30 +100,30 @@ function initEffectRegistry() {
     // Кража
     variable_struct_set(effectsRepository, "Steal", {
         onInstant: function(effect, caster, targets) {
-            var t = is_array(targets) ? (array_length(targets) > 0 ? targets[0] : noone) : targets
-            if (t == noone) { return }
+            var target = is_array(targets) ? (array_length(targets) > 0 ? targets[0] : noone) : targets
+            if (target == noone) { return }
 
-            if (variable_instance_exists(t, "hasSpear") && t.hasSpear) {
-                t.hasSpear = false
-                t.image_blend = c_white
+            if (variable_instance_exists(target, "hasSpear") && target.hasSpear) {
+                target.hasSpear = false
+                target.image_blend = c_white
                 questGrantSpear()
             } else {
-                var hand = t.getCardsInHand()
+                var hand = target.getCardsInHand()
                 if (array_length(hand) > 0) {
                     var picked = hand[irandom(array_length(hand) - 1)]
                     array_push(caster.deck.cardsInHand, picked)
                 }
             }
 
-            if (variable_instance_exists(t, "showEffectNotification")) {
-                t.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
+            if (variable_instance_exists(target, "showEffectNotification")) {
+                target.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
             }
         },
     })
 
     // Модификаторы
-    variable_struct_set(effectsRepository, "Buff", { iconFor: function(e) { return buffIcon(e, true) } })
-    variable_struct_set(effectsRepository, "Debuff", { iconFor: function(e) { return buffIcon(e, false) } })
+    variable_struct_set(effectsRepository, "Buff", { iconFor: function(effect) { return buffIcon(effect, true) } })
+    variable_struct_set(effectsRepository, "Debuff", { iconFor: function(effect) { return buffIcon(effect, false) } })
     variable_struct_set(effectsRepository, "Stun", { icon: noone })
     variable_struct_set(effectsRepository, "Weakening", { icon: noone })
     variable_struct_set(effectsRepository, "IgnoreWeakness", { icon: noone })
@@ -165,9 +165,9 @@ function effectKindFromType(type) {
 
 function effectHandler(effect) {
     if (!variable_global_exists("effectRegistry")) { return undefined }
-    var key = effectKind(effect)
-    if (key == undefined || !variable_struct_exists(global.effectRegistry, key)) { return undefined }
-    return variable_struct_get(global.effectRegistry, key)
+    var registryKey = effectKind(effect)
+    if (registryKey == undefined || !variable_struct_exists(global.effectRegistry, registryKey)) { return undefined }
+    return variable_struct_get(global.effectRegistry, registryKey)
 }
 
 function effectHasHook(handler, hookName) {
@@ -177,19 +177,19 @@ function effectHasHook(handler, hookName) {
 //// Обобщённый запуск хуков
 
 function runInstant(effect, caster, targets) {
-    var h = effectHandler(effect)
-    if (effectHasHook(h, "onInstant")) { h.onInstant(effect, caster, targets) }
+    var handler = effectHandler(effect)
+    if (effectHasHook(handler, "onInstant")) { handler.onInstant(effect, caster, targets) }
 }
 
 function runOnPlay(effect, caster, targets) {
-    var h = effectHandler(effect)
-    if (effectHasHook(h, "onPlay")) { h.onPlay(effect, caster, targets); return true }
+    var handler = effectHandler(effect)
+    if (effectHasHook(handler, "onPlay")) { handler.onPlay(effect, caster, targets); return true }
     return false
 }
 
 function runOnApply(effect, caster, target) {
-    var h = effectHandler(effect)
-    if (effectHasHook(h, "onApply")) { h.onApply(effect, caster, target) }
+    var handler = effectHandler(effect)
+    if (effectHasHook(handler, "onApply")) { handler.onApply(effect, caster, target) }
 }
 
 //// Иконки статусов
@@ -207,8 +207,8 @@ function statusNameIcon(effect) {
 }
 
 // Иконка слабости по сырому значению StatusNames (для инфы о враге)
-function weaknessIcon(sn) {
-    switch (sn) {
+function weaknessIcon(statusName) {
+    switch (statusName) {
         case StatusNames.Stun: return StunIcon
         case StatusNames.Burn: return BurnIcon
         case StatusNames.Bleeding: return BleedIcon
@@ -218,8 +218,8 @@ function weaknessIcon(sn) {
     return noone
 }
 
-function weaknessLabel(sn) {
-    switch (sn) {
+function weaknessLabel(statusName) {
+    switch (statusName) {
         case StatusNames.Stun: return loc("weakness.Stun")
         case StatusNames.Burn: return loc("weakness.Burn")
         case StatusNames.Freeze: return loc("weakness.Freeze")
@@ -243,21 +243,21 @@ function buffIcon(effect, isBuff) {
 }
 
 function effectIcon(effect) {
-    var s = statusNameIcon(effect)
-    if (s != noone) { return s }
-    var h = effectHandler(effect)
-    if (effectHasHook(h, "iconFor")) { return h.iconFor(effect) }
-    if (effectHasHook(h, "icon")) { return h.icon }
+    var statusIcon = statusNameIcon(effect)
+    if (statusIcon != noone) { return statusIcon }
+    var handler = effectHandler(effect)
+    if (effectHasHook(handler, "iconFor")) { return handler.iconFor(effect) }
+    if (effectHasHook(handler, "icon")) { return handler.icon }
     return noone
 }
 
 //  Помощники BossClone
 
 function countAliveOn(team) {
-    var n = 0
-    for (var i = 0; i < array_length(team); i++) 
-        if (!team[i].isKO()) { n++ }
-    return n
+    var aliveCount = 0
+    for (var memberIndex = 0; memberIndex < array_length(team); memberIndex++) 
+        if (!team[memberIndex].isKO()) { aliveCount++ }
+    return aliveCount
 }
 
 // Клон кастера: те же спрайты/статы/колода. isPuppet=true, чтобы
@@ -276,10 +276,10 @@ function cloneStarrior(src) {
   //  return clone
 }
 
-function cloneDeckFrom(src) {
+function cloneDeckFrom(sourceStarrior) {
     var deck = []
-    var origin = src.getOriginalDeck()
-    for (var i = 0; i < array_length(origin); i++) array_push(deck, origin[i])
+    var origin = sourceStarrior.getOriginalDeck()
+    for (var cardIndex = 0; cardIndex < array_length(origin); cardIndex++) array_push(deck, origin[cardIndex])
     return deck
 }
 
@@ -294,11 +294,11 @@ function DamageEffect(damageType, value, sprite = attackEffect, sound = PhysicaD
 }
 // Урон со временем времени со статусом (Burn, Bleeding)
 function DamageOverTimeEffect(damageType, value, duration, statusName, chance, sprite = noone, sound = noone) {
-    var e = { type: EffectTypes.Damage, damageType: damageType, value: value,
+    var effect = { type: EffectTypes.Damage, damageType: damageType, value: value,
               duration: duration, statusName: statusName, chance: chance,
               timing: Timing.EndOfTurn, sound: sound }
-    if (sprite != noone) { e.sprite = sprite }
-    return e
+    if (sprite != noone) { effect.sprite = sprite }
+    return effect
 }
 // Статус-эффект вторым эффектом карты (Stun/Weakening)
 function StatusEffect(effectType, statusName, duration, chance, timing) {
@@ -323,10 +323,10 @@ function WeakeningEffect(duration, chance, timing) {
 
 // Взрыв: мгновенный удар (statusName Bomb)
 function BombEffect(damageType, value, chance, sprite = bombEffect, sound = noone) {
-    var e = { type: EffectTypes.Damage, damageType: damageType, value: value,
+    var effect = { type: EffectTypes.Damage, damageType: damageType, value: value,
               chance: chance, statusName: StatusNames.Bomb, timing: Timing.Instant, sound: sound }
-    if (sprite != noone) { e.sprite = sprite }
-    return e
+    if (sprite != noone) { effect.sprite = sprite }
+    return effect
 }
 
 // Заморозка с дебаффом физ. защиты

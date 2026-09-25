@@ -13,9 +13,9 @@ if (opts != undefined) {
         if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) { selectedOption = (selectedOption - 1 + n) mod n }
         if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { selectedOption = (selectedOption + 1) mod n }
         if (confirm) {
-            var cb = opts[selectedOption].onSelect
+            var callback = opts[selectedOption].onSelect
             endDialog()
-            if (cb != undefined) { cb() }
+            if (callback != undefined) { callback() }
         }
     }
     exit

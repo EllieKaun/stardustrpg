@@ -2,21 +2,21 @@ enum Zone { Inner, Middle, Outer }
 enum Section { TopRight, TopLeft, BottomLeft, BottomRight }
 
 // Определение зоны
-function zoneAt(px, py) {
-    var c = global.zoneConfig
-    var cheb = max(abs(px - c.cx), abs(py - c.cy))
-    if (cheb <= c.innerHalf) { return Zone.Inner }
-    if (cheb <= c.middleHalf) { return Zone.Middle }
+function zoneAt(posX, posY) {
+    var config = global.zoneConfig
+    var chebyshevDist = max(abs(posX - config.cx), abs(posY - config.cy))
+    if (chebyshevDist <= config.innerHalf) { return Zone.Inner }
+    if (chebyshevDist <= config.middleHalf) { return Zone.Middle }
     return Zone.Outer
 }
 
 // Определение секции
-function sectionAt(px, py) {
-    var c  = global.zoneConfig
-    var dx = px - c.cx
-    var dy = py - c.cy
-    if (dy < 0) { return (dx >= 0) ? Section.TopRight : Section.TopLeft }
-    else { return (dx >= 0) ? Section.BottomRight : Section.BottomLeft }
+function sectionAt(posX, posY) {
+    var config  = global.zoneConfig
+    var offsetX = posX - config.cx
+    var offsetY = posY - config.cy
+    if (offsetY < 0) { return (offsetX >= 0) ? Section.TopRight : Section.TopLeft }
+    else { return (offsetX >= 0) ? Section.BottomRight : Section.BottomLeft }
 }
 
 // Типы мини врагов для секции 
@@ -84,60 +84,60 @@ function sectionCompositions(section) {
 
 // создание композиции врагов для битвы для секции для внешней зоны
 function createEncounterForSection(section) {
-    var comps = sectionCompositions(section);
-    var comp  = comps[irandom(array_length(comps) - 1)]
+    var compositions = sectionCompositions(section);
+    var composition  = compositions[irandom(array_length(compositions) - 1)]
     var result = []
-    for (var i = 0; i < array_length(comp); i++) {
-        array_push(result, comp[i]())
+    for (var creatorIndex = 0; creatorIndex < array_length(composition); creatorIndex++) {
+        array_push(result, composition[creatorIndex]())
     }
     return result
 }
 
 // создание пула наград для зоны для секции при победе
 function rewardPoolForSection(section) {
-    var C = global.CardId
+    var cardIds = global.CardId
     var rarities = [CardsRarity.Default, CardsRarity.Unusual]
     var ids
     switch (section) {
         case Section.TopLeft: 
             ids = [
-                C.physicalDamageSingleTarget, // атака одного врага
-                C.physicalDamageMultipleTarget, // атака группы  
-                C.physicalDamageWeakenChanceSingleTarget,// шанс слабости     
-                C.magicalDamageBurnChanceSingleTarget, // атака огнём     
-                C.buffPhysicalDamageSingleTarget // усиление физ урона
+                cardIds.physicalDamageSingleTarget, // атака одного врага
+                cardIds.physicalDamageMultipleTarget, // атака группы  
+                cardIds.physicalDamageWeakenChanceSingleTarget,// шанс слабости     
+                cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём     
+                cardIds.buffPhysicalDamageSingleTarget // усиление физ урона
             ]
         break
         case Section.TopRight:  
             ids = [
-                C.physicalDamageBleedChanceSingleTarget, // шанс кровотечения
-                C.buffPhysicalProtectionSingleTarget, // усиление физ защиты
-                C.debuffPhysicalDamageSingleTarget, // снижение физ атаки
-                C.instantManaGainSingleTarget, // восстановление mp 
-                C.magicalDamageStunChanceSingleTarget    // атака молнией  
+                cardIds.physicalDamageBleedChanceSingleTarget, // шанс кровотечения
+                cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
+                cardIds.debuffPhysicalDamageSingleTarget, // снижение физ атаки
+                cardIds.instantManaGainSingleTarget, // восстановление mp 
+                cardIds.magicalDamageStunChanceSingleTarget    // атака молнией  
             ]
         break
         case Section.BottomRight:
             ids = [
-                C.magicalDamageFreezeChanceSingleTarget, // атака льдом    
-                C.weaknessMagicalDamageSingleTarget,     // слабость к маг урону 
-                C.buffMagicalProtectionSingleTarget,     // усиление маг защиты
-                C.debuffMagicalDamageSingleTarget,       // снижение маг атаки
-                C.instantHealMultiTarget                 // восстановление 
+                cardIds.magicalDamageFreezeChanceSingleTarget, // атака льдом    
+                cardIds.weaknessMagicalDamageSingleTarget,     // слабость к маг урону 
+                cardIds.buffMagicalProtectionSingleTarget,     // усиление маг защиты
+                cardIds.debuffMagicalDamageSingleTarget,       // снижение маг атаки
+                cardIds.instantHealMultiTarget                 // восстановление 
             ]
         break
         case Section.BottomLeft: 
             ids = [
-                C.magicalDamageSingleTarget, // звёздная энергия  
-                C.magicalDamageStunChanceMultiTarget, // молния группе   
-                C.magicalDamageBurnChanceMultiTarget, // огонь группе 
-                C.magicalDamageFreezeChanceMultiTarget, // лёд группе    
-                C.overtimeHealSingleTarget, // постепенное hp
-                C.overtimeManaGainSingleTarget // постепенное mp 
+                cardIds.magicalDamageSingleTarget, // звёздная энергия  
+                cardIds.magicalDamageStunChanceMultiTarget, // молния группе   
+                cardIds.magicalDamageBurnChanceMultiTarget, // огонь группе 
+                cardIds.magicalDamageFreezeChanceMultiTarget, // лёд группе    
+                cardIds.overtimeHealSingleTarget, // постепенное hp
+                cardIds.overtimeManaGainSingleTarget // постепенное mp 
             ]
         break
         default:
-            ids = [C.physicalDamageSingleTarget]
+            ids = [cardIds.physicalDamageSingleTarget]
     }
     return { ids: ids, rarities: rarities }
 }
@@ -153,10 +153,10 @@ function rewardIdAllowed(id) {
 function forestRewardPool() {
     var ids = []
     var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
-    for (var i = 0; i < array_length(sections); i++) {
-        var pool = rewardPoolForSection(sections[i])
-        for (var j = 0; j < array_length(pool.ids); j++) {
-            if (rewardIdAllowed(pool.ids[j])) { array_push(ids, pool.ids[j]) }
+    for (var sectionIndex = 0; sectionIndex < array_length(sections); sectionIndex++) {
+        var pool = rewardPoolForSection(sections[sectionIndex])
+        for (var idIndex = 0; idIndex < array_length(pool.ids); idIndex++) {
+            if (rewardIdAllowed(pool.ids[idIndex])) { array_push(ids, pool.ids[idIndex]) }
         }
     }
     return { ids: ids, rarities: [CardsRarity.Default, CardsRarity.Unusual] }
@@ -170,13 +170,13 @@ function makeEncounter(enemyCreators, reward, introSprite = undefined) {
 
 // Единый пул композиций врагов в лесу
 function forestCompositions() {
-    var _all = []
+    var allCompositions = []
     var sections = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
-    for (var i = 0; i < array_length(sections); i++) {
-        var comps = sectionCompositions(sections[i])
-        for (var j = 0; j < array_length(comps); j++) array_push(_all, comps[j])
+    for (var sectionIndex = 0; sectionIndex < array_length(sections); sectionIndex++) {
+        var compositions = sectionCompositions(sections[sectionIndex])
+        for (var compositionIndex = 0; compositionIndex < array_length(compositions); compositionIndex++) array_push(allCompositions, compositions[compositionIndex])
     }
-    return _all
+    return allCompositions
 }
 
 // Конфиг зоны
@@ -196,36 +196,36 @@ function forestZoneConfig() {
 
 function winTierEnemyRange() {
     var tiers = forestZoneConfig().tiers
-    var w = getWins()
-    for (var i = 0; i < array_length(tiers); i++) {
-        if (w < tiers[i].winsUnder) { return { mn: tiers[i].mn, mx: tiers[i].mx } }
+    var wins = getWins()
+    for (var tierIndex = 0; tierIndex < array_length(tiers); tierIndex++) {
+        if (wins < tiers[tierIndex].winsUnder) { return { mn: tiers[tierIndex].mn, mx: tiers[tierIndex].mx } }
     }
     var last = tiers[array_length(tiers) - 1]
     return { mn: last.mn, mx: last.mx }
 }
 
 function enemyIgniteRoll() {
-    var w = getWins()
-    if (w >= 50) { return true }
-    if (w >= 25) { return (irandom(9) < 4) }
+    var wins = getWins()
+    if (wins >= 50) { return true }
+    if (wins >= 25) { return (irandom(9) < 4) }
     return false
 }
 
 function winScaledComposition() {
-    var cfg = forestZoneConfig()
+    var config = forestZoneConfig()
     var range = winTierEnemyRange()
-    var n = range.mn + irandom(range.mx - range.mn)
-    var comp = []
+    var enemyCount = range.mn + irandom(range.mx - range.mn)
+    var composition = []
     var leafUsed = false
-    for (var i = 0; i < n; i++) {
-        if (!leafUsed && irandom(cfg.limitedChance) == 0) {
-            array_push(comp, cfg.limitedEnemy)
+    for (var enemyIndex = 0; enemyIndex < enemyCount; enemyIndex++) {
+        if (!leafUsed && irandom(config.limitedChance) == 0) {
+            array_push(composition, config.limitedEnemy)
             leafUsed = true
         } else {
-            array_push(comp, cfg.enemyPool[irandom(array_length(cfg.enemyPool) - 1)])
+            array_push(composition, config.enemyPool[irandom(array_length(config.enemyPool) - 1)])
         }
     }
-    return comp
+    return composition
 }
 
 // создание битвы для рандомного врага
@@ -239,15 +239,15 @@ function tutorialEncounter() {
 
 // создание битвы для босса Марионетки
 function puppetMasterEncounter() {
-    var C = global.CardId;
-    var enc = makeEncounter(
+    var cardIds = global.CardId;
+    var encounter = makeEncounter(
         [createPuppetMaster],
-        { ids: [C.summonAttackPuppet, C.buffMagicalDamageSingleTarget, C.magicalDamageStunChanceSingleTarget],
+        { ids: [cardIds.summonAttackPuppet, cardIds.buffMagicalDamageSingleTarget, cardIds.magicalDamageStunChanceSingleTarget],
           rarities: [CardsRarity.Rare, CardsRarity.Epic] },
         PuppetMasterCutScene
     )
-    enc.raw = true
-    return enc
+    encounter.raw = true
+    return encounter
 }
 
 // Зацикленный звук ходьбы по траве выделенного персонажа.

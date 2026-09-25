@@ -72,11 +72,11 @@ function analyticsEnsure() {
 // Хелперы
 // Конверт в строку
 function analyticsToken(_v) {
-    var s = is_string(_v) ? _v : string(_v);
-    s = string_replace_all(s, ":", "_");
-    s = string_replace_all(s, " ", "_");
-    if (s == "") { s = "none"; }
-    return s;
+    var valueStr = is_string(_v) ? _v : string(_v);
+    valueStr = string_replace_all(valueStr, ":", "_");
+    valueStr = string_replace_all(valueStr, " ", "_");
+    if (valueStr == "") { valueStr = "none"; }
+    return valueStr;
 }
 
 // lowercase
@@ -117,18 +117,18 @@ function analyticsDesign(_eventId, _value = undefined) {
 function analyticsProgression(_status, _p1, _p2, _p3) {
     if (!analyticsEnsure()) { return; }
     ga_addProgressionEvent(_status, _p1, _p2, _p3);
-    var _st = (_status == GA_PROGRESSIONSTATUS_START) ? "Start"
+    var statusLabel = (_status == GA_PROGRESSIONSTATUS_START) ? "Start"
             : ((_status == GA_PROGRESSIONSTATUS_COMPLETE) ? "Complete"
             : ((_status == GA_PROGRESSIONSTATUS_FAIL) ? "Fail" : string(_status)));
-    analyticsLog("progress " + _st + "  " + _p1 + ":" + _p2 + ":" + _p3);
+    analyticsLog("progress " + statusLabel + "  " + _p1 + ":" + _p2 + ":" + _p3);
 }
 
 // Ресурс событие 
 function analyticsResource(_flow, _currency, _amount, _itemType, _itemId) {
     if (!analyticsEnsure()) { return; }
     ga_addResourceEvent(_flow, _currency, _amount, _itemType, _itemId);
-    var _f = (_flow == GA_RESOURCEFLOWTYPE_SOURCE) ? "Source" : "Sink";
-    analyticsLog("resource " + _f + "  " + string(_amount) + " " + _currency + "  (" + _itemType + ":" + _itemId + ")");
+    var flowLabel = (_flow == GA_RESOURCEFLOWTYPE_SOURCE) ? "Source" : "Sink";
+    analyticsLog("resource " + flowLabel + "  " + string(_amount) + " " + _currency + "  (" + _itemType + ":" + _itemId + ")");
 }
 
 // Меню
@@ -176,26 +176,26 @@ function analyticsShuffle() {
 
 function analyticsPlayCard(_cardId, _rarity, _character) {
     if (!analyticsEnsure()) { return; }
-    var ev = "battle:play_card:" + analyticsCharToken(_character)
+    var eventName = "battle:play_card:" + analyticsCharToken(_character)
            + ":" + analyticsRarityName(_rarity)
            + ":" + analyticsToken(_cardId);
-    analyticsDesign(ev, global.gaBattleId);
+    analyticsDesign(eventName, global.gaBattleId);
 }
 
 // Карты
 function analyticsReward(_cardId, _rarity, _source = "battle") {
     if (!analyticsEnsure()) { return; }
-    var ev = "reward:" + analyticsToken(_source)
+    var eventName = "reward:" + analyticsToken(_source)
            + ":" + analyticsRarityName(_rarity)
            + ":" + analyticsToken(_cardId);
-    analyticsDesign(ev, global.gaBattleId);
+    analyticsDesign(eventName, global.gaBattleId);
 }
 
 function analyticsAddToDeck(_character, _cardId, _rarity) {
-    var ev = "deck:add:" + analyticsCharToken(_character)
+    var eventName = "deck:add:" + analyticsCharToken(_character)
            + ":" + analyticsRarityName(_rarity)
            + ":" + analyticsToken(_cardId);
-    analyticsDesign(ev);
+    analyticsDesign(eventName);
 }
 
 // Сундуки
@@ -218,9 +218,9 @@ function analyticsChestGold(_amount) {
 
 // Магазин
 function analyticsPurchase(_itemId, _price = 0) {
-    var _it = analyticsToken(_itemId);
-    analyticsDesign("shop:purchase:" + _it, _price);
-    if (_price > 0) { analyticsResource(GA_RESOURCEFLOWTYPE_SINK, "gold", _price, "shop", _it); }
+    var itemToken = analyticsToken(_itemId);
+    analyticsDesign("shop:purchase:" + itemToken, _price);
+    if (_price > 0) { analyticsResource(GA_RESOURCEFLOWTYPE_SINK, "gold", _price, "shop", itemToken); }
 }
 
 // Квест 

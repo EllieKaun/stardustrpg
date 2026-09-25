@@ -17,8 +17,8 @@ function setCrispGui(baseW, baseH) {
 
 // GUI приводится к нужному размеру
 function guiSyncCrisp() {
-    var cam = view_camera[0]
-    setCrispGui(camera_get_view_width(cam), camera_get_view_height(cam))
+    var camera = view_camera[0]
+    setCrispGui(camera_get_view_width(camera), camera_get_view_height(camera))
 }
 
 // Клип прямоугольником в GUI-координатах через поверхность
@@ -592,8 +592,8 @@ function partyPanelSprites() {
 // Спрайт целиком по центру
 function drawSpriteCentered(sprite, centerX, centerY, scale) {
     var left = centerX - sprite_get_width(sprite) * scale * 0.5
-    var top = centerY - sprite_get_height(sprite) * scale * 0.5
-    draw_sprite_ext(sprite, 0, left + sprite_get_xoffset(sprite) * scale, top + sprite_get_yoffset(sprite) * scale,
+    var topY = centerY - sprite_get_height(sprite) * scale * 0.5
+    draw_sprite_ext(sprite, 0, left + sprite_get_xoffset(sprite) * scale, topY + sprite_get_yoffset(sprite) * scale,
         scale, scale, 0, c_white, 1)
 }
 

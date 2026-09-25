@@ -32,18 +32,18 @@ stepScriptedApproach = function() {
 stepControlled = function() {
     path_end()
 
-    var h = (keyboard_check(ord("D")) || keyboard_check(vk_right)) - (keyboard_check(ord("A")) || keyboard_check(vk_left))
-    var v = (keyboard_check(ord("S")) || keyboard_check(vk_down)) - (keyboard_check(ord("W")) || keyboard_check(vk_up))
-    var mx = h * spdWalk
-    var my = v * spdWalk
+    var horizontalInput = (keyboard_check(ord("D")) || keyboard_check(vk_right)) - (keyboard_check(ord("A")) || keyboard_check(vk_left))
+    var verticalInput = (keyboard_check(ord("S")) || keyboard_check(vk_down)) - (keyboard_check(ord("W")) || keyboard_check(vk_up))
+    var moveX = horizontalInput * spdWalk
+    var moveY = verticalInput * spdWalk
 
     var obstacles = worldObstacles()
     
-    if (!place_meeting(x + mx, y, obstacles)) { 
-        x += mx
+    if (!place_meeting(x + moveX, y, obstacles)) { 
+        x += moveX
     }
-    if (!place_meeting(x, y + my, obstacles)) { 
-        y += my
+    if (!place_meeting(x, y + moveY, obstacles)) { 
+        y += moveY
     }
 }
 
@@ -55,8 +55,8 @@ stepFollowing = function() {
         return
     }
 
-    var dis = point_distance(x, y, leader.x, leader.y)
-    if (dis <= distanceToStopFollowing) {
+    var distance = point_distance(x, y, leader.x, leader.y)
+    if (distance <= distanceToStopFollowing) {
         path_end()
         speed = 0
         return

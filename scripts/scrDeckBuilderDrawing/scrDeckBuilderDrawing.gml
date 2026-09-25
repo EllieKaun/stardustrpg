@@ -18,8 +18,8 @@ function Slot(_state, _card = undefined) constructor {
 // Подобрать шрифт и отрисовать текст центрировано
 function drawFitTextCentered(text, areaX, areaY, areaW, areaH, fonts = undefined) {
     if (fonts != undefined && array_length(fonts) > 0) {
-        for (var i = 0; i < array_length(fonts); i++) {
-            draw_set_font(fonts[i]);
+        for (var fontIndex = 0; fontIndex < array_length(fonts); fontIndex++) {
+            draw_set_font(fonts[fontIndex]);
             if (string_width(text) <= areaW && string_height(text) <= areaH) { break }
         }
     }
@@ -31,8 +31,8 @@ function drawFitTextCentered(text, areaX, areaY, areaW, areaH, fonts = undefined
 }
 
 // Попадание точки в прямоугольник
-function pointInRect(px, py, rx, ry, rw, rh) {
-    return (px >= rx && px < rx + rw && py >= ry && py < ry + rh)
+function pointInRect(pointX, pointY, rectX, rectY, rectWidth, rectHeight) {
+    return (pointX >= rectX && pointX < rectX + rectWidth && pointY >= rectY && pointY < rectY + rectHeight)
 }
 
 // Конфигурация панели, которая отвечает за отрисовку в дек билдере
@@ -144,12 +144,12 @@ function Panel(_config) constructor {
 
         // Статичная панель 
         if (!scrollable) {
-            var rows = max(1, ceil(array_length(slots) / cols))
-            var neededH = rows * cardHeight + (rows - 1) * gapY
+            var rowCount = max(1, ceil(array_length(slots) / cols))
+            var neededH = rowCount * cardHeight + (rowCount - 1) * gapY
             if (neededH > gridH) {
-                var k = gridH / neededH
-                cardHeight *= k
-                cardWidth  *= k
+                var scaleFactor = gridH / neededH
+                cardHeight *= scaleFactor
+                cardWidth  *= scaleFactor
             }
         }
 
@@ -182,36 +182,36 @@ function Panel(_config) constructor {
         var widths = array_create(tabsCount, 0)
         var total = 0
         var prevFont = draw_get_font()
-        for (var i = 0; i < tabsCount; i++) {
-            var spr = tabs[i][$ "sprite"]
-            var sc = uiTextScale(tabs[i].name, tabH * 0.8, 1000000)
-            var inset = (tabs[i][$ "textInset"] ?? 0) * tabH
-            var textNeed = inset + string_width(tabs[i].name) * sc + tabPadding
+        for (var tabIndex = 0; tabIndex < tabsCount; tabIndex++) {
+            var tabSprite = tabs[tabIndex][$ "sprite"]
+            var textScale = uiTextScale(tabs[tabIndex].name, tabH * 0.8, 1000000)
+            var inset = (tabs[tabIndex][$ "textInset"] ?? 0) * tabH
+            var textWidth = inset + string_width(tabs[tabIndex].name) * textScale + tabPadding
             var tabWidth
-            if (spr != undefined) {
-                var btnOff = (tabs[i][$ "btnOffsetX"] ?? 0) * tabH
-                var artNeed = btnOff + tabH * sprite_get_width(spr) / sprite_get_height(spr)
-                tabWidth = max(artNeed, textNeed)
+            if (tabSprite != undefined) {
+                var buttonOffsetX = (tabs[tabIndex][$ "btnOffsetX"] ?? 0) * tabH
+                var artWidth = buttonOffsetX + tabH * sprite_get_width(tabSprite) / sprite_get_height(tabSprite)
+                tabWidth = max(artWidth, textWidth)
             } else {
-                tabWidth = textNeed
+                tabWidth = textWidth
             }
-            widths[i] = tabWidth
+            widths[tabIndex] = tabWidth
             total += tabWidth
         }
         draw_set_font(prevFont)
         var avail = w - tabOffsetX - tabGap * max(0, tabsCount - 1)
-        var k = (total > avail && total > 0) ? avail / total : 1
-        return { widths: widths, k: k }
+        var scaleFactor = (total > avail && total > 0) ? avail / total : 1
+        return { widths: widths, k: scaleFactor }
     }
 
     // Данные о позиции и размере таба по индексу
     static getTabRect = function(index) {
         var tabsCount = array_length(tabs)
         if (tabsCount == 0) { return { tx: x, ty: y - tabH, tw: 0, th: tabH } }
-        var tw = getTabWidths()
+        var tabWidths = getTabWidths()
         var tabX = x + tabOffsetX
-        for (var i = 0; i < index; i++) tabX += tw.widths[i] * tw.k + tabGap
-        return { tx: tabX, ty: y - tabH, tw: tw.widths[index] * tw.k, th: tabH }
+        for (var tabIndex = 0; tabIndex < index; tabIndex++) tabX += tabWidths.widths[tabIndex] * tabWidths.k + tabGap
+        return { tx: tabX, ty: y - tabH, tw: tabWidths.widths[index] * tabWidths.k, th: tabH }
     }
 
     //// Фокус и выделение
@@ -263,12 +263,12 @@ function Panel(_config) constructor {
             return
         }
 
-        var nTabs = array_length(tabs)
+        var tabCount = array_length(tabs)
 
         // Когда выделены таьы
         if (onTabRow) {
             if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
-                if (nTabs > 0) { 
+                if (tabCount > 0) { 
                     activeTab = max(0, activeTab - 1)
                     if (onTabClick != undefined) { 
                         onTabClick(self, activeTab)
@@ -276,8 +276,8 @@ function Panel(_config) constructor {
                 }
             }
             if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
-                if (nTabs > 0) { 
-                    activeTab = min(nTabs - 1, activeTab + 1)
+                if (tabCount > 0) { 
+                    activeTab = min(tabCount - 1, activeTab + 1)
                     if (onTabClick != undefined) { 
                         onTabClick(self, activeTab)
                     }
@@ -294,21 +294,21 @@ function Panel(_config) constructor {
         }
 
         // Когда выделены карты
-        var dx = 0, dy = 0, moved = false
+        var moveX = 0, moveY = 0, moved = false
         if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) { 
-            dy = -1
+            moveY = -1
             moved = true
         }
         if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { 
-            dy =  1
+            moveY =  1
             moved = true
         }
         if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
-            dx = -1
+            moveX = -1
             moved = true
         }
         if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
-             dx =  1
+             moveX =  1
              moved = true
         }
 
@@ -320,13 +320,13 @@ function Panel(_config) constructor {
             }
 
             // Переход в режим табов
-            if (dy < 0 && cursorRow == 0 && nTabs > 0) {
+            if (moveY < 0 && cursorRow == 0 && tabCount > 0) {
                 onTabRow = true
                 return
             }
 
-            var newCol = cursorCol + dx
-            var newRow = cursorRow + dy
+            var newCol = cursorCol + moveX
+            var newRow = cursorRow + moveY
 
             if (newCol < 0) { 
                 if (onPanelSwitch != undefined) { 
@@ -362,7 +362,7 @@ function Panel(_config) constructor {
         }
 
         // На всякий случай переключение табов горячими клавишами
-        if (nTabs > 0) {
+        if (tabCount > 0) {
             if (keyboard_check_pressed(ord("Q"))) { 
                 activeTab = max(0, activeTab - 1)     
                 if (onTabClick != undefined) { 
@@ -370,7 +370,7 @@ function Panel(_config) constructor {
                 }
             }
             if (keyboard_check_pressed(ord("E"))) { 
-                activeTab = min(nTabs - 1, activeTab + 1) 
+                activeTab = min(tabCount - 1, activeTab + 1) 
                 if (onTabClick != undefined) { 
                     onTabClick(self, activeTab)
                 }
@@ -383,11 +383,11 @@ function Panel(_config) constructor {
     static stepMouse = function() {
         hoverSlot = -1
         // панель свёрстана прямо в координатах GUI (окна), поэтому мышь берём как есть
-        var mx = device_mouse_x_to_gui(0)
-        var my = device_mouse_y_to_gui(0)
+        var mouseX = device_mouse_x_to_gui(0)
+        var mouseY = device_mouse_y_to_gui(0)
 
         // область панели вместе со строкой табов над ней
-        if (!pointInRect(mx, my, x, y - tabH, w, h + tabH)) { return false }
+        if (!pointInRect(mouseX, mouseY, x, y - tabH, w, h + tabH)) { return false }
 
         // Прокрутка колесом
         if (scrollable) {
@@ -399,33 +399,33 @@ function Panel(_config) constructor {
         var clicked = mouse_check_button_pressed(mb_left)
 
         // Табы
-        for (var t = 0; t < array_length(tabs); t++) {
-            var tr = getTabRect(t)
-            if (pointInRect(mx, my, tr.tx, tr.ty, tr.tw, tr.th)) {
+        for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {
+            var tabRect = getTabRect(tabIndex)
+            if (pointInRect(mouseX, mouseY, tabRect.tx, tabRect.ty, tabRect.tw, tabRect.th)) {
                 if (clicked) {
                     if (instance_exists(oDeckBuilder)) { oDeckBuilder.focusPanel(self) }
                     onTabRow = true
-                    activeTab = t
-                    if (onTabClick != undefined) { onTabClick(self, t) }
+                    activeTab = tabIndex
+                    if (onTabClick != undefined) { onTabClick(self, tabIndex) }
                 }
                 return true
             }
         }
         
         // Видимость слотов
-        for (var i = 0; i < array_length(slots); i++) {
-            var sr = getSlotRect(i)
-            if (pointInRect(mx, my, sr.sx, sr.sy, sr.sw, sr.sh)
-                && pointInRect(mx, my, x, y, w, h)) {
-                hoverSlot = i
+        for (var slotIndex = 0; slotIndex < array_length(slots); slotIndex++) {
+            var slotRect = getSlotRect(slotIndex)
+            if (pointInRect(mouseX, mouseY, slotRect.sx, slotRect.sy, slotRect.sw, slotRect.sh)
+                && pointInRect(mouseX, mouseY, x, y, w, h)) {
+                hoverSlot = slotIndex
                 if (clicked) {
                     if (instance_exists(oDeckBuilder)) { oDeckBuilder.focusPanel(self) }
                     onTabRow = false
-                    cursorRow = i div cols
-                    cursorCol = i mod cols
-                    selectedSlot = i
-                    var slot = slots[i]
-                    if (slot.state != "locked" && onSlotClick != undefined) { onSlotClick(self, i) }
+                    cursorRow = slotIndex div cols
+                    cursorCol = slotIndex mod cols
+                    selectedSlot = slotIndex
+                    var slot = slots[slotIndex]
+                    if (slot.state != "locked" && onSlotClick != undefined) { onSlotClick(self, slotIndex) }
                 }
                 return true
             }
@@ -452,9 +452,9 @@ function Panel(_config) constructor {
         // Рисуем все слоты, лишнее обрежет клип
         var first = 0
         var last  = array_length(slots)
-        for (var i = first; i < last; i++) {
-            var slot = slots[i]
-            var slotRect = getSlotRect(i)
+        for (var slotIndex = first; slotIndex < last; slotIndex++) {
+            var slot = slots[slotIndex]
+            var slotRect = getSlotRect(slotIndex)
             switch (slot.state) {
                 case "locked":
                     if (slotSpriteLocked != undefined) {
@@ -467,7 +467,7 @@ function Panel(_config) constructor {
                     }
                     break
                 case "empty":
-                    var emptySprite = (slotSpriteEmptyWeb != undefined && array_contains(webSlotIndices, i)) ? slotSpriteEmptyWeb : slotSpriteEmpty
+                    var emptySprite = (slotSpriteEmptyWeb != undefined && array_contains(webSlotIndices, slotIndex)) ? slotSpriteEmptyWeb : slotSpriteEmpty
                     if (emptySprite != undefined) { 
                         draw_sprite_stretched(emptySprite, 
                             0, 
@@ -479,7 +479,7 @@ function Panel(_config) constructor {
                     break
                 case "filled":
                     if (cardRenderer != undefined) {
-                        cardRenderer(slot, slotRect, selectedSlot == i)
+                        cardRenderer(slot, slotRect, selectedSlot == slotIndex)
                         break
                     }
                     if (slotSpriteEmpty != undefined) {
@@ -496,7 +496,7 @@ function Panel(_config) constructor {
                             slotRect.sy,
                             slotRect.sw,
                             slotRect.sh,
-                            selectedSlot == i)
+                            selectedSlot == slotIndex)
                     }
                     drawSlotOverlays(slot, slotRect)
                     break
@@ -524,13 +524,13 @@ function Panel(_config) constructor {
             var isActive = (tabIndex == activeTab)
             if (tab[$ "sprite"] != undefined) {
                 // таб 1 показывает активный таб
-                var tabSub = min(isActive ? 1 : 0, sprite_get_number(tab.sprite) - 1)
+                var tabSubimage = min(isActive ? 1 : 0, sprite_get_number(tab.sprite) - 1)
                 draw_set_alpha(isActive ? 1.0 : 0.6)
 
                 // кнопка может быть сдвинута вправо 
-                var btnOff = (tab[$ "btnOffsetX"] ?? 0) * tabRow.th
-                draw_sprite_stretched(tab.sprite, tabSub,
-                    tabRow.tx + btnOff, tabRow.ty, tabRow.tw - btnOff, tabRow.th)
+                var buttonOffsetX = (tab[$ "btnOffsetX"] ?? 0) * tabRow.th
+                draw_sprite_stretched(tab.sprite, tabSubimage,
+                    tabRow.tx + buttonOffsetX, tabRow.ty, tabRow.tw - buttonOffsetX, tabRow.th)
 
                 // иконка поверх кнопки 
                 var tabIcon = tab[$ "icon"]
@@ -596,12 +596,12 @@ function drawSlotOverlays(slot, rect) {
 
     // иконка владельца 
     if (slot.ownerIcon != noone && sprite_exists(slot.ownerIcon)) {
-        var icoH = rect.sh * 0.2
-        var icoScale = icoH / sprite_get_height(slot.ownerIcon)
-        var icoW = sprite_get_width(slot.ownerIcon) * icoScale
-        var icoX = rect.sx + rect.sw * 0.95
-        var icoY = rect.sy + rect.sh * 0.04 
-        draw_sprite_ext(slot.ownerIcon, 0, icoX, icoY, icoScale, icoScale, 0, c_white, 1)
+        var iconHeight = rect.sh * 0.2
+        var iconScale = iconHeight / sprite_get_height(slot.ownerIcon)
+        var iconWidth = sprite_get_width(slot.ownerIcon) * iconScale
+        var iconX = rect.sx + rect.sw * 0.95
+        var iconY = rect.sy + rect.sh * 0.04 
+        draw_sprite_ext(slot.ownerIcon, 0, iconX, iconY, iconScale, iconScale, 0, c_white, 1)
     }
 
     // число копий (показываем при count > 1) 
@@ -609,18 +609,18 @@ function drawSlotOverlays(slot, rect) {
         var badgeH = rect.sh * 0.2
         var badgeScale = badgeH / sprite_get_height(AmountBtn)
         var badgeW = sprite_get_width(AmountBtn) * badgeScale
-        var bx = rect.sx + rect.sw * 0.05
-        var by = rect.sy + rect.sh * 0.04 
-        draw_sprite_ext(AmountBtn, 0, bx, by, badgeScale, badgeScale, 0, c_white, 1)
+        var badgeX = rect.sx + rect.sw * 0.05
+        var badgeY = rect.sy + rect.sh * 0.04 
+        draw_sprite_ext(AmountBtn, 0, badgeX, badgeY, badgeScale, badgeScale, 0, c_white, 1)
 
         var prevFont = draw_get_font()
         draw_set_font(uiFont())
         draw_set_halign(fa_center)
         draw_set_valign(fa_middle)
         draw_set_color(c_black)
-        var txt = string(slot.count)
-        var tsc = uiTextScale(txt, badgeH * 0.8, badgeW * 0.8)
-        draw_text_transformed(bx, by, txt, tsc, tsc, 0)
+        var countText = string(slot.count)
+        var countTextScale = uiTextScale(countText, badgeH * 0.8, badgeW * 0.8)
+        draw_text_transformed(badgeX, badgeY, countText, countTextScale, countTextScale, 0)
         draw_set_halign(fa_left)
         draw_set_valign(fa_top)
         draw_set_font(prevFont)

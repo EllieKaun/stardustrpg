@@ -1,5 +1,5 @@
-function menuParam(params, key, def) {
-    return (is_struct(params) && variable_struct_exists(params, key)) ? params[$ key] : def
+function menuParam(params, key, defaultValue) {
+    return (is_struct(params) && variable_struct_exists(params, key)) ? params[$ key] : defaultValue
 }
 
 // Пункт меню 
@@ -39,19 +39,19 @@ function MenuLayer(spr = noone, params = {}) constructor {
     self.ox = 0 // накопленный горизонтальный скролл
 
     self.update = function() {
-        var dt = delta_time / 1000000
-        self.time += dt
-        self.ox += self.scrollX * dt
+        var deltaTime = delta_time / 1000000
+        self.time += deltaTime
+        self.ox += self.scrollX * deltaTime
     }
 
-    self.draw = function(gw, gh) {
-        var bob = (self.bobAmp != 0) ? sin(self.time * self.bobFreq * 2 * pi) * self.bobAmp * gh : 0
-        var oy = self.scrollY * self.time + bob
+    self.draw = function(guiWidth, guiHeight) {
+        var bobOffset = (self.bobAmp != 0) ? sin(self.time * self.bobFreq * 2 * pi) * self.bobAmp * guiHeight : 0
+        var scrollOffsetY = self.scrollY * self.time + bobOffset
 
         if (self.spr == noone || !sprite_exists(self.spr)) {
             draw_set_alpha(self.alpha)
             draw_set_color(self.placeholderColor)
-            draw_rectangle(0, 0, gw, gh, false)
+            draw_rectangle(0, 0, guiWidth, guiHeight, false)
             draw_set_alpha(1)
             draw_set_color(c_white)
             draw_set_halign(fa_left)
@@ -60,34 +60,34 @@ function MenuLayer(spr = noone, params = {}) constructor {
             return
         }
 
-        var sw = sprite_get_width(self.spr)
-        var sh = sprite_get_height(self.spr)
+        var spriteWidth = sprite_get_width(self.spr)
+        var spriteHeight = sprite_get_height(self.spr)
 
         if (self.tiled) {
-            var offX = self.ox mod sw;
-            if (offX > 0) { offX -= sw }    
-            var offY = oy mod sh; 
-            if (offY > 0) {
-                offY -= sh
+            var tileOffsetX = self.ox mod spriteWidth;
+            if (tileOffsetX > 0) { tileOffsetX -= spriteWidth }    
+            var tileOffsetY = scrollOffsetY mod spriteHeight; 
+            if (tileOffsetY > 0) {
+                tileOffsetY -= spriteHeight
             } 
-            for (var yy = offY; yy < gh; yy += sh) 
-                for (var xx = offX; xx < gw; xx += sw)
-                    draw_sprite_ext(self.spr, 0, xx, yy, 1, 1, 0, c_white, self.alpha)
+            for (var tileY = tileOffsetY; tileY < guiHeight; tileY += spriteHeight) 
+                for (var tileX = tileOffsetX; tileX < guiWidth; tileX += spriteWidth)
+                    draw_sprite_ext(self.spr, 0, tileX, tileY, 1, 1, 0, c_white, self.alpha)
         } else {
             // Растянуть с оверсканом и центрированием, чтобы боб не оголял края.
-            var ew = gw * self.scale
-            var eh = gh * self.scale
-            var baseX = (gw - ew) * 0.5 + self.ox
-            var baseY = (gh - eh) * 0.5 + oy
+            var scaledWidth = guiWidth * self.scale
+            var scaledHeight = guiHeight * self.scale
+            var baseX = (guiWidth - scaledWidth) * 0.5 + self.ox
+            var baseY = (guiHeight - scaledHeight) * 0.5 + scrollOffsetY
 
             var visLeft = max(baseX, 0)
             var visTop = max(baseY, 0)
-            var visRight = min(baseX + ew, gw)
-            var visBottom = min(baseY + eh, gh)
+            var visRight = min(baseX + scaledWidth, guiWidth)
+            var visBottom = min(baseY + scaledHeight, guiHeight)
             if (visRight <= visLeft || visBottom <= visTop) { return }
 
-            var scaleX = ew / sw
-            var scaleY = eh / sh
+            var scaleX = scaledWidth / spriteWidth
+            var scaleY = scaledHeight / spriteHeight
             draw_sprite_part_ext(self.spr, 0,
                 (visLeft - baseX) / scaleX, (visTop - baseY) / scaleY,
                 (visRight - visLeft) / scaleX, (visBottom - visTop) / scaleY,
@@ -123,17 +123,17 @@ function Menu(items, config = {}) constructor {
     self.hitRects = []   // { x, y, w, h, index } в GUI-координатах, заполняется в draw
 
     // навигация
-    self.moveBy = function(dir) {
-        var n = array_length(self.items)
-        if (n == 0) { return }
-        var i = self.index
-        repeat (n) { // перескакиваем выключенные пункты
-            i += dir
-            if (self.wrap) { i = (i + n) mod n }
-            else { i = clamp(i, 0, n - 1) }
-            if (self.items[i].enabled) { break }
+    self.moveBy = function(direction) {
+        var itemCount = array_length(self.items)
+        if (itemCount == 0) { return }
+        var navIndex = self.index
+        repeat (itemCount) { // перескакиваем выключенные пункты
+            navIndex += direction
+            if (self.wrap) { navIndex = (navIndex + itemCount) mod itemCount }
+            else { navIndex = clamp(navIndex, 0, itemCount - 1) }
+            if (self.items[navIndex].enabled) { break }
         }
-        self.index = i
+        self.index = navIndex
     }
     self.moveNext = function() { self.moveBy(1) }
     self.movePrev = function() { self.moveBy(-1) }
@@ -141,84 +141,84 @@ function Menu(items, config = {}) constructor {
 
     self.confirm = function() {
         if (array_length(self.items) == 0) { return false }
-        var it = self.current()
-        if (!it.enabled) { return false }
-        if (it.onSelect != undefined) { it.onSelect(it) }
+        var item = self.current()
+        if (!item.enabled) { return false }
+        if (item.onSelect != undefined) { item.onSelect(item) }
         return true
     }
 
     // Ввод: клавиатура (вверх/вниз/enter/space) + мышь (наведение/клик по hitRects) 
     // Возвращает true, если пункт подтверждён.
-    self.handleInput = function(mx, my, mouseMoved, mouseClicked) {
+    self.handleInput = function(mouseX, mouseY, mouseMoved, mouseClicked) {
         if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) { self.movePrev() }
         if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { self.moveNext() }
 
         var confirmed = false
         if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) { confirmed = self.confirm() }
 
-        for (var i = 0; i < array_length(self.hitRects); i++) {
-            var r = self.hitRects[i]
-            if (pointInRect(mx, my, r.x, r.y, r.w, r.h)) {
-                if (self.items[r.index].enabled) {
-                    if (mouseMoved) {   self.index = r.index }
-                    if (mouseClicked) { self.index = r.index; confirmed = self.confirm() }
+        for (var rectIndex = 0; rectIndex < array_length(self.hitRects); rectIndex++) {
+            var hitRect = self.hitRects[rectIndex]
+            if (pointInRect(mouseX, mouseY, hitRect.x, hitRect.y, hitRect.w, hitRect.h)) {
+                if (self.items[hitRect.index].enabled) {
+                    if (mouseMoved) {   self.index = hitRect.index }
+                    if (mouseClicked) { self.index = hitRect.index; confirmed = self.confirm() }
                 }
                 break
             }
         }
         return confirmed
     }
-    self.draw = function(gw, gh) {
+    self.draw = function(guiWidth, guiHeight) {
         self.hitRects = []
 
-        var textPx = gh * self.textH
-        var stepPx = gh * self.spacing
+        var textPx = guiHeight * self.textH
+        var stepPx = guiHeight * self.spacing
         var iconPx = textPx * 1.15
-        var gapPx  = gh * self.iconGap
-        var cx = gw * self.anchorX
-        var y0 = gh * self.startY
+        var gapPx  = guiHeight * self.iconGap
+        var anchorPixelX = guiWidth * self.anchorX
+        var startPixelY = guiHeight * self.startY
 
         draw_set_valign(fa_middle)
         draw_set_halign(fa_left)
         draw_set_font(uiFont())
 
-        for (var i = 0; i < array_length(self.items); i++) {
-            var it = self.items[i]
-            var isSel = (i == self.index)
-            var yy = y0 + i * stepPx
-            var icon = it.icon(isSel)
+        for (var itemIndex = 0; itemIndex < array_length(self.items); itemIndex++) {
+            var item = self.items[itemIndex]
+            var isSel = (itemIndex == self.index)
+            var itemY = startPixelY + itemIndex * stepPx
+            var icon = item.icon(isSel)
             var hasIcon = (icon != noone && sprite_exists(icon))
 
-            var tScale = uiTextScale(it.label, textPx, gw)
-            var textW = string_width(it.label) * tScale
+            var tScale = uiTextScale(item.label, textPx, guiWidth)
+            var textW = string_width(item.label) * tScale
             var iconW = hasIcon ? iconPx : 0
             var groupW = iconW + (hasIcon ? gapPx : 0) + textW
 
             var left
             switch (self.halign) {
                 case fa_center: 
-                    left = cx - groupW / 2
+                    left = anchorPixelX - groupW / 2
                     break
                 case fa_right: 
-                    left = cx - groupW
+                    left = anchorPixelX - groupW
                     break
                 default: 
-                    left = cx
+                    left = anchorPixelX
                     break
             }
 
             // иконка
             if (hasIcon) {
-                var isc = iconPx / max(sprite_get_width(icon), sprite_get_height(icon))
-                draw_sprite_ext(icon, 0, left, yy - iconPx / 2, isc, isc, 0, c_white, 1)
+                var iconScale = iconPx / max(sprite_get_width(icon), sprite_get_height(icon))
+                draw_sprite_ext(icon, 0, left, itemY - iconPx / 2, iconScale, iconScale, 0, c_white, 1)
             }
 
             // текст
-            var col = !it.enabled ? self.colDisabled : (isSel ? self.colSelect : self.colNormal)
-            draw_set_color(col)
-            draw_text_transformed(left + (hasIcon ? iconW + gapPx : 0), yy, it.label, tScale, tScale, 0)
+            var textColor = !item.enabled ? self.colDisabled : (isSel ? self.colSelect : self.colNormal)
+            draw_set_color(textColor)
+            draw_text_transformed(left + (hasIcon ? iconW + gapPx : 0), itemY, item.label, tScale, tScale, 0)
 
-            array_push(self.hitRects, { x: left, y: yy - stepPx / 2, w: groupW, h: stepPx, index: i })
+            array_push(self.hitRects, { x: left, y: itemY - stepPx / 2, w: groupW, h: stepPx, index: itemIndex })
         }
 
         draw_set_halign(fa_left)
@@ -229,17 +229,17 @@ function Menu(items, config = {}) constructor {
 
 //// Помощник композиции слоёв 
 // Единый порядок отрисовки сцены меню
-function menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, gw, gh) {
-    for (var i = 0; i < array_length(backLayers); i++) backLayers[i].draw(gw, gh)
-    if (!itemsAboveForeground && menu != undefined) { menu.draw(gw, gh) }
-    for (var i = 0; i < array_length(foreLayers); i++) foreLayers[i].draw(gw, gh)
-    if (itemsAboveForeground && menu != undefined) { menu.draw(gw, gh) }
+function menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, guiWidth, guiHeight) {
+    for (var layerIndex = 0; layerIndex < array_length(backLayers); layerIndex++) backLayers[layerIndex].draw(guiWidth, guiHeight)
+    if (!itemsAboveForeground && menu != undefined) { menu.draw(guiWidth, guiHeight) }
+    for (var layerIndex = 0; layerIndex < array_length(foreLayers); layerIndex++) foreLayers[layerIndex].draw(guiWidth, guiHeight)
+    if (itemsAboveForeground && menu != undefined) { menu.draw(guiWidth, guiHeight) }
 }
 
 // Обновление анимации всех слоёв сцены (вызывать в Step)
 function menuUpdateLayers(backLayers, foreLayers) {
-    for (var i = 0; i < array_length(backLayers); i++) backLayers[i].update()
-    for (var i = 0; i < array_length(foreLayers); i++) foreLayers[i].update()
+    for (var layerIndex = 0; layerIndex < array_length(backLayers); layerIndex++) backLayers[layerIndex].update()
+    for (var layerIndex = 0; layerIndex < array_length(foreLayers); layerIndex++) foreLayers[layerIndex].update()
 }
 
 // GUI-слой в аспекте 16:9
@@ -259,17 +259,17 @@ function menuGetResolutions() {
         [3840, 2160]
     ]
     var valid_res = []
-    var dw = display_get_width()
-    var dh = display_get_height()
+    var displayWidth = display_get_width()
+    var displayHeight = display_get_height()
     
     // Если по какой-то причине дисплей не определен
-    if (dw == 0 || dh == 0) {
+    if (displayWidth == 0 || displayHeight == 0) {
         return all_res
     }
     
-    for (var i = 0; i < array_length(all_res); i++) {
-        if (all_res[i][0] <= dw && all_res[i][1] <= dh) {
-            array_push(valid_res, all_res[i])
+    for (var resIndex = 0; resIndex < array_length(all_res); resIndex++) {
+        if (all_res[resIndex][0] <= displayWidth && all_res[resIndex][1] <= displayHeight) {
+            array_push(valid_res, all_res[resIndex])
         }
     }
     
@@ -289,11 +289,11 @@ function applyWindowMode(winW, winH, fullscreen) {
     }
     window_set_fullscreen(false)
     // оконный размер не больше рабочего стола
-    var dw = display_get_width(), dh = display_get_height()
-    winW = min(winW, dw)
-    winH = min(winH, dh)
+    var displayWidth = display_get_width(), displayHeight = display_get_height()
+    winW = min(winW, displayWidth)
+    winH = min(winH, displayHeight)
     window_set_size(winW, winH)
-    window_set_position((dw - winW) div 2, max(0, (dh - winH) div 2))
+    window_set_position((displayWidth - winW) div 2, max(0, (displayHeight - winH) div 2))
 }
 
 // Применяет настройки дисплея при старте
@@ -302,14 +302,14 @@ function initDisplaySettings() {
     global.displayModeReady = true;
     
     ini_open("settings.ini")
-    var resInd = ini_read_real("Display", "ResolutionIndex", 2)
-    var fs = ini_read_real("Display", "Fullscreen", 1)
+    var resolutionIndex = ini_read_real("Display", "ResolutionIndex", 2)
+    var fullscreen = ini_read_real("Display", "Fullscreen", 1)
     ini_close()
 
-    var res = menuGetResolutions()
-    resInd = min(resInd, array_length(res) - 1)
-    if (resInd >= 0) {
-        applyWindowMode(res[resInd][0], res[resInd][1], fs)
+    var resolutions = menuGetResolutions()
+    resolutionIndex = min(resolutionIndex, array_length(resolutions) - 1)
+    if (resolutionIndex >= 0) {
+        applyWindowMode(resolutions[resolutionIndex][0], resolutions[resolutionIndex][1], fullscreen)
     }
-    global.displayFullscreen = fs
+    global.displayFullscreen = fullscreen
 }

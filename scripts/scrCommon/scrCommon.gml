@@ -80,9 +80,9 @@ function SequenceRunner() constructor {
     self.ctx = {}
 
     self.startCurrent = function() {
-        var s = self.steps[self.i]
-        if (variable_struct_exists(s, "start") && s.start != undefined) {
-            s.start(self.ctx)
+        var step = self.steps[self.i]
+        if (variable_struct_exists(step, "start") && step.start != undefined) {
+            step.start(self.ctx)
         }
     }
 
@@ -90,8 +90,8 @@ function SequenceRunner() constructor {
         var guard = 0
         while (self.running && guard < 64) {
             guard++
-            var s = self.steps[self.i]
-            var done = (variable_struct_exists(s, "update") && s.update != undefined) ? s.update(self.ctx) : true
+            var step = self.steps[self.i]
+            var done = (variable_struct_exists(step, "update") && step.update != undefined) ? step.update(self.ctx) : true
             if (!done) { break }
             self.i++
             if (self.i >= array_length(self.steps)) {

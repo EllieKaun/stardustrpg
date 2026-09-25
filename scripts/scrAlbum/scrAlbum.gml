@@ -4,16 +4,16 @@
 function buildAlbumSlots() {
     var refs = getCollectionRefs()
     var slots = []
-    for (var i = 0; i < array_length(refs); i++) {
-        var ref = refs[i]
-        var card = cardFromRef(ref)
+    for (var refIndex = 0; refIndex < array_length(refs); refIndex++) {
+        var cardRef = refs[refIndex]
+        var card = cardFromRef(cardRef)
         if (card == undefined) { continue }
         if (card.cardAlbumSpr == noone || !sprite_exists(card.cardAlbumSpr)) { continue }
-        var s = new Slot("filled", card)
-        s.ref = { id: ref.id, rarity: ref.rarity }
-        s.count = ref.count
-        s.addable = false
-        array_push(slots, s)
+        var newSlot = new Slot("filled", card)
+        newSlot.ref = { id: cardRef.id, rarity: cardRef.rarity }
+        newSlot.count = cardRef.count
+        newSlot.addable = false
+        array_push(slots, newSlot)
     }
     return slots
 }
@@ -23,9 +23,9 @@ function albumDrawCard(slot, rect, isSelected) {
     var card = slot.card
     var prevFilter = gpu_get_tex_filter()
     gpu_set_tex_filter(true) 
-    var spr = (card != undefined) ? card.cardAlbumSpr : noone
-    if (spr != noone && sprite_exists(spr)) {
-        draw_sprite_stretched(spr, 0, rect.sx, rect.sy, rect.sw, rect.sh)
+    var albumSprite = (card != undefined) ? card.cardAlbumSpr : noone
+    if (albumSprite != noone && sprite_exists(albumSprite)) {
+        draw_sprite_stretched(albumSprite, 0, rect.sx, rect.sy, rect.sw, rect.sh)
     } else {
 
         draw_set_color(make_color_rgb(28, 32, 46))
@@ -48,11 +48,11 @@ function albumDrawCard(slot, rect, isSelected) {
         var textW = rect.sw * (CARD_TEXT_W / CARD_ART_W)
         var textH = rect.sh * (CARD_TEXT_H / CARD_ART_H)
         // Как на лице карты: перенос строк + подбор шрифта под область, тёмный текст (область описания белая)
-        var fit = fitWrappedText(cardDisplayDesc(card), textW, textH)
-        draw_set_font(fit.font)
+        var fittedText = fitWrappedText(cardDisplayDesc(card), textW, textH)
+        draw_set_font(fittedText.font)
         draw_set_halign(fa_center)
         draw_set_valign(fa_middle)
-        drawTextBold(textX + textW * 0.5, textY + textH * 0.5, fit.text, fit.scale, 0, c_black, 1)
+        drawTextBold(textX + textW * 0.5, textY + textH * 0.5, fittedText.text, fittedText.scale, 0, c_black, 1)
         draw_set_halign(fa_left)
         draw_set_valign(fa_top)
         draw_set_color(c_white)
@@ -84,17 +84,17 @@ function albumMakePanel() {
 
 // Верстка аль бома
 function albumLayout(panel) {
-    var gw = display_get_gui_width()
-    var gh = display_get_gui_height()
-    var uiScale = gw / 320
+    var guiWidth = display_get_gui_width()
+    var guiHeight = display_get_gui_height()
+    var uiScale = guiWidth / 320
 
-    var top = gh * 0.14      // место под заголовок ALBUM
-    var bottom = gh * 0.04
+    var topMargin = guiHeight * 0.14      // место под заголовок ALBUM
+    var bottomMargin = guiHeight * 0.04
 
-    panel.x = gw * 0.06
-    panel.y = top
-    panel.w = gw * 0.88
-    panel.h = gh - top - bottom
+    panel.x = guiWidth * 0.06
+    panel.y = topMargin
+    panel.w = guiWidth * 0.88
+    panel.h = guiHeight - topMargin - bottomMargin
     panel.padding = 8 * uiScale
     panel.uiScale = uiScale
     panel.refreshScroll()

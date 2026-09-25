@@ -1,16 +1,16 @@
 // Полный список наград (id,rarity)
 function rewardCandidateRefs(spec) {
-    var out = []
-    for (var i = 0; i < array_length(spec.ids); i++) {
-        var _id = spec.ids[i]
-        if (cardCanVaryRarity(_id) && array_length(spec.rarities) > 0) {
-            for (var r = 0; r < array_length(spec.rarities); r++)
-                array_push(out, { id: _id, rarity: spec.rarities[r] })
+    var refs = []
+    for (var idIndex = 0; idIndex < array_length(spec.ids); idIndex++) {
+        var cardIdentifier = spec.ids[idIndex]
+        if (cardCanVaryRarity(cardIdentifier) && array_length(spec.rarities) > 0) {
+            for (var rarityIndex = 0; rarityIndex < array_length(spec.rarities); rarityIndex++)
+                array_push(refs, { id: cardIdentifier, rarity: spec.rarities[rarityIndex] })
         } else {
-            array_push(out, { id: _id, rarity: CardsRarity.Default })
+            array_push(refs, { id: cardIdentifier, rarity: CardsRarity.Default })
         }
     }
-    return out
+    return refs
 }
 
 // Вес карты при выборе награды. чем больше копий есть, тем реже выпадает
@@ -21,29 +21,29 @@ function rewardWeight(ref) {
 
 // Взвешенная случайная награда
 function rollOneReward(spec) {
-    var cands = rewardCandidateRefs(spec)
-    if (array_length(cands) == 0) { return { id: spec.ids[0], rarity: CardsRarity.Default } }
+    var candidates = rewardCandidateRefs(spec)
+    if (array_length(candidates) == 0) { return { id: spec.ids[0], rarity: CardsRarity.Default } }
 
     var total = 0
-    for (var i = 0; i < array_length(cands); i++) {
-        total += rewardWeight(cands[i])
+    for (var candidateIndex = 0; candidateIndex < array_length(candidates); candidateIndex++) {
+        total += rewardWeight(candidates[candidateIndex])
     }
 
     var roll = random(total)
-    for (var i = 0; i < array_length(cands); i++) {
-        var w = rewardWeight(cands[i])
-        if (roll < w) { return { id: cands[i].id, rarity: cands[i].rarity } }
-        roll -= w
+    for (var candidateIndex = 0; candidateIndex < array_length(candidates); candidateIndex++) {
+        var weight = rewardWeight(candidates[candidateIndex])
+        if (roll < weight) { return { id: candidates[candidateIndex].id, rarity: candidates[candidateIndex].rarity } }
+        roll -= weight
     }
-    var last = cands[array_length(cands) - 1]
+    var last = candidates[array_length(candidates) - 1]
     return { id: last.id, rarity: last.rarity }
 }
 
 // Сколько уникальных (id,rarity) карт может быть создано
 function rewardCandidateCount(spec) {
     var count = 0
-    for (var i = 0; i < array_length(spec.ids); i++) {
-        if (cardCanVaryRarity(spec.ids[i])) { 
+    for (var idIndex = 0; idIndex < array_length(spec.ids); idIndex++) {
+        if (cardCanVaryRarity(spec.ids[idIndex])) { 
             count += array_length(spec.rarities)
         }
         else { 
@@ -63,11 +63,11 @@ function rollRewardChoices(spec, count = 3) {
 
     while (array_length(choices) < target && safety < 1000) {
         safety++
-        var c = rollOneReward(spec)
-        var key = collectionKey(c.id, c.rarity) // id@rarity
-        if (!variable_struct_exists(seen, key)) {
-            seen[$ key] = true
-            array_push(choices, c)
+        var reward = rollOneReward(spec)
+        var rewardKey = collectionKey(reward.id, reward.rarity) // id@rarity
+        if (!variable_struct_exists(seen, rewardKey)) {
+            seen[$ rewardKey] = true
+            array_push(choices, reward)
         }
     }
     return choices
@@ -85,9 +85,9 @@ function grantBattleRewards() {
     var choices = rollRewardChoices(spec, 3)
     rewardChoices = []
 
-    for (var i = 0; i < array_length(choices); i++) {
-        var built = cardFromRef(choices[i])
-        built.cardRef = choices[i] // {id, rarity} 
+    for (var choiceIndex = 0; choiceIndex < array_length(choices); choiceIndex++) {
+        var built = cardFromRef(choices[choiceIndex])
+        built.cardRef = choices[choiceIndex] // {id, rarity} 
         array_push(rewardChoices, built)
     }
     rewardCursor = 0

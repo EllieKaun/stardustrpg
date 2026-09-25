@@ -1,9 +1,9 @@
 function tutorialOverworldLines() {
     var lana = asset_get_index("portraitLana")
-    var viv = asset_get_index("portraitViv")
+    var vivPortrait = asset_get_index("portraitViv")
     return [
         dialogLine("Lana", lana, loc("dlg.tut.ow1")),
-        dialogLine("Viv", viv, loc("dlg.tut.ow2")),
+        dialogLine("Viv", vivPortrait, loc("dlg.tut.ow2")),
         dialogLine("Lana", lana, loc("dlg.tut.ow3"))
     ]
 }
@@ -69,11 +69,11 @@ function deckTutorialIntroLines() {
 function drawTutorialSpotlight(rect) {
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
-    var pad = max(4, screenHeight * 0.012)
-    var spotlightLeft = rect.x - pad
-    var spotlightTop = rect.y - pad
-    var spotlightRight = rect.x + rect.w + pad
-    var spotlightBottom = rect.y + rect.h + pad
+    var padding = max(4, screenHeight * 0.012)
+    var spotlightLeft = rect.x - padding
+    var spotlightTop = rect.y - padding
+    var spotlightRight = rect.x + rect.w + padding
+    var spotlightBottom = rect.y + rect.h + padding
 
     draw_set_color(c_black)
     draw_set_alpha(0.62)
@@ -107,14 +107,14 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
                 var gapL = avoidRect.x
                 var gapR = screenWidth - (avoidRect.x + avoidRect.w)
                 var onRight = (gapR >= gapL)
-                var gap = onRight ? gapR : gapL
+                var sideGap = onRight ? gapR : gapL
                 panelH = screenHeight * 0.32
                 panelY = (screenHeight - panelH) * 0.5
-                panelW = clamp(gap - margin * 1.2, screenWidth * 0.22, screenWidth * 0.46)
+                panelW = clamp(sideGap - margin * 1.2, screenWidth * 0.22, screenWidth * 0.46)
                 if (onRight) {
-                    panelX = (avoidRect.x + avoidRect.w) + (gap - panelW) * 0.5
+                    panelX = (avoidRect.x + avoidRect.w) + (sideGap - panelW) * 0.5
                 } else {
-                    panelX = (gap - panelW) * 0.5
+                    panelX = (sideGap - panelW) * 0.5
                 }
             }
         }
@@ -122,18 +122,18 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
 
     draw_sprite_stretched(box, 0, panelX, panelY, panelW, panelH)
 
-    var pad = panelH * 0.14
-    var portraitSize = panelH - pad * 2
-    var portraitX = panelX + pad
-    var portraitY = panelY + pad
+    var padding = panelH * 0.14
+    var portraitSize = panelH - padding * 2
+    var portraitX = panelX + padding
+    var portraitY = panelY + padding
     if (portrait != undefined && sprite_exists(portrait)) {
         draw_sprite_stretched(portrait, 0, portraitX, portraitY, portraitSize, portraitSize)
     }
 
-    var textX = portraitX + portraitSize + pad
-    var textTop = panelY + pad
-    var textW = panelX + panelW - pad - textX
-    var textH = panelH - pad * 2
+    var textX = portraitX + portraitSize + padding
+    var textTop = panelY + padding
+    var textW = panelX + panelW - padding - textX
+    var textH = panelH - padding * 2
 
     var nameH = textH * 0.26
     draw_set_color(merge_color(c_white, c_yellow, 0.5))
@@ -156,7 +156,7 @@ function drawTutorialPanel(speaker, text, portrait, avoidRect) {
 
     draw_set_halign(fa_right)
     draw_set_color(merge_color(c_white, c_black, 0.35))
-    drawUiText(panelX + panelW - pad, panelY + panelH - pad - hintH, loc("ui.spaceNext"), hintH)
+    drawUiText(panelX + panelW - padding, panelY + panelH - padding - hintH, loc("ui.spaceNext"), hintH)
     draw_set_halign(fa_left)
     draw_set_color(c_white)
 }

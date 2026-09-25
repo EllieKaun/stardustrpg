@@ -88,8 +88,8 @@ menu = new Menu([
     new MenuItem("Sounds Vol", noone, noone, function(it) {
         selectedVolSounds = clamp(selectedVolSounds + 0.1, 0, 1.0)
         updateMenuLabels()
-        var snd = audio_play_sound(SND_CARD_SELECT, 8, false)
-        audio_sound_gain(snd, selectedVolSounds, 0)
+        var sound = audio_play_sound(SND_CARD_SELECT, 8, false)
+        audio_sound_gain(sound, selectedVolSounds, 0)
     }),
     new MenuItem("Language", noone, noone, function(it) {
         locCycleLanguage()

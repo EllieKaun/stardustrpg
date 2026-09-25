@@ -33,19 +33,19 @@ function initStarriorsFromEncounter(encounter) {
         shuffleDeckAndTake4(playOrder[i])
     }
     
-    var raw = variable_struct_exists(encounter, "raw") && encounter.raw
+    var isRaw = variable_struct_exists(encounter, "raw") && encounter.raw
     var bonus = enemyStatBonus()
     for (var i = 0; i < array_length(enemies); i++) {
-        var e = enemies[i]
-        e.isEnemy = true
-        e.hasSpear = false
-        if (raw) { 
+        var enemy = enemies[i]
+        enemy.isEnemy = true
+        enemy.hasSpear = false
+        if (isRaw) { 
             continue
         }
         if (enemyIgniteRoll()) {
-            igniteEnemy(e)
+            igniteEnemy(enemy)
         } else {
-            applyEnemyStatBonus(e, bonus)
+            applyEnemyStatBonus(enemy, bonus)
         }
     }
 
@@ -55,7 +55,7 @@ function initStarriorsFromEncounter(encounter) {
         global.battleHasSpear = false
     }
 
-    if (!raw
+    if (!isRaw
         && variable_global_exists("battleHasSpear")
         && global.battleHasSpear
         && array_length(enemies) > 0) {
@@ -63,20 +63,20 @@ function initStarriorsFromEncounter(encounter) {
         enemies[spearIdx].hasSpear = true
         if (spearBattleSprite() == noone) { enemies[spearIdx].image_blend = c_yellow }
 
-        var db = spearBattleBonus()
+        var damageBonus = spearBattleBonus()
         for (var i = 0; i < array_length(enemies); i++) {
-            applyEnemyStatBonus(enemies[i], db)
+            applyEnemyStatBonus(enemies[i], damageBonus)
         }
         global.battleHasSpear = false
     }
 }
 
-function igniteEnemy(e) {
-    e.strength = e.strength * 10
-    e.hp = e.hp * 6
-    e.maxHp = e.maxHp * 6
-    e.isIgnited = true
-    e.igniteEffectChance = 0.1
+function igniteEnemy(enemy) {
+    enemy.strength = enemy.strength * 10
+    enemy.hp = enemy.hp * 6
+    enemy.maxHp = enemy.maxHp * 6
+    enemy.isIgnited = true
+    enemy.igniteEffectChance = 0.1
 }
 
 function createStarrior(
@@ -175,8 +175,8 @@ function rebuildPlayOrder() {
     for (var i = 0; i < array_length(sortedEnemies); i++) array_push(playOrder, sortedEnemies[i])
 
     // очередь сдвинулась - указатель хода должен остаться на том же персонаже
-    var idx = array_get_index(playOrder, selectedCharacter)
-    if (idx >= 0) { selectedCharacterNumber = idx }
+    var selectedIndex = array_get_index(playOrder, selectedCharacter)
+    if (selectedIndex >= 0) { selectedCharacterNumber = selectedIndex }
 }
 
 function initStarriorsPositions(

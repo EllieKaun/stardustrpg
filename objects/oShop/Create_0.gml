@@ -83,9 +83,9 @@ layoutPanels = function() {
     var tabHt = signHeight * 0.72
     var tabWd = tabHt * sprite_get_width(ShopBtn) / sprite_get_height(ShopBtn)
     var tabYy = bannerY + signHeight * 0.5 - tabHt * 0.5
-    var gap = guiW * 0.006
-    var leftX  = bannerX - headInset - headW * 0.5 - gap // левее левой головы
-    var rightX = bannerX + bannerW + headInset + headW * 0.5 + gap // правее правой головы
+    var columnGap = guiW * 0.006
+    var leftX  = bannerX - headInset - headW * 0.5 - columnGap // левее левой головы
+    var rightX = bannerX + bannerW + headInset + headW * 0.5 + columnGap // правее правой головы
     shopPanel.tabRects = [
         { left: leftX - tabWd, top: tabYy, width: tabWd, height: tabHt }, // CARDS слева
         { left: rightX, top: tabYy, width: tabWd, height: tabHt }  // OTHER справа
@@ -93,13 +93,13 @@ layoutPanels = function() {
 
     // Панель списка
     var sideMargin = guiW * 0.15
-    var top = bannerY + signHeight + guiH * 0.045
+    var contentTop = bannerY + signHeight + guiH * 0.045
     var bottom = guiH * 0.03
 
     shopPanel.x = sideMargin
-    shopPanel.y = top
+    shopPanel.y = contentTop
     shopPanel.w = guiW - sideMargin * 2
-    shopPanel.h = guiH - top - bottom
+    shopPanel.h = guiH - contentTop - bottom
     shopPanel.padding = guiW * 0.010
     shopPanel.tabH = tabHt
     shopPanel.tabPadding = guiW * 0.006

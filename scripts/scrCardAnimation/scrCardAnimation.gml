@@ -12,33 +12,33 @@
 //    playCardAnimated(card, caster, targets, c)
 
 
-function pathArc(from, to, p, opts) { // дуга вверх
-    var cx = (from.x + to.x) * 0.5
-    var cy = min(from.y, to.y) - opts.arcHeight
-    var ax = lerp(from.x, cx, p), ay = lerp(from.y, cy, p)
-    var bx = lerp(cx, to.x, p), by = lerp(cy, to.y, p)
-    return { x: lerp(ax, bx, p), y: lerp(ay, by, p) }
+function pathArc(from, to, progress, options) { // дуга вверх
+    var controlX = (from.x + to.x) * 0.5
+    var controlY = min(from.y, to.y) - options.arcHeight
+    var lerpAX = lerp(from.x, controlX, progress), lerpAY = lerp(from.y, controlY, progress)
+    var lerpBX = lerp(controlX, to.x, progress), lerpBY = lerp(controlY, to.y, progress)
+    return { x: lerp(lerpAX, lerpBX, progress), y: lerp(lerpAY, lerpBY, progress) }
 }
 
-function pathLine(from, to, p, opts) { // по прямой
-    return { x: lerp(from.x, to.x, p), y: lerp(from.y, to.y, p) }
+function pathLine(from, to, progress, options) { // по прямой
+    return { x: lerp(from.x, to.x, progress), y: lerp(from.y, to.y, progress) }
 }
 
 // Стратегии сглаживания
-function easeOutQuad(p) { return 1 - power(1 - p, 2) }
-function easeLinear(p) { return p }
-function easeInOutQuad(p) { return (p < 0.5) ? 2 * p * p : 1 - power(-2 * p + 2, 2) * 0.5 }
+function easeOutQuad(progress) { return 1 - power(1 - progress, 2) }
+function easeLinear(progress) { return progress }
+function easeInOutQuad(progress) { return (progress < 0.5) ? 2 * progress * progress : 1 - power(-2 * progress + 2, 2) * 0.5 }
 
 // Стратегии исчезновения
-function fadeTail(p, anim) { return (p < 0.6) ? 1 : 1 - (p - 0.6) / 0.4 }  
-function fadeNone(p, anim) { return 1 }  
-function fadeInOut(p, anim) {
-    if (p < 0.15) { return p / 0.15 }
-    if (p > 0.85) { return (1 - p) / 0.15 }
+function fadeTail(progress, anim) { return (progress < 0.6) ? 1 : 1 - (progress - 0.6) / 0.4 }  
+function fadeNone(progress, anim) { return 1 }  
+function fadeInOut(progress, anim) {
+    if (progress < 0.15) { return progress / 0.15 }
+    if (progress > 0.85) { return (1 - progress) / 0.15 }
     return 1
 }
-function fadeShrink(p, anim) { 
-    anim.scale = lerp(anim.cfg.scaleFrom, 0.15, p)
+function fadeShrink(progress, anim) { 
+    anim.scale = lerp(anim.cfg.scaleFrom, 0.15, progress)
     return 1
 }
 
@@ -143,37 +143,37 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
 
     static update = function() {
         // множитель для ui: масштабирует абсолютные размеры/скорости частиц
-        var uiS = display_get_gui_width() / guiBaseWidth()
+        var uiScale = display_get_gui_width() / guiBaseWidth()
         if (!done) {
-            var px = x, py = y // позиция до шага 
+            var prevX = x, prevY = y // позиция до шага 
             t = min(t + 1, dur)
-            var p = t / dur
-            var e = cfg.ease(p) // сглаженное время
+            var progress = t / dur
+            var easedProgress = cfg.ease(progress) // сглаженное время
 
-            var pt = cfg.path(fromPt, toPt, e, cfg) // позиция по стратегии пути
-            x = pt.x
-            y = pt.y
-            angle = lerp(fromAngle, cfg.toAngle, e)
-            scale = lerp(cfg.scaleFrom, cfg.scaleTo, e)
-            alpha = cfg.fade(p, self) // исчезновение по стратегии
+            var point = cfg.path(fromPt, toPt, easedProgress, cfg) // позиция по стратегии пути
+            x = point.x
+            y = point.y
+            angle = lerp(fromAngle, cfg.toAngle, easedProgress)
+            scale = lerp(cfg.scaleFrom, cfg.scaleTo, easedProgress)
+            alpha = cfg.fade(progress, self) // исчезновение по стратегии
 
             // эмиттер частиц
-            if (p < pcfg.spawnUntil) {
+            if (progress < pcfg.spawnUntil) {
                 repeat (pcfg.rate) {
-                    var s = {
+                    var particle = {
                         x: x + random_range(-cardW * pcfg.posSpread, cardW * pcfg.posSpread),
                         y: y + random_range(-cardH * pcfg.posSpread, cardH * pcfg.posSpread),
-                        vx: (px - x) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter) * uiS,
-                        vy: (py - y) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter) * uiS,
+                        vx: (prevX - x) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter) * uiScale,
+                        vy: (prevY - y) * pcfg.backBias + random_range(-pcfg.velJitter, pcfg.velJitter) * uiScale,
                         life: irandom_range(pcfg.lifeMin, pcfg.lifeMax),
                         maxlife: 1,
-                        size: random_range(pcfg.sizeMin, pcfg.sizeMax) * uiS,
+                        size: random_range(pcfg.sizeMin, pcfg.sizeMax) * uiScale,
                         rot: random(360),
                         rotSpeed: random_range(-pcfg.rotSpeed, pcfg.rotSpeed),
                         spr: choose(StarParticle1, StarParticle2, StarParticle3)
                     };
-                    s.maxlife = s.life
-                    array_push(particles, s)
+                    particle.maxlife = particle.life
+                    array_push(particles, particle)
                 }
             }
 
@@ -189,11 +189,11 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
         }
 
         if (playing && !playDone) {
-            var spd = sprite_get_speed(playSpr)
+            var frameSpeed = sprite_get_speed(playSpr)
             if (sprite_get_speed_type(playSpr) == spritespeed_framespersecond) {
-                spd /= game_get_speed(gamespeed_fps)
+                frameSpeed /= game_get_speed(gamespeed_fps)
             }
-            playFrame += spd
+            playFrame += frameSpeed
             if (playFrame >= hideFrame) { cardHidden = true }
             var lastFrame = sprite_get_number(playSpr) - 1
             if (playFrame >= lastFrame) { 
@@ -204,11 +204,11 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
 
         // частицы живут и после приземления карты
         for (var i = array_length(particles) - 1; i >= 0; i--) {
-            var s = particles[i]
-            s.x += s.vx; s.y += s.vy; s.vy += pcfg.gravity * uiS
-            s.rot += s.rotSpeed
-            s.life -= 1
-            if (s.life <= 0) { array_delete(particles, i, 1) }
+            var particle = particles[i]
+            particle.x += particle.vx; particle.y += particle.vy; particle.vy += pcfg.gravity * uiScale
+            particle.rot += particle.rotSpeed
+            particle.life -= 1
+            if (particle.life <= 0) { array_delete(particles, i, 1) }
         }
     }
 
@@ -220,10 +220,10 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
         // частицы под картой
         gpu_set_fog(true, pcfg.color, 0, 0)
         for (var i = 0; i < array_length(particles); i++) {
-            var s = particles[i];
-            var k = s.life / s.maxlife;
-            var pscale = (s.size * k * 2) / sprite_get_width(s.spr)
-            draw_sprite_ext(s.spr, 0, s.x, s.y, pscale, pscale, s.rot, c_white, k)
+            var particle = particles[i];
+            var lifeRatio = particle.life / particle.maxlife;
+            var pscale = (particle.size * lifeRatio * 2) / sprite_get_width(particle.spr)
+            draw_sprite_ext(particle.spr, 0, particle.x, particle.y, pscale, pscale, particle.rot, c_white, lifeRatio)
         }
         gpu_set_fog(false, pcfg.color, 0, 0)
         if (!cardHidden) {
@@ -238,16 +238,16 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
 }
 
 // Рисует 4-конечную звёздочку, outer — размер лучей
-function drawStarSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) { return }
-    var inner = outer * 0.4
-    draw_set_color(col)
-    draw_set_alpha(alpha)
+function drawStarSparkle(centerX, centerY, outerRadius, rotation, alphaValue, color) {
+    if (outerRadius <= 0) { return }
+    var inner = outerRadius * 0.4
+    draw_set_color(color)
+    draw_set_alpha(alphaValue)
     draw_primitive_begin(pr_trianglefan)
-    draw_vertex(cx, cy)
-    for (var a = 0; a <= 360; a += 45) {
-        var r = ((a mod 90) == 0) ? outer : inner  // 0/90/180/270 — лучи, между — впадины
-        draw_vertex(cx + lengthdir_x(r, a + rot), cy + lengthdir_y(r, a + rot))
+    draw_vertex(centerX, centerY)
+    for (var angle = 0; angle <= 360; angle += 45) {
+        var radius = ((angle mod 90) == 0) ? outerRadius : inner  // 0/90/180/270 — лучи, между — впадины
+        draw_vertex(centerX + lengthdir_x(radius, angle + rotation), centerY + lengthdir_y(radius, angle + rotation))
     }
     draw_primitive_end()
     draw_set_alpha(1)
@@ -255,16 +255,16 @@ function drawStarSparkle(cx, cy, outer, rot, alpha, col) {
 }
 
 // Квадрат. outer — радиус до угла 
-function drawRectSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) {
+function drawRectSparkle(centerX, centerY, outerRadius, rotation, alphaValue, color) {
+    if (outerRadius <= 0) {
         return
     }
-    draw_set_color(col)
-    draw_set_alpha(alpha)
+    draw_set_color(color)
+    draw_set_alpha(alphaValue)
     draw_primitive_begin(pr_trianglefan)
-    draw_vertex(cx, cy) // центр веера
-    for (var a = 45; a <= 405; a += 90) { // 4 угла (+замыкание)
-        draw_vertex(cx + lengthdir_x(outer, a + rot), cy + lengthdir_y(outer, a + rot))
+    draw_vertex(centerX, centerY) // центр веера
+    for (var angle = 45; angle <= 405; angle += 90) { // 4 угла (+замыкание)
+        draw_vertex(centerX + lengthdir_x(outerRadius, angle + rotation), centerY + lengthdir_y(outerRadius, angle + rotation))
     }
     draw_primitive_end()
     draw_set_alpha(1)
@@ -272,13 +272,13 @@ function drawRectSparkle(cx, cy, outer, rot, alpha, col) {
 }
 
 // Равносторонний треугольник. outer — радиус от центра до вершины
-function drawTriangleSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) { return }
-    draw_set_color(col)
-    draw_set_alpha(alpha)
+function drawTriangleSparkle(centerX, centerY, outerRadius, rotation, alphaValue, color) {
+    if (outerRadius <= 0) { return }
+    draw_set_color(color)
+    draw_set_alpha(alphaValue)
     draw_primitive_begin(pr_trianglelist)
-    for (var a = -90; a < 270; a += 120) { // 3 вершины через 120°
-        draw_vertex(cx + lengthdir_x(outer, a + rot), cy + lengthdir_y(outer, a + rot))
+    for (var angle = -90; angle < 270; angle += 120) { // 3 вершины через 120°
+        draw_vertex(centerX + lengthdir_x(outerRadius, angle + rotation), centerY + lengthdir_y(outerRadius, angle + rotation))
     }
     draw_primitive_end()
     draw_set_alpha(1)
@@ -286,16 +286,16 @@ function drawTriangleSparkle(cx, cy, outer, rot, alpha, col) {
 }
 
 // Круг. outer — радиус
-function drawCircleSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) {
+function drawCircleSparkle(centerX, centerY, outerRadius, rotation, alphaValue, color) {
+    if (outerRadius <= 0) {
         return
     }
-    draw_set_color(col)
-    draw_set_alpha(alpha)
+    draw_set_color(color)
+    draw_set_alpha(alphaValue)
     draw_primitive_begin(pr_trianglefan)
-    draw_vertex(cx, cy) // центр
-    for (var a = 0; a <= 360; a += 30) { // 12 сегментов
-        draw_vertex(cx + lengthdir_x(outer, a), cy + lengthdir_y(outer, a))
+    draw_vertex(centerX, centerY) // центр
+    for (var angle = 0; angle <= 360; angle += 30) { // 12 сегментов
+        draw_vertex(centerX + lengthdir_x(outerRadius, angle), centerY + lengthdir_y(outerRadius, angle))
     }
     draw_primitive_end()
 }
@@ -306,17 +306,17 @@ function cardDeskGeometry() {
     // координаты GUI
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
-    var s = guiScale()
+    var guiScaleFactor = guiScale()
 
     var deskH = screenHeight / 3
-    var cardSpacing = 6 * s
-    var cardH = deskH - (5 + 3) * s
+    var cardSpacing = 6 * guiScaleFactor
+    var cardH = deskH - (5 + 3) * guiScaleFactor
     var cardW = cardH * 2 / 3
     var deskW = cardW * maxCardsOnDeskNumber + cardSpacing * (maxCardsOnDeskNumber + 1)
     var startX = (screenWidth - deskW) / 2
     var startY = screenHeight - deskH
 
-    var vPad = 8 * s
+    var vPad = 8 * guiScaleFactor
     var drawCardH = deskH - vPad * 2
     var drawCardW = drawCardH * 2 / 3
 
@@ -329,20 +329,20 @@ function cardDeskGeometry() {
 }
 
 function selectedCardTransform() {
-    var g = cardDeskGeometry()
-    var s = display_get_gui_width() / guiBaseWidth()
+    var geometry = cardDeskGeometry()
+    var guiScaleFactor = display_get_gui_width() / guiBaseWidth()
     var hand = selectedCharacter.getCardsInHand()
-    var n = min(array_length(hand), maxCardsOnDeskNumber)
-    var spread = min(g.drawCardW * 0.8, (g.deskW - g.drawCardW) / max(1, n))
-    var mid  = (n - 1) / 2
-    var off  = selectedCard - mid
-    var arcLift = 2 * s
+    var handCount = min(array_length(hand), maxCardsOnDeskNumber)
+    var spread = min(geometry.drawCardW * 0.8, (geometry.deskW - geometry.drawCardW) / max(1, handCount))
+    var middleIndex  = (handCount - 1) / 2
+    var offsetFromMiddle  = selectedCard - middleIndex
+    var arcLift = 2 * guiScaleFactor
     return {
-        x: g.handCenterX + off * spread,
-        y: g.handCenterY - abs(off) * arcLift - 6 * s,
+        x: geometry.handCenterX + offsetFromMiddle * spread,
+        y: geometry.handCenterY - abs(offsetFromMiddle) * arcLift - 6 * guiScaleFactor,
         angle: 0,
-        w: g.drawCardW,
-        h: g.drawCardH
+        w: geometry.drawCardW,
+        h: geometry.drawCardH
     }
 }
 
@@ -380,39 +380,39 @@ function playCardAnimated(card, caster, targets, cfg) {
     anim.targets = targets
 }
 
-function handSlotTransform(i, n) {
-    var g = cardDeskGeometry()
-    var s = display_get_gui_width() / guiBaseWidth()
-    var spread = min(g.drawCardW * 0.8, (g.deskW - g.drawCardW) / max(1, n))
-    var mid = (n - 1) / 2
-    var off = i - mid
-    var arcLift = 2 * s
+function handSlotTransform(i, handCount) {
+    var geometry = cardDeskGeometry()
+    var guiScaleFactor = display_get_gui_width() / guiBaseWidth()
+    var spread = min(geometry.drawCardW * 0.8, (geometry.deskW - geometry.drawCardW) / max(1, handCount))
+    var middleIndex = (handCount - 1) / 2
+    var offsetFromMiddle = i - middleIndex
+    var arcLift = 2 * guiScaleFactor
     var arcTilt = 5
     return {
-        x: g.handCenterX + off * spread,
-        y: g.handCenterY - abs(off) * arcLift,
-        angle: -off * arcTilt,
-        w: g.drawCardW,
-        h: g.drawCardH
+        x: geometry.handCenterX + offsetFromMiddle * spread,
+        y: geometry.handCenterY - abs(offsetFromMiddle) * arcLift,
+        angle: -offsetFromMiddle * arcTilt,
+        w: geometry.drawCardW,
+        h: geometry.drawCardH
     }
 }
 
 function deckPileTopCenter(deckCount) {
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
-    var s = guiScale()
+    var guiScaleFactor = guiScale()
     var cardDeskHeight = screenHeight / 3
     var deckH = cardDeskHeight * 0.7
     var deckScale = deckH / sprite_get_height(CardBack)
     var deckW = sprite_get_width(CardBack) * deckScale
-    var deckMargin = 8 * s
-    var deckStep = 2 * s
+    var deckMargin = 8 * guiScaleFactor
+    var deckStep = 2 * guiScaleFactor
     var deckX = screenWidth - deckMargin - deckW
     var deckBottomY = screenHeight - deckMargin
     var i = max(0, deckCount - 1)
-    var dx = deckX - i * deckStep
-    var dy = deckBottomY - deckH - i * deckStep
-    return { x: dx + deckW * 0.5, y: dy + deckH * 0.5 }
+    var topCardX = deckX - i * deckStep
+    var topCardY = deckBottomY - deckH - i * deckStep
+    return { x: topCardX + deckW * 0.5, y: topCardY + deckH * 0.5 }
 }
 
 // Можно ли добрать карту в начале хода (герой, не в стане, есть колода, рука не полна)
@@ -433,14 +433,14 @@ function beginDrawCardAnim(character) {
 
     var newHandSize = array_length(hand) + 1
     var slot = handSlotTransform(newHandSize - 1, newHandSize)
-    var src = deckPileTopCenter(pileCountBefore)
+    var pileCenter = deckPileTopCenter(pileCountBefore)
 
     var cfg = drawCardAnimConfig()
     cfg.toX = slot.x
     cfg.toY = slot.y
     cfg.toAngle = slot.angle
 
-    var from = { x: src.x, y: src.y, angle: 0, w: slot.w, h: slot.h }
+    var from = { x: pileCenter.x, y: pileCenter.y, angle: 0, w: slot.w, h: slot.h }
     spawnCardAnim(card, from, cfg, function(anim) {
         array_push(selectedCharacter.getCardsInHand(), anim.card)
         beginTurnFor(selectedCharacter)

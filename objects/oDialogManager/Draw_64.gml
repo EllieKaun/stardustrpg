@@ -13,7 +13,7 @@ var boxH = floor(screenHeight * 0.30)
 var boxW = screenWidth - margin * 2
 var boxX = margin
 var boxY = screenHeight - boxH - margin
-var pad = boxH * 0.12 // отступ текста от рамки
+var padding = boxH * 0.12 // отступ текста от рамки
 var pointerScale = max(1, floor(screenWidth / dialogBaseW * 0.5)) // указатель 
 
 var hasPortrait = (line.portrait != undefined && sprite_exists(line.portrait))
@@ -26,7 +26,7 @@ if (hasPortrait) {
     if (portraitSc >= 1) { portraitSc = floor(portraitSc) } 
     var portraitW = sprite_get_width(line.portrait) * portraitSc
     portraitH = sprite_get_height(line.portrait) * portraitSc
-    var portraitInset = pad * 1.5
+    var portraitInset = padding * 1.5
     var portraitLeft = onLeft ? (boxX + portraitInset) : (boxX + boxW - portraitInset - portraitW)
     var portraitTop = boxY + boxH * 0.03 - portraitH
     draw_sprite_ext(line.portrait, 0,
@@ -39,8 +39,8 @@ if (hasPortrait) {
 draw_sprite_stretched(box, 0, boxX, boxY, boxW, boxH)
 
 // Координаты и размеры текста
-var padX = pad * 1.5
-var padY = pad
+var padX = padding * 1.5
+var padY = padding
 var textX = boxX + padX
 var textW = boxW - padX * 2
 var textY = boxY + padY

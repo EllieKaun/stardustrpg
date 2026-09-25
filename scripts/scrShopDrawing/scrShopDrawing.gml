@@ -23,9 +23,9 @@ function shopNonSellableIds() {
 }
 
 function cardShopSellable(cardId) {
-    var ids = shopNonSellableIds()
-    for (var i = 0; i < array_length(ids); i++) {
-        if (ids[i] == cardId) { return false }
+    var nonSellableIds = shopNonSellableIds()
+    for (var i = 0; i < array_length(nonSellableIds); i++) {
+        if (nonSellableIds[i] == cardId) { return false }
     }
     return true
 }
@@ -91,17 +91,17 @@ function drawShopItem(item, rect, uiScale, isSelected = false) {
     // рамка товара
     draw_sprite_stretched(ItemShadow, 0, rect.left, rect.top, rect.width, rect.height)
 
-    var pad = rect.height * 0.12
-    var contentH = rect.height - pad * 2
-    var textX = rect.left + pad
-    var textTop = rect.top + pad
+    var padding = rect.height * 0.12
+    var contentH = rect.height - padding * 2
+    var textX = rect.left + padding
+    var textTop = rect.top + padding
 
     // карта слева
     if (item.kind == ShopItemKind.Card && item.card != undefined) {
         var cardH = contentH
         var cardW = cardH * 2 / 3
-        drawCardFace(item.card, rect.left + pad + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0, 1, 1, isSelected)
-        textX = rect.left + pad + cardW + pad
+        drawCardFace(item.card, rect.left + padding + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0, 1, 1, isSelected)
+        textX = rect.left + padding + cardW + padding
     }
 
     // выделение строки поверх рамки товара
@@ -124,7 +124,7 @@ function drawShopItem(item, rect, uiScale, isSelected = false) {
     var coinH = rect.height * 0.34
     var coinScale = coinH / sprite_get_height(CoinIcon)
     var coinW = sprite_get_width(CoinIcon) * coinScale
-    var coinCX = rect.left + rect.width - pad - coinW * 0.5
+    var coinCX = rect.left + rect.width - padding - coinW * 0.5
     var coinCY = rect.top + rect.height * 0.5
 
     var priceStr = string(item.price)
@@ -132,7 +132,7 @@ function drawShopItem(item, rect, uiScale, isSelected = false) {
     draw_set_valign(fa_middle)
     draw_set_color(c_white)
     var priceScale = uiTextScale(priceStr, coinH * 0.9, rect.width * 0.2)
-    draw_text_transformed(coinCX - coinW * 0.5 - pad * 0.4, coinCY, priceStr, priceScale, priceScale, 0)
+    draw_text_transformed(coinCX - coinW * 0.5 - padding * 0.4, coinCY, priceStr, priceScale, priceScale, 0)
 
     draw_sprite_ext(CoinIcon, 0, coinCX, coinCY, coinScale, coinScale, 0, c_white, 1)
 
@@ -402,28 +402,28 @@ function Shop(_config) constructor {
 
         // Вкладки 
         for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {
-            var tab = tabs[tabIndex]
+            var currentTab = tabs[tabIndex]
             var tabRect = getTabRect(tabIndex)
             var isActive = (tabIndex == activeTab)
 
-            if (tab[$ "sprite"] != undefined) {
-                var subimage = min(isActive ? 1 : 0, sprite_get_number(tab.sprite) - 1)
+            if (currentTab[$ "sprite"] != undefined) {
+                var subimage = min(isActive ? 1 : 0, sprite_get_number(currentTab.sprite) - 1)
                 draw_set_alpha(isActive ? 1.0 : 0.6)
-                draw_sprite_stretched(tab.sprite, subimage, tabRect.left, tabRect.top, tabRect.width, tabRect.height)
+                draw_sprite_stretched(currentTab.sprite, subimage, tabRect.left, tabRect.top, tabRect.width, tabRect.height)
                 draw_set_alpha(1.0)
             } else {
-                draw_set_color(tab[$ "color"] ?? c_gray)
+                draw_set_color(currentTab[$ "color"] ?? c_gray)
                 draw_set_alpha(isActive ? 1.0 : 0.6)
                 draw_rectangle(tabRect.left, tabRect.top, tabRect.left + tabRect.width - 1, tabRect.top + tabRect.height - 1, false)
                 draw_set_alpha(1.0)
             }
 
             draw_set_font(uiFont())
-            draw_set_color(tab[$ "textColor"] ?? c_white)
+            draw_set_color(currentTab[$ "textColor"] ?? c_white)
             draw_set_halign(fa_center)
             draw_set_valign(fa_middle)
-            var labelScale = uiTextScale(tab.name, tabRect.height * 0.55, tabRect.width - tabPadding * 2)
-            draw_text_transformed(tabRect.left + tabRect.width / 2, tabRect.top + tabRect.height / 2, tab.name, labelScale, labelScale, 0)
+            var labelScale = uiTextScale(currentTab.name, tabRect.height * 0.55, tabRect.width - tabPadding * 2)
+            draw_text_transformed(tabRect.left + tabRect.width / 2, tabRect.top + tabRect.height / 2, currentTab.name, labelScale, labelScale, 0)
             draw_set_halign(fa_left)
             draw_set_valign(fa_top)
         }

@@ -1,10 +1,10 @@
 //// Спавн Марионеток 
 
 function countAlivePuppetsIn(team) {
-    var n = 0;
-    for (var i = 0; i < array_length(team); i++)
-        if (team[i].isPuppet && !team[i].isKO()) { n++; }
-    return n;
+    var aliveCount = 0;
+    for (var memberIndex = 0; memberIndex < array_length(team); memberIndex++)
+        if (team[memberIndex].isPuppet && !team[memberIndex].isKO()) { aliveCount++; }
+    return aliveCount;
 }
 
 function puppetSpritesForCategory(category) {
@@ -28,32 +28,32 @@ function puppetSpawnSprite(category) {
 }
 
 function puppetDeckForCategory(category) {
-    var C = global.CardId
+    var cardIds = global.CardId
     var ids = []
     switch (category) {
         case CardCategory.Attack: 
-            ids = [C.physicalDamageSingleTarget, C.physicalDamageStunChanceSingleTarget]
+            ids = [cardIds.physicalDamageSingleTarget, cardIds.physicalDamageStunChanceSingleTarget]
         break
         case CardCategory.Magic: 
-            ids = [C.magicalDamageSingleTarget, C.magicalDamageBurnChanceSingleTarget]
+            ids = [cardIds.magicalDamageSingleTarget, cardIds.magicalDamageBurnChanceSingleTarget]
         break
         case CardCategory.Heal:   
-            ids = [C.instantHealSingleTarget, C.overtimeHealSingleTarget]     
+            ids = [cardIds.instantHealSingleTarget, cardIds.overtimeHealSingleTarget]     
         break
         case CardCategory.Buff:   
-            ids = [C.buffPhysicalDamageSingleTarget, C.buffMagicalDamageSingleTarget]
+            ids = [cardIds.buffPhysicalDamageSingleTarget, cardIds.buffMagicalDamageSingleTarget]
         break
     }
     var deck = []
-    for (var i = 0; i < array_length(ids); i++)
-        array_push(deck, cardFromRef({ id: ids[i], rarity: CardsRarity.Default }))
+    for (var idIndex = 0; idIndex < array_length(ids); idIndex++)
+        array_push(deck, cardFromRef({ id: ids[idIndex], rarity: CardsRarity.Default }))
     return deck
 }
 
 // Карта призывает марионетку
 function cardSummonsPuppet(card) {
-    for (var i = 0; i < array_length(card.effects); i++) {
-        var effect = card.effects[i]
+    for (var effectIndex = 0; effectIndex < array_length(card.effects); effectIndex++) {
+        var effect = card.effects[effectIndex]
         if (variable_struct_exists(effect, "type") && effect.type == EffectTypes.CreatePuppet) { return true }
     }
     return false
@@ -69,28 +69,28 @@ function spawnPuppet(category, caster) {
     var team      = enemySide ? enemies : heroes
     if (!canSpawnPuppetFor(caster)) { return }
 
-    var spr = puppetSpritesForCategory(category)
-    var p = createStarrior(
+    var sprites = puppetSpritesForCategory(category)
+    var puppet = createStarrior(
         "Puppet",
-        spr.idle, spr.attack, spr.spell, spr.cast, spr.ko, spr.dance,
+        sprites.idle, sprites.attack, sprites.spell, sprites.cast, sprites.ko, sprites.dance,
         8, 8,  0, 0,  1, 1,  /*str*/2, /*int*/2, /*aura*/0, /*guts*/0,
         puppetDeckForCategory(category)
     );
-    p.isPuppet = true
-    p.isEnemy = enemySide
-    p.puppetCategory = category
-    p.justSummoned   = true
-    p.image_xscale   = enemySide ? 1 : -1 // спрайты марионеток нарисованы лицом влево - у героев зеркалим
-    array_push(team, p)
-    array_push(playOrder, p)
-    shuffleDeckAndTake4(p)
+    puppet.isPuppet = true
+    puppet.isEnemy = enemySide
+    puppet.puppetCategory = category
+    puppet.justSummoned   = true
+    puppet.image_xscale   = enemySide ? 1 : -1 // спрайты марионеток нарисованы лицом влево - у героев зеркалим
+    array_push(team, puppet)
+    array_push(playOrder, puppet)
+    shuffleDeckAndTake4(puppet)
 
     initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)
 
-    var spawnSpr = puppetSpawnSprite(category)
-    if (spawnSpr != noone) {
-        p.spriteActionSpawn = spawnSpr
-        p.changeActionState(StarriorStates.Spawn, undefined)
+    var spawnSprite = puppetSpawnSprite(category)
+    if (spawnSprite != noone) {
+        puppet.spriteActionSpawn = spawnSprite
+        puppet.changeActionState(StarriorStates.Spawn, undefined)
     }
 }
 
@@ -104,10 +104,10 @@ function puppetTargetsEnemies(category) {
     return (category == CardCategory.Attack || category == CardCategory.Magic)
 }
 
-function aliveOf(arr) {
-    var r = []
-    for (var i = 0; i < array_length(arr); i++) if (!arr[i].isKO()) { array_push(r, arr[i]) }
-    return r
+function aliveOf(members) {
+    var alive = []
+    for (var memberIndex = 0; memberIndex < array_length(members); memberIndex++) if (!members[memberIndex].isKO()) { array_push(alive, members[memberIndex]) }
+    return alive
 }
 
 function runPuppetTurn(puppet) {
@@ -123,9 +123,9 @@ function runPuppetTurn(puppet) {
 
     var hand = puppet.getCardsInHand()
     var playable = []
-    for (var i = 0; i < array_length(hand); i++) {
-        var c = hand[i]
-        if (isSingleTargetCard(c) && checkIfCanPlayCard(puppet, c)) { array_push(playable, c) }
+    for (var index = 0; index < array_length(hand); index++) {
+        var candidateCard = hand[index]
+        if (isSingleTargetCard(candidateCard) && checkIfCanPlayCard(puppet, candidateCard)) { array_push(playable, candidateCard) }
     }
 
     if (array_length(playable) == 0) {
@@ -138,22 +138,22 @@ function runPuppetTurn(puppet) {
 
     // Категоризируем играбельные карты: первый хил / бафф / атака
     var healChoice = noone, buffChoice = noone, attackChoice = noone
-    for (var i = 0; i < array_length(playable); i++) {
-        var c = playable[i]
-        switch (cardCategoryOf(c)) {
-            case CardCategory.Heal: if (healChoice == noone) { healChoice = c; } break
-            case CardCategory.Buff: if (buffChoice == noone) { buffChoice = c; } break
+    for (var index = 0; index < array_length(playable); index++) {
+        var candidateCard = playable[index]
+        switch (cardCategoryOf(candidateCard)) {
+            case CardCategory.Heal: if (healChoice == noone) { healChoice = candidateCard; } break
+            case CardCategory.Buff: if (buffChoice == noone) { buffChoice = candidateCard; } break
             case CardCategory.Attack:
-            case CardCategory.Magic: if (attackChoice == noone) { attackChoice = c; } break
+            case CardCategory.Magic: if (attackChoice == noone) { attackChoice = candidateCard; } break
         }
     }
 
     // Самый раненый союзник (для хила)
     var woundedAlly = noone
     var lowestHp = 999999
-    for (var i = 0; i < array_length(allies); i++) {
-        var a = allies[i]
-        if (a.hp < a.maxHp && a.hp < lowestHp) { lowestHp = a.hp; woundedAlly = a }
+    for (var index = 0; index < array_length(allies); index++) {
+        var ally = allies[index]
+        if (ally.hp < ally.maxHp && ally.hp < lowestHp) { lowestHp = ally.hp; woundedAlly = ally }
     }
 
     var card = noone
@@ -167,16 +167,16 @@ function runPuppetTurn(puppet) {
 
     // Баффаем союзника, у которого ещё нет этого модификатора (сначала других, себя - в последнюю очередь)
     if (card == noone && buffChoice != noone) {
-        var e0 = buffChoice.effects[0]
+        var firstEffect = buffChoice.effects[0]
         var buffTarget = noone
-        for (var i = 0; i < array_length(allies) && buffTarget == noone; i++) {
-            var a = allies[i]
-            if (a == puppet) { continue }
-            if (variable_struct_exists(e0, "buffType") && !is_undefined(checkIfHasBuff(a, EffectTypes.Buff, e0.buffType))) { continue }
-            buffTarget = a
+        for (var index = 0; index < array_length(allies) && buffTarget == noone; index++) {
+            var ally = allies[index]
+            if (ally == puppet) { continue }
+            if (variable_struct_exists(firstEffect, "buffType") && !is_undefined(checkIfHasBuff(ally, EffectTypes.Buff, firstEffect.buffType))) { continue }
+            buffTarget = ally
         }
         if (buffTarget == noone) {
-            var selfBuffed = variable_struct_exists(e0, "buffType") && !is_undefined(checkIfHasBuff(puppet, EffectTypes.Buff, e0.buffType))
+            var selfBuffed = variable_struct_exists(firstEffect, "buffType") && !is_undefined(checkIfHasBuff(puppet, EffectTypes.Buff, firstEffect.buffType))
             if (!selfBuffed) { buffTarget = puppet }
         }
         if (buffTarget != noone) {

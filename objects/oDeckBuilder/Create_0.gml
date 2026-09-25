@@ -8,11 +8,11 @@ var tabFonts = UI_TAB_FONT_STACK
 // Смена фокуса панели на определнную строку
 switchFocusTo = function(target, row) {
     with (oDeckBuilder) {
-        var src = (target.tag == Panels.Collection) ? deckPanel : collectionPanel
+        var sourcePanel = (target.tag == Panels.Collection) ? deckPanel : collectionPanel
         collectionPanel.focused = (target.tag == Panels.Collection)
         deckPanel.focused = (target.tag == Panels.Deck)
         activePanel = (target.tag == Panels.Collection) ? Panels.Collection : Panels.Deck
-        if (target.x < src.x) { target.enterFromRight(row) }
+        if (target.x < sourcePanel.x) { target.enterFromRight(row) }
         else { target.enterFromLeft(row) }
     }
 }
@@ -78,9 +78,9 @@ collectionPanel = new Panel({
             if (slotIndex < 0 || slotIndex >= array_length(panel.slots)) { // Если индекс слота не существует
                 return
             }
-            var src = panel.slots[slotIndex]
+            var sourceSlot = panel.slots[slotIndex]
             // Если в слоте нет карты, или карта не существует, или слот залоченный
-            if (src.state != "filled" || src.ref == undefined || !src.addable) { 
+            if (sourceSlot.state != "filled" || sourceSlot.ref == undefined || !sourceSlot.addable) { 
                 return
             }
 
@@ -89,8 +89,8 @@ collectionPanel = new Panel({
                 return // свободных слотов деки нет
             } 
             // Добавление карты в слот и проверка, добавился ли
-            if (setDeckSlot(editingCharacter, freeSlot, src.ref.id, src.ref.rarity)) {
-                analyticsAddToDeck(characterKey(editingCharacter), src.ref.id, src.ref.rarity) // аналитика: карта добавлена в колоду
+            if (setDeckSlot(editingCharacter, freeSlot, sourceSlot.ref.id, sourceSlot.ref.rarity)) {
+                analyticsAddToDeck(characterKey(editingCharacter), sourceSlot.ref.id, sourceSlot.ref.rarity) // аналитика: карта добавлена в колоду
                 // Если добавился, обновляем коллекцию сотов текущего персонажа
                 deckPanel.slots = buildDeckSlots(editingCharacter)
                 refreshCollection() // Обновляем визуал
@@ -184,14 +184,14 @@ layoutPanels = function() {
     // Высота вкладок: 44 px арта при окне шириной 1366, дальше скейлится пропорционально окну
     var tabHeight = 44 * (display_get_gui_width() / 1366)
     var panelWidth = (dbBaseW * scaleUI - margin * 2) / 2
-    var top = margin + tabHeight
-    var panelHeight  = dbBaseH * scaleUI - top - margin
+    var topY = margin + tabHeight
+    var panelHeight  = dbBaseH * scaleUI - topY - margin
 
     var panels = [collectionPanel, deckPanel]
     for (var i = 0; i < 2; i++) {
         var panel = panels[i]
         panel.x = margin + i * panelWidth
-        panel.y = top
+        panel.y = topY
         panel.w = panelWidth
         panel.h = panelHeight
         panel.padding = 8 * scaleUI
@@ -218,9 +218,9 @@ deckTutStarted = false
 var lana = asset_get_index("portraitLana")
 deckTutorial = new TutorialRunner([
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db1"),
-      getRect: function() { var r = undefined; with (oDeckBuilder) r = { x: collectionPanel.x, y: collectionPanel.y, w: collectionPanel.w, h: collectionPanel.h }; return r } },
+      getRect: function() { var rect = undefined; with (oDeckBuilder) rect = { x: collectionPanel.x, y: collectionPanel.y, w: collectionPanel.w, h: collectionPanel.h }; return rect } },
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db2"),
-      getRect: function() { var r = undefined; with (oDeckBuilder) r = { x: deckPanel.x, y: deckPanel.y, w: deckPanel.w, h: deckPanel.h }; return r } },
+      getRect: function() { var rect = undefined; with (oDeckBuilder) rect = { x: deckPanel.x, y: deckPanel.y, w: deckPanel.w, h: deckPanel.h }; return rect } },
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db3") }
 ])
 

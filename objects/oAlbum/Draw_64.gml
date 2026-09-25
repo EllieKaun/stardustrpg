@@ -1,8 +1,8 @@
 menuEnsureCrispGui()
 albumLayout(panel)
 
-var gw = display_get_gui_width()
-var gh = display_get_gui_height()
+var guiWidth = display_get_gui_width()
+var guiHeight = display_get_gui_height()
 
 panel.draw()
 
@@ -10,11 +10,11 @@ panel.draw()
 draw_set_halign(fa_center)
 draw_set_valign(fa_middle)
 draw_set_color(c_white)
-drawUiText(gw * 0.5, gh * 0.07, loc("screen.album"), gh * 0.06)
+drawUiText(guiWidth * 0.5, guiHeight * 0.07, loc("screen.album"), guiHeight * 0.06)
 
 // Пустой альбом
 if (array_length(panel.slots) == 0) {
-    drawUiText(gw * 0.5, gh * 0.5, loc("ui.noCardsYet"), gh * 0.05)
+    drawUiText(guiWidth * 0.5, guiHeight * 0.5, loc("ui.noCardsYet"), guiHeight * 0.05)
 }
 
 draw_set_halign(fa_left)

@@ -37,17 +37,17 @@ var aliveEnemies = filterNotKO(enemies) // союзники врага
 // Принимаем решение по разыгрыванию карты
 var healChoice = noone, buffChoice = noone, attackChoice = noone
 for (var i = 0; i < array_length(cards); i++) {
-    var c = cards[i]
-    switch (cardCategoryOf(c)) {
+    var card = cards[i]
+    switch (cardCategoryOf(card)) {
         case CardCategory.Heal: 
-            if (healChoice == noone) { healChoice = c }
+            if (healChoice == noone) { healChoice = card }
             break
         case CardCategory.Buff: 
-            if (buffChoice == noone) { buffChoice = c }
+            if (buffChoice == noone) { buffChoice = card }
             break
         case CardCategory.Attack:
         case CardCategory.Magic: 
-            if (attackChoice == noone) { attackChoice = c }
+            if (attackChoice == noone) { attackChoice = card }
             break
     }
 }
@@ -56,8 +56,8 @@ for (var i = 0; i < array_length(cards); i++) {
 var woundedAlly = noone
 var lowestHp = 999999
 for (var i = 0; i < array_length(aliveEnemies); i++) {
-    var a = aliveEnemies[i]
-    if (a.hp < a.maxHp && a.hp < lowestHp) { lowestHp = a.hp; woundedAlly = a }
+    var enemy = aliveEnemies[i]
+    if (enemy.hp < enemy.maxHp && enemy.hp < lowestHp) { lowestHp = enemy.hp; woundedAlly = enemy }
 }
 
 var cardToPlay = noone
@@ -72,9 +72,9 @@ if (healChoice != noone && woundedAlly != noone) {
 // Если есть бафф и кастер ещё не забаффан этим модификатором, баффаем себя - но только в 50% случаев
 if (cardToPlay == noone && buffChoice != noone && irandom(1) == 0) {
     var alreadyBuffed = false
-    var e0 = buffChoice.effects[0]
-    if (variable_struct_exists(e0, "buffType")) {
-        alreadyBuffed = !is_undefined(checkIfHasBuff(currentEnemy, EffectTypes.Buff, e0.buffType))
+    var firstEffect = buffChoice.effects[0]
+    if (variable_struct_exists(firstEffect, "buffType")) {
+        alreadyBuffed = !is_undefined(checkIfHasBuff(currentEnemy, EffectTypes.Buff, firstEffect.buffType))
     }
     if (!alreadyBuffed) {
         target = enemyResolveTarget(buffChoice, currentEnemy, aliveHeroes, aliveEnemies, currentEnemy, noone)
