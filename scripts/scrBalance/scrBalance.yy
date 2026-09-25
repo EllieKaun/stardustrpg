@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrBalance",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrBalance",
+  "parent":{
+    "name":"BattleLogic",
+    "path":"folders/BattleDomain/Scripts/BattleLogic.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

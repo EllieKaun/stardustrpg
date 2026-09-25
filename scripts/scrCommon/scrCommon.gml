@@ -1,28 +1,9 @@
 //// Константы и общие функции
 
-// Золото
-#macro GOLD_PER_ENEMY 6 // награда за одного врага
-#macro GOLD_RUN_PENALTY 5 // штраф за побег
-
-// Магазин
-#macro SHOP_CARD_PRICE 100 // цены карты
-#macro SHOP_SLOT_BASE 100 // цена слота декбилдера
-#macro SHOP_SLOT_GROWTH 1.5 // во сколько раз увеличивается цена слота
-
 // Сундуки
 #macro CHEST_MAX_COUNT 5 // максимальное количество сундуков на карте
 #macro CHEST_MIN_DISTANCE 180 // минимальная дистанция между сундуками
-#macro CHEST_INTERACT_DIST 24 // 
-#macro CHEST_GOLD_MIN 5 // минимальная награда золота из сундука
-#macro CHEST_GOLD_RANGE 15 // максимальная награда золота из сундука
-
-// Награды
-#macro REWARD_DUPLICATE_FALLOFF 0.5 // падение шанса выпадения дубликата карты как награды
-
-// Сложность врагов
-#macro ENEMY_WIN_BONUS 2 // рост силы врагов
-#macro ENEMY_WIN_INTERVAL 5 // сколько побед нужно чтобы сложность выросла
-#macro SPEAR_BATTLE_BONUS 15  // сложность врагов с капьем
+#macro CHEST_INTERACT_DIST 24 //
 
 // Бой
 #macro BATTLE_BACKGROUND_DIM 0.1 // затемнение фона боя
@@ -64,11 +45,12 @@ function guiScale() {
 }
 
 // Прибавить врагу бонус к урону и здоровью
-function applyEnemyStatBonus(enemy, points) {
-    enemy.strength += points
-    enemy.intelligence += points
-    enemy.hp += points
-    enemy.maxHp += points
+function applyEnemyStatBonus(enemy, points, weights = undefined) {
+    var w = weights ?? { strength: 1, intelligence: 1, hp: 1, maxHp: 1 }
+    enemy.strength     += points * w.strength
+    enemy.intelligence += points * w.intelligence
+    enemy.hp           += points * w.hp
+    enemy.maxHp        += points * w.maxHp
 }
 
 // Раннер анимация и действий после их проигрывания

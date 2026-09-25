@@ -129,10 +129,6 @@ function addWin() {
     return global.playerData.wins
 }
 
-function enemyStatBonus() {
-    return floor(getWins() / ENEMY_WIN_INTERVAL) * ENEMY_WIN_BONUS
-}
-
 function chestGoldAmount() {
     return CHEST_GOLD_MIN + irandom(CHEST_GOLD_RANGE)
 }

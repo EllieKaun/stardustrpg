@@ -179,50 +179,18 @@ function forestCompositions() {
     return allCompositions
 }
 
-// Конфиг зоны
-function forestZoneConfig() {
-    return {
-        enemyPool: [createCrackerNut, createMushroom, createFlower],
-        limitedEnemy: createLeaf, // максимум один на бой
-        limitedChance: 3, // irandom(limitedChance) == 0
-        tiers: [
-            { winsUnder: 10, mn: 1, mx: 2 },
-            { winsUnder: 25, mn: 2, mx: 4 },
-            { winsUnder: 50, mn: 3, mx: 5 },
-            { winsUnder: 1000000, mn: 4, mx: 5 }
-        ]
-    }
-}
-
-function winTierEnemyRange() {
-    var tiers = forestZoneConfig().tiers
-    var wins = getWins()
-    for (var tierIndex = 0; tierIndex < array_length(tiers); tierIndex++) {
-        if (wins < tiers[tierIndex].winsUnder) { return { mn: tiers[tierIndex].mn, mx: tiers[tierIndex].mx } }
-    }
-    var last = tiers[array_length(tiers) - 1]
-    return { mn: last.mn, mx: last.mx }
-}
-
-function enemyIgniteRoll() {
-    var wins = getWins()
-    if (wins >= 50) { return true }
-    if (wins >= 25) { return (irandom(9) < 4) }
-    return false
-}
-
 function winScaledComposition() {
-    var config = forestZoneConfig()
-    var range = winTierEnemyRange()
+    var difficulty = battleDifficulty()
+    var range = enemyCountForLevel(difficulty, difficultyLevel())
     var enemyCount = range.mn + irandom(range.mx - range.mn)
     var composition = []
     var leafUsed = false
     for (var enemyIndex = 0; enemyIndex < enemyCount; enemyIndex++) {
-        if (!leafUsed && irandom(config.limitedChance) == 0) {
-            array_push(composition, config.limitedEnemy)
+        if (!leafUsed && irandom(difficulty.limitedChance) == 0) {
+            array_push(composition, difficulty.limitedEnemy)
             leafUsed = true
         } else {
-            array_push(composition, config.enemyPool[irandom(array_length(config.enemyPool) - 1)])
+            array_push(composition, difficulty.enemyPool[irandom(array_length(difficulty.enemyPool) - 1)])
         }
     }
     return composition

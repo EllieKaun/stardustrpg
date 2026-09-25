@@ -215,6 +215,7 @@
     {"id":{"name":"scrCardFactoryPhysicalDamage","path":"scripts/scrCardFactoryPhysicalDamage/scrCardFactoryPhysicalDamage.yy",},},
     {"id":{"name":"scrCardFactorySpecialCards","path":"scripts/scrCardFactorySpecialCards/scrCardFactorySpecialCards.yy",},},
     {"id":{"name":"scrCardRegistry","path":"scripts/scrCardRegistry/scrCardRegistry.yy",},},
+    {"id":{"name":"scrBalance","path":"scripts/scrBalance/scrBalance.yy",},},
     {"id":{"name":"scrCards","path":"scripts/scrCards/scrCards.yy",},},
     {"id":{"name":"scrCommon","path":"scripts/scrCommon/scrCommon.yy",},},
     {"id":{"name":"scrCreateEnemyStarriorFactory","path":"scripts/scrCreateEnemyStarriorFactory/scrCreateEnemyStarriorFactory.yy",},},

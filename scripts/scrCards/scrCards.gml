@@ -6,8 +6,6 @@
 #macro CARD_TEXT_W 258 // 318 - 60
 #macro CARD_TEXT_H 125 // 500 - 375
 
-#macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману (здоровье не трогаем)
-
 function Card(name,
             rarity,
             target,
@@ -47,123 +45,49 @@ function computeCardCost(rarity, effects) {
     var effectsCount = array_length(effects)
     if (effectsCount == 0) { return 0 }
 
+    var costs = cardBalance().cost
     var effect = effects[0]
     var effectType = variable_struct_exists(effect, "type") ? effect.type : undefined
     if (effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Physical) {
-        if (effectsCount > 1) {
-            return getCostByRarity(rarity, 4, 5, 6, 7)
-        } else {
-            return getCostByRarity(rarity, 2, 3, 4, 5)
-        }
+        return (effectsCount > 1) ? costs.physicalMulti[rarity] : costs.physicalSingle[rarity]
     } else if (effectType == EffectTypes.Damage && effect.damageType == DamageTypes.Magical) {
-        return getCostByRarity(rarity, 3, 4, 5, 6)
+        return costs.magical[rarity]
     } else if (effectType == EffectTypes.Heal && effect.timing == Timing.Instant) {
-        return getCostByRarity(rarity, 3, 4, 5, 6)
+        return costs.instantHeal[rarity]
     } else if (effectType == EffectTypes.Heal && effect.timing == Timing.EndOfTurn) {
-        return getCostByRarity(rarity, 2, 3, 4, 5)
+        return costs.overtimeHeal[rarity]
     } else {
-        return getCostByRarity(rarity, 3, 4, 5, 6)
-    }
-}
-
-function getCostByRarity(rarity, dafault, unusual, rare, epic) {
-    switch (rarity) {
-    	case CardsRarity.Default: 
-            return dafault
-    	case CardsRarity.Unusual: 
-            return unusual      
-    	case CardsRarity.Rare: 
-            return rare 
-    	case CardsRarity.Epic: 
-            return epic      
+        return costs.other[rarity]
     }
 }
 
 // Множитель к характеристике (сила/интеллект) для мгновенного урона карты
 // по редкости и типу цели
 function getDamageMultiplierOnRarityAndTarget(rarity, target) {
-    var single = (target == TargetTypes.SingleEnemyTarget)
-    if rarity == CardsRarity.Default {
-        return single ? 1 : 1
-    } else if rarity == CardsRarity.Unusual {
-        return single ? 2 : 1
-    } else if rarity == CardsRarity.Rare {
-        return single ? 3 : 2
-    } else if rarity == CardsRarity.Epic {
-        return single ? 4 : 3
-    }
+    var b = cardBalance()
+    return (target == TargetTypes.SingleEnemyTarget) ? b.damageMulSingle[rarity] : b.damageMulGroup[rarity]
 }
 
 // Мгновенное лечение по редкости
-function getInstantHealValueOnRarity(rarity) {
-    switch (rarity) {
-        case CardsRarity.Default: return 10
-        case CardsRarity.Unusual: return 20
-        case CardsRarity.Rare: return 30
-        case CardsRarity.Epic: return HEAL_FULL
-    }
-}
+function getInstantHealValueOnRarity(rarity) { return cardBalance().instantHeal[rarity] }
 
 // Постепенное лечение по редкости
-function getOvertimeHealValueOnRarity(rarity) {
-    switch (rarity) {
-        case CardsRarity.Default: return 6
-        case CardsRarity.Unusual: return 8
-        case CardsRarity.Rare: return 12
-        case CardsRarity.Epic: return 16
-    }
-}
+function getOvertimeHealValueOnRarity(rarity) { return cardBalance().overtimeHeal[rarity] }
 
-// Длительность постепенного лечения по редкости 
-function getOvertimeHealDurationOnRarity(rarity) {
-    switch (rarity) {
-        case CardsRarity.Default: return 2
-        case CardsRarity.Unusual: return 2
-        case CardsRarity.Rare: return 3
-        case CardsRarity.Epic: return 3
-    }
-}
-
+// Длительность постепенного лечения по редкости
+function getOvertimeHealDurationOnRarity(rarity) { return cardBalance().overtimeHealDur[rarity] }
 
 // Мгновенное восстановление маны по редкости
-function getInstantManaValueOnRarity(rarity) {
-    switch (rarity) {
-        case CardsRarity.Default: return 10
-        case CardsRarity.Unusual: return 20
-        case CardsRarity.Rare: return 30
-        case CardsRarity.Epic: return MANA_FULL
-    }
-}
+function getInstantManaValueOnRarity(rarity) { return cardBalance().instantMana[rarity] }
 
 // Постепенное восстановление маны по редкости за ход
-function getOvertimeManaValueOnRarity(rarity) {
-    switch (rarity) {
-        case CardsRarity.Default: return 6
-        case CardsRarity.Unusual: return 8
-        case CardsRarity.Rare: return 12
-        case CardsRarity.Epic: return 16
-    }
-}
+function getOvertimeManaValueOnRarity(rarity) { return cardBalance().overtimeMana[rarity] }
 
 // Длительность постепенного восстановления маны
-function getOvertimeManaDurationOnRarity(rarity) {
-    switch (rarity) {
-        case CardsRarity.Default: return 2
-        case CardsRarity.Unusual: return 2
-        case CardsRarity.Rare: return 3
-        case CardsRarity.Epic: return 3
-    }
-}
+function getOvertimeManaDurationOnRarity(rarity) { return cardBalance().overtimeManaDur[rarity] }
 
 // Величина усиления/снижения характеристики по редкости
-function getBuffValueOnRarity(rarity) {
-    switch (rarity) {
-        case CardsRarity.Default: return 2
-        case CardsRarity.Unusual: return 4
-        case CardsRarity.Rare: return 6
-        case CardsRarity.Epic: return 8
-    }
-}
+function getBuffValueOnRarity(rarity) { return cardBalance().buff[rarity] }
 
 // Есть ли у карты эффект воскрешения
 function cardIsResurrection(card) {

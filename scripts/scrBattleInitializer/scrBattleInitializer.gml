@@ -34,18 +34,21 @@ function initStarriorsFromEncounter(encounter) {
     }
     
     var isRaw = variable_struct_exists(encounter, "raw") && encounter.raw
-    var bonus = enemyStatBonus()
+    var difficulty = battleDifficulty()
+    var level = difficultyLevel(encounter)
+    var statPoints = difficulty.statPoints(level)
     for (var i = 0; i < array_length(enemies); i++) {
         var enemy = enemies[i]
         enemy.isEnemy = true
         enemy.hasSpear = false
-        if (isRaw) { 
+        if (isRaw) {
             continue
         }
-        if (enemyIgniteRoll()) {
-            igniteEnemy(enemy)
+        var affix = rollEnemyAffix(difficulty, level)
+        if (affix != undefined) {
+            applyEnemyAffix(enemy, affix)
         } else {
-            applyEnemyStatBonus(enemy, bonus)
+            applyEnemyStatBonus(enemy, statPoints, difficulty.statWeights)
         }
     }
 
@@ -71,12 +74,30 @@ function initStarriorsFromEncounter(encounter) {
     }
 }
 
-function igniteEnemy(enemy) {
-    enemy.strength = enemy.strength * 10
-    enemy.hp = enemy.hp * 6
-    enemy.maxHp = enemy.maxHp * 6
-    enemy.isIgnited = true
-    enemy.igniteEffectChance = 0.1
+function rollEnemyAffix(difficulty, level) {
+    var affixes = difficulty.affixes
+    for (var i = 0; i < array_length(affixes); i++) {
+        var affix = affixes[i]
+        if (random(1) < affix.roll(level)) { return affix }
+    }
+    return undefined
+}
+
+function applyEnemyAffix(enemy, affix) {
+    var mult = affix.statMult
+    var stats = variable_struct_get_names(mult)
+    for (var i = 0; i < array_length(stats); i++) {
+        var stat = stats[i]
+        variable_instance_set(enemy, stat, variable_instance_get(enemy, stat) * mult[$ stat])
+    }
+    if (affix.mark != undefined) { variable_instance_set(enemy, affix.mark, true) }
+    if (affix.chanceField != undefined) { variable_instance_set(enemy, affix.chanceField, affix.effectChance) }
+    if (affix.sprite != undefined) {
+        enemy.spriteActionIdle = affix.sprite
+        enemy.sprite_index = affix.sprite
+        enemy.mask_index = affix.sprite
+    }
+    if (affix.blend != undefined) { enemy.image_blend = affix.blend }
 }
 
 function createStarrior(
