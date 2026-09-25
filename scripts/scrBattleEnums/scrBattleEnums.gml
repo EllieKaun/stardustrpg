@@ -113,24 +113,36 @@ enum Timing {
 
 enum BattleStates {
     Preparing,
-    DeckPreparing,
-    CharacterPreparing,
     CharacterPlay,
     PlayProcess,
-    PlayResult,
     AfterPlayChecks,
-    BattleOver,
     EnemyTargetSelection,
     AllyTargetSelection,
     EnemysTurn,
     EnemyInfoSelection,
     EnemyInfoDisplay,
     Victory,
-    GameOver,  
+    GameOver,
     PuppetTurn,
     CardAnimating,
-    BossIntro,
     StunnedTurn
+}
+
+enum StateHook {
+    OnEnter,
+    OnExit,
+    Step,
+    DrawUnder,
+    DrawOver,
+    OnCancel,
+    Reentrant,
+    Count
+}
+
+enum BattleMenuAction {
+    Shuffle,
+    Run,
+    Info
 }
 
 enum StarriorStates {
