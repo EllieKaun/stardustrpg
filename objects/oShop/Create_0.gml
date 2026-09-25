@@ -36,9 +36,9 @@ shopPanel = new Shop({
     // Клик/Enter по товару — покупка
     onSlotClick: function(panel, slotIndex) {
         with (oShop) {
-            if (slotIndex < 0 || slotIndex >= array_length(panel.slots)) return
+            if (slotIndex < 0 || slotIndex >= array_length(panel.slots)) { return }
             var item = panel.slots[slotIndex]
-            if (getGold() < item.price) return // не хватает золота
+            if (getGold() < item.price) { return } // не хватает золота
 
             if (item.kind == ShopItemKind.Card) {
                 if (spendGold(item.price)) {

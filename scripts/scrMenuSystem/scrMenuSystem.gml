@@ -65,7 +65,7 @@ function MenuLayer(spr = noone, params = {}) constructor {
 
         if (self.tiled) {
             var offX = self.ox mod sw;
-            if (offX > 0) offX -= sw    
+            if (offX > 0) { offX -= sw }    
             var offY = oy mod sh; 
             if (offY > 0) {
                 offY -= sh
@@ -84,7 +84,7 @@ function MenuLayer(spr = noone, params = {}) constructor {
             var visTop = max(baseY, 0)
             var visRight = min(baseX + ew, gw)
             var visBottom = min(baseY + eh, gh)
-            if (visRight <= visLeft || visBottom <= visTop) return
+            if (visRight <= visLeft || visBottom <= visTop) { return }
 
             var scaleX = ew / sw
             var scaleY = eh / sh
@@ -125,13 +125,13 @@ function Menu(items, config = {}) constructor {
     // навигация
     self.moveBy = function(dir) {
         var n = array_length(self.items)
-        if (n == 0) return
+        if (n == 0) { return }
         var i = self.index
         repeat (n) { // перескакиваем выключенные пункты
             i += dir
-            if (self.wrap) i = (i + n) mod n
-            else i = clamp(i, 0, n - 1)
-            if (self.items[i].enabled) break
+            if (self.wrap) { i = (i + n) mod n }
+            else { i = clamp(i, 0, n - 1) }
+            if (self.items[i].enabled) { break }
         }
         self.index = i
     }
@@ -140,27 +140,27 @@ function Menu(items, config = {}) constructor {
     self.current  = function() { return self.items[self.index] }
 
     self.confirm = function() {
-        if (array_length(self.items) == 0) return false
+        if (array_length(self.items) == 0) { return false }
         var it = self.current()
-        if (!it.enabled) return false
-        if (it.onSelect != undefined) it.onSelect(it)
+        if (!it.enabled) { return false }
+        if (it.onSelect != undefined) { it.onSelect(it) }
         return true
     }
 
     // Ввод: клавиатура (вверх/вниз/enter/space) + мышь (наведение/клик по hitRects) 
     // Возвращает true, если пункт подтверждён.
     self.handleInput = function(mx, my, mouseMoved, mouseClicked) {
-        if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) self.movePrev()
-        if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) self.moveNext()
+        if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) { self.movePrev() }
+        if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { self.moveNext() }
 
         var confirmed = false
-        if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) confirmed = self.confirm()
+        if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) { confirmed = self.confirm() }
 
         for (var i = 0; i < array_length(self.hitRects); i++) {
             var r = self.hitRects[i]
             if (pointInRect(mx, my, r.x, r.y, r.w, r.h)) {
                 if (self.items[r.index].enabled) {
-                    if (mouseMoved)   self.index = r.index
+                    if (mouseMoved) {   self.index = r.index }
                     if (mouseClicked) { self.index = r.index; confirmed = self.confirm() }
                 }
                 break
@@ -231,9 +231,9 @@ function Menu(items, config = {}) constructor {
 // Единый порядок отрисовки сцены меню
 function menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, gw, gh) {
     for (var i = 0; i < array_length(backLayers); i++) backLayers[i].draw(gw, gh)
-    if (!itemsAboveForeground && menu != undefined) menu.draw(gw, gh)
+    if (!itemsAboveForeground && menu != undefined) { menu.draw(gw, gh) }
     for (var i = 0; i < array_length(foreLayers); i++) foreLayers[i].draw(gw, gh)
-    if (itemsAboveForeground && menu != undefined) menu.draw(gw, gh)
+    if (itemsAboveForeground && menu != undefined) { menu.draw(gw, gh) }
 }
 
 // Обновление анимации всех слоёв сцены (вызывать в Step)
@@ -245,8 +245,8 @@ function menuUpdateLayers(backLayers, foreLayers) {
 // GUI-слой в аспекте 16:9
 function menuEnsureCrispGui() {
     // В бою база GUI равна размеру вьюхи, меню поверх боя должно рисоваться в ней же
-    if (instance_exists(Battle)) setCrispGui(guiBaseWidth(), guiBaseHeight())
-    else setCrispGui(320, 180)
+    if (instance_exists(Battle)) { setCrispGui(guiBaseWidth(), guiBaseHeight()) }
+    else { setCrispGui(320, 180) }
 }
 
 // Возвращает список разрешений экрана, не превышающих размер дисплея
@@ -298,7 +298,7 @@ function applyWindowMode(winW, winH, fullscreen) {
 
 // Применяет настройки дисплея при старте
 function initDisplaySettings() {
-    if (variable_global_exists("displayModeReady") && global.displayModeReady) return;
+    if (variable_global_exists("displayModeReady") && global.displayModeReady) { return; }
     global.displayModeReady = true;
     
     ini_open("settings.ini")

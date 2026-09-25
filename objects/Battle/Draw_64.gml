@@ -101,10 +101,10 @@ if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.Puppet
         for (var pass = 0; pass < 2; pass++) {
             for (var i = 0; i < handSize; i++) {
                 var isSelected = (selectedCard == i)
-                if ((pass == 0) == isSelected) continue 
+                if ((pass == 0) == isSelected) { continue } 
 
                 var card = hand[i]
-                if (animatingCard != noone && card == animatingCard) continue // летит — не рисуем в руке
+                if (animatingCard != noone && card == animatingCard) { continue } // летит — не рисуем в руке
                 var offsetFromMiddle  = i - middleIndex
 
                 // сначала расчет оффсетов и поворотов, потом по выделению оффсет, потом скейлим к ui 
@@ -189,7 +189,7 @@ if (battleState == BattleStates.EnemyInfoDisplay && selectedTarget != noone) {
     draw_set_color(c_white)
     draw_set_halign(fa_left)
     var targetName = unitDisplayName(selectedTarget.name)
-    if (variable_instance_exists(selectedTarget, "isIgnited") && selectedTarget.isIgnited) targetName = loc("unit.ignitePrefix") + targetName
+    if (variable_instance_exists(selectedTarget, "isIgnited") && selectedTarget.isIgnited) { targetName = loc("unit.ignitePrefix") + targetName }
     drawUiText(statsX, statsY, loc("battle.name") + targetName, popupTextH)
     drawUiText(statsX, statsY + lineH, loc("battle.hp") + string(selectedTarget.hp) + "/" + string(selectedTarget.maxHp), popupTextH)
     drawUiText(statsX, statsY + lineH * 2, loc("battle.mp") + string(selectedTarget.mana) + "/" + string(selectedTarget.maxMana), popupTextH)
@@ -243,8 +243,8 @@ if (battleState != BattleStates.Victory && battleState != BattleStates.GameOver)
     drawPartyPanels(heroes, selectedCharacter)
 }
 
-if (battleState == BattleStates.Victory) drawVictoryScreen()
-if (battleState == BattleStates.GameOver) drawGameOverScreen()
+if (battleState == BattleStates.Victory) { drawVictoryScreen() }
+if (battleState == BattleStates.GameOver) { drawGameOverScreen() }
 
 // Летящие карты
 for (var i = 0; i < array_length(activeCardAnims); i++) {

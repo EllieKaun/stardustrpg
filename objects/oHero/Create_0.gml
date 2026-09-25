@@ -24,8 +24,8 @@ stepScriptedApproach = function() {
     var obstacles = worldObstacles()
     var stepX = clamp(global.introTarget.x - x, -introSpeed, introSpeed)
     var stepY = clamp(global.introTarget.y - y, -introSpeed, introSpeed)
-    if (!place_meeting(x + stepX, y, obstacles)) x += stepX
-    if (!place_meeting(x, y + stepY, obstacles)) y += stepY
+    if (!place_meeting(x + stepX, y, obstacles)) { x += stepX }
+    if (!place_meeting(x, y + stepY, obstacles)) { y += stepY }
 }
 
 // Движение выбранного персонажа

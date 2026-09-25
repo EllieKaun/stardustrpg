@@ -164,15 +164,15 @@ enum CardCategory { Attack, Magic, Heal, Buff, Special }
 function cardCategoryOf(_card) {
     if (is_struct(_card) && variable_struct_exists(_card, "cardId") && cardExists(_card.cardId)) {
         var cardDefinition = global.cardRegistry[$ _card.cardId]
-        if (variable_struct_exists(cardDefinition, "category")) return cardDefinition.category
+        if (variable_struct_exists(cardDefinition, "category")) { return cardDefinition.category }
     }
 
-    if (!is_struct(_card) || !variable_struct_exists(_card, "cardBaseSpr")) return CardCategory.Attack
+    if (!is_struct(_card) || !variable_struct_exists(_card, "cardBaseSpr")) { return CardCategory.Attack }
 
-    if (_card.cardBaseSpr == atcCard) return CardCategory.Attack
-    if (_card.cardBaseSpr == mgcCard) return CardCategory.Magic
-    if (_card.cardBaseSpr == healCard) return CardCategory.Heal
-    if (_card.cardBaseSpr == buffCard) return CardCategory.Buff
+    if (_card.cardBaseSpr == atcCard) { return CardCategory.Attack }
+    if (_card.cardBaseSpr == mgcCard) { return CardCategory.Magic }
+    if (_card.cardBaseSpr == healCard) { return CardCategory.Heal }
+    if (_card.cardBaseSpr == buffCard) { return CardCategory.Buff }
     return CardCategory.Attack
 }
 
@@ -189,7 +189,7 @@ function cardAnimState(card) {
 // Спрайты MasterPuppetCreate* - анимация босса и смотрит влево, поэтому подменяем только у врага.
 // Герой (например, с украденной у босса картой) кастует своей обычной анимацией
 function cardCastSpriteOverride(card, caster) {
-    if (!caster.isEnemy) return noone
+    if (!caster.isEnemy) { return noone }
     for (var i = 0; i < array_length(card.effects); i++) {
         var effect = card.effects[i]
         if (variable_struct_exists(effect, "type") && effect.type == EffectTypes.CreatePuppet) {

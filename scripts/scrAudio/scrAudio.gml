@@ -25,7 +25,7 @@ function applyAudioVolumes() {
 }
 
 function playSfx(track, prio, loop) {
-    if (track == noone || track < 0) return noone;
+    if (track == noone || track < 0) { return noone; }
     var snd = audio_play_sound(track, prio, loop)
     audio_sound_gain(snd, global.volSounds, 0)
     return snd
@@ -34,10 +34,10 @@ function playSfx(track, prio, loop) {
 // Музыка и фоновые звуки
 
 function playMusic(track) {
-    if (!variable_global_exists("currentMusic")) global.currentMusic = noone
-    if (track < 0) return
-    if (global.currentMusic == track && audio_is_playing(track)) return
-    if (global.currentMusic >= 0) audio_stop_sound(global.currentMusic)
+    if (!variable_global_exists("currentMusic")) { global.currentMusic = noone }
+    if (track < 0) { return }
+    if (global.currentMusic == track && audio_is_playing(track)) { return }
+    if (global.currentMusic >= 0) { audio_stop_sound(global.currentMusic) }
     global.currentMusic = track
     var snd = audio_play_sound(track, 10, true)
     audio_sound_gain(snd, global.volMusic, 0)
@@ -48,15 +48,15 @@ function stopMusic() {
         global.currentMusic = noone
         return 
     }
-    if (global.currentMusic >= 0) audio_stop_sound(global.currentMusic)
+    if (global.currentMusic >= 0) { audio_stop_sound(global.currentMusic) }
     global.currentMusic = noone
 }
 
 function playAmbient(track) {
-    if (!variable_global_exists("currentAmbient")) global.currentAmbient = noone
-    if (track < 0) return
-    if (global.currentAmbient == track && audio_is_playing(track)) return
-    if (global.currentAmbient >= 0) audio_stop_sound(global.currentAmbient)
+    if (!variable_global_exists("currentAmbient")) { global.currentAmbient = noone }
+    if (track < 0) { return }
+    if (global.currentAmbient == track && audio_is_playing(track)) { return }
+    if (global.currentAmbient >= 0) { audio_stop_sound(global.currentAmbient) }
     global.currentAmbient = track
     var snd = audio_play_sound(track, 5, true)
     audio_sound_gain(snd, global.volSounds, 0)
@@ -67,7 +67,7 @@ function stopAmbient() {
         global.currentAmbient = noone
         return 
     }
-    if (global.currentAmbient >= 0) audio_stop_sound(global.currentAmbient)
+    if (global.currentAmbient >= 0) { audio_stop_sound(global.currentAmbient) }
     global.currentAmbient = noone
 }
 

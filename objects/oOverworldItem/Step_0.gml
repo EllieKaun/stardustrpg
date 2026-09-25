@@ -1,4 +1,4 @@
-if (global.gamePaused) exit
+if (global.gamePaused) { exit }
 
 var vLeft = x - sprite_get_xoffset(sprite_index)
 var vTop = y - sprite_get_yoffset(sprite_index)

@@ -5,8 +5,8 @@ enum Section { TopRight, TopLeft, BottomLeft, BottomRight }
 function zoneAt(px, py) {
     var c = global.zoneConfig
     var cheb = max(abs(px - c.cx), abs(py - c.cy))
-    if (cheb <= c.innerHalf) return Zone.Inner
-    if (cheb <= c.middleHalf) return Zone.Middle
+    if (cheb <= c.innerHalf) { return Zone.Inner }
+    if (cheb <= c.middleHalf) { return Zone.Middle }
     return Zone.Outer
 }
 
@@ -15,8 +15,8 @@ function sectionAt(px, py) {
     var c  = global.zoneConfig
     var dx = px - c.cx
     var dy = py - c.cy
-    if (dy < 0) return (dx >= 0) ? Section.TopRight : Section.TopLeft
-    else return (dx >= 0) ? Section.BottomRight : Section.BottomLeft
+    if (dy < 0) { return (dx >= 0) ? Section.TopRight : Section.TopLeft }
+    else { return (dx >= 0) ? Section.BottomRight : Section.BottomLeft }
 }
 
 // Типы мини врагов для секции 
@@ -144,9 +144,9 @@ function rewardPoolForSection(section) {
 
 // Единый пул наград демо
 function rewardIdAllowed(id) {
-    if (!cardExists(id)) return false
+    if (!cardExists(id)) { return false }
     var card = cardFromRef({ id: id, rarity: CardsRarity.Default })
-    if (card == undefined) return false
+    if (card == undefined) { return false }
     return card.target != TargetTypes.AllEnemies
 }
 
@@ -156,7 +156,7 @@ function forestRewardPool() {
     for (var i = 0; i < array_length(sections); i++) {
         var pool = rewardPoolForSection(sections[i])
         for (var j = 0; j < array_length(pool.ids); j++) {
-            if (rewardIdAllowed(pool.ids[j])) array_push(ids, pool.ids[j])
+            if (rewardIdAllowed(pool.ids[j])) { array_push(ids, pool.ids[j]) }
         }
     }
     return { ids: ids, rarities: [CardsRarity.Default, CardsRarity.Unusual] }
@@ -198,7 +198,7 @@ function winTierEnemyRange() {
     var tiers = forestZoneConfig().tiers
     var w = getWins()
     for (var i = 0; i < array_length(tiers); i++) {
-        if (w < tiers[i].winsUnder) return { mn: tiers[i].mn, mx: tiers[i].mx }
+        if (w < tiers[i].winsUnder) { return { mn: tiers[i].mn, mx: tiers[i].mx } }
     }
     var last = tiers[array_length(tiers) - 1]
     return { mn: last.mn, mx: last.mx }
@@ -206,8 +206,8 @@ function winTierEnemyRange() {
 
 function enemyIgniteRoll() {
     var w = getWins()
-    if (w >= 50) return true
-    if (w >= 25) return (irandom(9) < 4)
+    if (w >= 50) { return true }
+    if (w >= 25) { return (irandom(9) < 4) }
     return false
 }
 
@@ -252,10 +252,10 @@ function puppetMasterEncounter() {
 
 // Зацикленный звук ходьбы по траве выделенного персонажа.
 function updateWalkSound(active) {
-    if (!variable_global_exists("walkSound") || global.walkSound < 0) return
+    if (!variable_global_exists("walkSound") || global.walkSound < 0) { return }
     if (active) {
-        if (!audio_is_playing(global.walkSound)) playSfx(global.walkSound, 1, true)
+        if (!audio_is_playing(global.walkSound)) { playSfx(global.walkSound, 1, true) }
     } else {
-        if (audio_is_playing(global.walkSound)) audio_stop_sound(global.walkSound)
+        if (audio_is_playing(global.walkSound)) { audio_stop_sound(global.walkSound) }
     }
 }

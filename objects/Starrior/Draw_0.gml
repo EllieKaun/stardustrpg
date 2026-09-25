@@ -1,5 +1,5 @@
 // Если у вага нет хп
-if (gone) exit
+if (gone) { exit }
 
 // Анимация исчезновения
 if (disappearing) {
@@ -58,9 +58,9 @@ if (!hpBarReady) {
     hpBarReady = true
 } else {
     displayHp += (hp - displayHp) * 0.2
-    if (abs(displayHp - hp) < 0.5) displayHp = hp
+    if (abs(displayHp - hp) < 0.5) { displayHp = hp }
     displayMana += (mana - displayMana) * 0.2
-    if (abs(displayMana - mana) < 0.5) displayMana = mana
+    if (abs(displayMana - mana) < 0.5) { displayMana = mana }
 }
 
 // ХП и Мана у врагов
@@ -86,14 +86,14 @@ var statusIcons = []
 var seenIcons = {}
 for (var i = 0; i < array_length(effects); i++) { // ищем иконки
     var icon = statusIconFor(effects[i])
-    if (icon == noone) continue;
+    if (icon == noone) { continue; }
 
     var iconKey = string(icon)
-    if (variable_struct_exists(seenIcons, iconKey)) continue
+    if (variable_struct_exists(seenIcons, iconKey)) { continue }
     seenIcons[$ iconKey] = true
 
     array_push(statusIcons, icon)
-    if (array_length(statusIcons) >= 3) break
+    if (array_length(statusIcons) >= 3) { break }
 }
 
 var iconCount = array_length(statusIcons)
@@ -102,7 +102,7 @@ if (iconCount > 0) {
     var iconGap  = 2
 
     var barTop = bbox_top
-    if (showHealthBar) barTop = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6)
+    if (showHealthBar) { barTop = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6) }
     var rowY = barTop - iconSize - 2
 
     var startX = bbox_left

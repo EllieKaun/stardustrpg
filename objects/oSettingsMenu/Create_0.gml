@@ -117,10 +117,10 @@ menu = new Menu([
         
         // Возвращаемся в предыдущее меню после сохранения
         if (instance_exists(oMainMenu)) {
-            with(oMainMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) rebuildMenu() }
+            with(oMainMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) { rebuildMenu() } }
         }
         if (instance_exists(oPauseMenu)) {
-            with(oPauseMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) rebuildMenu() }
+            with(oPauseMenu) { visible = true; menuCooldown = 2; if (variable_instance_exists(id, "rebuildMenu")) { rebuildMenu() } }
         }
         instance_destroy()
     }),

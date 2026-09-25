@@ -7,9 +7,9 @@ chestState = ChestState.Closed
 image_speed = 1
 
 chestBlocked = function() {
-    if (global.gamePaused || global.uiModal) return true
-    if (variable_global_exists("cutsceneActive") && global.cutsceneActive) return true
-    if (variable_global_exists("introWalk") && global.introWalk) return true
+    if (global.gamePaused || global.uiModal) { return true }
+    if (variable_global_exists("cutsceneActive") && global.cutsceneActive) { return true }
+    if (variable_global_exists("introWalk") && global.introWalk) { return true }
     return false
 }
 

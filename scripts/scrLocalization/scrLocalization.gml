@@ -20,7 +20,7 @@ function locLoadLang() {
     ini_open("settings.ini")
     var saved = ini_read_string("General", "Language", "")
     ini_close()
-    if (saved == "en" || saved == "ru") return saved
+    if (saved == "en" || saved == "ru") { return saved }
     return (os_get_language() == "ru") ? "ru" : "en"
 }
 
@@ -52,7 +52,7 @@ function locCycleLanguage() {
 
 // Очистить сохраненные локали
 function locInvalidateCaches() {
-    if (variable_global_exists("cardFaceLayouts")) global.cardFaceLayouts = {}
+    if (variable_global_exists("cardFaceLayouts")) { global.cardFaceLayouts = {} }
 }
 
 // Достать перевод по ключу
@@ -64,16 +64,16 @@ function loc(key) {
 function locDef(key, def) {
     locEnsure()
     var table = global.locStrings[$ global.language]
-    if (table != undefined && variable_struct_exists(table, key)) return table[$ key]
+    if (table != undefined && variable_struct_exists(table, key)) { return table[$ key] }
     var fallback = global.locStrings[$ global.locFallback]
-    if (fallback != undefined && variable_struct_exists(fallback, key)) return fallback[$ key]
+    if (fallback != undefined && variable_struct_exists(fallback, key)) { return fallback[$ key] }
     return def
 }
 
 // Инициализация имен карт
 function locBuildCardNameMap() {
     global.locCardNameToId = {}
-    if (!variable_global_exists("cardRegistry")) return
+    if (!variable_global_exists("cardRegistry")) { return }
     var ids = variable_struct_get_names(global.cardRegistry)
     for (var i = 0; i < array_length(ids); i++) {
         var def = global.cardRegistry[$ ids[i]]
@@ -86,17 +86,17 @@ function locBuildCardNameMap() {
 
 // Взять ID из имени
 function locCardIdFromName(rawName) {
-    if (!variable_global_exists("cardRegistry")) return ""
-    if (!variable_global_exists("locCardNameToId")) locBuildCardNameMap()
+    if (!variable_global_exists("cardRegistry")) { return "" }
+    if (!variable_global_exists("locCardNameToId")) { locBuildCardNameMap() }
     return variable_struct_exists(global.locCardNameToId, rawName) ? global.locCardNameToId[$ rawName] : ""
 }
 
 // Локализация ключа карты
 function locKeyForCard(card) {
-    if (is_struct(card) && variable_struct_exists(card, "cardId")) return string(card.cardId)
+    if (is_struct(card) && variable_struct_exists(card, "cardId")) { return string(card.cardId) }
     if (is_struct(card) && variable_struct_exists(card, "name")) {
         var mapped = locCardIdFromName(card.name)
-        if (mapped != "") return mapped
+        if (mapped != "") { return mapped }
         return string(card.name)
     }
     return ""

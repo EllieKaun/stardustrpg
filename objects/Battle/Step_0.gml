@@ -5,12 +5,12 @@ if (keyboard_check_pressed(vk_escape) && !transitioning) {
         // Esc обрабатывает само меню настроек
     } else if (instance_exists(oPauseMenu)) {
         // menuCooldown > 0 - только что вернулись из настроек тем же Esc
-        if (oPauseMenu.visible && oPauseMenu.menuCooldown <= 0) with (oPauseMenu) close()
+        if (oPauseMenu.visible && oPauseMenu.menuCooldown <= 0) { with (oPauseMenu) close() }
     } else if (!global.uiModal) {
         instance_create_layer(0, 0, "Instances", oPauseMenu)
     }
 }
-if (global.gamePaused) exit // на паузе бой полностью заморожен
+if (global.gamePaused) { exit } // на паузе бой полностью заморожен
 
 autosaveUpdate()
 updateCardAnims() // Анимации карт
@@ -58,7 +58,7 @@ switch (battleState) {
         if (hoveredCard >= 0) {
             if (mouseMoved) {
                 focusArea = FocusArea.Deck
-                if (selectedCard != hoveredCard) playCardSelectSound()
+                if (selectedCard != hoveredCard) { playCardSelectSound() }
                 selectedCard = hoveredCard
             }
             if (mouseClicked)     { focusArea = FocusArea.Deck; selectedCard = hoveredCard; mouseConfirm = true }
@@ -66,7 +66,7 @@ switch (battleState) {
             for (var i = 0; i < array_length(menuHitRects); i++) {
                 var hitRect = menuHitRects[i]
                 if (pointInRect(mouseGuiX, mouseGuiY, hitRect.x, hitRect.y, hitRect.w, hitRect.h)) {
-                    if (mouseClicked) doMenuAction(hitRect.name)
+                    if (mouseClicked) { doMenuAction(hitRect.name) }
                     break
                 }
             }
@@ -78,14 +78,15 @@ switch (battleState) {
     case BattleStates.EnemyInfoSelection:
         if (mouseMoved || mouseClicked) {
             var overTarget = selectTargetAtMouse()
-            if (mouseClicked && overTarget) mouseConfirm = true
+            if (mouseClicked && overTarget) { mouseConfirm = true }
         }
     break
 
     case BattleStates.EnemyInfoDisplay:
         if (mouseClicked && infoCloseRect != undefined
-            && pointInRect(mouseGuiX, mouseGuiY, infoCloseRect.x, infoCloseRect.y, infoCloseRect.w, infoCloseRect.h))
+            && pointInRect(mouseGuiX, mouseGuiY, infoCloseRect.x, infoCloseRect.y, infoCloseRect.w, infoCloseRect.h)) {
             mouseConfirm = true
+            }
     break
 }
 
@@ -177,8 +178,8 @@ switch (battleState) {
                     changeBattleState(BattleStates.EnemyTargetSelection)
                 } else if currentCard.target == TargetTypes.SingleAllyTarget {
                     changeBattleState(BattleStates.AllyTargetSelection)
-                    if (cardIsResurrection(currentCard)) initTargetSelectionKO(heroes)
-                    else initTargetSelection(heroes)
+                    if (cardIsResurrection(currentCard)) { initTargetSelectionKO(heroes) }
+                    else { initTargetSelection(heroes) }
                 } else if currentCard.target == TargetTypes.AllEnemies {
                     playCardAnimated(currentCard, selectedCharacter, enemies)
                 } else if currentCard.target == TargetTypes.AllAllies {
@@ -196,8 +197,8 @@ switch (battleState) {
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
         var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
         var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
-        if (leftPressed) selectPreviousTarget()
-        if (rightPressed) selectNextTarget()
+        if (leftPressed) { selectPreviousTarget() }
+        if (rightPressed) { selectNextTarget() }
         
         if (enterPressed) {
             changeBattleState(BattleStates.EnemyInfoDisplay) // Отображение конкретной информации

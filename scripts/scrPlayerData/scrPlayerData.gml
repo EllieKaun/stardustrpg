@@ -8,7 +8,7 @@ enum Characters { Lana, Viv }
 // Инициализация пользователя (каждый раз на старте)
 function playerDataInit() {
     // global.playerData - свойство для хранения структуры пользователя для сохранения
-    if (!playerDataLoad()) global.playerData = playerDataDefault()
+    if (!playerDataLoad()) { global.playerData = playerDataDefault() }
 
     // Флаг новой игры
     global.isNewGame = false
@@ -37,9 +37,9 @@ function playerDataInit() {
     if (is_string(global.playerData.questSafarSpear)) {
         var qs = global.playerData.questSafarSpear
         var mapped = QuestSpearState.Inactive
-        if (qs == "active") mapped = QuestSpearState.Active
-        else if (qs == "spearObtained") mapped = QuestSpearState.SpearObtained
-        else if (qs == "completed") mapped = QuestSpearState.Completed
+        if (qs == "active") { mapped = QuestSpearState.Active }
+        else if (qs == "spearObtained") { mapped = QuestSpearState.SpearObtained }
+        else if (qs == "completed") { mapped = QuestSpearState.Completed }
         global.playerData.questSafarSpear = mapped
     }
 }
@@ -93,7 +93,7 @@ function playerDataDefault() {
 
 // Текущий баланс 
 function getGold() {
-    if (!variable_struct_exists(global.playerData, "gold")) global.playerData.gold = 0
+    if (!variable_struct_exists(global.playerData, "gold")) { global.playerData.gold = 0 }
     return global.playerData.gold
 }
 
@@ -112,14 +112,14 @@ function addGold(amount) {
 
 // Списать amount, если хватает
 function spendGold(amount) {
-    if (getGold() < amount) return false
+    if (getGold() < amount) { return false }
     global.playerData.gold = getGold() - amount
     playerDataSave()
     return true
 }
 
 function getWins() {
-    if (!variable_struct_exists(global.playerData, "wins")) global.playerData.wins = 0
+    if (!variable_struct_exists(global.playerData, "wins")) { global.playerData.wins = 0 }
     return global.playerData.wins
 }
 
@@ -152,7 +152,7 @@ function spearBattleBonus() {
 }
 
 function questSpearState() {
-    if (!variable_struct_exists(global.playerData, "questSafarSpear")) global.playerData.questSafarSpear = QuestSpearState.Inactive
+    if (!variable_struct_exists(global.playerData, "questSafarSpear")) { global.playerData.questSafarSpear = QuestSpearState.Inactive }
     return global.playerData.questSafarSpear
 }
 
@@ -166,7 +166,7 @@ function questAcceptSpear() {
     analyticsStartSafarQuest() // аналитика: начат квест Safar
     unlockCard(global.CardId.stealCard, CardsRarity.Default, 1)
     var slot = firstFreeDeckSlot(Characters.Lana)
-    if (slot >= 0) setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default)
+    if (slot >= 0) { setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default) }
     playerDataSave()
     var rewardCard = cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default })
     showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
@@ -176,8 +176,8 @@ function questGrantSpear() {
     if (questSpearState() == QuestSpearState.Active) {
         questSetSpearState(QuestSpearState.SpearObtained)
     }
-    if (variable_global_exists("spearCarrierExists")) global.spearCarrierExists = false
-    if (variable_global_exists("battleHasSpear")) global.battleHasSpear = false
+    if (variable_global_exists("spearCarrierExists")) { global.spearCarrierExists = false }
+    if (variable_global_exists("battleHasSpear")) { global.battleHasSpear = false }
 }
 
 function questCompleteSpear() {
@@ -188,7 +188,7 @@ function questCompleteSpear() {
 }
 
 function tutorialIsDone() {
-    if (!variable_struct_exists(global.playerData, "tutorialDone")) return true
+    if (!variable_struct_exists(global.playerData, "tutorialDone")) { return true }
     return global.playerData.tutorialDone
 }
 
@@ -198,7 +198,7 @@ function markTutorialDone() {
 }
 
 function deckTutorialIsDone() {
-    if (!variable_struct_exists(global.playerData, "deckTutorialDone")) return true
+    if (!variable_struct_exists(global.playerData, "deckTutorialDone")) { return true }
     return global.playerData.deckTutorialDone
 }
 
@@ -223,13 +223,13 @@ function playerDataSave() {
 
 // Вызывать каждый шаг в комнатах, где идёт игра
 function autosaveUpdate() {
-    if (!variable_global_exists("playerData")) return
+    if (!variable_global_exists("playerData")) { return }
     if (!variable_global_exists("autosavePlayTime")) {
         global.autosavePlayTime = 0
         global.autosaveIconStart = -1
     }
     global.autosavePlayTime += min(delta_time, 100000) / 1000000
-    if (global.autosavePlayTime < AUTOSAVE_INTERVAL_SECONDS) return
+    if (global.autosavePlayTime < AUTOSAVE_INTERVAL_SECONDS) { return }
 
     global.autosavePlayTime = 0
     playerDataSave()
@@ -237,9 +237,9 @@ function autosaveUpdate() {
 }
 
 function autosaveDrawIcon() {
-    if (!variable_global_exists("autosaveIconStart") || global.autosaveIconStart < 0) return
+    if (!variable_global_exists("autosaveIconStart") || global.autosaveIconStart < 0) { return }
     var elapsedSeconds = (current_time - global.autosaveIconStart) / 1000
-    if (elapsedSeconds >= AUTOSAVE_ICON_SECONDS) return
+    if (elapsedSeconds >= AUTOSAVE_ICON_SECONDS) { return }
 
     var fadeInSeconds = 0.3
     var fadeOutSeconds = 0.6
@@ -260,7 +260,7 @@ function autosaveDrawIcon() {
 
 // Загрузить данные о пользователе с устройства
 function playerDataLoad() {
-    if (!file_exists(PLAYER_SAVE_FILE)) return false
+    if (!file_exists(PLAYER_SAVE_FILE)) { return false }
     try {
         var bufPlayerData = buffer_load(PLAYER_SAVE_FILE)
         var stringPlayerData = buffer_read(bufPlayerData, buffer_string)
@@ -303,7 +303,7 @@ function unlockCard(cardIdentifier, rarity = CardsRarity.Default, count = 1) {
         show_debug_message("unlockCard: unknown id " + string(cardIdentifier))
         return 
     }
-    if (!cardCanVaryRarity(cardIdentifier)) rarity = CardsRarity.Default
+    if (!cardCanVaryRarity(cardIdentifier)) { rarity = CardsRarity.Default }
         
     var keyOfCard = collectionKey(cardIdentifier, rarity)
     var collection = global.playerData.collection
@@ -353,7 +353,7 @@ function countCardInDeck(character, cardIdentifier, rarity) {
     var cards = deckOf(character).cards
     var count = 0
     for (var i = 0; i < array_length(cards); i++)
-        if (cards[i].id == cardIdentifier && cards[i].rarity == rarity) count++
+        if (cards[i].id == cardIdentifier && cards[i].rarity == rarity) { count++ }
     return count
 }
 
@@ -361,7 +361,7 @@ function countCardInDeck(character, cardIdentifier, rarity) {
 function deckSlotRef(character, slot) {
     var cards = deckOf(character).cards
     for (var i = 0; i < array_length(cards); i++)
-        if (cards[i].slot == slot) return cards[i]
+        if (cards[i].slot == slot) { return cards[i] }
     return undefined
 }
 
@@ -385,7 +385,7 @@ function freeCopies(cardIdentifier, rarity = CardsRarity.Default) {
 
 // Добавить карту в деку персонажа
 function setDeckSlot(character, slot, cardIdentifier, rarity = CardsRarity.Default) {
-    if (!cardCanVaryRarity(cardIdentifier)) rarity = CardsRarity.Default
+    if (!cardCanVaryRarity(cardIdentifier)) { rarity = CardsRarity.Default }
 
     var deck = deckOf(character)
     if (slot < 0 || slot >= deck.unlocked) {
@@ -412,7 +412,7 @@ function setDeckSlot(character, slot, cardIdentifier, rarity = CardsRarity.Defau
 function firstFreeDeckSlot(character) {
     var deck = deckOf(character)
     for (var i = 0; i < deck.unlocked; i++) {
-        if (deckSlotRef(character, i) == undefined) return i
+        if (deckSlotRef(character, i) == undefined) { return i }
     }
     return -1
 }
@@ -468,8 +468,8 @@ function buildCollectionSlots(category = undefined, cols = 4, currentCharacter =
     for (var i = 0; i < array_length(refs); i++) {
         var ref = refs[i]
         var card = cardFromRef(ref)
-        if (card == undefined) continue
-        if (category != undefined && cardCategoryOf(card) != category) continue
+        if (card == undefined) { continue }
+        if (category != undefined && cardCategoryOf(card) != category) { continue }
 
         var total = ref.count
         var inCurrent = countCardInDeck(currentCharacter, ref.id, ref.rarity)
@@ -523,8 +523,8 @@ function buildDeckSlots(character, total = DECK_CAPACITY) {
             continue 
         }
         var ref = deckSlotRef(character, i)
-        if (ref != undefined) array_push(slots, new Slot("filled", cardFromRef(ref)))
-        else array_push(slots, new Slot("empty"))
+        if (ref != undefined) { array_push(slots, new Slot("filled", cardFromRef(ref))) }
+        else { array_push(slots, new Slot("empty")) }
     }
     return slots
 }

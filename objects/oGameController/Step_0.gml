@@ -8,7 +8,7 @@ if (global.cutsceneActive) {
     }
     // страховка: если у спрайта нет анимации (ккорость 0 / один кадр) —
     // показываем 1.5 сек и завершаем, иначе катсцена зависнет
-    if (csSpd <= 0) csSpd = sprite_get_number(cutsceneSprite) / (1.5 * game_get_speed(gamespeed_fps))
+    if (csSpd <= 0) { csSpd = sprite_get_number(cutsceneSprite) / (1.5 * game_get_speed(gamespeed_fps)) }
     cutsceneFrame += csSpd
     if (cutsceneFrame >= sprite_get_number(cutsceneSprite)) {
         global.cutsceneActive = false

@@ -22,7 +22,7 @@ function rewardWeight(ref) {
 // Взвешенная случайная награда
 function rollOneReward(spec) {
     var cands = rewardCandidateRefs(spec)
-    if (array_length(cands) == 0) return { id: spec.ids[0], rarity: CardsRarity.Default }
+    if (array_length(cands) == 0) { return { id: spec.ids[0], rarity: CardsRarity.Default } }
 
     var total = 0
     for (var i = 0; i < array_length(cands); i++) {
@@ -32,7 +32,7 @@ function rollOneReward(spec) {
     var roll = random(total)
     for (var i = 0; i < array_length(cands); i++) {
         var w = rewardWeight(cands[i])
-        if (roll < w) return { id: cands[i].id, rarity: cands[i].rarity }
+        if (roll < w) { return { id: cands[i].id, rarity: cands[i].rarity } }
         roll -= w
     }
     var last = cands[array_length(cands) - 1]
@@ -43,10 +43,12 @@ function rollOneReward(spec) {
 function rewardCandidateCount(spec) {
     var count = 0
     for (var i = 0; i < array_length(spec.ids); i++) {
-        if (cardCanVaryRarity(spec.ids[i])) 
+        if (cardCanVaryRarity(spec.ids[i])) { 
             count += array_length(spec.rarities)
-        else 
+        }
+        else { 
             count += 1
+        }
     }
     return count
 }

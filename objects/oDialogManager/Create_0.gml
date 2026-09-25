@@ -10,7 +10,7 @@ selectedOption = 0
 
 currentOptions = function() {
     var line = lines[lineIndex]
-    if (variable_struct_exists(line, "options")) return line.options
+    if (variable_struct_exists(line, "options")) { return line.options }
     return undefined
 }
 
@@ -41,8 +41,9 @@ startDialog = function(_lines, _onComplete = undefined) {
 // Перейти к следующей линии на ентер
 runLineEnter = function() {
     var line = lines[lineIndex]
-    if (variable_struct_exists(line, "onEnter") && line.onEnter != undefined)
+    if (variable_struct_exists(line, "onEnter") && line.onEnter != undefined) {
         line.onEnter()
+    }
 }
 
 // Доступ к тексту линии

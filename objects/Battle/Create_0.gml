@@ -63,7 +63,7 @@ tutorialCardsRect = undefined
 // Размеры бейджа меню персонажа по названию 
 menuRectNamed = function(menuName) {
     for (var i = 0; i < array_length(menuHitRects); i++) {
-        if (menuHitRects[i].name == menuName) return menuHitRects[i]
+        if (menuHitRects[i].name == menuName) { return menuHitRects[i] }
     }
     return undefined
 }

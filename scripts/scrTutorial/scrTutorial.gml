@@ -22,7 +22,7 @@ function TutorialRunner(_steps) constructor {
     self.runOnEnter = function() {
         if (self.index >= array_length(self.steps)) { return }
         var tutorialStep = self.steps[self.index]
-        if (variable_struct_exists(tutorialStep, "onEnter") && tutorialStep.onEnter != undefined) tutorialStep.onEnter()
+        if (variable_struct_exists(tutorialStep, "onEnter") && tutorialStep.onEnter != undefined) { tutorialStep.onEnter() }
     }
 
     self.reset = function() {
@@ -47,8 +47,8 @@ function TutorialRunner(_steps) constructor {
         if (self.index >= array_length(self.steps)) { return }
         var tutorialStep = self.steps[self.index]
         var rect = variable_struct_exists(tutorialStep, "getRect") ? tutorialStep.getRect() : undefined
-        if (rect != undefined) drawTutorialSpotlight(rect)
-        else drawScreenDim(0.55)
+        if (rect != undefined) { drawTutorialSpotlight(rect) }
+        else { drawScreenDim(0.55) }
         var portrait = variable_struct_exists(tutorialStep, "portrait") ? tutorialStep.portrait : noone
         drawTutorialPanel(tutorialStep.speaker, tutorialStep.text, portrait, rect)
         draw_set_halign(fa_left)

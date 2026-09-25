@@ -37,7 +37,7 @@ function Card(name,
   
     self.cardTokenSpr = (self.costTypeCached == CostType.Health) ? hpCostToken : mpCostToken
     self.costValueCached = computeCardCost(rarity, effects)
-    if (self.costTypeCached == CostType.Mana) self.costValueCached *= CARD_MANA_COST_MULTIPLIER
+    if (self.costTypeCached == CostType.Mana) { self.costValueCached *= CARD_MANA_COST_MULTIPLIER }
     self.costType  = function() { return self.costTypeCached }
     self.costValue = function() { return self.costValueCached }
 }
@@ -45,7 +45,7 @@ function Card(name,
 // Стоимость карты по её первому эффекту и редкости (кэшируется в costValueCached)
 function computeCardCost(rarity, effects) {
     var effectsCount = array_length(effects)
-    if (effectsCount == 0) return 0
+    if (effectsCount == 0) { return 0 }
 
     var effect = effects[0]
     var effectType = variable_struct_exists(effect, "type") ? effect.type : undefined
@@ -160,8 +160,8 @@ function getBuffValueOnRarity(rarity) {
     switch (rarity) {
         case CardsRarity.Default: return 2
         case CardsRarity.Unusual: return 4
-        case CardsRarity.Rare:    return 6
-        case CardsRarity.Epic:    return 8
+        case CardsRarity.Rare: return 6
+        case CardsRarity.Epic: return 8
     }
 }
 
@@ -169,7 +169,9 @@ function getBuffValueOnRarity(rarity) {
 function cardIsResurrection(card) {
     for (var i = 0; i < array_length(card.effects); i++) {
         var e = card.effects[i]
-        if (variable_struct_exists(e, "type") && e.type == EffectTypes.Resurrection) return true
+        if (variable_struct_exists(e, "type") && e.type == EffectTypes.Resurrection) {
+            return true
+        }
     }
     return false
 }
@@ -181,16 +183,24 @@ function checkIfCanPlayCard(caster, card) {
         var hasKO = false
         for (var i = 0; i < array_length(team); i++)
             if (!team[i].isPuppet && team[i].isKO()) { hasKO = true; break }
-        if (!hasKO) return false
+        if (!hasKO) { 
+            return false
+        }
     }
 
     // Марионетку не призвать, если команда уже держит максимум
-    if (cardSummonsPuppet(card) && !canSpawnPuppetFor(caster)) return false
+    if (cardSummonsPuppet(card) && !canSpawnPuppetFor(caster)) {
+        return false
+    }
 
-    if (caster.isEnemy) return true // враги играют бесплатно
+    if (caster.isEnemy){ 
+        return true // враги играют бесплатно
+    }
 
     if (card.costType() == CostType.Mana) {
-        if (caster.maxMana <= 0) return true
+        if (caster.maxMana <= 0) { 
+            return true
+        }
         return caster.mana >= card.costValue()
     } else {
         return caster.hp > card.costValue() // нельзя уйти в 0 HP от стоимости
@@ -198,10 +208,12 @@ function checkIfCanPlayCard(caster, card) {
 }
 
 function applyCost(caster, card) {
-    if (caster.isEnemy) return // враги играют бесплатно 
+    if (caster.isEnemy) {
+        return // враги играют бесплатно 
+    }
 
     if (card.costType() == CostType.Mana) {
-        if (caster.maxMana <= 0) return
+        if (caster.maxMana <= 0) { return }
         caster.mana = caster.mana - card.costValue()
     } else {
         caster.hp = caster.hp - card.costValue()
@@ -291,14 +303,14 @@ function executeEndOfTurn(character) {
     var effects = character.effects
     for(var i = array_length(effects) - 1; i >= 0; i--) {
         var effect = effects[i]
-        if (effect.timing != Timing.EndOfTurn) continue
+        if (effect.timing != Timing.EndOfTurn) { continue }
         var h = effectHandler(effect)
         if (effectHasHook(h, "onEndOfTurn")) {
             h.onEndOfTurn(effect, character)
             character.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
             if (variable_instance_exists(effect, "duration")) {
                 effect.duration -= 1
-                if (effect.duration <= 0) array_delete(effects, i, 1)
+                if (effect.duration <= 0) { array_delete(effects, i, 1) }
             }
         }
     }
@@ -324,10 +336,10 @@ function effectField(effect, fieldName) {
 // Считаем эффекты одинаковыми, если совпадает тип и уточнения:
 // статус (Burn/Freeze...), модификатор баффа/дебаффа, цель временной слабости
 function effectsMatch(a, b) {
-    if (effectField(a, "type") != effectField(b, "type")) return false
-    if (effectField(a, "statusName") != effectField(b, "statusName")) return false
-    if (effectField(a, "buffType") != effectField(b, "buffType")) return false
-    if (effectField(a, "weakness") != effectField(b, "weakness")) return false
+    if (effectField(a, "type") != effectField(b, "type")) { return false }
+    if (effectField(a, "statusName") != effectField(b, "statusName")) { return false }
+    if (effectField(a, "buffType") != effectField(b, "buffType")) { return false }
+    if (effectField(a, "weakness") != effectField(b, "weakness")) { return false }
     return true
 }
 
@@ -352,22 +364,22 @@ function refreshOrPushEffect(target, effect) {
 
 // шанс наложения статуса на цель: базовый + бонус, если цель слаба к этому статусу 
 function effectChanceFor(target, effect) {
-    if (!variable_instance_exists(effect, "chance")) return 1 
+    if (!variable_instance_exists(effect, "chance")) { return 1 } 
     var c = effect.chance
-    if (checkIfHasWeaknesses(target, effect)) c += WEAKNESS_STATUS_CHANCE_BONUS
+    if (checkIfHasWeaknesses(target, effect)) { c += WEAKNESS_STATUS_CHANCE_BONUS }
     return clamp(c, 0, 1)
 }
 
 function casterIsIgnited(caster) {
-    if (caster == undefined || caster == noone) return false
-    if (!variable_instance_exists(caster, "isIgnited")) return false
+    if (caster == undefined || caster == noone) { return false }
+    if (!variable_instance_exists(caster, "isIgnited")) { return false }
     return caster.isIgnited && variable_instance_exists(caster, "igniteEffectChance")
 }
 
 function effectChanceForCaster(caster, target, effect) {
-    if (!variable_instance_exists(effect, "chance")) return 1
+    if (!variable_instance_exists(effect, "chance")) { return 1 }
     var base = casterIsIgnited(caster) ? caster.igniteEffectChance : effect.chance
-    if (checkIfHasWeaknesses(target, effect)) base += WEAKNESS_STATUS_CHANCE_BONUS
+    if (checkIfHasWeaknesses(target, effect)) { base += WEAKNESS_STATUS_CHANCE_BONUS }
     return clamp(base, 0, 1)
 }
 
@@ -422,7 +434,7 @@ function checkIfHasStrengths(target, effect) {
 
 // Слабость к стихии/статусу входящего эффекта
 function checkIfHasWeaknesses(target, effect) {
-    if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) return false
+    if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) { return false }
     if (variable_instance_exists(effect, "statusName")
         && array_contains(target.weaknesses, effect.statusName)) {
         return true
@@ -442,7 +454,7 @@ function checkIfHasWeaknesses(target, effect) {
 
 // Находится ли цель в состоянии, к которому она слаба
 function checkIfWeakStateActive(target) {
-    if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) return false
+    if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) { return false }
     var effects = target.effects
     for (var i = 0; i < array_length(effects); i++) {
         var e = effects[i]
@@ -474,15 +486,15 @@ function executeDamageEffect(
     }
     var atkBuff = checkIfHasBuff(caster, EffectTypes.Buff,   atkModifier)
     var atkDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, atkModifier)
-    if (atkBuff != undefined && is_real(atkBuff.value)) stat += atkBuff.value
-    if (atkDebuff != undefined && is_real(atkDebuff.value)) stat -= atkDebuff.value
-    if (!is_real(stat)) stat = 0
+    if (atkBuff != undefined && is_real(atkBuff.value)) { stat += atkBuff.value }
+    if (atkDebuff != undefined && is_real(atkDebuff.value)) { stat -= atkDebuff.value }
+    if (!is_real(stat)) { stat = 0 }
     stat = max(stat, 0)
 
     var damage = cardMult * stat
 
     // Ослабление кастера
-    if (checkIfHasEffectType(caster, EffectTypes.Weakening)) damage *= 0.9
+    if (checkIfHasEffectType(caster, EffectTypes.Weakening)) { damage *= 0.9 }
 
     // Модификация на стороне ЦЕЛИ: защита (+ баффы и дебаффы), слабости и сопротивления
     damage = mitigateDamage(targets, effect, damage)
@@ -519,7 +531,7 @@ function reduceOrRemoveEffectType(target, effectType) {
         if (effect.type == effectType) {
             if (variable_instance_exists(effect, "duration")) {
                 effect.duration -= 1
-                if (effect.duration <= 0) array_delete(effects, i, 1)
+                if (effect.duration <= 0) { array_delete(effects, i, 1) }
             } else {
                 array_delete(effects, i, 1)
             }
@@ -582,18 +594,18 @@ function mitigateDamage(target, effect, rawDamage) {
     }
     var protBuff = checkIfHasBuff(target, EffectTypes.Buff, protModifier)
     var protDebuff = checkIfHasBuff(target, EffectTypes.Debuff, protModifier)
-    if (protBuff != undefined && is_real(protBuff.value)) def += protBuff.value
-    if (protDebuff != undefined && is_real(protDebuff.value)) def -= protDebuff.value
-    if (!is_real(def)) def = 0
+    if (protBuff != undefined && is_real(protBuff.value)) { def += protBuff.value }
+    if (protDebuff != undefined && is_real(protDebuff.value)) { def -= protDebuff.value }
+    if (!is_real(def)) { def = 0 }
     damage -= max(def, 0)
 
     // Слабые места и ослабление как процентные модификаторы урона
-    if (checkIfHasEffectType(target, EffectTypes.Weakening)) modifier += 0.1
+    if (checkIfHasEffectType(target, EffectTypes.Weakening)) { modifier += 0.1 }
     // Слабые места: сила (−); слабость к стихии входящего эффекта (+);
     // и доп. урон, пока цель В СОСТОЯНИИ, к которому слаба (+).
-    if (checkIfHasStrengths(target, effect)) modifier -= WEAKNESS_DAMAGE_MODIFIER
-    if (checkIfHasWeaknesses(target, effect)) modifier += WEAKNESS_DAMAGE_MODIFIER
-    if (checkIfWeakStateActive(target)) modifier += WEAKNESS_DAMAGE_MODIFIER
+    if (checkIfHasStrengths(target, effect)) { modifier -= WEAKNESS_DAMAGE_MODIFIER }
+    if (checkIfHasWeaknesses(target, effect)) { modifier += WEAKNESS_DAMAGE_MODIFIER }
+    if (checkIfWeakStateActive(target)) { modifier += WEAKNESS_DAMAGE_MODIFIER }
 
     damage += damage * modifier
     return max(round(damage), 1)

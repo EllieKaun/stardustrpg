@@ -34,7 +34,7 @@ var mayDance = (isActive && spriteActionDance != noone && instance_exists(Battle
 if (mayDance) {
     if (mouse_check_button_pressed(mb_left) || keyboard_check_pressed(vk_anykey)) {
         idleDanceTimer = 0
-        if (actionState == StarriorStates.Dance) changeActionState(StarriorStates.Idle, undefined)
+        if (actionState == StarriorStates.Dance) { changeActionState(StarriorStates.Idle, undefined) }
     } else {
         idleDanceTimer += 1
         if (idleDanceTimer >= IDLE_DANCE_SECONDS * game_get_speed(gamespeed_fps) && actionState == StarriorStates.Idle) {
@@ -43,5 +43,5 @@ if (mayDance) {
     }
 } else {
     idleDanceTimer = 0
-    if (actionState == StarriorStates.Dance) changeActionState(StarriorStates.Idle, undefined)
+    if (actionState == StarriorStates.Dance) { changeActionState(StarriorStates.Idle, undefined) }
 }

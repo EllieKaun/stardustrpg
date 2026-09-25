@@ -80,14 +80,14 @@ function testUnitApply(s, o) {
     }
     var keys = variable_struct_get_names(fields)
     for (var i = 0; i < array_length(keys); i++) {
-        if (variable_struct_exists(o, keys[i])) variable_instance_set(s, fields[$ keys[i]], o[$ keys[i]])
+        if (variable_struct_exists(o, keys[i])) { variable_instance_set(s, fields[$ keys[i]], o[$ keys[i]]) }
     }
 
     // mana/energy без max -> max подтягивается
-    if (variable_struct_exists(o, "mana"))   s.maxMana   = o[$ "maxMana"]   ?? max(s.maxMana, s.mana)
-    if (variable_struct_exists(o, "energy")) s.maxEnergy = o[$ "maxEnergy"] ?? max(s.maxEnergy, s.energy)
+    if (variable_struct_exists(o, "mana")) {   s.maxMana   = o[$ "maxMana"]   ?? max(s.maxMana, s.mana) }
+    if (variable_struct_exists(o, "energy")) { s.maxEnergy = o[$ "maxEnergy"] ?? max(s.maxEnergy, s.energy) }
 
-    if (variable_struct_exists(o, "maxHp")) s.maxHp = o.maxHp
+    if (variable_struct_exists(o, "maxHp")) { s.maxHp = o.maxHp }
     if (variable_struct_exists(o, "hp")) {
         s.hp = o.hp
         s.maxHp = o[$ "maxHp"] ?? max(s.maxHp, o.hp)
@@ -122,6 +122,6 @@ function testBattleEncounter() {
     var cfg = testBattleSetup()
     var enc = makeEncounter(testCreators(cfg.enemies), cfg[$ "reward"] ?? forestRewardPool())
     enc.raw = cfg[$ "exactStats"] ?? true
-    if (variable_struct_exists(cfg, "heroes")) enc.heroCreators = testCreators(cfg.heroes)
+    if (variable_struct_exists(cfg, "heroes")) { enc.heroCreators = testCreators(cfg.heroes) }
     return enc
 }

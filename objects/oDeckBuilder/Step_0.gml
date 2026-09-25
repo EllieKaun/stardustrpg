@@ -1,4 +1,4 @@
-if (!open) exit
+if (!open) { exit }
 guiSyncCrisp() 
 layoutPanels()
 
@@ -19,5 +19,5 @@ collectionPanel.stepMouse()
 deckPanel.stepMouse()
 
 // Клавиатура — только для сфокусированной панели
-if (collectionPanel.focused) collectionPanel.step()
-else if (deckPanel.focused) deckPanel.step()
+if (collectionPanel.focused) { collectionPanel.step() }
+else if (deckPanel.focused) { deckPanel.step() }

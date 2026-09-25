@@ -33,8 +33,8 @@ function easeInOutQuad(p) { return (p < 0.5) ? 2 * p * p : 1 - power(-2 * p + 2,
 function fadeTail(p, anim) { return (p < 0.6) ? 1 : 1 - (p - 0.6) / 0.4 }  
 function fadeNone(p, anim) { return 1 }  
 function fadeInOut(p, anim) {
-    if (p < 0.15) return p / 0.15
-    if (p > 0.85) return (1 - p) / 0.15
+    if (p < 0.15) { return p / 0.15 }
+    if (p > 0.85) { return (1 - p) / 0.15 }
     return 1
 }
 function fadeShrink(p, anim) { 
@@ -183,8 +183,8 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
                     effectFired = true
                     onDone(self)
                 }
-                if (cfg.playOverlay && sprite_exists(playSpr)) playing = true
-                else playDone = true
+                if (cfg.playOverlay && sprite_exists(playSpr)) { playing = true }
+                else { playDone = true }
             }
         }
 
@@ -194,7 +194,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
                 spd /= game_get_speed(gamespeed_fps)
             }
             playFrame += spd
-            if (playFrame >= hideFrame) cardHidden = true
+            if (playFrame >= hideFrame) { cardHidden = true }
             var lastFrame = sprite_get_number(playSpr) - 1
             if (playFrame >= lastFrame) { 
                 playFrame = lastFrame
@@ -208,7 +208,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
             s.x += s.vx; s.y += s.vy; s.vy += pcfg.gravity * uiS
             s.rot += s.rotSpeed
             s.life -= 1
-            if (s.life <= 0) array_delete(particles, i, 1)
+            if (s.life <= 0) { array_delete(particles, i, 1) }
         }
     }
 
@@ -239,7 +239,7 @@ function CardPlayAnim(card, fromX, fromY, fromAngle, cardW, cardH, onDone, cfg) 
 
 // Рисует 4-конечную звёздочку, outer — размер лучей
 function drawStarSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) return
+    if (outer <= 0) { return }
     var inner = outer * 0.4
     draw_set_color(col)
     draw_set_alpha(alpha)
@@ -273,7 +273,7 @@ function drawRectSparkle(cx, cy, outer, rot, alpha, col) {
 
 // Равносторонний треугольник. outer — радиус от центра до вершины
 function drawTriangleSparkle(cx, cy, outer, rot, alpha, col) {
-    if (outer <= 0) return
+    if (outer <= 0) { return }
     draw_set_color(col)
     draw_set_alpha(alpha)
     draw_primitive_begin(pr_trianglelist)
@@ -371,7 +371,7 @@ function spawnCardAnim(card, from, cfg, onDone) {
 // Запускает анимацию выбранной карты перед тем как начать разыгрывание
 function playCardAnimated(card, caster, targets, cfg) {
     playCardPlaySound() // звук начала розыгрыша карты
-    if (cfg == undefined) cfg = defaultCardAnimConfig()
+    if (cfg == undefined) { cfg = defaultCardAnimConfig() }
 
     var anim = spawnCardAnim(card, selectedCardTransform(), cfg, function(anim) {
         playCard(anim.card, anim.caster, anim.targets)
@@ -417,10 +417,10 @@ function deckPileTopCenter(deckCount) {
 
 // Можно ли добрать карту в начале хода (герой, не в стане, есть колода, рука не полна)
 function canDrawCardForTurn(character) {
-    if (character.isEnemy || character.isPuppet) return false
-    if (checkIfHasEffectType(character, EffectTypes.Stun)) return false
-    if (array_length(character.getShuffeledDeck()) == 0) return false
-    if (array_length(character.getCardsInHand()) >= maxCardsOnDeskNumber) return false
+    if (character.isEnemy || character.isPuppet) { return false }
+    if (checkIfHasEffectType(character, EffectTypes.Stun)) { return false }
+    if (array_length(character.getShuffeledDeck()) == 0) { return false }
+    if (array_length(character.getCardsInHand()) >= maxCardsOnDeskNumber) { return false }
     return true
 }
 

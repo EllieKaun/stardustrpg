@@ -12,8 +12,8 @@ switchFocusTo = function(target, row) {
         collectionPanel.focused = (target.tag == Panels.Collection)
         deckPanel.focused = (target.tag == Panels.Deck)
         activePanel = (target.tag == Panels.Collection) ? Panels.Collection : Panels.Deck
-        if (target.x < src.x) target.enterFromRight(row)
-        else target.enterFromLeft(row)
+        if (target.x < src.x) { target.enterFromRight(row) }
+        else { target.enterFromLeft(row) }
     }
 }
 
@@ -172,8 +172,9 @@ refreshCollection = function() {
     var category = categoryForTab(collectionPanel.activeTab)
     collectionPanel.slots = buildCollectionSlots(category, 4, editingCharacter)
     collectionPanel.refreshScroll()
-    if (collectionPanel.selectedSlot >= array_length(collectionPanel.slots))
+    if (collectionPanel.selectedSlot >= array_length(collectionPanel.slots)) {
         collectionPanel.selectedSlot = -1
+    }
 }
 
 // Верстает обе панели

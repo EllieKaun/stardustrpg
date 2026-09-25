@@ -40,14 +40,14 @@ for (var i = 0; i < array_length(cards); i++) {
     var c = cards[i]
     switch (cardCategoryOf(c)) {
         case CardCategory.Heal: 
-            if (healChoice == noone) healChoice = c
+            if (healChoice == noone) { healChoice = c }
             break
         case CardCategory.Buff: 
-            if (buffChoice == noone) buffChoice = c
+            if (buffChoice == noone) { buffChoice = c }
             break
         case CardCategory.Attack:
         case CardCategory.Magic: 
-            if (attackChoice == noone) attackChoice = c
+            if (attackChoice == noone) { attackChoice = c }
             break
     }
 }
@@ -66,25 +66,26 @@ var target = noone
 // Если есть хил и есть раненый союзник, значит лечим самого раненого
 if (healChoice != noone && woundedAlly != noone) {
     target = enemyResolveTarget(healChoice, currentEnemy, aliveHeroes, aliveEnemies, woundedAlly, noone)
-    if (target != noone) cardToPlay = healChoice
+    if (target != noone) { cardToPlay = healChoice }
 }
 
 // Если есть бафф и кастер ещё не забаффан этим модификатором, баффаем себя - но только в 50% случаев
 if (cardToPlay == noone && buffChoice != noone && irandom(1) == 0) {
     var alreadyBuffed = false
     var e0 = buffChoice.effects[0]
-    if (variable_struct_exists(e0, "buffType"))
+    if (variable_struct_exists(e0, "buffType")) {
         alreadyBuffed = !is_undefined(checkIfHasBuff(currentEnemy, EffectTypes.Buff, e0.buffType))
+    }
     if (!alreadyBuffed) {
         target = enemyResolveTarget(buffChoice, currentEnemy, aliveHeroes, aliveEnemies, currentEnemy, noone)
-        if (target != noone) cardToPlay = buffChoice
+        if (target != noone) { cardToPlay = buffChoice }
     }
 }
 
 // Атакуем
 if (cardToPlay == noone && attackChoice != noone) {
     target = enemyResolveTarget(attackChoice, currentEnemy, aliveHeroes, aliveEnemies, noone, noone)
-    if (target != noone) cardToPlay = attackChoice
+    if (target != noone) { cardToPlay = attackChoice }
 }
 
 // Если ничего не выполнилось, случайная карта из руки

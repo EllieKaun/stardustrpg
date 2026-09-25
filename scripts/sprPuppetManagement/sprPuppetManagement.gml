@@ -3,7 +3,7 @@
 function countAlivePuppetsIn(team) {
     var n = 0;
     for (var i = 0; i < array_length(team); i++)
-        if (team[i].isPuppet && !team[i].isKO()) n++;
+        if (team[i].isPuppet && !team[i].isKO()) { n++; }
     return n;
 }
 
@@ -54,7 +54,7 @@ function puppetDeckForCategory(category) {
 function cardSummonsPuppet(card) {
     for (var i = 0; i < array_length(card.effects); i++) {
         var effect = card.effects[i]
-        if (variable_struct_exists(effect, "type") && effect.type == EffectTypes.CreatePuppet) return true
+        if (variable_struct_exists(effect, "type") && effect.type == EffectTypes.CreatePuppet) { return true }
     }
     return false
 }
@@ -67,7 +67,7 @@ function canSpawnPuppetFor(caster) {
 function spawnPuppet(category, caster) {
     var enemySide = caster.isEnemy
     var team      = enemySide ? enemies : heroes
-    if (!canSpawnPuppetFor(caster)) return
+    if (!canSpawnPuppetFor(caster)) { return }
 
     var spr = puppetSpritesForCategory(category)
     var p = createStarrior(
@@ -106,7 +106,7 @@ function puppetTargetsEnemies(category) {
 
 function aliveOf(arr) {
     var r = []
-    for (var i = 0; i < array_length(arr); i++) if (!arr[i].isKO()) array_push(r, arr[i])
+    for (var i = 0; i < array_length(arr); i++) if (!arr[i].isKO()) { array_push(r, arr[i]) }
     return r
 }
 
@@ -125,7 +125,7 @@ function runPuppetTurn(puppet) {
     var playable = []
     for (var i = 0; i < array_length(hand); i++) {
         var c = hand[i]
-        if (isSingleTargetCard(c) && checkIfCanPlayCard(puppet, c)) array_push(playable, c)
+        if (isSingleTargetCard(c) && checkIfCanPlayCard(puppet, c)) { array_push(playable, c) }
     }
 
     if (array_length(playable) == 0) {
@@ -141,10 +141,10 @@ function runPuppetTurn(puppet) {
     for (var i = 0; i < array_length(playable); i++) {
         var c = playable[i]
         switch (cardCategoryOf(c)) {
-            case CardCategory.Heal: if (healChoice == noone) healChoice = c; break
-            case CardCategory.Buff: if (buffChoice == noone) buffChoice = c; break
+            case CardCategory.Heal: if (healChoice == noone) { healChoice = c; } break
+            case CardCategory.Buff: if (buffChoice == noone) { buffChoice = c; } break
             case CardCategory.Attack:
-            case CardCategory.Magic: if (attackChoice == noone) attackChoice = c; break
+            case CardCategory.Magic: if (attackChoice == noone) { attackChoice = c; } break
         }
     }
 
@@ -162,7 +162,7 @@ function runPuppetTurn(puppet) {
     // Лечим самого раненого союзника
     if (healChoice != noone && woundedAlly != noone) {
         target = enemyResolveTarget(healChoice, puppet, foes, allies, woundedAlly, noone)
-        if (target != noone) card = healChoice
+        if (target != noone) { card = healChoice }
     }
 
     // Баффаем союзника, у которого ещё нет этого модификатора (сначала других, себя - в последнюю очередь)
@@ -171,24 +171,24 @@ function runPuppetTurn(puppet) {
         var buffTarget = noone
         for (var i = 0; i < array_length(allies) && buffTarget == noone; i++) {
             var a = allies[i]
-            if (a == puppet) continue
-            if (variable_struct_exists(e0, "buffType") && !is_undefined(checkIfHasBuff(a, EffectTypes.Buff, e0.buffType))) continue
+            if (a == puppet) { continue }
+            if (variable_struct_exists(e0, "buffType") && !is_undefined(checkIfHasBuff(a, EffectTypes.Buff, e0.buffType))) { continue }
             buffTarget = a
         }
         if (buffTarget == noone) {
             var selfBuffed = variable_struct_exists(e0, "buffType") && !is_undefined(checkIfHasBuff(puppet, EffectTypes.Buff, e0.buffType))
-            if (!selfBuffed) buffTarget = puppet
+            if (!selfBuffed) { buffTarget = puppet }
         }
         if (buffTarget != noone) {
             target = enemyResolveTarget(buffChoice, puppet, foes, allies, buffTarget, noone)
-            if (target != noone) card = buffChoice
+            if (target != noone) { card = buffChoice }
         }
     }
 
     // Атакуем
     if (card == noone && attackChoice != noone) {
         target = enemyResolveTarget(attackChoice, puppet, foes, allies, noone, noone)
-        if (target != noone) card = attackChoice
+        if (target != noone) { card = attackChoice }
     }
 
     // Если не получилось, случайная играбельная карта

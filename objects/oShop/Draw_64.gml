@@ -1,4 +1,4 @@
-if (!open) exit
+if (!open) { exit }
 
 guiSyncCrisp()
 layoutPanels()

@@ -1,9 +1,9 @@
 depth = -bbox_bottom
 
-if (global.gamePaused) exit
+if (global.gamePaused) { exit }
 
 var leader = oGameController.selected_character
-if (!instance_exists(leader)) exit
+if (!instance_exists(leader)) { exit }
 
 if (place_meeting(x, y, leader)) {
     if (!triggered) {

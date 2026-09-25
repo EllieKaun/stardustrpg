@@ -25,7 +25,7 @@ function shopNonSellableIds() {
 function cardShopSellable(cardId) {
     var ids = shopNonSellableIds()
     for (var i = 0; i < array_length(ids); i++) {
-        if (ids[i] == cardId) return false
+        if (ids[i] == cardId) { return false }
     }
     return true
 }
@@ -38,9 +38,9 @@ function buildShopItems(category) {
         // Карты, которые игрок уже открыл
         var refs = getCollectionRefs()
         for (var i = 0; i < array_length(refs); i++) {
-            if (!cardShopSellable(refs[i].id)) continue
+            if (!cardShopSellable(refs[i].id)) { continue }
             var card = cardFromRef(refs[i])
-            if (card == undefined) continue
+            if (card == undefined) { continue }
             var shopItem = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)
             shopItem.card = card
             shopItem.ref = { id: refs[i].id, rarity: refs[i].rarity }
@@ -211,15 +211,15 @@ function Shop(_config) constructor {
     }
 
     static scrollToRow = function(row) {
-        if (!scrollable) return
+        if (!scrollable) { return }
         var layout = computeLayout()
         var pitch = layout.rowH + layout.gapY
         var rowTop = layout.gridY + row * pitch
         var rowBottom = rowTop + layout.rowH
         var visTop = layout.gridY
         var visBottom = y + h - padding
-        if (rowTop - scrollY < visTop) scrollY = rowTop - visTop
-        else if (rowBottom - scrollY > visBottom) scrollY = rowBottom - visBottom
+        if (rowTop - scrollY < visTop) { scrollY = rowTop - visTop }
+        else if (rowBottom - scrollY > visBottom) { scrollY = rowBottom - visBottom }
         refreshScroll()
     }
 
@@ -252,10 +252,10 @@ function Shop(_config) constructor {
     }
 
     static getTabRect = function(index) {
-        if (tabRects != undefined && index < array_length(tabRects)) return tabRects[index]
+        if (tabRects != undefined && index < array_length(tabRects)) { return tabRects[index] }
 
         var tabsCount = array_length(tabs)
-        if (tabsCount == 0) return { left: x, top: y - tabH, width: 0, height: tabH }
+        if (tabsCount == 0) { return { left: x, top: y - tabH, width: 0, height: tabH } }
         var tabWidths = getTabWidths()
         var tabX = x
         for (var i = 0; i < index; i++) tabX += tabWidths.widths[i] * tabWidths.shrink + tabGap
@@ -289,10 +289,10 @@ function Shop(_config) constructor {
 
         if (onTabRow) {
             if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
-                if (nTabs > 0) { activeTab = max(0, activeTab - 1); if (onTabClick != undefined) onTabClick(self, activeTab) }
+                if (nTabs > 0) { activeTab = max(0, activeTab - 1); if (onTabClick != undefined) { onTabClick(self, activeTab) } }
             }
             if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
-                if (nTabs > 0) { activeTab = min(nTabs - 1, activeTab + 1); if (onTabClick != undefined) onTabClick(self, activeTab) }
+                if (nTabs > 0) { activeTab = min(nTabs - 1, activeTab + 1); if (onTabClick != undefined) { onTabClick(self, activeTab) } }
             }
             if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S")) ||
                 keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) {
@@ -311,18 +311,18 @@ function Shop(_config) constructor {
         if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) {
             cursorRow = min(array_length(slots) - 1, cursorRow + 1); moved = true
         }
-        if (moved) selectAtCursor()
+        if (moved) { selectAtCursor() }
 
         if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) {
             if (selectedSlot >= 0 && selectedSlot < array_length(slots)) {
                 var slot = slots[selectedSlot]
-                if (slot.state != "locked" && onSlotClick != undefined) onSlotClick(self, selectedSlot)
+                if (slot.state != "locked" && onSlotClick != undefined) { onSlotClick(self, selectedSlot) }
             }
         }
 
         if (nTabs > 0) {
-            if (keyboard_check_pressed(ord("Q"))) { activeTab = max(0, activeTab - 1); if (onTabClick != undefined) onTabClick(self, activeTab) }
-            if (keyboard_check_pressed(ord("E"))) { activeTab = min(nTabs - 1, activeTab + 1); if (onTabClick != undefined) onTabClick(self, activeTab) }
+            if (keyboard_check_pressed(ord("Q"))) { activeTab = max(0, activeTab - 1); if (onTabClick != undefined) { onTabClick(self, activeTab) } }
+            if (keyboard_check_pressed(ord("E"))) { activeTab = min(nTabs - 1, activeTab + 1); if (onTabClick != undefined) { onTabClick(self, activeTab) } }
         }
     }
 
@@ -339,18 +339,18 @@ function Shop(_config) constructor {
         for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {
             var tabRect = getTabRect(tabIndex)
             if (pointInRect(mouseX, mouseY, tabRect.left, tabRect.top, tabRect.width, tabRect.height)) {
-                if (clicked) { focused = true; onTabRow = true; activeTab = tabIndex; if (onTabClick != undefined) onTabClick(self, tabIndex) }
+                if (clicked) { focused = true; onTabRow = true; activeTab = tabIndex; if (onTabClick != undefined) { onTabClick(self, tabIndex) } }
                 return true
             }
         }
 
         // в пределах панели списка
-        if (!pointInRect(mouseX, mouseY, x, y, w, h)) return false
+        if (!pointInRect(mouseX, mouseY, x, y, w, h)) { return false }
 
         if (scrollable) {
             var wheelStep = rowPitch() * 0.5
-            if (mouse_wheel_down()) scrollY = clamp(scrollY + wheelStep, 0, scrollMax())
-            if (mouse_wheel_up())   scrollY = clamp(scrollY - wheelStep, 0, scrollMax())
+            if (mouse_wheel_down()) { scrollY = clamp(scrollY + wheelStep, 0, scrollMax()) }
+            if (mouse_wheel_up()) {   scrollY = clamp(scrollY - wheelStep, 0, scrollMax()) }
         }
 
         // товары
@@ -369,7 +369,7 @@ function Shop(_config) constructor {
                     selectedSlot = i
                     cursorRow = i
                     var slot = slots[i]
-                    if (slot.state != "locked" && onSlotClick != undefined) onSlotClick(self, i)
+                    if (slot.state != "locked" && onSlotClick != undefined) { onSlotClick(self, i) }
                 }
                 break
             }
@@ -394,7 +394,7 @@ function Shop(_config) constructor {
         var showSelection = focused && !onTabRow
         for (var i = 0; i < array_length(slots); i++) {
             var slotRect = getSlotRect(i)
-            if (slotRect.top > clipY + clipH || slotRect.top + slotRect.height < clipY) continue
+            if (slotRect.top > clipY + clipH || slotRect.top + slotRect.height < clipY) { continue }
             drawShopItem(slots[i], slotRect, uiScale, showSelection && i == selectedSlot)
         }
 

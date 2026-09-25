@@ -23,9 +23,9 @@ function initEffectRegistry() {
         onInstant: function(effect, caster, targets) {
             if (is_array(targets)) {
                 for (var i = 0; i < array_length(targets); i++)
-                    if (!targets[i].isKO()) executeDamageEffect(effect, caster, targets[i])
+                    if (!targets[i].isKO()) { executeDamageEffect(effect, caster, targets[i]) }
             } else {
-                if (!targets.isKO()) executeDamageEffect(effect, caster, targets)
+                if (!targets.isKO()) { executeDamageEffect(effect, caster, targets) }
             }
         },
         onEndOfTurn: function(effect, character) {
@@ -54,8 +54,8 @@ function initEffectRegistry() {
     // Воскрешение
     variable_struct_set(effectsRepository, "Resurrection", {
         onInstant: function(effect, caster, targets) {
-            if (targets.isPuppet) return
-            if (!targets.isKO()) return // воскрешают только павшего
+            if (targets.isPuppet) { return }
+            if (!targets.isKO()) { return } // воскрешают только павшего
             targets.hp = floor(targets.maxHp / 2) // поднять на половину HP
             targets.changeActionState(StarriorStates.Idle, undefined) // снять нокаут
             targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
@@ -101,7 +101,7 @@ function initEffectRegistry() {
     variable_struct_set(effectsRepository, "Steal", {
         onInstant: function(effect, caster, targets) {
             var t = is_array(targets) ? (array_length(targets) > 0 ? targets[0] : noone) : targets
-            if (t == noone) return
+            if (t == noone) { return }
 
             if (variable_instance_exists(t, "hasSpear") && t.hasSpear) {
                 t.hasSpear = false
@@ -115,8 +115,9 @@ function initEffectRegistry() {
                 }
             }
 
-            if (variable_instance_exists(t, "showEffectNotification"))
+            if (variable_instance_exists(t, "showEffectNotification")) {
                 t.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
+            }
         },
     })
 
@@ -135,8 +136,8 @@ function initEffectRegistry() {
 
 // Ключ репозитория для эффекта
 function effectKind(effect) {
-    if (variable_instance_exists(effect, "kind")) return effect.kind
-    if (!variable_instance_exists(effect, "type")) return undefined
+    if (variable_instance_exists(effect, "kind")) { return effect.kind }
+    if (!variable_instance_exists(effect, "type")) { return undefined }
     return effectKindFromType(effect.type)
 }
 
@@ -163,9 +164,9 @@ function effectKindFromType(type) {
 }
 
 function effectHandler(effect) {
-    if (!variable_global_exists("effectRegistry")) return undefined
+    if (!variable_global_exists("effectRegistry")) { return undefined }
     var key = effectKind(effect)
-    if (key == undefined || !variable_struct_exists(global.effectRegistry, key)) return undefined
+    if (key == undefined || !variable_struct_exists(global.effectRegistry, key)) { return undefined }
     return variable_struct_get(global.effectRegistry, key)
 }
 
@@ -177,7 +178,7 @@ function effectHasHook(handler, hookName) {
 
 function runInstant(effect, caster, targets) {
     var h = effectHandler(effect)
-    if (effectHasHook(h, "onInstant")) h.onInstant(effect, caster, targets)
+    if (effectHasHook(h, "onInstant")) { h.onInstant(effect, caster, targets) }
 }
 
 function runOnPlay(effect, caster, targets) {
@@ -188,13 +189,13 @@ function runOnPlay(effect, caster, targets) {
 
 function runOnApply(effect, caster, target) {
     var h = effectHandler(effect)
-    if (effectHasHook(h, "onApply")) h.onApply(effect, caster, target)
+    if (effectHasHook(h, "onApply")) { h.onApply(effect, caster, target) }
 }
 
 //// Иконки статусов
 
 function statusNameIcon(effect) {
-    if (!variable_instance_exists(effect, "statusName")) return noone
+    if (!variable_instance_exists(effect, "statusName")) { return noone }
     switch (effect.statusName) {
         case StatusNames.Stun: return StunIcon
         case StatusNames.Burn: return BurnIcon
@@ -232,7 +233,7 @@ function weaknessLabel(sn) {
 }
 
 function buffIcon(effect, isBuff) {
-    if (!variable_instance_exists(effect, "buffType")) return noone
+    if (!variable_instance_exists(effect, "buffType")) { return noone }
     switch (effect.buffType) {
         case ModifiersToBuff.PhysicalDamage: return isBuff ? StrBuffStatus : StrDebuff
         case ModifiersToBuff.MagicalDamage: return isBuff ? MagicBuffStatus : MagicDebuff
@@ -243,10 +244,10 @@ function buffIcon(effect, isBuff) {
 
 function effectIcon(effect) {
     var s = statusNameIcon(effect)
-    if (s != noone) return s
+    if (s != noone) { return s }
     var h = effectHandler(effect)
-    if (effectHasHook(h, "iconFor")) return h.iconFor(effect)
-    if (effectHasHook(h, "icon")) return h.icon
+    if (effectHasHook(h, "iconFor")) { return h.iconFor(effect) }
+    if (effectHasHook(h, "icon")) { return h.icon }
     return noone
 }
 
@@ -255,7 +256,7 @@ function effectIcon(effect) {
 function countAliveOn(team) {
     var n = 0
     for (var i = 0; i < array_length(team); i++) 
-        if (!team[i].isKO()) n++
+        if (!team[i].isKO()) { n++ }
     return n
 }
 
@@ -296,7 +297,7 @@ function DamageOverTimeEffect(damageType, value, duration, statusName, chance, s
     var e = { type: EffectTypes.Damage, damageType: damageType, value: value,
               duration: duration, statusName: statusName, chance: chance,
               timing: Timing.EndOfTurn, sound: sound }
-    if (sprite != noone) e.sprite = sprite
+    if (sprite != noone) { e.sprite = sprite }
     return e
 }
 // Статус-эффект вторым эффектом карты (Stun/Weakening)
@@ -324,7 +325,7 @@ function WeakeningEffect(duration, chance, timing) {
 function BombEffect(damageType, value, chance, sprite = bombEffect, sound = noone) {
     var e = { type: EffectTypes.Damage, damageType: damageType, value: value,
               chance: chance, statusName: StatusNames.Bomb, timing: Timing.Instant, sound: sound }
-    if (sprite != noone) e.sprite = sprite
+    if (sprite != noone) { e.sprite = sprite }
     return e
 }
 

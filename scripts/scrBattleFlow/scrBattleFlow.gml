@@ -68,7 +68,7 @@ function beginTurnFor(character) {
 function checkIfHasEffectType(character, effectType) {
     var effects = character.effects 
     for(var i = 0; i < array_length(effects); i++) {
-        if effects[i].type == effectType return true
+        if effects[i].type == effectType { return true }
     }
     return false
 }
@@ -78,7 +78,7 @@ function checkIfHasBuff(character, effectType, modifierToBuff) {
     var effects = character.effects 
     for(var i = 0; i < array_length(effects); i++) {
         var effect = effects[i]
-        if effect.type == effectType && effect.buffType == modifierToBuff return effect
+        if effect.type == effectType && effect.buffType == modifierToBuff { return effect }
     }
     return undefined
 }
@@ -121,7 +121,7 @@ function removeCardFromHand(caster, card) {
 // Проверить, мертвы ли все в массиве
 function checkIfAllDead(array) {
     for(var i = 0; i < array_length(array); i ++) {
-        if array[i].hp > 0 return false
+        if array[i].hp > 0 { return false }
     }
     return true
 }
@@ -149,19 +149,19 @@ function enemyPlayableCards(enemy, cards) {
 function enemyResolveTarget(card, caster, foes, allies, preferAlly, preferFoe) {
     switch (card.target) {
         case TargetTypes.SingleEnemyTarget:
-            if (array_length(foes) == 0) return noone
+            if (array_length(foes) == 0) { return noone }
             return (preferFoe != noone) ? preferFoe : foes[irandom(array_length(foes) - 1)]
         case TargetTypes.AllEnemies:
             return (array_length(foes) > 0) ? foes : noone
         case TargetTypes.SingleAllyTarget:
-            if (array_length(allies) == 0) return noone
+            if (array_length(allies) == 0) { return noone }
             return (preferAlly != noone) ? preferAlly : allies[irandom(array_length(allies) - 1)]
         case TargetTypes.AllAllies:
             return (array_length(allies) > 0) ? allies : noone
         case TargetTypes.Self:
             return caster
         default:
-            if (array_length(foes) == 0) return noone
+            if (array_length(foes) == 0) { return noone }
             return foes[irandom(array_length(foes) - 1)]
     }
 }
@@ -169,7 +169,7 @@ function enemyResolveTarget(card, caster, foes, allies, preferAlly, preferFoe) {
 // Выбор следующего персонажа
 function selectNextCharacter() {
     var count = array_length(playOrder)
-    if (count == 0) return // если игроков нет - выход 
+    if (count == 0) { return } // если игроков нет - выход 
     
     var startIndex = (selectedCharacterNumber + 1) % count
     
@@ -218,7 +218,7 @@ function doMenuAction(name) {
             skipTurn()
         break
         case "Run":
-            if (variable_global_exists("battleNoFlee") && global.battleNoFlee) break
+            if (variable_global_exists("battleNoFlee") && global.battleNoFlee) { break }
             analyticsRetreat() // аналитика: побег из боя
             addGold(-GOLD_RUN_PENALTY) // штраф за побег
             startTransition(global.returnRoom)
@@ -234,7 +234,7 @@ function initTargetSelection(targets) {
     // isActive не снимаем: обводка ходящего персонажа остаётся на выборе цели и в анимациях
     var aliveTargets = []
     for(var i = 0; i < array_length(targets); i++) {
-        if !targets[i].isKO() array_push(aliveTargets, targets[i])
+        if !targets[i].isKO() { array_push(aliveTargets, targets[i]) }
     }
     targetOptions = aliveTargets
     selectedTargetNumber = -1
@@ -245,7 +245,7 @@ function initTargetSelection(targets) {
 function initTargetSelectionKO(targets) {
     var pool = []
     for(var i = 0; i < array_length(targets); i++) {
-        if (targets[i].isKO() && !targets[i].isPuppet) array_push(pool, targets[i])
+        if (targets[i].isKO() && !targets[i].isPuppet) { array_push(pool, targets[i]) }
     }
     targetOptions = pool
     selectedTargetNumber = -1
@@ -254,7 +254,7 @@ function initTargetSelectionKO(targets) {
 
 // Выбор целей для игровки
 function selectNextTarget() {
-    if array_length(targetOptions) == 0 return
+    if array_length(targetOptions) == 0 { return }
     if selectedTargetNumber == -1 {
         selectedTargetNumber = 0
     } else {
@@ -268,7 +268,7 @@ function selectNextTarget() {
 
 // Выбор целей для игровки
 function selectPreviousTarget() {
-    if array_length(targetOptions) == 0 return
+    if array_length(targetOptions) == 0 { return }
     if selectedTargetNumber == -1 {
         selectedTargetNumber = array_length(targetOptions) - 1
     } else {
@@ -309,7 +309,7 @@ function selectTargetAtMouse() {
 function filterNotKO(targets) {
     var aliveTargets = []
     for (var i = 0; i < array_length(targets); i++) {
-        if (!targets[i].isKO()) array_push(aliveTargets, targets[i])
+        if (!targets[i].isKO()) { array_push(aliveTargets, targets[i]) }
     }
     return aliveTargets
 }
@@ -342,11 +342,11 @@ function removeDeadPuppets() {
             removeFromArray(enemies, puppet)
             array_delete(playOrder, i, 1)
 
-            if (i <= selectedCharacterNumber) selectedCharacterNumber--
+            if (i <= selectedCharacterNumber) { selectedCharacterNumber-- }
 
             // Даём марионетке растаять, инстанс удалится сам в конце анимации
-            if (puppet.disappearing) puppet.destroyWhenGone = true
-            else instance_destroy(puppet)
+            if (puppet.disappearing) { puppet.destroyWhenGone = true }
+            else { instance_destroy(puppet) }
         }
     }
     initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)  

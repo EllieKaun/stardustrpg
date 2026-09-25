@@ -1,4 +1,4 @@
-if (!active) exit
+if (!active) { exit }
 
 var sw = display_get_gui_width()
 var sh = display_get_gui_height()

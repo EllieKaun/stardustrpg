@@ -1,4 +1,4 @@
-if (!active) exit
+if (!active) { exit }
 
 var screenWidth = display_get_gui_width()
 var screenHeight = display_get_gui_height()
@@ -23,7 +23,7 @@ var onLeft = (line.side != "right")
 if (hasPortrait) {
     var portraitH = floor(screenHeight * 0.36)
     var portraitSc = portraitH / sprite_get_height(line.portrait)
-    if (portraitSc >= 1) portraitSc = floor(portraitSc) 
+    if (portraitSc >= 1) { portraitSc = floor(portraitSc) } 
     var portraitW = sprite_get_width(line.portrait) * portraitSc
     portraitH = sprite_get_height(line.portrait) * portraitSc
     var portraitInset = pad * 1.5

@@ -1,4 +1,4 @@
-if (!visible) exit
+if (!visible) { exit }
 
 if (menuCooldown > 0) {
     menuCooldown--

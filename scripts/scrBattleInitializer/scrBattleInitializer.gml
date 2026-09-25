@@ -61,7 +61,7 @@ function initStarriorsFromEncounter(encounter) {
         && array_length(enemies) > 0) {
         var spearIdx = irandom(array_length(enemies) - 1)
         enemies[spearIdx].hasSpear = true
-        if (spearBattleSprite() == noone) enemies[spearIdx].image_blend = c_yellow
+        if (spearBattleSprite() == noone) { enemies[spearIdx].image_blend = c_yellow }
 
         var db = spearBattleBonus()
         for (var i = 0; i < array_length(enemies); i++) {
@@ -148,11 +148,11 @@ function assignStarriorSlots(team) {
     var used = []
     for (var i = 0; i < array_length(team); i++) {
         var slot = team[i].slotIndex
-        if (slot >= 0 && !array_contains(used, slot)) array_push(used, slot)
-        else team[i].slotIndex = -1 // повторный слот - назначим заново
+        if (slot >= 0 && !array_contains(used, slot)) { array_push(used, slot) }
+        else { team[i].slotIndex = -1 } // повторный слот - назначим заново
     }
     for (var i = 0; i < array_length(team); i++) {
-        if (team[i].slotIndex >= 0) continue
+        if (team[i].slotIndex >= 0) { continue }
         var free = 0
         while (array_contains(used, free)) free++
         team[i].slotIndex = free
@@ -176,7 +176,7 @@ function rebuildPlayOrder() {
 
     // очередь сдвинулась - указатель хода должен остаться на том же персонаже
     var idx = array_get_index(playOrder, selectedCharacter)
-    if (idx >= 0) selectedCharacterNumber = idx
+    if (idx >= 0) { selectedCharacterNumber = idx }
 }
 
 function initStarriorsPositions(

@@ -20,7 +20,7 @@ function drawFitTextCentered(text, areaX, areaY, areaW, areaH, fonts = undefined
     if (fonts != undefined && array_length(fonts) > 0) {
         for (var i = 0; i < array_length(fonts); i++) {
             draw_set_font(fonts[i]);
-            if (string_width(text) <= areaW && string_height(text) <= areaH) break
+            if (string_width(text) <= areaW && string_height(text) <= areaH) { break }
         }
     }
     draw_set_halign(fa_center)
@@ -112,15 +112,15 @@ function Panel(_config) constructor {
 
     // Доскроллить так, чтобы строка row была видна целиком
     static scrollToRow = function(row) {
-        if (!scrollable) return
+        if (!scrollable) { return }
         var layout = computeLayout()
         var pitch = layout.cardHeight + layout.gapY
         var rowTop = layout.gridY + row * pitch
         var rowBottom = rowTop + layout.cardHeight
         var visTop = layout.gridY
         var visBottom = y + h - padding
-        if (rowTop - scrollY < visTop) scrollY = rowTop - visTop
-        else if (rowBottom - scrollY > visBottom) scrollY = rowBottom - visBottom
+        if (rowTop - scrollY < visTop) { scrollY = rowTop - visTop }
+        else if (rowBottom - scrollY > visBottom) { scrollY = rowBottom - visBottom }
         refreshScroll()
     }
 
@@ -207,7 +207,7 @@ function Panel(_config) constructor {
     // Данные о позиции и размере таба по индексу
     static getTabRect = function(index) {
         var tabsCount = array_length(tabs)
-        if (tabsCount == 0) return { tx: x, ty: y - tabH, tw: 0, th: tabH }
+        if (tabsCount == 0) { return { tx: x, ty: y - tabH, tw: 0, th: tabH } }
         var tw = getTabWidths()
         var tabX = x + tabOffsetX
         for (var i = 0; i < index; i++) tabX += tw.widths[i] * tw.k + tabGap
@@ -270,15 +270,17 @@ function Panel(_config) constructor {
             if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
                 if (nTabs > 0) { 
                     activeTab = max(0, activeTab - 1)
-                    if (onTabClick != undefined) 
+                    if (onTabClick != undefined) { 
                         onTabClick(self, activeTab)
+                    }
                 }
             }
             if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
                 if (nTabs > 0) { 
                     activeTab = min(nTabs - 1, activeTab + 1)
-                    if (onTabClick != undefined) 
+                    if (onTabClick != undefined) { 
                         onTabClick(self, activeTab)
+                    }
                 }
             }
             if (keyboard_check_pressed(vk_down)  || keyboard_check_pressed(ord("S")) ||
@@ -327,20 +329,22 @@ function Panel(_config) constructor {
             var newRow = cursorRow + dy
 
             if (newCol < 0) { 
-                if (onPanelSwitch != undefined) 
+                if (onPanelSwitch != undefined) { 
                     onPanelSwitch(self, -1)
+                }
                 return
             }
             if (newCol >= cols) { 
-                if (onPanelSwitch != undefined) 
+                if (onPanelSwitch != undefined) { 
                     onPanelSwitch(self,  1)
+                }
                 return
             }
 
             newRow = clamp(newRow, 0, max(0, totalRows - 1))
 
             var slotsInRow = array_length(slots) - newRow * cols
-            if (slotsInRow <= 0) return
+            if (slotsInRow <= 0) { return }
             newCol = clamp(newCol, 0, slotsInRow - 1)
 
             cursorCol = newCol
@@ -353,7 +357,7 @@ function Panel(_config) constructor {
         if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) {
             if (selectedSlot >= 0 && selectedSlot < array_length(slots)) {
                 var slot = slots[selectedSlot]
-                if (slot.state != "locked" && onSlotClick != undefined) onSlotClick(self, selectedSlot)
+                if (slot.state != "locked" && onSlotClick != undefined) { onSlotClick(self, selectedSlot) }
             }
         }
 
@@ -361,13 +365,15 @@ function Panel(_config) constructor {
         if (nTabs > 0) {
             if (keyboard_check_pressed(ord("Q"))) { 
                 activeTab = max(0, activeTab - 1)     
-                if (onTabClick != undefined) 
+                if (onTabClick != undefined) { 
                     onTabClick(self, activeTab)
+                }
             }
             if (keyboard_check_pressed(ord("E"))) { 
                 activeTab = min(nTabs - 1, activeTab + 1) 
-                if (onTabClick != undefined) 
+                if (onTabClick != undefined) { 
                     onTabClick(self, activeTab)
+                }
             }
         }
     }
@@ -381,13 +387,13 @@ function Panel(_config) constructor {
         var my = device_mouse_y_to_gui(0)
 
         // область панели вместе со строкой табов над ней
-        if (!pointInRect(mx, my, x, y - tabH, w, h + tabH)) return false
+        if (!pointInRect(mx, my, x, y - tabH, w, h + tabH)) { return false }
 
         // Прокрутка колесом
         if (scrollable) {
             var wheelStep = rowPitch() * 0.5
-            if (mouse_wheel_down()) scrollY = clamp(scrollY + wheelStep, 0, scrollMax())
-            if (mouse_wheel_up()) scrollY = clamp(scrollY - wheelStep, 0, scrollMax())
+            if (mouse_wheel_down()) { scrollY = clamp(scrollY + wheelStep, 0, scrollMax()) }
+            if (mouse_wheel_up()) { scrollY = clamp(scrollY - wheelStep, 0, scrollMax()) }
         }
 
         var clicked = mouse_check_button_pressed(mb_left)
@@ -397,10 +403,10 @@ function Panel(_config) constructor {
             var tr = getTabRect(t)
             if (pointInRect(mx, my, tr.tx, tr.ty, tr.tw, tr.th)) {
                 if (clicked) {
-                    if (instance_exists(oDeckBuilder)) oDeckBuilder.focusPanel(self)
+                    if (instance_exists(oDeckBuilder)) { oDeckBuilder.focusPanel(self) }
                     onTabRow = true
                     activeTab = t
-                    if (onTabClick != undefined) onTabClick(self, t)
+                    if (onTabClick != undefined) { onTabClick(self, t) }
                 }
                 return true
             }
@@ -413,13 +419,13 @@ function Panel(_config) constructor {
                 && pointInRect(mx, my, x, y, w, h)) {
                 hoverSlot = i
                 if (clicked) {
-                    if (instance_exists(oDeckBuilder)) oDeckBuilder.focusPanel(self)
+                    if (instance_exists(oDeckBuilder)) { oDeckBuilder.focusPanel(self) }
                     onTabRow = false
                     cursorRow = i div cols
                     cursorCol = i mod cols
                     selectedSlot = i
                     var slot = slots[i]
-                    if (slot.state != "locked" && onSlotClick != undefined) onSlotClick(self, i)
+                    if (slot.state != "locked" && onSlotClick != undefined) { onSlotClick(self, i) }
                 }
                 return true
             }
@@ -433,7 +439,7 @@ function Panel(_config) constructor {
         var oldFont = draw_get_font()
 
         // Бэк
-        if (bgSprite != undefined) draw_sprite_stretched(bgSprite, 0, x, y, w, h)
+        if (bgSprite != undefined) { draw_sprite_stretched(bgSprite, 0, x, y, w, h) }
 
         // Клип сетки по прямоугольнику фона
         var clipInset = 4 * uiScale
@@ -451,43 +457,47 @@ function Panel(_config) constructor {
             var slotRect = getSlotRect(i)
             switch (slot.state) {
                 case "locked":
-                    if (slotSpriteLocked != undefined)
+                    if (slotSpriteLocked != undefined) {
                         draw_sprite_stretched(slotSpriteLocked, 
                             0, 
                             slotRect.sx, 
                             slotRect.sy, 
                             slotRect.sw, 
                             slotRect.sh)
+                    }
                     break
                 case "empty":
                     var emptySprite = (slotSpriteEmptyWeb != undefined && array_contains(webSlotIndices, i)) ? slotSpriteEmptyWeb : slotSpriteEmpty
-                    if (emptySprite != undefined) 
+                    if (emptySprite != undefined) { 
                         draw_sprite_stretched(emptySprite, 
                             0, 
                             slotRect.sx,
                             slotRect.sy, 
                             slotRect.sw,
                             slotRect.sh)
+                    }
                     break
                 case "filled":
                     if (cardRenderer != undefined) {
                         cardRenderer(slot, slotRect, selectedSlot == i)
                         break
                     }
-                    if (slotSpriteEmpty != undefined)
+                    if (slotSpriteEmpty != undefined) {
                         draw_sprite_stretched(slotSpriteEmpty,
                             0,
                             slotRect.sx,
                             slotRect.sy,
                             slotRect.sw,
                             slotRect.sh)
-                    if (slot.card != undefined)
+                    }
+                    if (slot.card != undefined) {
                          drawCard(slot.card,
                             slotRect.sx,
                             slotRect.sy,
                             slotRect.sw,
                             slotRect.sh,
                             selectedSlot == i)
+                    }
                     drawSlotOverlays(slot, slotRect)
                     break
             }

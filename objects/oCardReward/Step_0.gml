@@ -1,4 +1,4 @@
-if (!active) exit
+if (!active) { exit }
 if (inputGuard > 0) { 
     inputGuard--
     exit 

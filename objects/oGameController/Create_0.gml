@@ -58,14 +58,14 @@ generateChests = function() {
         var cx, cy
         if (array_length(trees) > 0 && irandom(1) == 0) {
             var t = trees[irandom(array_length(trees) - 1)]
-            if (!instance_exists(t)) continue
+            if (!instance_exists(t)) { continue }
             cx = t.x
             cy = t.bbox_bottom + 8 // у основания дерева, на проходимой земле
         } else {
             cx = 96 + random(room_width - 192)
             cy = 96 + random(room_height - 192)
         }
-        if (cx < 48 || cy < 48 || cx > room_width - 48 || cy > room_height - 48) continue
+        if (cx < 48 || cy < 48 || cx > room_width - 48 || cy > room_height - 48) { continue }
 
         // Позиция должна быть проходимой — иначе герой не наступит и коллизия не сработает
         if (collision_point(cx, cy, oWall,   false, true) != noone
@@ -74,7 +74,7 @@ generateChests = function() {
          || collision_point(cx, cy, oTree3,  false, true) != noone
          || collision_point(cx, cy, oTree4,  false, true) != noone
          || collision_point(cx, cy, oTree5,  false, true) != noone
-         || collision_point(cx, cy, oStump,  false, true) != noone) continue
+         || collision_point(cx, cy, oStump,  false, true) != noone) { continue }
 
         var tooClose = false
         for (var i = 0; i < array_length(global.chests); i++) {
@@ -83,7 +83,7 @@ generateChests = function() {
                 break
             }
         }
-        if (tooClose) continue
+        if (tooClose) { continue }
 
         array_push(global.chests, {
             x: cx,
@@ -99,7 +99,7 @@ spawnChests = function() {
     with (oChest) instance_destroy()
     for (var i = 0; i < array_length(global.chests); i++) {
         var ch = global.chests[i]
-        if (ch.opened) continue
+        if (ch.opened) { continue }
         var c = instance_create_layer(ch.x, ch.y, "Instances", oChest)
         c.chestKind = ch.kind
         c.chestIndex = i
@@ -108,7 +108,7 @@ spawnChests = function() {
 
 startTutorialIntro = function() {
     var leader = selected_character
-    if (!instance_exists(leader)) return
+    if (!instance_exists(leader)) { return }
     var obstacles = worldObstacles()
     var dist = 120
     var dirs = [0, 90, 270, 180, 45, 315, 135, 225]
@@ -117,7 +117,7 @@ startTutorialIntro = function() {
     for (var i = 0; i < array_length(dirs); i++) {
         var cx = leader.x + lengthdir_x(dist, dirs[i])
         var cy = leader.y + lengthdir_y(dist, dirs[i])
-        if (cx < 48 || cy < 48 || cx > room_width - 48 || cy > room_height - 48) continue
+        if (cx < 48 || cy < 48 || cx > room_width - 48 || cy > room_height - 48) { continue }
         if (collision_line(leader.x, leader.y, cx, cy, obstacles, true, true) == noone) {
             tx = cx
             ty = cy
@@ -139,7 +139,7 @@ cutsceneTargetRoom = noone
 
 // Запустить катсцену. Возвращает true, если катсцена запущена
 startBossCutscene = function(spr, targetRoom) {
-    if (spr == noone || spr == undefined || !sprite_exists(spr)) return false
+    if (spr == noone || spr == undefined || !sprite_exists(spr)) { return false }
     cutsceneSprite = spr
     cutsceneFrame = 0
     cutsceneTargetRoom = targetRoom

@@ -7,8 +7,8 @@ function buildAlbumSlots() {
     for (var i = 0; i < array_length(refs); i++) {
         var ref = refs[i]
         var card = cardFromRef(ref)
-        if (card == undefined) continue
-        if (card.cardAlbumSpr == noone || !sprite_exists(card.cardAlbumSpr)) continue
+        if (card == undefined) { continue }
+        if (card.cardAlbumSpr == noone || !sprite_exists(card.cardAlbumSpr)) { continue }
         var s = new Slot("filled", card)
         s.ref = { id: ref.id, rarity: ref.rarity }
         s.count = ref.count

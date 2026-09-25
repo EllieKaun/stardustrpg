@@ -7,7 +7,7 @@ if (a > 0) {
     draw_set_color(c_white)
 }
 
-if (!open) exit
+if (!open) { exit }
 
 guiSyncCrisp()
 layoutPanels()
