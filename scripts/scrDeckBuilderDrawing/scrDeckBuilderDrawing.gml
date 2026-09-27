@@ -4,9 +4,9 @@ enum Panels { Collection, Deck }
 #macro EMPTY_WEB_SLOT_INDICES [6, 9, 11]
 
 // Конструктор слотов, который используется для отрисовки в дек билдере
-function Slot(_state, _card = undefined) constructor {
-    state = _state // "empty" | "locked" | "filled"
-    card = _card
+function Slot(initialState, initialCard = undefined) constructor {
+    state = initialState // "empty" | "locked" | "filled"
+    card = initialCard
     ref = undefined
     selected = false
     count = 1 // сколько одинаковых карт в этом слоте
@@ -25,7 +25,8 @@ function drawFitTextCentered(text, areaX, areaY, areaW, areaH, fonts = undefined
     }
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    draw_text(areaX + areaW / 2, areaY + areaH / 2, text)
+
+    draw_text(floor(areaX + areaW / 2), floor(areaY + areaH / 2), text)
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
 }
@@ -36,42 +37,42 @@ function pointInRect(pointX, pointY, rectX, rectY, rectWidth, rectHeight) {
 }
 
 // Конфигурация панели, которая отвечает за отрисовку в дек билдере
-function Panel(_config) constructor {
-    x = _config[$ "x"] ?? 0
-    y = _config[$ "y"] ?? 0
-    w = _config[$ "w"] ?? 200
-    h = _config[$ "h"] ?? 200
+function Panel(config) constructor {
+    x = config[$ "x"] ?? 0
+    y = config[$ "y"] ?? 0
+    w = config[$ "w"] ?? 200
+    h = config[$ "h"] ?? 200
 
-    bgSprite = _config[$ "bgSprite"]
-    slotSpriteEmpty = _config[$ "slotSpriteEmpty"]
-    slotSpriteLocked = _config[$ "slotSpriteLocked"]
-    slotSpriteEmptyWeb = _config[$ "slotSpriteEmptyWeb"] // вместо пустого слота для слотов из webSlotIndices
-    webSlotIndices = _config[$ "webSlotIndices"] ?? [] // индексы слотов (с нуля), у которых пустой слот в паутине
-    selectSprite = _config[$ "selectSprite"]
-    pointerSprite = _config[$ "pointerSprite"]
+    bgSprite = config[$ "bgSprite"]
+    slotSpriteEmpty = config[$ "slotSpriteEmpty"]
+    slotSpriteLocked = config[$ "slotSpriteLocked"]
+    slotSpriteEmptyWeb = config[$ "slotSpriteEmptyWeb"] // вместо пустого слота для слотов из webSlotIndices
+    webSlotIndices = config[$ "webSlotIndices"] ?? [] // индексы слотов (с нуля), у которых пустой слот в паутине
+    selectSprite = config[$ "selectSprite"]
+    pointerSprite = config[$ "pointerSprite"]
 
-    tabs = _config[$ "tabs"] ?? []
-    tabFonts = _config[$ "tabFonts"] ?? undefined
-    tabOffsetX = _config[$ "tabOffsetX"] ?? 0 // отступ ряда вкладок слева
+    tabs = config[$ "tabs"] ?? []
+    tabFonts = config[$ "tabFonts"] ?? undefined
+    tabOffsetX = config[$ "tabOffsetX"] ?? 0 // отступ ряда вкладок слева
     activeTab = 0
 
     cols = 4        
     cardRatio = 2 / 3
-    slots = _config[$ "slots"] ?? []
-    padding = _config[$ "padding"] ?? 8
-    tabH = _config[$ "tabH"] ?? 18
-    tabGap = _config[$ "tabGap"] ?? 2
-    tabPadding = _config[$ "tabPadding"] ?? 4
+    slots = config[$ "slots"] ?? []
+    padding = config[$ "padding"] ?? 8
+    tabH = config[$ "tabH"] ?? 18
+    tabGap = config[$ "tabGap"] ?? 2
+    tabPadding = config[$ "tabPadding"] ?? 4
 
-    onSlotClick = _config[$ "onSlotClick"] ?? undefined
-    onTabClick = _config[$ "onTabClick"] ?? undefined
-    onPanelSwitch = _config[$ "onPanelSwitch"] ?? undefined
+    onSlotClick = config[$ "onSlotClick"] ?? undefined
+    onTabClick = config[$ "onTabClick"] ?? undefined
+    onPanelSwitch = config[$ "onPanelSwitch"] ?? undefined
 
     // Кастомный рендер слота карт (для переиспользования)
-    cardRenderer = _config[$ "cardRenderer"] ?? undefined
+    cardRenderer = config[$ "cardRenderer"] ?? undefined
 
     scrollY = 0 // пиксельный скролл сетки 
-    scrollable = _config[$ "scrollable"] ?? true
+    scrollable = config[$ "scrollable"] ?? true
     totalRows = ceil(array_length(slots) / cols)
 
     cursorCol = 0

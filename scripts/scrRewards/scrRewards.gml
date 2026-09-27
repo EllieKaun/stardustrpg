@@ -1,11 +1,18 @@
+// Редкости наград
+function rewardRarities(spec) {
+    if (REWARD_DEFAULT_RARITY_ONLY) { return [CardsRarity.Default] }
+    return spec.rarities
+}
+
 // Полный список наград (id,rarity)
 function rewardCandidateRefs(spec) {
     var refs = []
+    var rarities = rewardRarities(spec)
     for (var idIndex = 0; idIndex < array_length(spec.ids); idIndex++) {
         var cardIdentifier = spec.ids[idIndex]
-        if (cardCanVaryRarity(cardIdentifier) && array_length(spec.rarities) > 0) {
-            for (var rarityIndex = 0; rarityIndex < array_length(spec.rarities); rarityIndex++)
-                array_push(refs, { id: cardIdentifier, rarity: spec.rarities[rarityIndex] })
+        if (cardCanVaryRarity(cardIdentifier) && array_length(rarities) > 0) {
+            for (var rarityIndex = 0; rarityIndex < array_length(rarities); rarityIndex++)
+                array_push(refs, { id: cardIdentifier, rarity: rarities[rarityIndex] })
         } else {
             array_push(refs, { id: cardIdentifier, rarity: CardsRarity.Default })
         }
@@ -44,7 +51,7 @@ function rewardCandidateCount(spec) {
     var count = 0
     for (var idIndex = 0; idIndex < array_length(spec.ids); idIndex++) {
         if (cardCanVaryRarity(spec.ids[idIndex])) { 
-            count += array_length(spec.rarities)
+            count += max(1, array_length(rewardRarities(spec)))
         }
         else { 
             count += 1

@@ -1,0 +1,762 @@
+================================================================================
+  ДРАГ-Н-ДРОП КАРТ: ГАЙД ПО РЕАЛИЗАЦИИ (декбилдер → потом бой)
+  Проект: stardustrpg (GameMaker, GML)
+================================================================================
+
+Этот гайд — не готовый код, а маршрут. Каждый шаг объясняет ЧТО сделать,
+ЗАЧЕМ, и какие функции GameMaker для этого нужны. Куски кода — это скелеты
+с TODO: дописывай их сам. Если застрял — перечитай раздел про системные
+функции (часть 2), там разобрано всё, что используется.
+
+Итог после частей 1–5: в декбилдере можно
+  - тащить карту из коллекции в любой слот колоды (в пустой — добавить,
+    в занятый — заменить);
+  - тащить карту из колоды обратно в коллекцию (убрать);
+  - тащить карту из одного слота колоды в другой (переставить / поменять);
+  - отменять перетаскивание правой кнопкой или Esc;
+  - клик по карте работает как раньше (добавить / убрать).
+Часть 6 — как этот же механизм подключить в бою (карта → враг).
+
+
+--------------------------------------------------------------------------------
+СОДЕРЖАНИЕ
+--------------------------------------------------------------------------------
+  Часть 0. Карта проекта: что уже есть и где лежит
+  Часть 1. Как устроен кадр в GameMaker (порядок событий) — это важно
+  Часть 2. Системные функции и приёмы GML, которые понадобятся
+  Часть 3. Архитектура: менеджер, источник, цель, груз
+  Часть 4. Пошаговая реализация в декбилдере
+  Часть 5. Шлифовка: подсветка, анимации, отмена, крайние случаи
+  Часть 6. Перенос в бой
+  Часть 7. Чек-лист тестирования
+  Часть 8. Частые ошибки
+
+
+================================================================================
+  ЧАСТЬ 0. КАРТА ПРОЕКТА
+================================================================================
+
+Декбилдер
+---------
+objects/oDeckBuilder/
+  Create_0.gml   — создаёт две панели (collectionPanel, deckPanel) через
+                   конструктор Panel. Здесь же колбэки onSlotClick/onTabClick,
+                   функции openBuilder/closeBuilder, layoutPanels, refreshCollection.
+  Step_0.gml     — если открыт: guiSyncCrisp(), layoutPanels(), потом
+                   collectionPanel.stepMouse(), deckPanel.stepMouse(),
+                   потом клавиатура только для сфокусированной панели.
+                   ВАЖНО: пока идёт обучение декбилдера (deckTutorial),
+                   Step выходит раньше (exit) — мышь не обрабатывается.
+  Draw_64.gml    — это событие Draw GUI. Рисует обе панели и обучение.
+
+scripts/scrDeckBuilderDrawing/scrDeckBuilderDrawing.gml
+  Slot(_state, _card)  — конструктор слота. Поля: state ("empty" | "locked" |
+                         "filled"), card (struct Card), ref ({id, rarity}),
+                         count, dimmed, ownerIcon, addable.
+  pointInRect(...)     — попадание точки в прямоугольник.
+  Panel(_config)       — конструктор панели. Ключевые методы:
+      computeLayout()  — считает размер карт и сетки.
+      getSlotRect(i)   — прямоугольник слота i в GUI-координатах
+                         ({sx, sy, sw, sh}), уже с учётом прокрутки scrollY.
+      getTabRect(i)    — прямоугольник вкладки.
+      stepMouse()      — наведение и клики мышью. ВНИМАНИЕ: клик по слоту
+                         срабатывает на НАЖАТИИ кнопки (mouse_check_button_pressed).
+                         Для драг-н-дропа это придётся поменять (шаг 4.6).
+      draw()           — рисует фон, слоты (внутри клипа через поверхность!),
+                         указатель, вкладки.
+  drawCard(card, x, y, w, h, selected) — рисует карту в прямоугольнике.
+
+scripts/scrPlayerData/scrPlayerData.gml — данные игрока
+  global.playerData.collection  — все карты игрока, ключ "id@rarity".
+  deckOf(character)             — колода героя: { unlocked, cards: [{slot, id, rarity}] }.
+  deckSlotRef(character, slot)  — что лежит в слоте (или undefined).
+  setDeckSlot(character, slot, id, rarity) — положить карту в слот.
+        Возвращает true/false. Сам проверяет: слот открыт, карта есть,
+        есть свободная копия (freeCopies > 0). Если в слоте что-то было —
+        сначала очищает его.
+  clearDeckSlot(character, slot) — убрать карту из слота.
+  firstFreeDeckSlot(character)   — первый пустой открытый слот или -1.
+  freeCopies(id, rarity)         — сколько копий не занято ни одной колодой.
+  buildCollectionSlots(...)      — строит массив Slot для панели коллекции.
+  buildDeckSlots(character)      — строит массив Slot для панели колоды.
+        ВНИМАНИЕ: сейчас НЕ ставит slot.ref. Для драга это нужно (шаг 4.1).
+  playerDataSave()               — сохранить на диск.
+
+Общие вещи
+----------
+  global.uiModal  — true, когда открыто модальное окно (декбилдер, диалог,
+                    пауза). Герой не ходит, меню не открываются.
+  oGameController/Step_0.gml — обрабатывает Esc (закрыть декбилдер/паузу)
+                    и Tab (открыть/закрыть декбилдер).
+  guiSyncCrisp() / setCrispGui() (scrDrawing) — подгоняют размер GUI-слоя под
+                    окно. Размер GUI МЕНЯЕТСЯ, поэтому все размеры считаем от
+                    display_get_gui_width() или uiScale, а не константами.
+  drawCardFace(card, cx, cy, w, h, angle, scale, alpha, selected) —
+                    рисует карту по ЦЕНТРУ, с поворотом и масштабом. Для
+                    «летящей» карты это то, что нужно.
+
+Бой (для части 6)
+-----------------
+  objects/Battle/Draw_64.gml — рисует руку, заполняет cardHitRects
+                    ({x, y, w, h, angle, index} — центр, размер, наклон).
+  scripts/scrBattleInitializer — машина состояний боя (stateAt,
+                    changeBattleState) и targetSelectStep — как подтверждается
+                    цель: changeBattleState(BattleStates.PlayProcess) +
+                    playCardAnimated(card, caster, target).
+  scripts/scrBattleFlow — initTargetSelection, selectTargetAtMouse
+                    (цели проверяются через position_meeting(mouse_x, mouse_y, ...)).
+  scripts/scrCards — checkIfCanPlayCard(caster, card).
+  scripts/scrDrawing — pointInRotatedRect(...) для наклонённых карт руки.
+
+
+================================================================================
+  ЧАСТЬ 1. КАК УСТРОЕН КАДР В GAMEMAKER
+================================================================================
+
+Каждый кадр (60 раз в секунду) GameMaker проходит события в таком порядке:
+
+  1. Begin Step    — у ВСЕХ инстансов
+  2. (алармы, клавиатура/мышь-события объектов, если используются)
+  3. Step          — у всех инстансов
+  4. End Step      — у всех инстансов
+  5. Draw Begin / Draw / Draw End   — рисование в мире (комната, камера)
+  6. Draw GUI Begin / Draw GUI / Draw GUI End — рисование интерфейса
+                   поверх всего, в координатах экрана (GUI), камера не влияет
+
+Почему это важно для драга:
+
+  * Порядок инстансов ВНУТРИ одного события не гарантирован. Если менеджер
+    драга и декбилдер оба обрабатывают мышь в Step, неизвестно, кто первый.
+    Решение: менеджер обрабатывает мышь в BEGIN STEP. Тогда к моменту Step
+    декбилдера менеджер уже решил «идёт перетаскивание или нет», и панель
+    может это проверить.
+
+  * Карта в руке должна рисоваться ПОВЕРХ всех панелей. Panel.draw() рисует
+    слоты внутри клипа (на поверхность — см. guiClipBegin/guiClipEnd), всё,
+    что выходит за край панели, обрезается. Если рисовать летящую карту там —
+    её обрежет. Решение: рисовать её в событии DRAW GUI END отдельного
+    объекта-менеджера. Оно идёт после всех Draw GUI, значит поверх всего.
+
+  Как добавить событие в IDE: открыть объект → Add Event →
+    Step → Begin Step
+    Draw → Draw GUI End
+
+
+================================================================================
+  ЧАСТЬ 2. СИСТЕМНЫЕ ФУНКЦИИ И ПРИЁМЫ GML
+================================================================================
+
+2.1. Мышь
+---------
+device_mouse_x_to_gui(0), device_mouse_y_to_gui(0)
+    Позиция мыши в координатах GUI-слоя (0,0 — левый верхний угол экрана,
+    размер = display_get_gui_width/height). Декбилдер и рука в бою рисуются
+    в GUI, поэтому для них берём ЭТО. Аргумент 0 — номер устройства (мышь/
+    первый палец).
+
+mouse_x, mouse_y
+    Позиция мыши В МИРЕ (в комнате, с учётом камеры). Нужна, когда цель —
+    инстанс в комнате (враг в бою). Не путать с GUI!
+
+mouse_check_button_pressed(mb_left)   — true ТОЛЬКО в кадр нажатия.
+mouse_check_button(mb_left)           — true, пока кнопка зажата.
+mouse_check_button_released(mb_left)  — true ТОЛЬКО в кадр отпускания.
+    Драг — это как раз связка: pressed (начало) → check (держим) → released
+    (бросили). mb_right — правая кнопка (удобно для отмены).
+
+keyboard_check_pressed(vk_escape)     — Esc в этот кадр.
+
+2.2. Геометрия
+--------------
+point_distance(x1, y1, x2, y2)  — расстояние. Нужно для «порога драга»:
+    пока мышь сдвинулась от точки нажатия меньше порога — это ещё клик.
+pointInRect(px, py, rx, ry, rw, rh) — (наш, scrDeckBuilderDrawing) попадание.
+pointInRotatedRect(px, py, cx, cy, w, h, angle) — (наш, scrDrawing) то же для
+    наклонённой карты (рука в бою).
+position_meeting(x, y, obj_or_inst) — есть ли инстанс в точке МИРА
+    (по его маске столкновения). Так бой ищет цель под курсором.
+
+2.3. Плавность
+--------------
+lerp(a, b, t)  — линейная интерполяция: a + (b - a) * t.
+    Каждый кадр x = lerp(x, targetX, 0.35) — объект «догоняет» цель,
+    быстро в начале и мягко в конце. Так делаем движение летящей карты,
+    возврат на место и «примагничивание» к слоту.
+clamp(v, min, max) — ограничить значение.
+sign(v) — знак (-1/0/1), удобно для наклона карты по направлению движения.
+
+2.4. Рисование
+--------------
+display_get_gui_width()/height() — размер GUI. У нас меняется (setCrispGui),
+    поэтому все пороги/размеры считать от него (или от panel.uiScale).
+draw_set_alpha(a), draw_set_color(c) — ГЛОБАЛЬНОЕ состояние рисования.
+    Всегда возвращай обратно (draw_set_alpha(1), draw_set_color(c_white)),
+    иначе испортишь всё, что рисуется после тебя. В проекте так делают везде.
+draw_rectangle(x1, y1, x2, y2, outline) — подсветка слота (outline=true — рамка).
+draw_sprite_stretched(spr, img, x, y, w, h) — спрайт в прямоугольник.
+drawCardFace(...) — (наш) карта по центру с углом/масштабом/прозрачностью.
+
+2.5. Структуры, конструкторы, методы
+------------------------------------
+Конструктор:
+    function DragManager() constructor { state = 0 }
+    var m = new DragManager()
+  Поля объявляются как обычные присваивания внутри.
+
+static в конструкторе:
+    static update = function() { ... }
+  Метод создаётся ОДИН раз и общий для всех экземпляров (как у Panel).
+  Без static каждый new создаёт свою копию функции.
+
+Доступ к полю по строке и значение по умолчанию:
+    _config[$ "onDrop"] ?? undefined
+  [$ "key"] — чтение поля структуры по имени (не падает, если поля нет —
+  вернёт undefined). ?? — «если слева undefined, возьми справа».
+
+ВАЖНО про self и привязку методов (здесь чаще всего ошибаются):
+  Функция, объявленная ВНУТРИ литерала структуры { ... onSlotClick: function() {...} },
+  привязывается к ЭТОЙ структуре. Внутри неё self — это структура-конфиг,
+  а не oDeckBuilder. Поэтому в Create_0.gml декбилдера колбэки пишут
+      with (oDeckBuilder) { ... }
+  чтобы вызвать код «от лица» декбилдера (доступ к editingCharacter,
+  deckPanel и т.д.). Делай так же в своих колбэках источников/целей,
+  либо явно привязывай: method(oDeckBuilder.id, function() {...}).
+
+  method(context, func) — вернуть функцию, привязанную к context.
+  with (obj) { ... }    — выполнить блок от лица инстанса(ов) obj.
+
+2.6. Инстансы
+-------------
+instance_exists(obj)       — есть ли хоть один.
+instance_create_depth(x, y, depth, obj) — создать.
+Объект, у которого в комнате ровно один инстанс, можно адресовать по имени:
+    oDragManager.state
+  (так проект делает с oGameController, oDeckBuilder).
+
+2.7. enum и macro
+-----------------
+enum DragState { Idle, Pressed, Dragging, Returning }
+    Именованные целые числа. Сравнивай state == DragState.Dragging.
+#macro DRAG_THRESHOLD_FRAC 0.006
+    Константа, подставляется при компиляции. В проекте балансные числа
+    лежат в scripts/scrBalance — туда же можно положить настройки драга.
+
+
+================================================================================
+  ЧАСТЬ 3. АРХИТЕКТУРА
+================================================================================
+
+Цель: менеджер драга НИЧЕГО не знает про колоду и бой. Он умеет только:
+«под курсором есть что взять?» → «тащим» → «под курсором есть куда бросить?»
+→ «бросили / отменили». Всё знание про колоду — в маленьких адаптерах.
+
+Четыре понятия:
+
+  ГРУЗ (payload) — что тащим. Обычная структура:
+      {
+          kind:   "card",            // тип груза: потом можно таскать не только карты
+          card:   <struct Card>,     // для отрисовки
+          ref:    { id, rarity },    // для логики
+          source: <источник>,        // откуда взяли (чтобы вернуть / знать контекст)
+          data:   { slotIndex: 3 }   // что угодно, что нужно источнику
+      }
+
+  ИСТОЧНИК (source) — откуда можно взять. Структура с функциями:
+      hitTest(gx, gy)       → payload или undefined   (что под курсором)
+      onDragStart(payload)  → (например, спрятать карту в слоте)
+      onDragEnd(payload, dropped) → (вернуть отображение)
+
+  ЦЕЛЬ (target) — куда можно бросить. Структура с функциями:
+      hitTest(gx, gy)          → ctx или undefined (например {slotIndex: 5})
+      accepts(payload, ctx)    → true/false (можно ли сюда)
+      onDrop(payload, ctx)     → true/false (выполнить действие)
+      drawHighlight(payload, ctx, ok) → (необязательно: подсветка)
+
+  МЕНЕДЖЕР (oDragManager) — один объект. Хранит списки источников и целей,
+  состояние и текущий груз. Каждый кадр:
+
+      Idle ──(нажали ЛКМ над источником)──► Pressed
+      Pressed ──(отпустили, не сдвинув)──► Idle         = это был КЛИК
+      Pressed ──(сдвинули дальше порога)──► Dragging    = начался ДРАГ
+      Dragging ──(отпустили над целью, accepts=true)──► onDrop → Idle
+      Dragging ──(отпустили мимо / ПКМ / Esc)──► Returning
+      Returning ──(карта долетела обратно)──► Idle
+
+Почему «Pressed» отдельно: чтобы обычный клик не превращался в драг
+от дрожания руки, и чтобы старое поведение «клик = добавить/убрать» работало.
+
+Почему регистрация, а не жёсткий код: декбилдер при открытии регистрирует
+свои источники/цели, при закрытии снимает. Бой сделает то же со своими.
+Менеджеру всё равно, кто его использует.
+
+
+================================================================================
+  ЧАСТЬ 4. ПОШАГОВАЯ РЕАЛИЗАЦИЯ В ДЕКБИЛДЕРЕ
+================================================================================
+
+Делай по шагам и проверяй игру после каждого. Не пиши всё сразу.
+
+--------------------------------------------------------------------------------
+Шаг 4.1. Данные: ref у слотов колоды
+--------------------------------------------------------------------------------
+Файл: scripts/scrPlayerData/scrPlayerData.gml, функция buildDeckSlots.
+Сейчас слот колоды знает card, но не ref. Для драга нужен ref (id + редкость),
+потому что card.rarity — не то, что лежит в сохранении по ключу.
+
+  Что сделать: там, где создаётся new Slot("filled", cardFromRef(cardRef)),
+  сохрани слот в переменную и поставь ему
+      newSlot.ref = { id: cardRef.id, rarity: cardRef.rarity }
+  как это уже сделано в buildCollectionSlots.
+
+Проверка: ничего не должно сломаться, всё выглядит как раньше.
+
+--------------------------------------------------------------------------------
+Шаг 4.2. Данные: операции с колодой в одном месте
+--------------------------------------------------------------------------------
+Сейчас логика «добавить в колоду» живёт внутри onSlotClick коллекции
+(Create_0.gml декбилдера): setDeckSlot + аналитика + перестроить панели +
+сохранить. Для драга понадобится то же самое, но в другой слот. Чтобы
+не копировать код, вынеси операции в функции.
+
+В scrPlayerData.gml (раздел «Работа с UI декбилдера») добавь:
+
+  // Положить карту в конкретный слот. Если там была другая — она вернётся
+  // в коллекцию (setDeckSlot сам очищает слот)
+  function deckPutCard(character, slot, ref) {
+      // TODO: вызвать setDeckSlot(character, slot, ref.id, ref.rarity)
+      // TODO: если вернул true — analyticsAddToDeck(characterKey(character), ref.id, ref.rarity)
+      // TODO: вернуть результат (true/false)
+  }
+
+  // Переставить карту из слота a в слот b. Если b занят — поменять местами
+  function deckMoveCard(character, a, b) {
+      // TODO: если a == b — return false
+      // var refA = deckSlotRef(character, a)   // может быть undefined
+      // var refB = deckSlotRef(character, b)
+      // TODO: если refA == undefined — return false (нечего двигать)
+      //
+      // Подумай о порядке! setDeckSlot проверяет freeCopies: если одна и та же
+      // карта (одинаковые id+rarity) уже занята, а свободных копий нет, он
+      // вернёт false. Поэтому: СНАЧАЛА очистить оба слота (clearDeckSlot),
+      // ПОТОМ ставить. Тогда копии освободятся.
+      //
+      // clearDeckSlot(character, a); clearDeckSlot(character, b)
+      // var ok = setDeckSlot(character, b, refA.id, refA.rarity)
+      // if (refB != undefined) { ok = ok && setDeckSlot(character, a, refB.id, refB.rarity) }
+      //
+      // TODO: если что-то не получилось — ОТКАТИТЬ: очистить оба и вернуть
+      // как было (refA в a, refB в b). Иначе можно потерять карту из колоды.
+  }
+
+  // Убрать карту из слота
+  function deckTakeCard(character, slot) {
+      // TODO: если deckSlotRef(...) == undefined — return false
+      // TODO: clearDeckSlot; return true
+  }
+
+И в oDeckBuilder/Create_0.gml добавь одну функцию, которая после любой
+операции обновляет всё:
+
+  applyDeckChange = function() {
+      deckPanel.slots = buildDeckSlots(editingCharacter)
+      refreshCollection()
+      playerDataSave()
+  }
+
+Теперь перепиши onSlotClick обеих панелей через эти функции
+(коллекция: deckPutCard(editingCharacter, firstFreeDeckSlot(...), sourceSlot.ref);
+колода: deckTakeCard(editingCharacter, slotIndex)), а после успеха —
+applyDeckChange(). Не забудь with (oDeckBuilder) — см. 2.5.
+
+Проверка: клик по карте коллекции добавляет, клик по карте колоды убирает —
+как раньше. Если да — фундамент готов.
+
+--------------------------------------------------------------------------------
+Шаг 4.3. Объект-менеджер
+--------------------------------------------------------------------------------
+Создай в IDE объект oDragManager (без спрайта). События:
+  Create, Begin Step, Draw GUI End.
+
+Где он будет жить: overworld-комната persistent, поэтому достаточно создать
+его один раз. Самый простой способ — в oGameController/Create_0.gml:
+
+  if (!instance_exists(oDragManager)) { instance_create_depth(0, 0, 0, oDragManager) }
+
+(Для боя — то же самое в Create объекта Battle, см. часть 6.)
+
+Create_0.gml — поля:
+
+  enum DragState { Idle, Pressed, Dragging, Returning }   // enum лучше вынести в скрипт
+
+  state = DragState.Idle
+  sources = []          // зарегистрированные источники
+  targets = []          // зарегистрированные цели
+  payload = undefined   // что тащим
+  pressX = 0            // где нажали (GUI)
+  pressY = 0
+  // Позиция и размер летящей карты (GUI), для отрисовки
+  ghostX = 0; ghostY = 0; ghostW = 0; ghostH = 0
+  // Откуда взяли (центр и размер слота-источника) — чтобы вернуть туда
+  homeX = 0; homeY = 0
+  hoverTarget = undefined   // цель под курсором
+  hoverCtx = undefined      // и её контекст (например номер слота)
+  hoverOk = false           // принимает ли она груз
+  wasClick = false          // в этот кадр был клик (без драга)
+  consumedEscape = false    // Esc в этот кадр ушёл на отмену драга
+
+  register = function(item, list) { array_push(list, item) }
+  // TODO: unregisterAll() — очистить sources и targets (вызывать при закрытии экрана)
+  // TODO: cancel() — если Dragging: state = Returning, source.onDragEnd(payload, false)
+  // TODO: isBusy() — state != Idle
+
+--------------------------------------------------------------------------------
+Шаг 4.4. Логика состояний (Begin Step)
+--------------------------------------------------------------------------------
+Скелет Begin Step:
+
+  wasClick = false
+  consumedEscape = false
+  var gx = device_mouse_x_to_gui(0)
+  var gy = device_mouse_y_to_gui(0)
+  var threshold = display_get_gui_width() * DRAG_THRESHOLD_FRAC  // ~6-8 px на 1366
+
+  switch (state) {
+      case DragState.Idle:
+          if (mouse_check_button_pressed(mb_left)) {
+              // пройти по sources, у каждого hitTest(gx, gy)
+              // первый, кто вернул payload — запомнить payload (иначе payload = undefined)
+              // pressX/Y = gx/gy; state = DragState.Pressed
+              // В Pressed переходим ВСЕГДА, даже без груза: иначе клик по пустому
+              // слоту не распознается как клик (wasClick) и панель не выделит слот.
+              // ВАЖНО: пока НЕ вызываем onDragStart — это ещё может быть клик
+          }
+          break
+
+      case DragState.Pressed:
+          if (!mouse_check_button(mb_left)) {
+              // отпустили не сдвинув → это клик
+              wasClick = true
+              payload = undefined
+              state = DragState.Idle
+          } else if (payload != undefined && point_distance(pressX, pressY, gx, gy) > threshold) {
+              // начался драг (только если было что брать)
+              // payload.source.onDragStart(payload)
+              // ghostX/Y = центр слота-источника (payload.data.rect), ghostW/H = его размер
+              // homeX/Y = тот же центр
+              state = DragState.Dragging
+          }
+          break
+
+      case DragState.Dragging:
+          // 1) карта едет за мышью: ghostX = lerp(ghostX, gx, 0.5) и т.д.
+          // 2) найти цель под курсором: пройти targets, hitTest(gx, gy)
+          //    → hoverTarget, hoverCtx; hoverOk = hoverTarget.accepts(payload, hoverCtx)
+          // 3) отмена: mouse_check_button_pressed(mb_right) || keyboard_check_pressed(vk_escape)
+          //    → cancel(); если это был Esc — consumedEscape = true
+          // 4) отпустили ЛКМ (mouse_check_button_released(mb_left)):
+          //    если hoverTarget != undefined && hoverOk:
+          //        var ok = hoverTarget.onDrop(payload, hoverCtx)
+          //        payload.source.onDragEnd(payload, ok)
+          //        если ok: payload = undefined; state = Idle
+          //        иначе: state = Returning
+          //    иначе: state = Returning (и onDragEnd(payload, false) — см. cancel)
+          break
+
+      case DragState.Returning:
+          // ghostX = lerp(ghostX, homeX, 0.3), то же для Y
+          // когда point_distance(ghostX, ghostY, homeX, homeY) < 1 → payload = undefined; state = Idle
+          break
+  }
+
+Зачем wasClick: панель увидит его в своём Step (он идёт ПОСЛЕ Begin Step)
+и выполнит старое действие клика. См. шаг 4.6.
+
+--------------------------------------------------------------------------------
+Шаг 4.5. Рисование летящей карты (Draw GUI End)
+--------------------------------------------------------------------------------
+  if (payload == undefined) { exit }
+  if (state != DragState.Dragging && state != DragState.Returning) { exit }
+
+  // Тень: та же карта, чёрная полупрозрачная, чуть смещённая
+  // (можно пропустить в первой версии)
+
+  // Наклон по движению — «живость». Храни ghostPrevX и считай
+  // var tilt = clamp((ghostX - ghostPrevX) * -1.5, -12, 12)
+  drawCardFace(payload.card, ghostX, ghostY, ghostW, ghostH, tilt, 1.08, 1, false)
+
+drawCardFace рисует ПО ЦЕНТРУ — поэтому ghostX/ghostY это центр карты,
+а не левый верхний угол. Не перепутай с getSlotRect (там левый верхний угол sx, sy).
+Центр слота = sx + sw * 0.5, sy + sh * 0.5.
+
+Проверка на этом этапе: зарегистрируй временно один источник, который
+всегда возвращает какую-нибудь карту — должна появляться карта и ездить
+за мышью, а после отпускания — улетать обратно.
+
+--------------------------------------------------------------------------------
+Шаг 4.6. Панель: клик на отпускании, а не на нажатии
+--------------------------------------------------------------------------------
+Проблема: Panel.stepMouse вызывает onSlotClick на mouse_check_button_pressed.
+Если ничего не менять — при начале драга из коллекции карта сразу
+добавится в колоду кликом, а потом ещё и перетащится.
+
+Решение (в Panel.stepMouse, scrDeckBuilderDrawing.gml):
+  * Вкладки оставь на pressed — их не таскают.
+  * Для слотов вместо clicked используй «клик от менеджера»:
+        var slotClicked = instance_exists(oDragManager) ? oDragManager.wasClick
+                                                        : mouse_check_button_pressed(mb_left)
+    Менеджер ставит wasClick в кадр ОТПУСКАНИЯ, если мышь не сдвинулась.
+  * Пока менеджер тащит (oDragManager.state == DragState.Dragging или Returning) —
+    не обрабатывать наведение и клики вообще (return в начале stepMouse).
+    Колесо прокрутки можно оставить — пусть листается во время драга.
+
+Тонкость: wasClick говорит «был клик», но не «по какому слоту». Панель
+сама смотрит, над каким слотом курсор (hoverSlot) — это тот же слот, где
+нажали, потому что курсор почти не двигался. Этого достаточно.
+
+Проверка: клик по картам работает как раньше (но на отпускании).
+
+--------------------------------------------------------------------------------
+Шаг 4.7. Адаптеры: источники и цели декбилдера
+--------------------------------------------------------------------------------
+Здесь связываем менеджер с панелями. Всё — в oDeckBuilder/Create_0.gml.
+
+Общая функция «слот под курсором» (можно методом Panel):
+
+  // Индекс слота под точкой или -1. Учитывает, что слот виден (внутри панели)
+  slotAt = function(panel, gx, gy) {
+      // TODO: цикл по panel.slots, panel.getSlotRect(i),
+      //       pointInRect(gx, gy, r.sx, r.sy, r.sw, r.sh) && pointInRect(gx, gy, panel.x, panel.y, panel.w, panel.h)
+      //       (вторая проверка — чтобы не хватать слот, уехавший прокруткой под край)
+  }
+
+ИСТОЧНИК «коллекция»:
+  collectionSource = {
+      hitTest: function(gx, gy) {
+          // with (oDeckBuilder) { ... }
+          // i = slotAt(collectionPanel, gx, gy); если -1 → undefined
+          // slot = collectionPanel.slots[i]
+          // можно брать только если slot.state == "filled" && slot.addable
+          // вернуть payload: { kind: "card", card: slot.card, ref: slot.ref,
+          //                    source: collectionSource, data: { panel: "collection", slotIndex: i, rect: r } }
+      },
+      onDragStart: function(payload) { /* можно ничего */ },
+      onDragEnd: function(payload, dropped) { /* можно ничего */ }
+  }
+  (Внутри функций self — это сама структура collectionSource, поэтому на
+  неё можно ссылаться через self в поле source.)
+
+ИСТОЧНИК «колода»: то же для deckPanel, условие slot.state == "filled".
+  onDragStart — хорошее место, чтобы пометить слот как «пустой на время»
+  (например payloadSlot.hiddenWhileDragging = true, и в отрисовке панели
+  такие слоты рисовать пустыми). В первой версии можно пропустить.
+
+ЦЕЛЬ «слот колоды»:
+  deckSlotTarget = {
+      hitTest: function(gx, gy) {
+          // i = slotAt(deckPanel, gx, gy); -1 → undefined; иначе { slotIndex: i }
+      },
+      accepts: function(payload, ctx) {
+          // слот не locked
+          // если груз из коллекции: ok (пустой — добавить, занятый — заменить)
+          // если груз из колоды: ctx.slotIndex != payload.data.slotIndex
+      },
+      onDrop: function(payload, ctx) {
+          // with (oDeckBuilder):
+          //   из коллекции: ok = deckPutCard(editingCharacter, ctx.slotIndex, payload.ref)
+          //   из колоды:    ok = deckMoveCard(editingCharacter, payload.data.slotIndex, ctx.slotIndex)
+          //   if (ok) applyDeckChange()
+          //   return ok
+      }
+  }
+
+ЦЕЛЬ «коллекция» (убрать карту, бросив её на левую панель):
+  hitTest — курсор внутри прямоугольника collectionPanel (x, y, w, h) → {}
+  accepts — только груз из колоды
+  onDrop  — deckTakeCard(editingCharacter, payload.data.slotIndex) + applyDeckChange()
+
+Регистрация: в openBuilder() —
+  with (oDragManager) {
+      unregisterAll()
+      register(other.collectionSource, sources)   // other — это oDeckBuilder внутри with
+      register(other.deckSource, sources)
+      register(other.deckSlotTarget, targets)
+      register(other.collectionTarget, targets)
+  }
+  В closeBuilder() — oDragManager.cancel(); oDragManager.unregisterAll()
+
+(Про other: внутри with (X) { } self — это X, а other — тот, кто вызвал with.)
+
+Проверка:
+  - тащим из коллекции в пустой слот → карта добавилась;
+  - в занятый → заменилась, старая вернулась в коллекцию;
+  - из колоды в колоду → переставилась/поменялась;
+  - из колоды на коллекцию → убралась;
+  - мимо → вернулась, ничего не изменилось.
+
+--------------------------------------------------------------------------------
+Шаг 4.8. Esc, Tab и обучение
+--------------------------------------------------------------------------------
+Esc: oGameController/Step_0.gml по Esc закрывает декбилдер. Если драг
+отменён Esc'ом — декбилдер закрываться не должен. Менеджер в Begin Step
+ставит consumedEscape = true, а в oGameController перед обработкой Esc:
+  if (instance_exists(oDragManager) && oDragManager.consumedEscape) { /* пропустить */ }
+Именно поэтому менеджер — в Begin Step: он успевает раньше Step контроллера.
+
+Tab / закрытие: closeBuilder() вызывает cancel() и unregisterAll() —
+иначе карта «повиснет» в воздухе над закрытым окном.
+
+Обучение декбилдера: пока идёт (global.deckTutorialStage == DeckTutorialStage.Steps),
+Step декбилдера выходит раньше. Менеджер тоже не должен работать:
+в hitTest источников декбилдера верни undefined, если обучение активно
+(или не регистрируй источники, пока оно идёт).
+
+
+================================================================================
+  ЧАСТЬ 5. ШЛИФОВКА
+================================================================================
+
+5.1. Подсветка целей
+  Во время драга в Draw GUI End менеджера пройди по targets и дай каждой
+  нарисовать подсказку (необязательный метод drawHighlight). Для слотов
+  колоды: зелёная рамка на тех, что accepts=true, и чуть ярче — на той, что
+  под курсором. Для недоступных — затемнение (как slot.dimmed).
+  Помни про draw_set_alpha/draw_set_color — возвращай в 1 / c_white.
+
+5.2. Прилипание к слоту
+  Если hoverOk, пусть ghost тянется не к мыши, а к центру слота-цели
+  (lerp с меньшим коэффициентом). Выглядит как «магнит».
+
+5.3. Прокрутка у края
+  Если тащим над коллекцией у верхнего/нижнего края — меняй
+  collectionPanel.scrollY на небольшую величину каждый кадр и вызывай
+  refreshScroll(). Удобно делать в Begin Step менеджера через необязательный
+  метод цели onHover(payload, ctx, gx, gy).
+
+5.4. Звуки
+  В проекте есть playCardSelectSound() (бой). Подними карту/брось — звук.
+
+5.5. Размеры и масштаб
+  Не используй «8 пикселей». Используй display_get_gui_width() * коэффициент
+  или panel.uiScale — GUI меняет размер при смене окна (setCrispGui).
+
+5.6. Переключение героя во время драга (по желанию)
+  Цель «вкладка героя»: hitTest по deckPanel.getTabRect(i); если курсор
+  держится над вкладкой > ~0.4 сек — вызвать deckPanel.onTabClick(deckPanel, i).
+  Таймер — просто счётчик кадров в менеджере или цели.
+
+
+================================================================================
+  ЧАСТЬ 6. ПЕРЕНОС В БОЙ
+================================================================================
+
+Менеджер тот же. Меняются только источники и цели.
+
+6.1. Создание: в Create объекта Battle —
+  if (!instance_exists(oDragManager)) { instance_create_depth(0, 0, 0, oDragManager) }
+  и регистрация источника/целей. При выходе из боя — unregisterAll().
+
+6.2. Источник «рука»:
+  hitTest(gx, gy):
+    - только если battleState == BattleStates.CharacterPlay (ход героя);
+    - пройти cardHitRects (их заполняет Draw_64 боя) С КОНЦА: выбранная
+      карта рисуется последней, значит она сверху;
+    - попадание: pointInRotatedRect(gx, gy, r.x, r.y, r.w, r.h, r.angle);
+    - card = selectedCharacter.getCardsInHand()[r.index];
+    - если !checkIfCanPlayCard(selectedCharacter, card) → undefined
+      (не хватает маны/здоровья — карту не оторвать; можно «потрясти»);
+    - payload: { kind: "card", card: card, source: ..., data: { handIndex: r.index, rect: r } }
+  Пока карту тащат, в Battle/Draw_64.gml её надо НЕ рисовать в руке —
+  так же, как там уже пропускают animatingCard.
+
+  Внимание: cardHitRects заполняются в Draw GUI, то есть это данные
+  ПРОШЛОГО кадра. Для hitTest это нормально.
+
+6.3. Координаты: GUI vs мир.
+  Карта в руке — в GUI. Враги — инстансы в МИРЕ. Для целей используй
+  mouse_x, mouse_y (мир), как это делает selectTargetAtMouse:
+      position_meeting(mouse_x, mouse_y, enemy)
+  Менеджер передаёт в hitTest GUI-координаты — цель-враг их просто
+  игнорирует и берёт mouse_x/mouse_y. Это нормально: интерфейс один,
+  реализация своя.
+
+6.4. Цели по типу карты (card.target):
+  SingleEnemyTarget  — цель на каждого живого врага:
+                        hitTest: position_meeting(mouse_x, mouse_y, enemy) && !enemy.isKO()
+  SingleAllyTarget   — то же для heroes (для воскрешения — только isKO(), см.
+                        initTargetSelectionKO).
+  AllEnemies / AllAllies / Self — одна большая зона «поле боя»
+                        (всё выше стола: gy < высота экрана - высота стола).
+  accepts(payload, ctx) проверяет, что тип цели подходит payload.card.target.
+
+6.5. onDrop — НЕ играть карту самому!
+  Повтори ровно то, что делает подтверждение цели с клавиатуры
+  (targetSelectStep в scrBattleInitializer):
+      selectedCard = payload.data.handIndex
+      selectedTarget = <цель>          // для одиночных
+      changeBattleState(BattleStates.PlayProcess)
+      unselectTargets()
+      playCardAnimated(payload.card, selectedCharacter, <цель или массив enemies/heroes>)
+  Тогда стоимость, анимации, эффекты, обучение боя — всё отработает как
+  обычно. Драг — просто ещё один способ ввода.
+
+6.6. Подсветка цели: при наведении ставь enemy.isTarget = true (как
+  selectNextTarget), при уходе — unselectTargets(). Тогда враг
+  подсветится существующей отрисовкой.
+
+6.7. Вариант «стрелка» (как в Slay the Spire): карта остаётся у руки, от неё
+  к курсору рисуется кривая. Для далёких целей это удобнее. Можно добавить
+  в payload поле visual: "ghost" | "arrow" и в Draw GUI End рисовать по-разному.
+  Кривая Безье по трём точкам: p(t) = (1-t)^2*A + 2(1-t)t*B + t^2*C,
+  рисуй 12–20 точками/спрайтами-стрелками.
+
+6.8. Отмена: ПКМ / Esc / отпустили мимо — карта возвращается в руку.
+  В бою уже есть wantsCancel(input) — можно использовать и его.
+
+
+================================================================================
+  ЧАСТЬ 7. ЧЕК-ЛИСТ ТЕСТИРОВАНИЯ
+================================================================================
+  [ ] Клик по карте коллекции добавляет в первый свободный слот.
+  [ ] Клик по карте колоды убирает её.
+  [ ] Клавиатура (стрелки + Enter) работает как раньше.
+  [ ] Драг коллекция → пустой слот колоды.
+  [ ] Драг коллекция → занятый слот (замена; старая вернулась в коллекцию).
+  [ ] Драг коллекция → закрытый (locked) слот — не принимается, карта вернулась.
+  [ ] Драг карты, у которой нет свободных копий (addable=false) — не отрывается.
+  [ ] Драг колода → колода (в пустой и в занятый).
+  [ ] Драг колода → коллекция (убрать).
+  [ ] Драг мимо всего — возврат, данные не изменились.
+  [ ] ПКМ и Esc во время драга — отмена; Esc НЕ закрывает декбилдер.
+  [ ] Tab во время драга — декбилдер закрылся, карта не висит на экране.
+  [ ] Во время обучения декбилдера драг не работает.
+  [ ] Смена героя (вкладки Лана/Вив) и повторный драг.
+  [ ] Сохранение: перезапустить игру — колода такая же.
+  [ ] Смена размера окна / полноэкранный режим (F11) — порог и размеры адекватны.
+  [ ] Прокрутка коллекции колесом во время драга.
+
+
+================================================================================
+  ЧАСТЬ 8. ЧАСТЫЕ ОШИБКИ
+================================================================================
+  * Перепутал центр и угол. drawCardFace — центр; getSlotRect — левый верхний
+    угол (sx, sy). Центр = sx + sw/2, sy + sh/2.
+  * Смешал GUI и мир. device_mouse_*_to_gui — для интерфейса; mouse_x/y — для
+    инстансов в комнате.
+  * self не тот. Функции в литерале структуры привязаны к структуре.
+    Нужен декбилдер — with (oDeckBuilder) { ... }.
+  * Не вернул draw_set_alpha/draw_set_color — половина интерфейса стала
+    прозрачной/цветной.
+  * Карта исчезает у края панели — рисуешь её внутри Panel.draw (клип).
+    Рисуй в Draw GUI End менеджера.
+  * Клик и драг сработали оба — клик остался на pressed (шаг 4.6).
+  * Карта потерялась из колоды при перестановке — нет отката в deckMoveCard,
+    или ставил до того, как очистил (freeCopies).
+  * После закрытия окна карта висит — не вызвал cancel()/unregisterAll().
+  * Устаревшие индексы: после applyDeckChange() массивы slots пересоздаются.
+    Не храни ссылки на старые Slot после onDrop — бери данные из payload.ref.
+  * Не забудь playerDataSave() после изменения колоды (applyDeckChange делает).
+
+
+Удачи! Совет: сначала сделай шаги 4.1–4.5 и добейся, чтобы «карта ездила
+за мышью и возвращалась». Это самое интересное и даёт уверенность.
+Логика колоды (4.7) потом ложится очень быстро.

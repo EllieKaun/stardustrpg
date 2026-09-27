@@ -148,6 +148,31 @@ global.zoneConfig = { // нужно для определение секций �
     innerHalf:  240, // ширина внутренней зоны
     middleHalf: 480  // ширина средней зоны
 }
+
+// Последовательность следования персонажей
+followSequence = function() {
+    var sequence = [selected_character]
+    var partyNumber = array_length(partyMembers)
+    for (var index = 1; index < partyNumber; index++) {
+        array_push(sequence, partyMembers[(selectedIndex + index) mod partyNumber])
+    }
+    if (global.safarJoined && instance_exists(oSafar)) {
+        array_push(sequence, oSafar)
+    }
+    return sequence
+}
+
+// За кем идёт member
+followTargetOfMember = function(member) {
+    var sequence = followSequence()
+    for (var index = 1; index < array_length(sequence); index++) {
+        if (member.object_index == sequence[index]) {
+            return sequence[index - 1]
+        }
+    }
+    return selected_character
+}
+
 switchCharacter = function() {
     if (global.uiModal) {
         return

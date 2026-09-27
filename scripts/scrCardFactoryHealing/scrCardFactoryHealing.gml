@@ -1,6 +1,5 @@
 // Восстановление hp одному герою
-function createInstantHealSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createInstantHealSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Instant Heal",
@@ -19,8 +18,7 @@ function createInstantHealSingleTargetCard() {
 }
 
 //  Восстановление hp группе героев
-function createInstantMultipleTargetsHealCard() {
-    var rarity = CardsRarity.Default
+function createInstantMultipleTargetsHealCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllAllies
     return new Card(
         "Instant Heal Group",
@@ -39,8 +37,7 @@ function createInstantMultipleTargetsHealCard() {
 }
 
 // Постепенное восстановление hp одному герою
-function createOvertimeHealSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createOvertimeHealSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Heal Over Time",
@@ -61,8 +58,7 @@ function createOvertimeHealSingleTargetCard() {
 
 
 // Восстановление mp одному герою
-function createInstantManaGainSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createInstantManaGainSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Mana Gain",
@@ -81,8 +77,7 @@ function createInstantManaGainSingleTargetCard() {
 }
 
 // Восстановление mp группе героев
-function createInstantMultipleTargetsManaGainCard() {
-    var rarity = CardsRarity.Default
+function createInstantMultipleTargetsManaGainCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllAllies
     return new Card(
         "Mana Gain Group",
@@ -101,8 +96,7 @@ function createInstantMultipleTargetsManaGainCard() {
 }
 
 // Постепенное восстановление mp одному герою
-function createOvertimeManaGainSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createOvertimeManaGainSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Mana Over Time",
@@ -121,8 +115,7 @@ function createOvertimeManaGainSingleTargetCard() {
 }
 
 // Снятие статуса шока одному герою - уникальная
-function createRemoveStatusShockSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createRemoveStatusShockSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Remove Shock",
@@ -141,8 +134,7 @@ function createRemoveStatusShockSingleTargetCard() {
 }
 
 // Снятие статуса поджога одному герою - уникальная
-function createRemoveStatusBurnSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createRemoveStatusBurnSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Remove Burn",
@@ -161,8 +153,7 @@ function createRemoveStatusBurnSingleTargetCard() {
 }
 
 // Снятие статуса заморозки одному герою - уникальная
-function createRemoveStatusFreezeSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createRemoveStatusFreezeSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Remove Freeze",
@@ -181,8 +172,7 @@ function createRemoveStatusFreezeSingleTargetCard() {
 }
 
 // Снятие статуса кровотечения одному герою - уникальная
-function createRemoveStatusBleedingSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createRemoveStatusBleedingSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Remove Bleeding",
@@ -201,8 +191,7 @@ function createRemoveStatusBleedingSingleTargetCard() {
 }
 
 // Снятие статуса оглушения одному герою - уникальная
-function createRemoveStatusStunSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createRemoveStatusStunSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "Remove Stun",
@@ -221,8 +210,7 @@ function createRemoveStatusStunSingleTargetCard() {
 }
 
 // Воскрешение павшего союзника - уникальная
-function createResurrectionCard() {
-    var rarity = CardsRarity.Default
+function createResurrectionCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "ResurrectionCard",

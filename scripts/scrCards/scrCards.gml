@@ -34,10 +34,22 @@ function Card(name,
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana
   
     self.cardTokenSpr = (self.costTypeCached == CostType.Health) ? hpCostToken : mpCostToken
+    // Рамка по редкости
+    self.cardBorderSpr = cardBorderForRarity(rarity)
     self.costValueCached = computeCardCost(rarity, effects)
     if (self.costTypeCached == CostType.Mana) { self.costValueCached *= CARD_MANA_COST_MULTIPLIER }
     self.costType  = function() { return self.costTypeCached }
     self.costValue = function() { return self.costValueCached }
+}
+
+// Рамка карты по редкости
+function cardBorderForRarity(rarity) {
+    switch (rarity) {
+        case CardsRarity.Unusual: return uncommonBorder
+        case CardsRarity.Rare: return rareBorder
+        case CardsRarity.Epic: return epicBorder
+        default: return commonBorder
+    }
 }
 
 // Стоимость карты по её первому эффекту и редкости (кэшируется в costValueCached)
@@ -64,8 +76,8 @@ function computeCardCost(rarity, effects) {
 // Множитель к характеристике (сила/интеллект) для мгновенного урона карты
 // по редкости и типу цели
 function getDamageMultiplierOnRarityAndTarget(rarity, target) {
-    var b = cardBalance()
-    return (target == TargetTypes.SingleEnemyTarget) ? b.damageMulSingle[rarity] : b.damageMulGroup[rarity]
+    var balance = cardBalance()
+    return (target == TargetTypes.SingleEnemyTarget) ? balance.damageMulSingle[rarity] : balance.damageMulGroup[rarity]
 }
 
 // Мгновенное лечение по редкости
@@ -212,8 +224,8 @@ function cardPlaySequence(card, caster, targets) {
 function playCard(card, caster, targets) {
     // аналитика
     if (!caster.isEnemy && !caster.isPuppet) {
-        var _cid = variable_struct_exists(card, "cardId") ? card.cardId : card.name
-        analyticsPlayCard(_cid, card.rarity, caster.name)
+        var playedCardId = variable_struct_exists(card, "cardId") ? card.cardId : card.name
+        analyticsPlayCard(playedCardId, card.rarity, caster.name)
     }
     var runner = new SequenceRunner()
     runner.play(cardPlaySequence(card, caster, targets), {

@@ -1,6 +1,10 @@
-depth = -bbox_bottom
+if (global.safarJoined) {
+    if (mask_index != sLana) { joinParty() }
+    event_inherited()
+    exit
+}
 
-if (global.safarJoined) { exit }
+depth = -bbox_bottom
 if (global.gamePaused || global.uiModal) { exit }
 
 var leader = oGameController.selected_character

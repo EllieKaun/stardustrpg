@@ -13,6 +13,7 @@
 
 // Награды
 #macro REWARD_DUPLICATE_FALLOFF 0.5 // падение шанса выпадения дубликата карты как награды
+#macro REWARD_DEFAULT_RARITY_ONLY true // в наградах только обычная редкость
 
 // Сложность врагов
 #macro ENEMY_WIN_BONUS 2 // рост силы врагов
@@ -95,8 +96,8 @@ function battleDifficulty(zoneId = undefined) {
 
 function enemyCountForLevel(difficulty, level) {
     var tiers = difficulty.enemyCount
-    for (var i = 0; i < array_length(tiers); i++) {
-        if (level < tiers[i].maxLevel) { return { mn: tiers[i].mn, mx: tiers[i].mx } }
+    for (var index = 0; index < array_length(tiers); index++) {
+        if (level < tiers[index].maxLevel) { return { mn: tiers[index].mn, mx: tiers[index].mx } }
     }
     var last = tiers[array_length(tiers) - 1]
     return { mn: last.mn, mx: last.mx }

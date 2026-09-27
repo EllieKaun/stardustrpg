@@ -18,7 +18,7 @@ function createLana(){
             1,
             playerDeckFor(Characters.Lana)
     )
-    starrior.themeColor = make_color_rgb(214, 36, 140)
+    starrior.themeColor = make_color_rgb(105, 93, 164)
     starrior.portrait = sprCharacterPanelLanaHead
     return starrior
 }
@@ -56,7 +56,7 @@ function createSafar(){
         2,
         safarFixedDeck()
     )
-    starrior.themeColor = make_color_rgb(220, 160, 60)
+    starrior.themeColor = make_color_rgb(60, 145, 174)
     starrior.portrait = sprCharacterPanelSafarHead
     return starrior
 }
@@ -83,7 +83,7 @@ function createViv(){
         2,
         playerDeckFor(Characters.Viv)
     )
-    starrior.themeColor = make_color_rgb(60, 140, 220)
+    starrior.themeColor = make_color_rgb(199, 9, 151)
     starrior.portrait = sprCharacterPanelVivHead
     return starrior
 }

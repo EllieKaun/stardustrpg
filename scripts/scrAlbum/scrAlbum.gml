@@ -59,10 +59,6 @@ function albumDrawCard(slot, rect, isSelected) {
     }
 
     gpu_set_tex_filter(prevFilter)
-
-    if (isSelected && sprite_exists(sprCardSelected)) {
-        draw_sprite_stretched(sprCardSelected, 0, rect.sx, rect.sy, rect.sw, rect.sh)
-    }
 }
 
 // Панель альбома
@@ -72,8 +68,6 @@ function albumMakePanel() {
         bgSprite: box2,
         tabs: [],
         scrollable: true,
-        pointerSprite: sPointer,
-        selectSprite: sprCardSelected,
         cardRenderer: albumDrawCard,
         slots: buildAlbumSlots()
     })

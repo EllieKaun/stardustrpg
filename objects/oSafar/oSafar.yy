@@ -13,8 +13,8 @@
     "path":"folders/Overworld/Characters/Safar.yy",
   },
   "parentObjectId":{
-    "name":"oShadowDrawing",
-    "path":"objects/oShadowDrawing/oShadowDrawing.yy",
+    "name":"oHero",
+    "path":"objects/oHero/oHero.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,
