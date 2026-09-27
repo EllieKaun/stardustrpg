@@ -24,26 +24,26 @@
 #macro WEAKNESS_DAMAGE_MODIFIER 0.1
 #macro WEAKNESS_STATUS_CHANCE_BONUS 0.1
 
-#macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману (здоровье не трогаем)
+#macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману
 
 function cardBalance() {
     return {
-        instantHeal:     [10, 20, 30, HEAL_FULL],
-        overtimeHeal:    [6, 8, 12, 16],
+        instantHeal: [10, 20, 30, HEAL_FULL],
+        overtimeHeal: [6, 8, 12, 16],
         overtimeHealDur: [2, 2, 3, 3],
-        instantMana:     [10, 20, 30, MANA_FULL],
-        overtimeMana:    [6, 8, 12, 16],
+        instantMana: [10, 20, 30, MANA_FULL],
+        overtimeMana: [6, 8, 12, 16],
         overtimeManaDur: [2, 2, 3, 3],
-        buff:            [2, 4, 6, 8],
+        buff: [2, 4, 6, 8],
         damageMulSingle: [1, 2, 3, 4],
-        damageMulGroup:  [1, 1, 2, 3],
+        damageMulGroup: [1, 1, 2, 3],
         cost: {
             physicalSingle: [2, 3, 4, 5],
-            physicalMulti:  [4, 5, 6, 7],
-            magical:        [3, 4, 5, 6],
-            instantHeal:    [3, 4, 5, 6],
-            overtimeHeal:   [2, 3, 4, 5],
-            other:          [3, 4, 5, 6]
+            physicalMulti: [4, 5, 6, 7],
+            magical: [3, 4, 5, 6],
+            instantHeal: [3, 4, 5, 6],
+            overtimeHeal: [2, 3, 4, 5],
+            other: [3, 4, 5, 6]
         }
     }
 }

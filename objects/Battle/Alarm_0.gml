@@ -1,4 +1,4 @@
-// Пауза: откладываем срабатывание таймера
+// Пауза
 if (global.gamePaused) {
     alarm_set(ENEMYS_TURN, 1)
     exit
@@ -69,7 +69,7 @@ if (healChoice != noone && woundedAlly != noone) {
     if (target != noone) { cardToPlay = healChoice }
 }
 
-// Если есть бафф и кастер ещё не забаффан этим модификатором, баффаем себя - но только в 50% случаев
+// Если есть бафф и кастер ещё не забаффан этим модификатором, баффаем себя в 50% 
 if (cardToPlay == noone && buffChoice != noone && irandom(1) == 0) {
     var alreadyBuffed = false
     var firstEffect = buffChoice.effects[0]

@@ -1,11 +1,11 @@
 // ТЕСТОВЫЙ БОЙ
-// Включи TEST_BATTLE_ENABLED и правь только testBattleSetup() - любой бой станет тестовым.
+// Нужно включить TEST_BATTLE_ENABLED и править testBattleSetup() - любой бой станет тестовым.
 //
 // Юнит = hero(...) / mob(...):
-//   hero("Lana"|"Viv"|"Safar", { ... })   - настоящий герой с оверрайдами
-//   mob(createMushroom, { ... })          - настоящий моб с оверрайдами
-//   mob(undefined, { ... })               - пустой манекен (по умолчанию 20 hp, 1 энергия)
-//   times(5, mob(...))                    - N одинаковых юнитов
+//   hero("Lana"|"Viv"|"Safar", { ... }) - настоящий герой с оверрайдами
+//   mob(createMushroom, { ... }) - настоящий моб с оверрайдами
+//   mob(undefined, { ... }) - пустой манекен (по умолчанию 20 hp, 1 энергия)
+//   times(5, mob(...)) - N одинаковых юнитов
 //
 // Оверрайды (все необязательны):
 //   name, hp, maxHp, mana, maxMana, energy, maxEnergy,
@@ -32,7 +32,7 @@ function testBattleSetup() {
     }
 }
 
-// ---- конструкторы описаний ----
+// конструкторы описаний
 
 function hero(base, overrides = {}) {
     return { kind: "hero", base: base, overrides: overrides, count: 1 }
@@ -47,7 +47,7 @@ function times(n, spec) {
     return spec
 }
 
-// ---- сборка ----
+// сборка
 
 function testUnitCreate(spec) {
     var unit
@@ -72,7 +72,7 @@ function testUnitCreate(spec) {
 }
 
 function testUnitApply(unit, overrides) {
-    // короткие имена -> поля Starrior
+    // короткие имена 
     var fields = {
         name: "name", str: "strength", int: "intelligence", aura: "aura", guts: "guts",
         mana: "mana", maxMana: "maxMana", energy: "energy", maxEnergy: "maxEnergy",
@@ -83,8 +83,8 @@ function testUnitApply(unit, overrides) {
         if (variable_struct_exists(overrides, keys[i])) { variable_instance_set(unit, fields[$ keys[i]], overrides[$ keys[i]]) }
     }
 
-    // mana/energy без max -> max подтягивается
-    if (variable_struct_exists(overrides, "mana")) {   unit.maxMana   = overrides[$ "maxMana"]   ?? max(unit.maxMana, unit.mana) }
+    // mana/energy
+    if (variable_struct_exists(overrides, "mana")) { unit.maxMana = overrides[$ "maxMana"]   ?? max(unit.maxMana, unit.mana) }
     if (variable_struct_exists(overrides, "energy")) { unit.maxEnergy = overrides[$ "maxEnergy"] ?? max(unit.maxEnergy, unit.energy) }
 
     if (variable_struct_exists(overrides, "maxHp")) { unit.maxHp = overrides.maxHp }
@@ -105,7 +105,6 @@ function testUnitApply(unit, overrides) {
     }
 }
 
-// Создатели юнитов (вызываются в начале боя): spec.count раз на описание
 function testCreators(specs) {
     var creators = []
     for (var i = 0; i < array_length(specs); i++) {

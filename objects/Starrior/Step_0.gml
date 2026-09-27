@@ -1,4 +1,4 @@
-// Пауза боя: замораживаем анимацию и таймеры
+// Пауза боя 
 if (global.gamePaused) {
     if (!pauseFrozen) {
         pauseAnimSpeed = image_speed

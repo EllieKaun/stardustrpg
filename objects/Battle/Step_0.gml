@@ -1,16 +1,20 @@
-// Пауза по Esc (не во время смены комнаты)
+// Пауза по Esc 
 var transitioning = instance_exists(oTransition) && oTransition.state != "idle"
 if (keyboard_check_pressed(vk_escape) && !transitioning) {
     if (instance_exists(oSettingsMenu)) {
         // Esc обрабатывает само меню настроек
     } else if (instance_exists(oPauseMenu)) {
-        // menuCooldown > 0 - только что вернулись из настроек тем же Esc
-        if (oPauseMenu.visible && oPauseMenu.menuCooldown <= 0) { with (oPauseMenu) close() }
+        // menuCooldown > 0 - только что вернулись из настроек
+        if (oPauseMenu.visible && oPauseMenu.menuCooldown <= 0) {
+             with (oPauseMenu) {
+                close() 
+            }
+        }
     } else if (!global.uiModal) {
         instance_create_layer(0, 0, "Instances", oPauseMenu)
     }
 }
-if (global.gamePaused) { exit } // на паузе бой полностью заморожен
+if (global.gamePaused) { exit } // пауза
 
 autosaveUpdate()
 updateCardAnims() // Анимации карт

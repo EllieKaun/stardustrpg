@@ -149,7 +149,7 @@ function applyDamage(value) {
 }
 
 function applyHeal(value) {
-    var healed = min(value, max(0, maxHp - hp))   // не выше максимума
+    var healed = min(value, max(0, maxHp - hp)) // не выше максимума
     hp += healed
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
@@ -157,7 +157,7 @@ function applyHeal(value) {
 }
 
 function applyMana(value) {
-    var gained = min(value, max(0, maxMana - mana))   // не выше максимума
+    var gained = min(value, max(0, maxMana - mana)) // не выше максимума
     mana += gained
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)

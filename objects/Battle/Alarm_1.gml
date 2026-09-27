@@ -1,4 +1,4 @@
-// Пауза: откладываем срабатывание таймера
+// Пауза
 if (global.gamePaused) {
     alarm_set(PUPPET_TURN, 1)
     exit

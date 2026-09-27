@@ -194,8 +194,6 @@ function cardAnimState(card) {
 }
 
 // Спрайт каста при призыве марионетки (по её категории)
-// Спрайты MasterPuppetCreate* - анимация босса и смотрит влево, поэтому подменяем только у врага.
-// Герой (например, с украденной у босса картой) кастует своей обычной анимацией
 function cardCastSpriteOverride(card, caster) {
     if (!caster.isEnemy) { return noone }
     for (var i = 0; i < array_length(card.effects); i++) {
