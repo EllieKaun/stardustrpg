@@ -169,6 +169,7 @@ function isKO() {
 }
 
 function showEffectNotification(effect, dismissMode, duration) {
+    if (global.suppressEffectVisual) { return } // фаза применения
     if (variable_instance_exists(effect, "sound") && effect.sound != noone) {
         playSfx(effect.sound, 1, false)
     }

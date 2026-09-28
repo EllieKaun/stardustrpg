@@ -13,14 +13,12 @@ function afterPlayChecks() {
         return;
     }
     
-    // Проверка на поражение
-    if checkIfAllDead(heroes) {
-        changeBattleState(BattleStates.GameOver)
+    if (checkIfAllDead(heroes)) {
+        battleEndDelayed(BattleOutcome.Lose)
         return
     }
-    // Проверка на победу
-    if checkIfAllDead(enemies) {
-        grantBattleRewards()
+    if (checkIfAllDead(enemies)) {
+        battleEndDelayed(BattleOutcome.Win)
         return
     }
     if selectedCharacter.energy > 0 {
@@ -33,6 +31,21 @@ function afterPlayChecks() {
         startTurnFor(selectedCharacter)
     }
     selectedTarget = noone
+}
+
+// Отложенный конец боя
+function battleEndDelayed(outcome) {
+    var runner = new SequenceRunner()
+    runner.play([
+        stepWait(BATTLE_END_FRAMES),
+        stepDo(function(ctx) {
+            with (Battle) {
+                if (outcome == BattleOutcome.Win) { grantBattleRewards() }
+                else { changeBattleState(BattleStates.GameOver) }
+            }
+        })
+    ])
+    array_push(actionsQueue, runner)
 }
 
 function startTurnFor(character) {

@@ -12,6 +12,11 @@
 
 #macro MAX_STARRIORS_PER_SIDE 5
 
+// Тайминги боя в кадрах
+#macro EFFECT_ANIM_FRAMES 14 // длительность анимации эффекта до применения значения
+#macro CARD_RESOLVE_FRAMES 18 // пауза после применения
+#macro BATTLE_END_FRAMES 45 // задержка перед экраном победы или поражения
+
 // Лечение всего здоровья
 #macro HEAL_FULL 999999
 
@@ -139,6 +144,15 @@ enum BattleMenuAction {
     Shuffle,
     Run,
     Info
+}
+
+enum BattleOutcome {
+    Win,
+    Lose
+}
+
+enum ZoneId {
+    Forest
 }
 
 enum StarriorStates {

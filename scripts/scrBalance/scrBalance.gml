@@ -49,7 +49,7 @@ function cardBalance() {
 }
 
 function currentZoneId() {
-    return "forest"
+    return ZoneId.Forest
 }
 
 function difficultyLevel(encounter = undefined) {
@@ -60,7 +60,7 @@ function difficultyLevel(encounter = undefined) {
 function battleDifficulty(zoneId = undefined) {
     zoneId = zoneId ?? currentZoneId()
     switch (zoneId) {
-        case "forest":
+        case ZoneId.Forest:
         default:
             return {
                 statPoints: function(level) { return floor(level / ENEMY_WIN_INTERVAL) * ENEMY_WIN_BONUS },
@@ -108,7 +108,7 @@ function zoneContent(zoneId = undefined) {
     var cardIds = global.CardId
     var sections = array_create(4, undefined) // индекс = enum Section
     switch (zoneId) {
-        case "forest":
+        case ZoneId.Forest:
         default:
             sections[Section.TopLeft] = {
                 compositions: [

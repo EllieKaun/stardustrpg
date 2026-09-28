@@ -95,8 +95,74 @@ function SequenceRunner() constructor {
         }
     }
 
-    self.isRunning = function() { 
-        return self.running 
+    self.isRunning = function() {
+        return self.running
+    }
+}
+
+// Билдеры шагов для SequenceRunner. Каждый возвращает { start(ctx), update(ctx) -> done }.
+// Шаг без update завершается сразу; с update — держится, пока update не вернёт true.
+
+// Выполнить действие и сразу продолжить.
+function stepDo(action) {
+    return { start: action }
+}
+
+// Проиграть анимацию актёра и продолжить, когда она завершится.
+function stepActorAnim(actor, state, spriteOverride = noone) {
+    return {
+        actor: actor,
+        state: state,
+        spr: spriteOverride,
+        done: false,
+        start: function(ctx) {
+            self.done = false
+            self.actor.changeActionState(self.state, method(self, function() { self.done = true }), self.spr)
+        },
+        update: function(ctx) { return self.done }
+    }
+}
+
+// Пауза на N кадров.
+function stepWait(frames) {
+    return {
+        frames: frames,
+        left: 0,
+        start: function(ctx) { self.left = self.frames },
+        update: function(ctx) { self.left -= 1; return self.left <= 0 }
+    }
+}
+
+// Сколько кадров играет спрайт один раз (при image_speed = 1)
+function spritePlayFrames(spr) {
+    if (spr == noone || !sprite_exists(spr)) { return 0 }
+    var frames = sprite_get_number(spr)
+    var spd = sprite_get_speed(spr)
+    if (sprite_get_speed_type(spr) == spritespeed_framespersecond) {
+        spd = spd / game_get_speed(gamespeed_fps)
+    }
+    if (spd <= 0) { spd = 1 }
+    return ceil(frames / spd)
+}
+
+// Ждать, пока полоски хп/маны целей доиграют (длительность определяется сама)
+function stepWaitBars(targets) {
+    return {
+        targets: targets,
+        elapsed: 0,
+        start: function(ctx) { self.elapsed = 0 },
+        update: function(ctx) {
+            self.elapsed += 1
+            if (self.elapsed > 120) { return true } // предохранитель от зависания
+            var list = is_array(self.targets) ? self.targets : [self.targets]
+            for (var i = 0; i < array_length(list); i++) {
+                var t = list[i]
+                if (!instance_exists(t)) { continue }
+                if (abs(t.displayHp - t.hp) >= 0.5) { return false }
+                if (abs(t.displayMana - t.mana) >= 0.5) { return false }
+            }
+            return true
+        }
     }
 }
 
@@ -123,6 +189,7 @@ function initGameGlobals() {
     global.uiModal = false
     global.gamePaused = false
     global.cutsceneActive = false
+    global.suppressEffectVisual = false
 
     if (!variable_global_exists("chestsGenerated")) {
         global.chestsGenerated = false

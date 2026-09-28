@@ -163,61 +163,92 @@ function applyCost(caster, card) {
 // 1) каст-анимация (эффекты срабатывают по её концу)
 // 2) применение эффектов
 // 3) проверки после розыгрыша
+function showCardEffectVisuals(effects, targets) {
+    for (var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        var dismiss = (variable_struct_exists(effect, "timing") && effect.timing == Timing.Instant
+                    && variable_struct_exists(effect, "type") && effect.type == EffectTypes.Damage)
+                    ? EffectVisualizerType.AnimationEnd : EffectVisualizerType.TimeBased
+        if (is_array(targets)) {
+            for (var t = 0; t < array_length(targets); t++) {
+                if (!targets[t].isKO()) { targets[t].showEffectNotification(effect, dismiss, 1) }
+            }
+        } else {
+            targets.showEffectNotification(effect, dismiss, 1)
+        }
+    }
+}
+
+function cardEffectAnimFrames(effects) {
+    var frames = 0
+    for (var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        if (variable_struct_exists(effect, "sprite") && effect.sprite != noone) {
+            frames = max(frames, spritePlayFrames(effect.sprite))
+        }
+    }
+    return frames
+}
+
 function cardPlaySequence(card, caster, targets) {
     return [
-        {
-            start: function(ctx) {
-                with (Battle) {
-                    var caster = ctx.caster
-                    applyCost(caster, ctx.card)
-                    if (checkIfHasEffectType(caster, EffectTypes.CopyCard)) {
-                        copyNextCard = true
-                        reduceOrRemoveEffectType(caster, EffectTypes.CopyCard)
-                    }
-                    removeCardFromHand(caster, ctx.card)
-                    ctx.animEnded = false
-                    caster.changeActionState(
-                        cardAnimState(ctx.card),
-                        method(ctx, function() { self.animEnded = true }),
-                        cardCastSpriteOverride(ctx.card, caster)
-                    )
+        // 1) разыгрывание карты
+        stepDo(function(ctx) {
+            with (Battle) {
+                applyCost(ctx.caster, ctx.card)
+                if (checkIfHasEffectType(ctx.caster, EffectTypes.CopyCard)) {
+                    copyNextCard = true
+                    reduceOrRemoveEffectType(ctx.caster, EffectTypes.CopyCard)
                 }
-            },
-            update: function(ctx) { return ctx.animEnded }
-        },
-        {
-            start: function(ctx) {
-                with (Battle) {
-                    var effects = ctx.card.effects
-                    for (var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
-                        var effect = effects[effectIndex]
-                        switch (effect.timing) {
-                            case Timing.Instant:
-                                executeEffect(effect, ctx.caster, ctx.targets)
-                            break
-                            case Timing.EndOfTurn:
-                                effectApplyStatus(effect, ctx.caster, ctx.targets)
-                            break
-                            case Timing.Overtime:
-                                effectApplyStatus(effect, ctx.caster, ctx.targets)
-                            break
-                            case Timing.OnActions:
-                                runOnPlay(effect, ctx.caster, ctx.targets)
-                                ctx.targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
-                            break
-                        }
-                    }
-                    ctx.caster.energy -= ctx.card.energy
-                    if (copyNextCard) {
-                        copyNextCard = false
-                        array_push(ctx.caster.deck.cardsInHand, ctx.card)
-                    }
-                }
+                removeCardFromHand(ctx.caster, ctx.card)
             }
-        },
-        {
-            start: function(ctx) { with (Battle) { afterPlayChecks() } }
-        }
+        }),
+
+        // 2) анимация кастера
+        stepActorAnim(caster, cardAnimState(card), cardCastSpriteOverride(card, caster)),
+
+        // 3) анимация эффектов
+        stepDo(function(ctx) {
+            with (Battle) { showCardEffectVisuals(ctx.card.effects, ctx.targets) }
+        }),
+        stepWait(cardEffectAnimFrames(card.effects)),
+
+        // 4) применение значений
+        stepDo(function(ctx) {
+            with (Battle) {
+                global.suppressEffectVisual = true
+                var effects = ctx.card.effects
+                for (var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
+                    var effect = effects[effectIndex]
+                    switch (effect.timing) {
+                        case Timing.Instant:
+                            executeEffect(effect, ctx.caster, ctx.targets)
+                        break
+                        case Timing.EndOfTurn:
+                            effectApplyStatus(effect, ctx.caster, ctx.targets)
+                        break
+                        case Timing.Overtime:
+                            effectApplyStatus(effect, ctx.caster, ctx.targets)
+                        break
+                        case Timing.OnActions:
+                            runOnPlay(effect, ctx.caster, ctx.targets)
+                        break
+                    }
+                }
+                ctx.caster.energy -= ctx.card.energy
+                if (copyNextCard) {
+                    copyNextCard = false
+                    array_push(ctx.caster.deck.cardsInHand, ctx.card)
+                }
+                global.suppressEffectVisual = false
+            }
+        }),
+
+        // 5) пауза — дождаться просадки хп до перехода
+        stepWaitBars(targets),
+
+        // 6) проверки после розыгрыша
+        stepDo(function(ctx) { with (Battle) { afterPlayChecks() } })
     ]
 }
 
