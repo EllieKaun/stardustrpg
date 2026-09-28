@@ -36,15 +36,19 @@ function afterPlayChecks() {
 // Отложенный конец боя
 function battleEndDelayed(outcome) {
     var runner = new SequenceRunner()
+    // outcome передаём через ctx: шаг выполняется позже, когда параметр функции
+    // уже недоступен (замыкание его не держит). ctx.outcome читаем в локальную
+    // до with — внутри with (Battle) голое имя искалось бы как поле Battle
     runner.play([
         stepWait(BATTLE_END_FRAMES),
         stepDo(function(ctx) {
+            var battleOutcome = ctx.outcome
             with (Battle) {
-                if (outcome == BattleOutcome.Win) { grantBattleRewards() }
+                if (battleOutcome == BattleOutcome.Win) { grantBattleRewards() }
                 else { changeBattleState(BattleStates.GameOver) }
             }
         })
-    ])
+    ], { outcome: outcome })
     array_push(actionsQueue, runner)
 }
 

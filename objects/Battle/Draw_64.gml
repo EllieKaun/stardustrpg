@@ -29,8 +29,14 @@ if (currentState != undefined) {
     if (drawUnder != undefined) { drawUnder() }
 }
 
-// Рисуем карты
-if (battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn || battleState == BattleStates.StunnedTurn) {
+// Рисуем карты.
+// Руку показываем только когда ходит управляемый герой. Иначе — "Ожидание".
+// Опираться лишь на battleState нельзя: во время розыгрыша карты врага и на
+// переходных состояниях (AfterPlayChecks/PlayProcess) состояние на кадры выходит
+// из "ход врага", а selectedCharacter ещё враг — тогда мелькала бы его рука
+var opponentTurn = (selectedCharacter != noone
+    && (selectedCharacter.isEnemy || selectedCharacter.isPuppet))
+if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn || battleState == BattleStates.StunnedTurn) {
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
