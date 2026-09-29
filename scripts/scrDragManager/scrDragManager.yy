@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrDragManager",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrDragManager",
+  "parent":{
+    "name":"DragNDrop",
+    "path":"folders/DragNDrop.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

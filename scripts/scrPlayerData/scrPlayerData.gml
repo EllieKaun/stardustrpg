@@ -471,6 +471,10 @@ function deckMoveCard(character, slotA, slotB) {
     if (refB != undefined) {
         isDeckSlotSet = isDeckSlotSet && setDeckSlot(character, slotA, refB.id, refB.rarity)
     }
+    if (!isDeckSlotSet) {
+        setDeckSlot(character, slotA, refA.id, refA.rarity)
+        setDeckSlot(character, slotB, refB.id, refB.rarity)
+    }
     return isDeckSlotSet
 }
 

@@ -41,6 +41,13 @@ categoryForTab = function(tab) { // Мап индекса таба фильтр�
     }
 }
 
+applyChanges = function () {
+    // Если добавился, обновляем коллекцию сотов текущего персонажа
+    deckPanel.slots = buildDeckSlots(editingCharacter)
+    refreshCollection() // Обновляем визуал
+    playerDataSave() // Сохраняем все
+}
+
 // Панель коллекции всех карт 
 collectionPanel = new Panel({
     x: 0, y: 0, w: 0, h: 0,
@@ -89,12 +96,8 @@ collectionPanel = new Panel({
                 return // свободных слотов деки нет
             } 
             // Добавление карты в слот и проверка, добавился ли
-            if (setDeckSlot(editingCharacter, freeSlot, sourceSlot.ref.id, sourceSlot.ref.rarity)) {
-                analyticsAddToDeck(characterKey(editingCharacter), sourceSlot.ref.id, sourceSlot.ref.rarity) // аналитика: карта добавлена в колоду
-                // Если добавился, обновляем коллекцию сотов текущего персонажа
-                deckPanel.slots = buildDeckSlots(editingCharacter)
-                refreshCollection() // Обновляем визуал
-                playerDataSave() // Сохраняем все
+            if (deckPutCard(editingCharacter, freeSlot, sourceSlot.ref)) {
+                applyChanges()
             }
         }
     },
@@ -150,10 +153,8 @@ deckPanel = new Panel({
             if (slot.state != "filled") {
                  return 
             }
-            clearDeckSlot(editingCharacter, slotIndex) // Убираем карту из слота
-            panel.slots = buildDeckSlots(editingCharacter) // Перестраиваем слоты
-            refreshCollection() // Обновляем визуал
-            playerDataSave() // Обновляем данные пользователя
+            deckRemoveCard(editingCharacter, slotIndex)
+            applyChanges()
         }
     },
     onPanelSwitch: panelSwitchCallback
