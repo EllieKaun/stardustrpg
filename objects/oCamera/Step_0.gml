@@ -1,4 +1,4 @@
-if (global.gamePaused) exit // на паузе камера заморожена
+if (global.gamePaused) { exit } // на паузе камера заморожена
 
 if (instance_exists(oGameController) && instance_exists(oGameController.selected_character)) {
 	follow = oGameController.selected_character;

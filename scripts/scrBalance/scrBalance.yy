@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"scrTestBattle",
+  "%Name":"scrBalance",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"scrTestBattle",
+  "name":"scrBalance",
   "parent":{
     "name":"BattleLogic",
     "path":"folders/BattleDomain/Scripts/BattleLogic.yy",

@@ -1,6 +1,5 @@
 // Атака звездной энергией одного врага
-function createMagicalDamageSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createMagicalDamageSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "MagicalDamageSingleTargetCard",
@@ -19,8 +18,7 @@ function createMagicalDamageSingleTargetCard() {
 }
 
 // Атака звездной энергией группы врагов
-function createMagicalDamageMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createMagicalDamageMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "MagicalDamageMultipleTargetCard",
@@ -39,8 +37,7 @@ function createMagicalDamageMultipleTargetCard() {
 }
 
 // Атака молнией одного врага - (Имеет шанс шокировать врага. Враг не можетдействовать х ходов)
-function createMagicalDamageStunChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createMagicalDamageStunChanseSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "MagicalDamageStunChanseSingleTarget",
@@ -62,8 +59,7 @@ function createMagicalDamageStunChanseSingleTargetCard() {
 }
 
 // Атака молнией группы врагов - (Имеет шанс шокировать врагов. Враги не могут действовать х ходов)
-function createMagicalDamageStunChanseMultipleTargetsCard() {
-    var rarity = CardsRarity.Default
+function createMagicalDamageStunChanseMultipleTargetsCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "MagicalDamageStunChanseMultipleTarget",
@@ -85,8 +81,7 @@ function createMagicalDamageStunChanseMultipleTargetsCard() {
 }
 
 // Атака огнем одного врага - (Имеет шанс поджечь врага. Враг получает магический урон х ходов)
-function createMagicalDamageBurnChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createMagicalDamageBurnChanseSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "MagicalDamageBurnChanceSingleTarget",
@@ -108,8 +103,7 @@ function createMagicalDamageBurnChanseSingleTargetCard() {
 }
 
 // Атака огнем группы врагов - (Имеет шанс поджечь врагов. Враги получают магический урон х ходов)
-function createMagicalDamageBurnChanseMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createMagicalDamageBurnChanseMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "MagicalDamageBurnChanceMultipleTarget",
@@ -130,8 +124,7 @@ function createMagicalDamageBurnChanseMultipleTargetCard() {
     )
 }
 // Атака льдом одного врага - (Имеет шанс заморозить врага. Замороженный враг получает повышенный физ урон х количество ходов)
-function createMagicalDamageFreezingChanceSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createMagicalDamageFreezingChanceSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "MagicalDamageFreezingChanceSingleTarget",
@@ -153,8 +146,7 @@ function createMagicalDamageFreezingChanceSingleTargetCard() {
 }
 
 // Атака льдом группы врагов - (Имеет шанс заморозить врагов. Замороженные враги получают повышенный физ урон х количество ходов)
-function createMagicalDamageFreezingChanceMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createMagicalDamageFreezingChanceMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "MagicalDamageFreezingChanceMultipleTarget",

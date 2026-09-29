@@ -1,13 +1,13 @@
 menuEnsureCrispGui()
 
-var gw = display_get_gui_width()
-var gh = display_get_gui_height()
+var guiWidth = display_get_gui_width()
+var guiHeight = display_get_gui_height()
 
-menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, gw, gh)
+menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, guiWidth, guiHeight)
 
 draw_set_halign(fa_center)
 draw_set_valign(fa_middle)
 draw_set_color(c_white)
-drawUiText(gw * 0.5, gh * 0.08, loc("screen.settings"), gh * 0.08)
+drawUiText(guiWidth * 0.5, guiHeight * 0.08, loc("screen.settings"), guiHeight * 0.08)
 draw_set_halign(fa_left)
 draw_set_valign(fa_top)

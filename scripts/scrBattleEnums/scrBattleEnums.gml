@@ -12,9 +12,10 @@
 
 #macro MAX_STARRIORS_PER_SIDE 5
 
-// Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
-#macro WEAKNESS_DAMAGE_MODIFIER 0.1
-#macro WEAKNESS_STATUS_CHANCE_BONUS 0.1
+// Тайминги боя в кадрах
+#macro EFFECT_ANIM_FRAMES 14 // длительность анимации эффекта до применения значения
+#macro CARD_RESOLVE_FRAMES 18 // пауза после применения
+#macro BATTLE_END_FRAMES 45 // задержка перед экраном победы или поражения
 
 // Лечение всего здоровья
 #macro HEAL_FULL 999999
@@ -113,24 +114,45 @@ enum Timing {
 
 enum BattleStates {
     Preparing,
-    DeckPreparing,
-    CharacterPreparing,
     CharacterPlay,
     PlayProcess,
-    PlayResult,
     AfterPlayChecks,
-    BattleOver,
     EnemyTargetSelection,
     AllyTargetSelection,
     EnemysTurn,
     EnemyInfoSelection,
     EnemyInfoDisplay,
     Victory,
-    GameOver,  
+    GameOver,
     PuppetTurn,
     CardAnimating,
-    BossIntro,
     StunnedTurn
+}
+
+enum StateHook {
+    OnEnter,
+    OnExit,
+    Step,
+    DrawUnder,
+    DrawOver,
+    OnCancel,
+    Reentrant,
+    Count
+}
+
+enum BattleMenuAction {
+    Shuffle,
+    Run,
+    Info
+}
+
+enum BattleOutcome {
+    Win,
+    Lose
+}
+
+enum ZoneId {
+    Forest
 }
 
 enum StarriorStates {
@@ -164,15 +186,15 @@ enum CardCategory { Attack, Magic, Heal, Buff, Special }
 function cardCategoryOf(_card) {
     if (is_struct(_card) && variable_struct_exists(_card, "cardId") && cardExists(_card.cardId)) {
         var cardDefinition = global.cardRegistry[$ _card.cardId]
-        if (variable_struct_exists(cardDefinition, "category")) return cardDefinition.category
+        if (variable_struct_exists(cardDefinition, "category")) { return cardDefinition.category }
     }
 
-    if (!is_struct(_card) || !variable_struct_exists(_card, "cardBaseSpr")) return CardCategory.Attack
+    if (!is_struct(_card) || !variable_struct_exists(_card, "cardBaseSpr")) { return CardCategory.Attack }
 
-    if (_card.cardBaseSpr == atcCard) return CardCategory.Attack
-    if (_card.cardBaseSpr == mgcCard) return CardCategory.Magic
-    if (_card.cardBaseSpr == healCard) return CardCategory.Heal
-    if (_card.cardBaseSpr == buffCard) return CardCategory.Buff
+    if (_card.cardBaseSpr == atcCard) { return CardCategory.Attack }
+    if (_card.cardBaseSpr == mgcCard) { return CardCategory.Magic }
+    if (_card.cardBaseSpr == healCard) { return CardCategory.Heal }
+    if (_card.cardBaseSpr == buffCard) { return CardCategory.Buff }
     return CardCategory.Attack
 }
 
@@ -186,10 +208,8 @@ function cardAnimState(card) {
 }
 
 // Спрайт каста при призыве марионетки (по её категории)
-// Спрайты MasterPuppetCreate* - анимация босса и смотрит влево, поэтому подменяем только у врага.
-// Герой (например, с украденной у босса картой) кастует своей обычной анимацией
 function cardCastSpriteOverride(card, caster) {
-    if (!caster.isEnemy) return noone
+    if (!caster.isEnemy) { return noone }
     for (var i = 0; i < array_length(card.effects); i++) {
         var effect = card.effects[i]
         if (variable_struct_exists(effect, "type") && effect.type == EffectTypes.CreatePuppet) {

@@ -1,8 +1,8 @@
 
-if (global.gamePaused) exit
+if (global.gamePaused) { exit }
 
-if (global.uiModal) exit
-if (variable_global_exists("cutsceneActive") && global.cutsceneActive) exit
+if (global.uiModal) { exit }
+if (variable_global_exists("cutsceneActive") && global.cutsceneActive) { exit }
 
 depth = -bbox_bottom
 
@@ -16,11 +16,11 @@ if (carriesSpear && questSpearState() != QuestSpearState.Active) {
 if (canCarrySpear && !carriesSpear && questSpearState() == QuestSpearState.Active && !global.spearCarrierExists) {
     carriesSpear = true
     global.spearCarrierExists = true
-    if (spearSprite() == noone) image_blend = c_yellow
+    if (spearSprite() == noone) { image_blend = c_yellow }
 }
 
 var leader = oGameController.selected_character
-if (!instance_exists(leader)) exit
+if (!instance_exists(leader)) { exit }
 
 // логика прогулки
 if (!triggered && shouldWalk) {
@@ -34,18 +34,18 @@ if (!triggered && shouldWalk) {
     }
     var moved = false
     if (patrolAxis == 0) {
-        var nx = x + patrolDir * patrolSpeed
-        if (nx < minX || nx > maxX || place_meeting(nx, y, oWall)) patrolDir = -patrolDir
+        var nextX = x + patrolDir * patrolSpeed
+        if (nextX < minX || nextX > maxX || place_meeting(nextX, y, oWall)) { patrolDir = -patrolDir }
         else { 
-            x = nx
+            x = nextX
             moved = true 
         }
         image_xscale = (patrolDir < 0) ?  1 : -1
     } else {
-        var ny = y + patrolDir * patrolSpeed
-        if (ny < minY || ny > maxY || place_meeting(x, ny, oWall)) patrolDir = -patrolDir
+        var nextY = y + patrolDir * patrolSpeed
+        if (nextY < minY || nextY > maxY || place_meeting(x, nextY, oWall)) { patrolDir = -patrolDir }
         else { 
-            y = ny
+            y = nextY
             moved = true 
         }
     }
@@ -61,7 +61,7 @@ if (!triggered && shouldWalk) {
             patrolStuckSteps = 0
             patrolAxis = 1 - patrolAxis
             patrolAxisSwitches++
-            if (patrolAxisSwitches >= 2) shouldWalk = false
+            if (patrolAxisSwitches >= 2) { shouldWalk = false }
         }
     }
 }
@@ -74,7 +74,7 @@ if (place_meeting(x, y, leader)) {
         global.battleNoFlee = false
         // spearCarrierExists не сбрасываем: носитель остаётся на карте, если от него убежали или проиграли.
         // Флаг сбросит кража копья (questGrantSpear) или удаление носителя (Destroy)
-        if (carriesSpear) global.battleHasSpear = true
+        if (carriesSpear) { global.battleHasSpear = true }
         global.battleSection = spawnSection
         global.battleEncounter = getEncounter()
         global.returnRoom = room
@@ -83,8 +83,8 @@ if (place_meeting(x, y, leader)) {
         leader.can_move = false
 
         // Проверка на наличие катсцены. если есть, сначала проигрываем ее
-        var enc = global.battleEncounter
-        var intro = variable_struct_exists(enc, "introSprite") ? enc.introSprite : undefined
+        var encounter = global.battleEncounter
+        var intro = variable_struct_exists(encounter, "introSprite") ? encounter.introSprite : undefined
         var started = false
         if (intro != undefined && intro != noone && instance_exists(oGameController)) {
             started = oGameController.startBossCutscene(intro, BattleRoom)
@@ -97,10 +97,10 @@ if (place_meeting(x, y, leader)) {
         }
     }
 } else {
-    var d = point_distance(x, y, leader.x, leader.y)
-    if (triggered && d > rearmDistance) triggered = false
-    if (spawnedDynamically && d > oSpawnerManager.spawnDistance) {
-        if (carriesSpear) global.spearCarrierExists = false
+    var distance = point_distance(x, y, leader.x, leader.y)
+    if (triggered && distance > rearmDistance) { triggered = false }
+    if (spawnedDynamically && distance > oSpawnerManager.spawnDistance) {
+        if (carriesSpear) { global.spearCarrierExists = false }
         instance_destroy()
     }
 }

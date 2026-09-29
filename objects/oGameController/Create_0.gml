@@ -8,13 +8,13 @@ setDisplayMode = function(fullscreen) {
     
     ini_open("settings.ini")
     ini_write_real("Display", "Fullscreen", fullscreen ? 1 : 0)
-    var resInd = ini_read_real("Display", "ResolutionIndex", 2)
+    var resolutionIndex = ini_read_real("Display", "ResolutionIndex", 2)
     ini_close()
 
-    var res = menuGetResolutions()
-    resInd = min(resInd, array_length(res) - 1)
+    var resolutions = menuGetResolutions()
+    resolutionIndex = min(resolutionIndex, array_length(resolutions) - 1)
 
-    applyWindowMode(res[resInd][0], res[resInd][1], fullscreen)
+    applyWindowMode(resolutions[resolutionIndex][0], resolutions[resolutionIndex][1], fullscreen)
 }
 // применяем настройки экрана
 initDisplaySettings()
@@ -42,12 +42,11 @@ selected_character = partyMembers[0]
 
 generateChests = function() {
     global.chests = []
-    var trees = []
-    with (oTree1) array_push(trees, id)
-    with (oTree2) array_push(trees, id)
-    with (oTree3) array_push(trees, id)
-    with (oTree4) array_push(trees, id)
-    with (oTree5) array_push(trees, id)
+
+    // Спавним сундуки внутри зон спавна (oSpawner) — как врагов: эти зоны всегда в проходимых местах
+    var spawners = []
+    with (oSpawner) { array_push(spawners, id) }
+    if (array_length(spawners) == 0) { return }
 
     var kinds = [ChestKind.Gold, ChestKind.Card, ChestKind.Enemy]
     var minDist = CHEST_MIN_DISTANCE
@@ -55,39 +54,35 @@ generateChests = function() {
     var attempts = 0
     while (made < CHEST_MAX_COUNT && attempts < 300) {
         attempts++
-        var cx, cy
-        if (array_length(trees) > 0 && irandom(1) == 0) {
-            var t = trees[irandom(array_length(trees) - 1)]
-            if (!instance_exists(t)) continue
-            cx = t.x
-            cy = t.bbox_bottom + 8 // у основания дерева, на проходимой земле
-        } else {
-            cx = 96 + random(room_width - 192)
-            cy = 96 + random(room_height - 192)
-        }
-        if (cx < 48 || cy < 48 || cx > room_width - 48 || cy > room_height - 48) continue
 
-        // Позиция должна быть проходимой — иначе герой не наступит и коллизия не сработает
-        if (collision_point(cx, cy, oWall,   false, true) != noone
-         || collision_point(cx, cy, oTree1,  false, true) != noone
-         || collision_point(cx, cy, oTree2,  false, true) != noone
-         || collision_point(cx, cy, oTree3,  false, true) != noone
-         || collision_point(cx, cy, oTree4,  false, true) != noone
-         || collision_point(cx, cy, oTree5,  false, true) != noone
-         || collision_point(cx, cy, oStump,  false, true) != noone) continue
+        var spawner = spawners[irandom(array_length(spawners) - 1)]
+        var chestX = spawner.bbox_left + random(spawner.bbox_right - spawner.bbox_left)
+        var chestY = spawner.bbox_top  + random(spawner.bbox_bottom - spawner.bbox_top)
+
+        // точка должна быть реально внутри зоны спавна
+        if (!collision_point(chestX, chestY, oSpawner, false, true)) { continue }
+
+        // и не на препятствии — иначе герой не наступит и коллизия не сработает
+        if (collision_point(chestX, chestY, oWall,   false, true) != noone
+         || collision_point(chestX, chestY, oTree1,  false, true) != noone
+         || collision_point(chestX, chestY, oTree2,  false, true) != noone
+         || collision_point(chestX, chestY, oTree3,  false, true) != noone
+         || collision_point(chestX, chestY, oTree4,  false, true) != noone
+         || collision_point(chestX, chestY, oTree5,  false, true) != noone
+         || collision_point(chestX, chestY, oStump,  false, true) != noone) { continue }
 
         var tooClose = false
-        for (var i = 0; i < array_length(global.chests); i++) {
-            if (point_distance(cx, cy, global.chests[i].x, global.chests[i].y) < minDist) {
+        for (var chestIndex = 0; chestIndex < array_length(global.chests); chestIndex++) {
+            if (point_distance(chestX, chestY, global.chests[chestIndex].x, global.chests[chestIndex].y) < minDist) {
                 tooClose = true
                 break
             }
         }
-        if (tooClose) continue
+        if (tooClose) { continue }
 
         array_push(global.chests, {
-            x: cx,
-            y: cy,
+            x: chestX,
+            y: chestY,
             kind: kinds[irandom(2)],
             opened: false
         })
@@ -97,38 +92,38 @@ generateChests = function() {
 
 spawnChests = function() {
     with (oChest) instance_destroy()
-    for (var i = 0; i < array_length(global.chests); i++) {
-        var ch = global.chests[i]
-        if (ch.opened) continue
-        var c = instance_create_layer(ch.x, ch.y, "Instances", oChest)
-        c.chestKind = ch.kind
-        c.chestIndex = i
+    for (var chestIndex = 0; chestIndex < array_length(global.chests); chestIndex++) {
+        var chest = global.chests[chestIndex]
+        if (chest.opened) { continue }
+        var chestInstance = instance_create_layer(chest.x, chest.y, "Instances", oChest)
+        chestInstance.chestKind = chest.kind
+        chestInstance.chestIndex = chestIndex
     }
 }
 
 startTutorialIntro = function() {
     var leader = selected_character
-    if (!instance_exists(leader)) return
+    if (!instance_exists(leader)) { return }
     var obstacles = worldObstacles()
-    var dist = 120
-    var dirs = [0, 90, 270, 180, 45, 315, 135, 225]
-    var tx = leader.x + dist
-    var ty = leader.y
-    for (var i = 0; i < array_length(dirs); i++) {
-        var cx = leader.x + lengthdir_x(dist, dirs[i])
-        var cy = leader.y + lengthdir_y(dist, dirs[i])
-        if (cx < 48 || cy < 48 || cx > room_width - 48 || cy > room_height - 48) continue
-        if (collision_line(leader.x, leader.y, cx, cy, obstacles, true, true) == noone) {
-            tx = cx
-            ty = cy
+    var distance = 120
+    var directionAngles = [0, 90, 270, 180, 45, 315, 135, 225]
+    var spawnX = leader.x + distance
+    var spawnY = leader.y
+    for (var dirIndex = 0; dirIndex < array_length(directionAngles); dirIndex++) {
+        var candidateX = leader.x + lengthdir_x(distance, directionAngles[dirIndex])
+        var candidateY = leader.y + lengthdir_y(distance, directionAngles[dirIndex])
+        if (candidateX < 48 || candidateY < 48 || candidateX > room_width - 48 || candidateY > room_height - 48) { continue }
+        if (collision_line(leader.x, leader.y, candidateX, candidateY, obstacles, true, true) == noone) {
+            spawnX = candidateX
+            spawnY = candidateY
             break
         }
     }
-    var e = instance_create_layer(tx, ty, "Instances", oCrakerNutSmall)
-    e.spawnedDynamically = true
-    e.shouldWalk = false
-    e.getEncounter = function() { return tutorialEncounter() }
-    global.introTarget = e
+    var enemy = instance_create_layer(spawnX, spawnY, "Instances", oCrakerNutSmall)
+    enemy.spawnedDynamically = true
+    enemy.shouldWalk = false
+    enemy.getEncounter = function() { return tutorialEncounter() }
+    global.introTarget = enemy
     global.introWalk = true
 }
 
@@ -138,9 +133,9 @@ cutsceneFrame = 0
 cutsceneTargetRoom = noone
 
 // Запустить катсцену. Возвращает true, если катсцена запущена
-startBossCutscene = function(spr, targetRoom) {
-    if (spr == noone || spr == undefined || !sprite_exists(spr)) return false
-    cutsceneSprite = spr
+startBossCutscene = function(bossSprite, targetRoom) {
+    if (bossSprite == noone || bossSprite == undefined || !sprite_exists(bossSprite)) { return false }
+    cutsceneSprite = bossSprite
     cutsceneFrame = 0
     cutsceneTargetRoom = targetRoom
     global.cutsceneActive = true
@@ -153,6 +148,31 @@ global.zoneConfig = { // нужно для определение секций �
     innerHalf:  240, // ширина внутренней зоны
     middleHalf: 480  // ширина средней зоны
 }
+
+// Последовательность следования персонажей
+followSequence = function() {
+    var sequence = [selected_character]
+    var partyNumber = array_length(partyMembers)
+    for (var index = 1; index < partyNumber; index++) {
+        array_push(sequence, partyMembers[(selectedIndex + index) mod partyNumber])
+    }
+    if (global.safarJoined && instance_exists(oSafar)) {
+        array_push(sequence, oSafar)
+    }
+    return sequence
+}
+
+// За кем идёт member
+followTargetOfMember = function(member) {
+    var sequence = followSequence()
+    for (var index = 1; index < array_length(sequence); index++) {
+        if (member.object_index == sequence[index]) {
+            return sequence[index - 1]
+        }
+    }
+    return selected_character
+}
+
 switchCharacter = function() {
     if (global.uiModal) {
         return

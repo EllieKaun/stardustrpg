@@ -9,6 +9,8 @@ nSpeed = 0.8
 calcPathDelay = 8
 calcPathTimer = 0
 distanceToStopFollowing = 24
+distanceToTeleport = 320 // слишком далекое расстояние,
+// после которого телепортируем персонажа к лидеру
 
 sprIdle = sViv
 sprWalk = sVivWalk
@@ -17,6 +19,7 @@ introSpeed = 0.9
 
 stepScriptedApproach = function() {
     path_end()
+    speed = 0
     if (!instance_exists(global.introTarget)) {
         global.introWalk = false
         return
@@ -24,39 +27,49 @@ stepScriptedApproach = function() {
     var obstacles = worldObstacles()
     var stepX = clamp(global.introTarget.x - x, -introSpeed, introSpeed)
     var stepY = clamp(global.introTarget.y - y, -introSpeed, introSpeed)
-    if (!place_meeting(x + stepX, y, obstacles)) x += stepX
-    if (!place_meeting(x, y + stepY, obstacles)) y += stepY
+    if (!place_meeting(x + stepX, y, obstacles)) { x += stepX }
+    if (!place_meeting(x, y + stepY, obstacles)) { y += stepY }
 }
 
 // Движение выбранного персонажа
 stepControlled = function() {
     path_end()
+    speed = 0 
 
-    var h = (keyboard_check(ord("D")) || keyboard_check(vk_right)) - (keyboard_check(ord("A")) || keyboard_check(vk_left))
-    var v = (keyboard_check(ord("S")) || keyboard_check(vk_down)) - (keyboard_check(ord("W")) || keyboard_check(vk_up))
-    var mx = h * spdWalk
-    var my = v * spdWalk
+    var horizontalInput = (keyboard_check(ord("D")) || keyboard_check(vk_right)) - (keyboard_check(ord("A")) || keyboard_check(vk_left))
+    var verticalInput = (keyboard_check(ord("S")) || keyboard_check(vk_down)) - (keyboard_check(ord("W")) || keyboard_check(vk_up))
+    var moveX = horizontalInput * spdWalk
+    var moveY = verticalInput * spdWalk
 
     var obstacles = worldObstacles()
     
-    if (!place_meeting(x + mx, y, obstacles)) { 
-        x += mx
+    if (!place_meeting(x + moveX, y, obstacles)) { 
+        x += moveX
     }
-    if (!place_meeting(x, y + my, obstacles)) { 
-        y += my
+    if (!place_meeting(x, y + moveY, obstacles)) { 
+        y += moveY
     }
 }
 
 // MP движение невыделенного персонажа
 stepFollowing = function() {
-    var leader = oGameController.selected_character
+    var leader = oGameController.followTargetOfMember(id) // найти за кем следовать
     if (!instance_exists(leader)) {
         path_end()
         return
     }
 
-    var dis = point_distance(x, y, leader.x, leader.y)
-    if (dis <= distanceToStopFollowing) {
+    var distance = point_distance(x, y, leader.x, leader.y)
+    // телепортация при большом отставании 
+    if (distance > distanceToTeleport) {
+        path_end()
+        speed = 0
+        x = leader.x
+        y = leader.y
+        return
+    }
+    
+    if (distance <= distanceToStopFollowing) {
         path_end()
         speed = 0
         return
@@ -71,11 +84,12 @@ stepFollowing = function() {
         return
     }
 
-    // Иначе обходим препятствия по сетке
+    // Иначе обходим препятствия по MP
     if (calcPathTimer-- <= 0) {
         calcPathTimer = calcPathDelay
         var found = mp_grid_path(global.mpGrid, path, x, y, leader.x, leader.y, true)
         if (found) {
+            speed = 0 
             path_start(path, nSpeed, path_action_stop, false)
         } else {
             path_end()

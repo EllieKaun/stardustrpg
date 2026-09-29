@@ -1,10 +1,10 @@
-var mx = device_mouse_x_to_gui(0)
-var my = device_mouse_y_to_gui(0)
+var mouseX = device_mouse_x_to_gui(0)
+var mouseY = device_mouse_y_to_gui(0)
 
-var mouseMoved = (mx != mouseLastX || my != mouseLastY)
+var mouseMoved = (mouseX != mouseLastX || mouseY != mouseLastY)
 var mouseClicked = mouse_check_button_pressed(mb_left)
 
-menu.handleInput(mx, my, mouseMoved, mouseClicked)
+menu.handleInput(mouseX, mouseY, mouseMoved, mouseClicked)
 
 var langKeyPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A")) || keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
 if (menu.index == 5 && langKeyPressed) { // язык переключается стрелками, как остальные пункты со "< >"
@@ -28,8 +28,8 @@ if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
     } else if (menu.index == 4) {
         selectedVolSounds = clamp(selectedVolSounds - 0.1, 0, 1.0)
         updateMenuLabels()
-        var snd = audio_play_sound(SND_CARD_SELECT, 8, false)
-        audio_sound_gain(snd, selectedVolSounds, 0)
+        var sound = audio_play_sound(SND_CARD_SELECT, 8, false)
+        audio_sound_gain(sound, selectedVolSounds, 0)
     }
 }
 if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
@@ -48,8 +48,8 @@ if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
     } else if (menu.index == 4) {
         selectedVolSounds = clamp(selectedVolSounds + 0.1, 0, 1.0)
         updateMenuLabels()
-        var snd = audio_play_sound(SND_CARD_SELECT, 8, false)
-        audio_sound_gain(snd, selectedVolSounds, 0)
+        var sound = audio_play_sound(SND_CARD_SELECT, 8, false)
+        audio_sound_gain(sound, selectedVolSounds, 0)
     }
 }
 
@@ -74,7 +74,7 @@ if (keyboard_check_pressed(vk_escape)) {
     instance_destroy()
 }
 
-mouseLastX = mx
-mouseLastY = my
+mouseLastX = mouseX
+mouseLastY = mouseY
 
 menuUpdateLayers(backLayers, foreLayers)

@@ -19,9 +19,9 @@ tutorialMaxDist = 140 // в пределах экрана
 // Возвращает true при успешном спавне.
 trySpawnEnemy = function(minDist, maxDist) {
     var leader = oGameController.selected_character
-    if (!instance_exists(leader)) return false
-    var px = leader.x
-    var py = leader.y
+    if (!instance_exists(leader)) { return false }
+    var leaderX = leader.x
+    var leaderY = leader.y
 
     var spawners = ds_list_create() // спавнеры на карте
     with (oSpawner) {
@@ -37,24 +37,24 @@ trySpawnEnemy = function(minDist, maxDist) {
     // Процесс спавна врага
     for (var attempt = 0; attempt < maxSpawnAttempts; attempt++) {
 
-        var seg = spawners[| irandom(ds_list_size(spawners) - 1)] // берем случайный спавнер
+        var segment = spawners[| irandom(ds_list_size(spawners) - 1)] // берем случайный спавнер
 
-        var sx = seg.bbox_left + random(seg.bbox_right - seg.bbox_left) // случайные коордианты на спавнере
-        var sy = seg.bbox_top  + random(seg.bbox_bottom - seg.bbox_top)
+        var spawnX = segment.bbox_left + random(segment.bbox_right - segment.bbox_left) // случайные коордианты на спавнере
+        var spawnY = segment.bbox_top  + random(segment.bbox_bottom - segment.bbox_top)
 
-        if (!collision_point(sx, sy, oSpawner, false, true)) { // если в этих координатах нет спавнера - ошибка
-            if (spawnDebug) show_debug_message("CREATING ENEMY ERROR: POINT IS NOT IN SPAWNER ZONE" + string(sx) + " " + string(sy))
+        if (!collision_point(spawnX, spawnY, oSpawner, false, true)) { // если в этих координатах нет спавнера - ошибка
+            if (spawnDebug) { show_debug_message("CREATING ENEMY ERROR: POINT IS NOT IN SPAWNER ZONE" + string(spawnX) + " " + string(spawnY)) }
             continue
         }
 
-        var dist = point_distance(px, py, sx, sy)
+        var dist = point_distance(leaderX, leaderY, spawnX, spawnY)
         if (dist > maxDist) { // если дальше допустимой дистанции - ошибка
-            if (spawnDebug) show_debug_message("CREATING ENEMY ERROR: POINT IS NOT IN SPAWN DISTANCE")
+            if (spawnDebug) { show_debug_message("CREATING ENEMY ERROR: POINT IS NOT IN SPAWN DISTANCE") }
             continue
         }
 
         if (dist < minDist) { // если ближе допустимой дистанции - ошибка
-            if (spawnDebug) show_debug_message("CREATING ENEMY ERROR: POINT IS TOO CLOSE")
+            if (spawnDebug) { show_debug_message("CREATING ENEMY ERROR: POINT IS TOO CLOSE") }
             continue
         }
 
@@ -62,7 +62,7 @@ trySpawnEnemy = function(minDist, maxDist) {
         for (var i = 0; i < ds_list_size(enemyList); i++) {
             var _other = enemyList[| i]
             if (instance_exists(_other)) {
-                if (point_distance(sx, sy, _other.x, _other.y) < minEnemySpacing) {
+                if (point_distance(spawnX, spawnY, _other.x, _other.y) < minEnemySpacing) {
                     tooClose = true
                     break
                 }
@@ -70,12 +70,12 @@ trySpawnEnemy = function(minDist, maxDist) {
         }
 
         if (tooClose) { // если слишком близко к существующему врагу - ошибка
-            if (spawnDebug) show_debug_message("CREATING ENEMY ERROR: POINT IS IN OTHER ENEMY DISTANCE")
+            if (spawnDebug) { show_debug_message("CREATING ENEMY ERROR: POINT IS IN OTHER ENEMY DISTANCE") }
             continue
         }
 
-        var zone = zoneAt(sx, sy) // определяем в какой зоне (внешняя, cредняя или внутренняя)
-        var section = sectionAt(sx, sy) // определяем секцию (верх-право верх-лево и тд)
+        var zone = zoneAt(spawnX, spawnY) // определяем в какой зоне (внешняя, cредняя или внутренняя)
+        var section = sectionAt(spawnX, spawnY) // определяем секцию (верх-право верх-лево и тд)
         var types = enemyTypesForRegion(zone, section) // определяем каких мини врагов можем там спавнить
         var chosenType = types[irandom(array_length(types) - 1)] // случайным образом из доступных
         if (spawnDebug) {
@@ -84,16 +84,16 @@ trySpawnEnemy = function(minDist, maxDist) {
             show_debug_message("CREATING ENEMY MONSTER TYPE: " + string(chosenType))
         }
         // Точка спавна в стене - патрулировать не сможет
-        if (collision_point(sx, sy, oWall, false, true) != noone) {
-            if (spawnDebug) show_debug_message("CREATING ENEMY ERROR: POINT IS INSIDE A WALL")
+        if (collision_point(spawnX, spawnY, oWall, false, true) != noone) {
+            if (spawnDebug) { show_debug_message("CREATING ENEMY ERROR: POINT IS INSIDE A WALL") }
             continue
         }
-        var enemy = instance_create_layer(sx, sy, "Instances", chosenType) // создаем мини врага
-        enemy.spawnSection = sectionAt(sx, sy) // определение секции
+        var enemy = instance_create_layer(spawnX, spawnY, "Instances", chosenType) // создаем мини врага
+        enemy.spawnSection = sectionAt(spawnX, spawnY) // определение секции
         enemy.spawnedDynamically = true // заспавненный 
-        enemy.my_spawner = seg 
+        enemy.my_spawner = segment 
         ds_list_add(enemyList, enemy)
-        if (spawnDebug) show_debug_message("CREATING ENEMY SUCCESS")
+        if (spawnDebug) { show_debug_message("CREATING ENEMY SUCCESS") }
         spawned = true
         break
     }

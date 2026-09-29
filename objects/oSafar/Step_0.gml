@@ -1,10 +1,14 @@
-depth = -bbox_bottom
+if (global.safarJoined) {
+    if (mask_index != sLana) { joinParty() }
+    event_inherited()
+    exit
+}
 
-if (global.safarJoined) exit
-if (global.gamePaused || global.uiModal) exit
+depth = -bbox_bottom
+if (global.gamePaused || global.uiModal) { exit }
 
 var leader = oGameController.selected_character
-if (!instance_exists(leader)) exit
+if (!instance_exists(leader)) { exit }
 
 if (place_meeting(x, y, leader)) {
     if (!spoke) {
@@ -36,5 +40,5 @@ if (place_meeting(x, y, leader)) {
         }
     }
 } else {
-    if (point_distance(x, y, leader.x, leader.y) > 24) spoke = false
+    if (point_distance(x, y, leader.x, leader.y) > 24) { spoke = false }
 }

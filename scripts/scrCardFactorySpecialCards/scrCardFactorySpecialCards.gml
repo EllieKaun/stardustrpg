@@ -1,6 +1,5 @@
 // Копирует следующую использованную карту и добавляет в руку героя - уникальная
-function createCopyNextPlayedCardCard() {
-    var rarity = CardsRarity.Default
+function createCopyNextPlayedCardCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "CopyNextPlayedCard",
@@ -18,8 +17,7 @@ function createCopyNextPlayedCardCard() {
 }
 
 // Дает дополнительный ход герою - уникальная
-function createAddEnergyCard() {
-    var rarity = CardsRarity.Default
+function createAddEnergyCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "AddEnergyCard",
@@ -37,8 +35,7 @@ function createAddEnergyCard() {
 }
 
 // Перемешивает колоду без траты хода  - уникальная
-function createShuffleDeckCard() {
-    var rarity = CardsRarity.Default
+function createShuffleDeckCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
     return new Card(
         "ShuffleDeckCard",
@@ -56,10 +53,10 @@ function createShuffleDeckCard() {
 }
 
 // Убирает слабость одного героя на х ходов - (Слабые места*)
-function createCardIgnoreWeaknessSingleTarget() {
+function createCardIgnoreWeaknessSingleTarget(rarity = CardsRarity.Default) {
     return new Card(
         "Ignore Weakness",
-        CardsRarity.Default,
+        rarity,
         TargetTypes.SingleAllyTarget,
         StarriorStates.Cast,
         1,
@@ -73,10 +70,10 @@ function createCardIgnoreWeaknessSingleTarget() {
 }
 
 // Крадёт бафф у врага (и копьё Сафара, если враг его несёт)
-function createStealCard() {
+function createStealCard(rarity = CardsRarity.Default) {
     return new Card(
         "Steal",
-        CardsRarity.Default,
+        rarity,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
         0,

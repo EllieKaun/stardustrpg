@@ -72,11 +72,11 @@ function analyticsEnsure() {
 // Хелперы
 // Конверт в строку
 function analyticsToken(_v) {
-    var s = is_string(_v) ? _v : string(_v);
-    s = string_replace_all(s, ":", "_");
-    s = string_replace_all(s, " ", "_");
-    if (s == "") s = "none";
-    return s;
+    var valueStr = is_string(_v) ? _v : string(_v);
+    valueStr = string_replace_all(valueStr, ":", "_");
+    valueStr = string_replace_all(valueStr, " ", "_");
+    if (valueStr == "") { valueStr = "none"; }
+    return valueStr;
 }
 
 // lowercase
@@ -86,7 +86,7 @@ function analyticsCharToken(_v) {
 
 // Редкость в строку
 function analyticsRarityName(_r) {
-    if (is_string(_r)) return string_lower(_r);
+    if (is_string(_r)) { return string_lower(_r); }
     switch (_r) {
         case CardsRarity.Default: return "default";
         case CardsRarity.Unusual: return "unusual";
@@ -98,12 +98,12 @@ function analyticsRarityName(_r) {
 
 // Лог аналитики в Output
 function analyticsLog(_msg) {
-    if (GA_DEBUG) show_debug_message("[GA] " + _msg);
+    if (GA_DEBUG) { show_debug_message("[GA] " + _msg); }
 }
 
 // UI события
 function analyticsDesign(_eventId, _value = undefined) {
-    if (!analyticsEnsure()) return;
+    if (!analyticsEnsure()) { return; }
     if (is_undefined(_value)) {
         ga_addDesignEvent(_eventId);
         analyticsLog("design   " + _eventId);
@@ -115,20 +115,20 @@ function analyticsDesign(_eventId, _value = undefined) {
 
 // Событие прогрессии
 function analyticsProgression(_status, _p1, _p2, _p3) {
-    if (!analyticsEnsure()) return;
+    if (!analyticsEnsure()) { return; }
     ga_addProgressionEvent(_status, _p1, _p2, _p3);
-    var _st = (_status == GA_PROGRESSIONSTATUS_START) ? "Start"
+    var statusLabel = (_status == GA_PROGRESSIONSTATUS_START) ? "Start"
             : ((_status == GA_PROGRESSIONSTATUS_COMPLETE) ? "Complete"
             : ((_status == GA_PROGRESSIONSTATUS_FAIL) ? "Fail" : string(_status)));
-    analyticsLog("progress " + _st + "  " + _p1 + ":" + _p2 + ":" + _p3);
+    analyticsLog("progress " + statusLabel + "  " + _p1 + ":" + _p2 + ":" + _p3);
 }
 
 // Ресурс событие 
 function analyticsResource(_flow, _currency, _amount, _itemType, _itemId) {
-    if (!analyticsEnsure()) return;
+    if (!analyticsEnsure()) { return; }
     ga_addResourceEvent(_flow, _currency, _amount, _itemType, _itemId);
-    var _f = (_flow == GA_RESOURCEFLOWTYPE_SOURCE) ? "Source" : "Sink";
-    analyticsLog("resource " + _f + "  " + string(_amount) + " " + _currency + "  (" + _itemType + ":" + _itemId + ")");
+    var flowLabel = (_flow == GA_RESOURCEFLOWTYPE_SOURCE) ? "Source" : "Sink";
+    analyticsLog("resource " + flowLabel + "  " + string(_amount) + " " + _currency + "  (" + _itemType + ":" + _itemId + ")");
 }
 
 // Меню
@@ -143,7 +143,7 @@ function analyticsContinue() {
 // Бой
 // новый id, чтобы группировать события одной битвы
 function analyticsBattleStart(_area = "overworld", _foe = "enemy") {
-    if (!analyticsEnsure()) return;
+    if (!analyticsEnsure()) { return; }
     global.gaBattleId++;
     global.gaBattleArea = analyticsToken(_area);
     global.gaBattleFoe  = analyticsToken(_foe);
@@ -153,49 +153,49 @@ function analyticsBattleStart(_area = "overworld", _foe = "enemy") {
 }
 
 function analyticsWin() {
-    if (!analyticsEnsure()) return;
+    if (!analyticsEnsure()) { return; }
     analyticsProgression(GA_PROGRESSIONSTATUS_COMPLETE, global.gaBattleArea, global.gaBattleFoe, global.gaBattleTag);
     analyticsDesign("battle:win", global.gaBattleId);
 }
 
 function analyticsDefeat() {
-    if (!analyticsEnsure()) return;
+    if (!analyticsEnsure()) { return; }
     analyticsProgression(GA_PROGRESSIONSTATUS_FAIL, global.gaBattleArea, global.gaBattleFoe, global.gaBattleTag);
     analyticsDesign("battle:defeat", global.gaBattleId);
 }
 
 function analyticsRetreat() {
-    if (!analyticsEnsure()) return;
+    if (!analyticsEnsure()) { return; }
     analyticsDesign("battle:retreat", global.gaBattleId)
 }
 
 function analyticsShuffle() {
-    if (!analyticsEnsure()) return;
+    if (!analyticsEnsure()) { return; }
     analyticsDesign("battle:shuffle", global.gaBattleId)
 }
 
 function analyticsPlayCard(_cardId, _rarity, _character) {
-    if (!analyticsEnsure()) return;
-    var ev = "battle:play_card:" + analyticsCharToken(_character)
+    if (!analyticsEnsure()) { return; }
+    var eventName = "battle:play_card:" + analyticsCharToken(_character)
            + ":" + analyticsRarityName(_rarity)
            + ":" + analyticsToken(_cardId);
-    analyticsDesign(ev, global.gaBattleId);
+    analyticsDesign(eventName, global.gaBattleId);
 }
 
 // Карты
 function analyticsReward(_cardId, _rarity, _source = "battle") {
-    if (!analyticsEnsure()) return;
-    var ev = "reward:" + analyticsToken(_source)
+    if (!analyticsEnsure()) { return; }
+    var eventName = "reward:" + analyticsToken(_source)
            + ":" + analyticsRarityName(_rarity)
            + ":" + analyticsToken(_cardId);
-    analyticsDesign(ev, global.gaBattleId);
+    analyticsDesign(eventName, global.gaBattleId);
 }
 
 function analyticsAddToDeck(_character, _cardId, _rarity) {
-    var ev = "deck:add:" + analyticsCharToken(_character)
+    var eventName = "deck:add:" + analyticsCharToken(_character)
            + ":" + analyticsRarityName(_rarity)
            + ":" + analyticsToken(_cardId);
-    analyticsDesign(ev);
+    analyticsDesign(eventName);
 }
 
 // Сундуки
@@ -213,14 +213,14 @@ function analyticsChestOpen(_kind) {
 // Золото, выпавшее из сундука
 function analyticsChestGold(_amount) {
     analyticsDesign("chest:gold", _amount);
-    if (_amount > 0) analyticsResource(GA_RESOURCEFLOWTYPE_SOURCE, "gold", _amount, "chest", "chest");
+    if (_amount > 0) { analyticsResource(GA_RESOURCEFLOWTYPE_SOURCE, "gold", _amount, "chest", "chest"); }
 }
 
 // Магазин
 function analyticsPurchase(_itemId, _price = 0) {
-    var _it = analyticsToken(_itemId);
-    analyticsDesign("shop:purchase:" + _it, _price);
-    if (_price > 0) analyticsResource(GA_RESOURCEFLOWTYPE_SINK, "gold", _price, "shop", _it);
+    var itemToken = analyticsToken(_itemId);
+    analyticsDesign("shop:purchase:" + itemToken, _price);
+    if (_price > 0) { analyticsResource(GA_RESOURCEFLOWTYPE_SINK, "gold", _price, "shop", itemToken); }
 }
 
 // Квест 

@@ -1,6 +1,5 @@
 // Атака одного врага
-function createPhysicalDamageSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageSingleTargetCard",
@@ -19,8 +18,7 @@ function createPhysicalDamageSingleTargetCard() {
 }
 
 // Атака группы врагов
-function createPhysicalDamageMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageMultipleTargetCard",
@@ -39,8 +37,7 @@ function createPhysicalDamageMultipleTargetCard() {
 }
 
 // Атака с шансом оглушения одного врага - (враг не может действовать х ходов)
-function createPhysicalDamageStunChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageStunChanseSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageStunChanseSingleTargetCard",
@@ -62,8 +59,7 @@ function createPhysicalDamageStunChanseSingleTargetCard() {
 }
 
 // Атака с шансом оглушения группы врагов - (враги не могут действовать х ходов)
-function createPhysicalDamageStunChanseMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageStunChanseMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageStunChanseMultipleTargetCard",
@@ -85,8 +81,7 @@ function createPhysicalDamageStunChanseMultipleTargetCard() {
 }
 
 // Атака с шансом кровотечения одного врага - (враг получает физический урон х ходов)
-function createPhysicalDamageBleedingChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageBleedingChanseSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageBleedingChanseSingleTargetCard",
@@ -108,8 +103,7 @@ function createPhysicalDamageBleedingChanseSingleTargetCard() {
 }
 
 // Атака с шансом кровотечения группы врагов - (враги получают физический урон х ходов)
-function createPhysicalDamageBleedingChanseMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageBleedingChanseMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageBleedingChanseMultipleTargetCard",
@@ -131,8 +125,7 @@ function createPhysicalDamageBleedingChanseMultipleTargetCard() {
 }
 
 // Атака с шансом взрыва одного врага - (враг получает большой урон сразу)
-function createPhysicalDamageBombChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageBombChanseSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageBombChanseSingleTargetCard",
@@ -154,8 +147,7 @@ function createPhysicalDamageBombChanseSingleTargetCard() {
 }
 
 // Атака с шансом взрыва группы врагов - (враги получают большой урон сразу)
-function createPhysicalDamageBombChanseMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageBombChanseMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageBombChanseMultipleTargetCard",
@@ -177,8 +169,7 @@ function createPhysicalDamageBombChanseMultipleTargetCard() {
 }
 
 // Атака с шансом слабости одного врага
-function createPhysicalDamageWeakeningChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageWeakeningChanseSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageWeakeningChanseSingleTargetCard",
@@ -200,8 +191,7 @@ function createPhysicalDamageWeakeningChanseSingleTargetCard() {
 }
 
 // Атака с шансом слабости группы врагов
-function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageWeakeningChanseMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageWeakeningChanseMultipleTargetCard",
@@ -223,8 +213,7 @@ function createPhysicalDamageWeakeningChanseMultipleTargetCard() {
 }
 
 // Атака с шансом вампиризма одного врага - (нанесенный физ урон преобразуется в здоровье)
-function createPhysicalDamageVampirismChanseSingleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageVampirismChanseSingleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleEnemyTarget
     return new Card(
         "PhysicalDamageVampirismChanseSingleTargetCard",
@@ -243,8 +232,7 @@ function createPhysicalDamageVampirismChanseSingleTargetCard() {
 }
 
 // Атака с шансом вампиризма группы врагов - (нанесенный физ урон преобразуется в здоровье)
-function createPhysicalDamageVampirismChanceMultipleTargetCard() {
-    var rarity = CardsRarity.Default
+function createPhysicalDamageVampirismChanceMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies
     return new Card(
         "PhysicalDamageVampirismChanseMultipleTargetCard",
