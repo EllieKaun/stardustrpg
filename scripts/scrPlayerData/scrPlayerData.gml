@@ -451,6 +451,35 @@ function otherCharacter(character) {
     return (character == Characters.Lana) ? Characters.Viv : Characters.Lana
 }
 
+function deckPutCard(character, slot, ref) {
+    var isDeckSlotSet = setDeckSlot(character, slot, ref.id, ref.rarity)
+    if (isDeckSlotSet) {
+        analyticsAddToDeck(characterKey(character), ref.id, ref.rarity)
+    }
+    return isDeckSlotSet
+}
+
+function deckMoveCard(character, slotA, slotB) {
+    if (slotA == slotB) { return false }
+    var refA = deckSlotRef(character, slotA)
+    var refB = deckSlotRef(character, slotB)
+    if (refA == undefined) { return false }
+        
+    clearDeckSlot(character, slotA)
+    clearDeckSlot(character, slotB)
+    var isDeckSlotSet = setDeckSlot(character, slotB, refA.id, refA.rarity)
+    if (refB != undefined) {
+        isDeckSlotSet = isDeckSlotSet && setDeckSlot(character, slotA, refB.id, refB.rarity)
+    }
+    return isDeckSlotSet
+}
+
+function deckRemoveCard(charcter, slot) {
+    if (deckSlotRef(charcter, slot) == undefined) { return false }
+        
+    clearDeckSlot(charcter, slot)
+}
+
 // Построение слотов панели всех карт.
 // Одинаковые карты (id+редкость) группируются в один слот с числом.
 // Если часть копий занята деками — они выделяются в отдельные слоты:
@@ -519,7 +548,11 @@ function buildDeckSlots(character, total = DECK_CAPACITY) {
             continue 
         }
         var cardRef = deckSlotRef(character, slotIndex)
-        if (cardRef != undefined) { array_push(slots, new Slot("filled", cardFromRef(cardRef))) }
+        if (cardRef != undefined) { 
+            var newSlot = new Slot("filled", cardFromRef(cardRef))
+            newSlot.ref = { id: cardRef.id, rarity: cardRef.rarity }
+            array_push(slots, newSlot) 
+        }
         else { array_push(slots, new Slot("empty")) }
     }
     return slots
