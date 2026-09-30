@@ -1,0 +1,9 @@
+lightSurface = -1 
+dayColor = c_white
+nightColor = make_color_rgb(45, 55, 95)
+
+lights = []
+addLight = function (cfg) {
+    array_push(lights, cfg)
+    return cfg
+}
