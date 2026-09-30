@@ -480,8 +480,9 @@ function deckMoveCard(character, slotA, slotB) {
 
 function deckRemoveCard(charcter, slot) {
     if (deckSlotRef(charcter, slot) == undefined) { return false }
-        
+
     clearDeckSlot(charcter, slot)
+    return true
 }
 
 // Построение слотов панели всех карт.

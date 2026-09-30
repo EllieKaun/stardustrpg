@@ -15,6 +15,18 @@ function Slot(initialState, initialCard = undefined) constructor {
     addable = true // можно ли добавить эту карту в деку
 }
 
+function slotAt(panel, guiX, guiY) {
+    var slots = panel.slots
+    for(var index = 0; index < array_length(slots); index++) {
+        var slotRect = panel.getSlotRect(index)
+        if (pointInRect(guiX, guiY, slotRect.sx, slotRect.sy, slotRect.sw, slotRect.sh)
+            && pointInRect(guiX, guiY, panel.x, panel.y, panel.w, panel.h)) {
+                return index
+        }
+    }
+    return -1
+}
+
 // Подобрать шрифт и отрисовать текст центрировано
 function drawFitTextCentered(text, areaX, areaY, areaW, areaH, fonts = undefined) {
     if (fonts != undefined && array_length(fonts) > 0) {
@@ -257,6 +269,8 @@ function Panel(config) constructor {
         stepKeyboard()
     }
 
+    
+    
     // Считывание и обновление данных с клавиатуры
     static stepKeyboard = function() {
         if (justGainedFocus) { 
@@ -382,6 +396,10 @@ function Panel(config) constructor {
     // Считывание и обработка мыши (наведение +
     // клик по табам/слотам). Возвращает true, если курсор над этой панелью
     static stepMouse = function() {
+        if (instance_exists(oDragManager) 
+            && (oDragManager.state == DragState.Dragging || oDragManager.state == DragState.Returning)) {
+            return 
+        }
         hoverSlot = -1
         // панель свёрстана прямо в координатах GUI (окна), поэтому мышь берём как есть
         var mouseX = device_mouse_x_to_gui(0)
@@ -412,14 +430,15 @@ function Panel(config) constructor {
                 return true
             }
         }
-        
+        var slotClicked = instance_exists(oDragManager) ? oDragManager.didClick
+                                                        : clicked
         // Видимость слотов
         for (var slotIndex = 0; slotIndex < array_length(slots); slotIndex++) {
             var slotRect = getSlotRect(slotIndex)
             if (pointInRect(mouseX, mouseY, slotRect.sx, slotRect.sy, slotRect.sw, slotRect.sh)
                 && pointInRect(mouseX, mouseY, x, y, w, h)) {
                 hoverSlot = slotIndex
-                if (clicked) {
+                if (slotClicked) {
                     if (instance_exists(oDeckBuilder)) { oDeckBuilder.focusPanel(self) }
                     onTabRow = false
                     cursorRow = slotIndex div cols

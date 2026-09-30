@@ -4,11 +4,13 @@ targets = []
 payload = undefined
 pressX = 0
 pressY = 0
-
+image_speed = 1
 draggedItemX = 0
 draggedItemY = 0
 draggedItemWidth = 0
 draggedItemHeight = 0
+grabOffsetX = 0
+grabOffsetY = 0
 
 sourceX = 0
 sourceY = 0 
@@ -22,14 +24,15 @@ register = function(item, list) {
     array_push(list, item)
 }
 
-unregisterAll = function (list) {
-    array_delete(list, 0, array_length(list))
+unregisterAll = function () {
+    array_delete(sources, 0, array_length(sources))
+    array_delete(targets, 0, array_length(targets))
 }
 
 cancel = function () {
     if (state == DragState.Dragging) {
         state = DragState.Returning
-        source.onDragEnd(payload, false)
+        payload.source.onDragEnd(payload, false)
     }
 }
 

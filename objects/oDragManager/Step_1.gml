@@ -1,14 +1,14 @@
-wasClick = false 
-consumedEscape = false 
+didClick = false
+consumedEscape = false
 var guiX = device_mouse_x_to_gui(0)
 var guiY = device_mouse_y_to_gui(0)
-var threshold = display_get_gui_width() * 8
+var threshold = display_get_gui_width() / 100
 
 switch (state) {
 	case DragState.Idle: 
         if (mouse_check_button_pressed(mb_left)) {
             for(var index = 0; index < array_length(sources); index++) {
-                var sourceContext = sources[i].hitTest(guiX, guiY)
+                var sourceContext = sources[index].hitTest(guiX, guiY)
                 if(sourceContext == undefined) { continue }
                     
                 payload = sourceContext
@@ -19,29 +19,39 @@ switch (state) {
         }
         break
     case DragState.Pressed: 
+        show_debug_message("------- DRAGMANAGER state PRESSED")
         if (!mouse_check_button(mb_left)) {
-            wasClick = true
+            didClick = true
             payload = undefined
             state = DragState.Idle
         } else if (payload != undefined && point_distance(pressX, pressY, guiX, guiY) > threshold) {
             payload.source.onDragStart(payload)
-            draggedItemX = payload.data.rect.x 
-            draggedItemY = payload.data.rect.y
-            draggedItemHeight = payload.data.rect.height
-            draggedItemWidth = payload.data.rect.width
+            draggedItemWidth = payload.data.rect.sw
+            draggedItemHeight = payload.data.rect.sh
+            // стартуем из ЦЕНТРА слота (drawCardFace рисует от центра, а не от угла)
+            draggedItemX = payload.data.rect.sx + draggedItemWidth * 0.5
+            draggedItemY = payload.data.rect.sy + draggedItemHeight * 0.5
+            // смещение точки захвата относительно центра — чтобы карта не прыгала серединой под курсор
+            grabOffsetX = pressX - draggedItemX
+            grabOffsetY = pressY - draggedItemY
             sourceX = draggedItemX
             sourceY = draggedItemY
             state = DragState.Dragging
         }
         break
     case DragState.Dragging: 
-        draggedItemX = lerp(draggedItemX, guiX, 0.5)
+        show_debug_message("------- DRAGMANAGER state DRAGGING")
+        draggedItemX = lerp(draggedItemX, guiX - grabOffsetX, 0.5)
+        draggedItemY = lerp(draggedItemY, guiY - grabOffsetY, 0.5)
+        hoverTarget = undefined
+        hoverContext = undefined
+        isHoverTarget = false
         for(var index = 0; index < array_length(targets); index++) {
             var targetContext = targets[index].hitTest(guiX, guiY)
             if (targetContext == undefined) { continue }
-                
-            hoverTarget = targetContext
-            hoverContext = targetContext.ctx
+
+            hoverTarget = targets[index]
+            hoverContext = targetContext
             isHoverTarget = hoverTarget.accepts(payload, hoverContext)
         }
         if (mouse_check_button_pressed(mb_right) || keyboard_check_pressed(vk_escape)) {
@@ -66,6 +76,7 @@ switch (state) {
         }
         break
     case DragState.Returning:     
+        show_debug_message("------- DRAGMANAGER state RETURNING")
         draggedItemX = lerp(draggedItemX, sourceX, 0.3)
         draggedItemY = lerp(draggedItemY, sourceY, 0.3)
         if (point_distance(draggedItemX, draggedItemY, sourceX, sourceY) < 1) {
