@@ -11,7 +11,9 @@ setCrispGui(global.guiBaseW, global.guiBaseH)
 // Затемняем фон боя
 var backgroundLayer = layer_get_id("Background")
 if (backgroundLayer != -1) {
-    layer_background_blend(layer_background_get_id(backgroundLayer), merge_color(c_white, c_black, BATTLE_BACKGROUND_DIM))
+    var baseDim = merge_color(c_white, c_black, BATTLE_BACKGROUND_DIM)
+    var battleTint = merge_color(baseDim, make_color_rgb(45, 55, 95), nightValue() * 0.8)
+    layer_background_blend(layer_background_get_id(backgroundLayer), battleTint)
 }
 selectedCard = 0
 maxCardsOnDeskNumber = 4

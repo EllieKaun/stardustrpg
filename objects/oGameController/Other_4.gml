@@ -14,7 +14,7 @@ for (var i = 0; i < array_length(obstacles); i++) {
     mp_grid_add_instances(global.mpGrid, obstacles[i], false)
 }
 
-playMusicNamed("ForestDayMusic")
+syncMusicToTime() // музыка по текущему времени суток
 playAmbientNamed("ForestAmbience")
 
 // Возврат из боя

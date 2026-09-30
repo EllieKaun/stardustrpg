@@ -13,6 +13,7 @@ function Slot(initialState, initialCard = undefined) constructor {
     dimmed = false // затемнить (карта занята чужой декой)
     ownerIcon = noone // иконка-метка владельца (LanaIcon/VivIcon)
     addable = true // можно ли добавить эту карту в деку
+    dragging = false // перетаскиваемая карта
 }
 
 function slotAt(panel, guiX, guiY) {
@@ -511,14 +512,17 @@ function Panel(config) constructor {
                             slotRect.sh)
                     }
                     if (slot.card != undefined) {
+                         // Пока карту тащат — исходный слот показываем полупрозрачным
+                         var cardAlpha = slot.dragging ? 0.3 : 1
                          drawCard(slot.card,
                             slotRect.sx,
                             slotRect.sy,
                             slotRect.sw,
                             slotRect.sh,
-                            selectedSlot == slotIndex)
+                            selectedSlot == slotIndex,
+                            cardAlpha)
                     }
-                    drawSlotOverlays(slot, slotRect)
+                    if (!slot.dragging) { drawSlotOverlays(slot, slotRect) }
                     break
             }
         }
@@ -596,11 +600,11 @@ function Panel(config) constructor {
 }
 
 // Отрисовка карты
-function drawCard(card, cardX, cardY, cardW, cardH, isSelected = false) {
+function drawCard(card, cardX, cardY, cardW, cardH, isSelected = false, alpha = 1) {
     if (card.cardBaseSpr == undefined) {
         return
     }
-    drawCardFace(card, cardX + cardW * 0.5, cardY + cardH * 0.5, cardW, cardH, 0, 1, 1, isSelected)
+    drawCardFace(card, cardX + cardW * 0.5, cardY + cardH * 0.5, cardW, cardH, 0, 1, alpha, isSelected)
 }
 
 // Оверлеи слота коллекции: затемнение, иконка владельца и число копий

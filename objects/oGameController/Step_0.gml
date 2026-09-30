@@ -1,4 +1,5 @@
 autosaveUpdate()
+updateTimeOfDay() // продвигаем время суток (день/ночь)
 
 // Катсцена босса
 if (global.cutsceneActive) {
@@ -79,3 +80,5 @@ if (keyboard_check_pressed(ord("I")) && instance_exists(oShop) && oShop.open) {
 if (keyboard_check_pressed(vk_lcontrol)) {
     switchCharacter()
 }
+
+updateDayNightMusic()
