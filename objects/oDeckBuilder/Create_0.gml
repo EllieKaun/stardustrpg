@@ -41,6 +41,13 @@ categoryForTab = function(tab) { // Мап индекса таба фильтр�
     }
 }
 
+applyChanges = function () {
+    // Если добавился, обновляем коллекцию сотов текущего персонажа
+    deckPanel.slots = buildDeckSlots(editingCharacter)
+    refreshCollection() // Обновляем визуал
+    playerDataSave() // Сохраняем все
+}
+
 // Панель коллекции всех карт 
 collectionPanel = new Panel({
     x: 0, y: 0, w: 0, h: 0,
@@ -89,12 +96,8 @@ collectionPanel = new Panel({
                 return // свободных слотов деки нет
             } 
             // Добавление карты в слот и проверка, добавился ли
-            if (setDeckSlot(editingCharacter, freeSlot, sourceSlot.ref.id, sourceSlot.ref.rarity)) {
-                analyticsAddToDeck(characterKey(editingCharacter), sourceSlot.ref.id, sourceSlot.ref.rarity) // аналитика: карта добавлена в колоду
-                // Если добавился, обновляем коллекцию сотов текущего персонажа
-                deckPanel.slots = buildDeckSlots(editingCharacter)
-                refreshCollection() // Обновляем визуал
-                playerDataSave() // Сохраняем все
+            if (deckPutCard(editingCharacter, freeSlot, sourceSlot.ref)) {
+                applyChanges()
             }
         }
     },
@@ -150,10 +153,8 @@ deckPanel = new Panel({
             if (slot.state != "filled") {
                  return 
             }
-            clearDeckSlot(editingCharacter, slotIndex) // Убираем карту из слота
-            panel.slots = buildDeckSlots(editingCharacter) // Перестраиваем слоты
-            refreshCollection() // Обновляем визуал
-            playerDataSave() // Обновляем данные пользователя
+            deckRemoveCard(editingCharacter, slotIndex)
+            applyChanges()
         }
     },
     onPanelSwitch: panelSwitchCallback
@@ -235,7 +236,13 @@ openBuilder = function() {
     deckPanel.slots = buildDeckSlots(editingCharacter)
     deckPanel.scrollY = 0
     deckPanel.refreshScroll()
-
+    with (oDragManager) {
+        unregisterAll() 
+        register(other.collectionSource, sources)
+        register(other.deckSource, sources)
+        register(other.deckSlotTarget, targets)
+        register(other.collectionTarget, targets)
+    }
     collectionPanel.focused = true
     deckPanel.focused = false
     collectionPanel.enterFromLeft(0)
@@ -244,5 +251,140 @@ openBuilder = function() {
 
 closeBuilder = function() {
     open = false
+    oDragManager.cancel()
+    oDragManager.unregisterAll()
     global.uiModal = false
+}
+
+collectionSource = {
+    hitTest: function (guiX, guiY) {
+        with (oDeckBuilder) {
+            var index = slotAt(collectionPanel, guiX, guiY)
+        	if (index == -1 || index >= array_length(collectionPanel.slots)) { 
+                return undefined 
+            }
+                
+            var slot = collectionPanel.slots[index]
+            if (slot.state == "filled" && slot.addable) {
+                return {
+                    kind: "card",
+                    card: slot.card, 
+                    ref: slot.ref,
+                    source: collectionSource,
+                    data: {
+                        panel: "collection",
+                        slotIndex: index,
+                        rect: collectionPanel.getSlotRect(index)
+                    }
+                }
+            }
+        }
+    },
+    onDragStart: function(payload) {},
+    onDragEnd: function(payload, dropped) {}
+}
+
+deckSource = {
+    hitTest: function (guiX, guiY) {
+        with (oDeckBuilder) {
+            var index = slotAt(deckPanel, guiX, guiY)
+        	if (index == -1 || index >= array_length(deckPanel.slots)) { 
+                return undefined 
+            }
+                
+            var slot = deckPanel.slots[index]
+            if (slot.state == "filled") {
+                return {
+                    kind: "card",
+                    card: slot.card, 
+                    ref: slot.ref,
+                    source: deckSource,
+                    data: {
+                        panel: "deck",
+                        slotIndex: index,
+                        rect: deckPanel.getSlotRect(index)
+                    }
+                }
+            }
+        }
+    },
+    onDragStart: function(payload) { },
+    onDragEnd: function(payload, dropped) { }
+}
+
+collectionTarget = {
+    hitTest: function(guiX, guiY) {
+        with (oDeckBuilder) {
+            if(!pointInRect(guiX, 
+            guiY, 
+            collectionPanel.x,
+            collectionPanel.y,
+            collectionPanel.w,
+            collectionPanel.h)) { return undefined }
+            
+            return { }
+        }
+    },
+    accepts: function (payload, ctx) {
+        with (oDeckBuilder) {
+            if (payload.data.panel != "deck") { return false }
+                
+            return true
+        }
+    },
+    onDrop: function (payload, ctx) {
+        with (oDeckBuilder) {
+            var isCardRemoved = deckRemoveCard(editingCharacter, payload.data.slotIndex)
+            if (isCardRemoved) {
+                applyChanges()
+            }
+            return isCardRemoved
+        }
+    }
+}
+
+deckSlotTarget = {
+    hitTest: function(guiX, guiY) {
+        with (oDeckBuilder) {
+            var index = slotAt(deckPanel, guiX, guiY)
+            if (index == -1 || index >= array_length(deckPanel.slots)) { 
+                return undefined 
+            }
+            
+            return {
+                slotIndex: index
+            }
+        }
+    },
+    accepts: function(payload, ctx) {
+        with (oDeckBuilder) {
+            var targetSlot = deckPanel.slots[ctx.slotIndex]
+            if (targetSlot.state == "locked") { return false }
+            if (payload.data.panel == "collection") { return true }
+            if (payload.data.panel == "deck" && ctx.slotIndex != payload.data.slotIndex) { return true }
+            return false
+        }
+    },
+    onDrop: function (payload, ctx) {
+        with (oDeckBuilder) {
+            var result = false
+            
+            if (payload.data.panel == "collection") {
+                result = deckPutCard(editingCharacter, ctx.slotIndex, payload.ref)
+            }
+                
+            if (payload.data.panel == "deck" && ctx.slotIndex != payload.data.slotIndex) {
+                result = deckMoveCard(
+                    editingCharacter, 
+                    payload.data.slotIndex,
+                    ctx.slotIndex
+                )
+            }
+            
+            if (result) {
+                applyChanges()
+            }
+            return result
+        }
+    }
 }
