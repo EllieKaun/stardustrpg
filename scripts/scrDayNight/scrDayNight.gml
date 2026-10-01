@@ -16,3 +16,7 @@ function nightValue() {
     var dayFactor = smoothstep(0.20, 0.30, time) * (1 - smoothstep(0.70, 0.8, time))
     return dayFactor
 }
+
+function isNight() {
+    return nightValue() >= 0.5
+}

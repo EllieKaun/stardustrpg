@@ -92,6 +92,11 @@ trySpawnEnemy = function(minDist, maxDist) {
         enemy.spawnSection = sectionAt(spawnX, spawnY) // определение секции
         enemy.spawnedDynamically = true // заспавненный 
         enemy.my_spawner = segment 
+        enemy.isIgnited = (random(1) < worldIgniteChance())
+        if (enemy.isIgnited) {
+            if (enemy.igniteSprite != noone) { enemy.sprite_index = enemy.igniteSprite }
+            else { enemy.image_blend = make_color_rgb(255, 90, 60) } 
+        }
         ds_list_add(enemyList, enemy)
         if (spawnDebug) { show_debug_message("CREATING ENEMY SUCCESS") }
         spawned = true

@@ -22,8 +22,20 @@ if (canCarrySpear && !carriesSpear && questSpearState() == QuestSpearState.Activ
 var leader = oGameController.selected_character
 if (!instance_exists(leader)) { exit }
 
+// Ночью ignite-враг гонится за игроком
+var isChasing = false
+if (!triggered && isIgnited && isNight()
+    && point_distance(x, y, leader.x, leader.y) <= IGNITE_CHASE_RADIUS) {
+    isChasing = true
+    var chaseX = clamp(leader.x - x, -IGNITE_CHASE_SPEED, IGNITE_CHASE_SPEED)
+    var chaseY = clamp(leader.y - y, -IGNITE_CHASE_SPEED, IGNITE_CHASE_SPEED)
+    if (!place_meeting(x + chaseX, y, oWall)) { x += chaseX }
+    if (!place_meeting(x, y + chaseY, oWall)) { y += chaseY }
+    if (chaseX != 0) { image_xscale = (chaseX < 0) ? 1 : -1 }
+}
+
 // логика прогулки
-if (!triggered && shouldWalk) {
+if (!isChasing && !triggered && shouldWalk) {
     var minX = homeX - patrolAmp, maxX = homeX + patrolAmp
     var minY = homeY - patrolAmp, maxY = homeY + patrolAmp
     if (instance_exists(my_spawner)) {
@@ -72,9 +84,11 @@ if (place_meeting(x, y, leader)) {
         global.fightEnemy = id
         global.returningFromBattle = true
         global.battleNoFlee = false
+        global.battleEnemyFirst = false // обычная встреча — первыми ходят герои
         // spearCarrierExists не сбрасываем: носитель остаётся на карте, если от него убежали или проиграли.
         // Флаг сбросит кража копья (questGrantSpear) или удаление носителя (Destroy)
         if (carriesSpear) { global.battleHasSpear = true }
+        global.battleIsIgnited = isIgnited // ignite-враг делает весь бой ignite
         global.battleSection = spawnSection
         global.battleEncounter = getEncounter()
         global.returnRoom = room

@@ -2,6 +2,11 @@
 #macro GOLD_PER_ENEMY 6 // награда за одного врага
 #macro GOLD_RUN_PENALTY 5 // штраф за побег
 
+// Ночные бои / ignite 
+#macro NIGHT_GOLD_MULT 1.5 // ×золото за победу и ×штраф за побег в ночном бою
+#macro IGNITE_CHASE_RADIUS 40 // с какого расстояния ignite-враг начинает погоню ночью
+#macro IGNITE_CHASE_SPEED 0.68 // скорость погони 
+
 // Магазин
 #macro SHOP_CARD_PRICE 100 // цены карты
 #macro SHOP_SLOT_BASE 100 // цена слота декбилдера
@@ -69,16 +74,19 @@ function battleDifficulty(zoneId = undefined) {
                     {
                         id: "ignite",
                         roll: function(level) {
-                            if (level >= 50) { return 1 }
-                            if (level >= 25) { return 0.4 }
-                            return 0
+                            var base = (level >= 50) ? 1 : (level >= 25) ? 0.4 : 0
+                            return clamp(base + nightValue() * 0.2, 0, 1)
                         },
                         statMult: { strength: 10, hp: 6, maxHp: 6 },
                         mark: "isIgnited",
                         chanceField: "igniteEffectChance",
                         effectChance: 0.1,
-                        sprite: undefined,
-                        blend: undefined
+                        // Боевые спрайты ignite по анимациям:
+                        // sprites: { idle: sprIgniteIdle, attack: sprIgniteAttack,
+                        //            cast: sprIgniteCast, spell: sprIgniteSpell,
+                        //            dance: sprIgniteDance, ko: sprIgniteKO }
+                        sprites: undefined,
+                        blend: undefined 
                     }
                 ],
                 enemyCount: [

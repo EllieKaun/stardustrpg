@@ -91,6 +91,14 @@ function forestCompositions() {
     return allCompositions
 }
 
+function worldIgniteChance() {
+    
+    var difficulty = battleDifficulty()
+    var affix = findAffixById(difficulty, "ignite")
+    if (affix == undefined) { return 0 }
+    return affix.roll(difficultyLevel())
+}
+
 function winScaledComposition() {
     var difficulty = battleDifficulty()
     var range = enemyCountForLevel(difficulty, difficultyLevel())

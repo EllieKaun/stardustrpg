@@ -15,6 +15,8 @@ if (backgroundLayer != -1) {
     var battleTint = merge_color(baseDim, make_color_rgb(45, 55, 95), nightValue() * 0.8)
     layer_background_blend(layer_background_get_id(backgroundLayer), battleTint)
 }
+
+global.battleIsNight = isNight()
 selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false

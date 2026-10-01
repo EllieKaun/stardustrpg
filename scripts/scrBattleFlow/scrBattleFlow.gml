@@ -237,7 +237,8 @@ function doMenuAction(action) {
         case BattleMenuAction.Run:
             if (variable_global_exists("battleNoFlee") && global.battleNoFlee) { break }
             analyticsRetreat() // аналитика: побег из боя
-            addGold(-GOLD_RUN_PENALTY) // штраф за побег
+            var fleeMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
+            addGold(-round(GOLD_RUN_PENALTY * fleeMult)) // штраф за побег (ночью ×1.5)
             startTransition(global.returnRoom)
         break
         case BattleMenuAction.Info:

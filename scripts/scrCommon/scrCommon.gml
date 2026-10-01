@@ -183,6 +183,9 @@ function initGameGlobals() {
     global.battleNoFlee = false
     global.spearCarrierExists = false
     global.battleHasSpear = false
+    global.battleIsNight = false // снимается на входе в бой
+    global.battleIsIgnited = false // ставит ignite-враг на триггере боя
+    global.battleEnemyFirst = false // враги ходят первыми
 
     global.mpGrid = -1
     global.battleSection = 1
