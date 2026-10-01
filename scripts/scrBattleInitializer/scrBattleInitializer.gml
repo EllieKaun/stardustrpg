@@ -6,7 +6,7 @@ function generateLevel(zoneH, screenW, spacing, encounter) {
         orderEnemiesFirst()
     }
     selectNextCharacter()
-    changeBattleState(BattleStates.CharacterPlay)
+    startTurnFor(selectedCharacter)
 }
 
 function orderEnemiesFirst() {
@@ -134,6 +134,11 @@ function applyEnemyAffix(enemy, affix) {
     if (affix.chanceField != undefined) { variable_instance_set(enemy, affix.chanceField, affix.effectChance) }
 
     var affixSprites = affix[$ "sprites"]
+    var spritesForKind = affix[$ "spritesForKind"]
+    if (spritesForKind != undefined && variable_instance_exists(enemy, "kind")) {
+        var kindSet = spritesForKind(enemy.kind)
+        if (kindSet != undefined) { affixSprites = kindSet }
+    }
     if (affixSprites != undefined) {
         if (affixSprites[$ "idle"] != undefined) {
             enemy.spriteActionIdle = affixSprites.idle

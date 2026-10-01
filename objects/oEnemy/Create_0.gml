@@ -1,6 +1,7 @@
 triggered = false
-isIgnited = false 
-igniteSprite = noone
+isIgnited = false
+kind = worldEnemyKind(object_index)
+igniteSprite = worldIgniteSprite(kind)
 my_spawner = noone
 spawnedDynamically = false
 carriesSpear = false

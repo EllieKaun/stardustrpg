@@ -30,6 +30,7 @@ aura = 0
 resistense = 0
 isEnemy = false
 isPuppet = false
+kind = EnemyKind.None
 slotIndex = -1 
 effects = []
 weaknesses = []

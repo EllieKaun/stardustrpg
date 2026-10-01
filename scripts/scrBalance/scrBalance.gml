@@ -62,6 +62,92 @@ function difficultyLevel(encounter = undefined) {
     return getWins() + bonus
 }
 
+// Вернуть спрайт по имени ассета
+function affixSpriteSlot(assetName) {
+    var asset = asset_get_index(assetName)
+    return (asset >= 0 && sprite_exists(asset)) ? asset : undefined
+}
+
+// Собрать набор анимаций из имён ассетов
+function affixSpriteSet(idle, attack, cast, spell, dance, ko) {
+    var set = {}
+    var value
+    value = affixSpriteSlot(idle)
+    if (value != undefined) { 
+        set.idle = value 
+    }
+    
+    value = affixSpriteSlot(attack)
+    if (value != undefined) { 
+        set.attack = value 
+    }
+    
+    value = affixSpriteSlot(cast)
+    if (value != undefined) { 
+        set.cast = value 
+    }
+    
+    value = affixSpriteSlot(spell)
+    if (value != undefined) { 
+        set.spell = value 
+    }
+    
+    value = affixSpriteSlot(dance)
+    if (value != undefined) { 
+        set.dance = value 
+    }
+    
+    value = affixSpriteSlot(ko)
+    if (value != undefined) { 
+        set.ko = value 
+    }
+    return set
+}
+
+// Игнайт-спрайты под конкретный вид врага
+function igniteSpritesForKind(kind) {
+    switch (kind) {
+        case EnemyKind.CrackerNut:
+            return affixSpriteSet(
+                "sprCrackerNutIgniteIdle", 
+                "sprCrackerNutIgniteHit",
+                "sprCrackerNutIgniteCast", 
+                "sprCrackerNutIgniteCast", 
+                "", 
+                ""
+            )
+        case EnemyKind.Mushroom:
+            return affixSpriteSet(
+                "sprMushroomIgniteIdle", 
+                "sprMushroomIgniteHit", 
+                "sprMushroomIgniteCast", 
+                "sprMushroomIgniteCast", 
+                "", 
+                ""
+            )
+        case EnemyKind.Flower:
+            return affixSpriteSet(
+                "sprPowerFlowerIgniteIdle", 
+                "sprPowerFlowerIgniteHit", 
+                "sprPowerFlowerIgniteSpell", 
+                "sprPowerFlowerIgniteCast", 
+                "", 
+                ""
+            )
+        case EnemyKind.Leaf:
+            return affixSpriteSet(
+                "sprLeafIgniteIdle", 
+                "sprLeafIgniteHit", 
+                "sprLeafIgniteCast", 
+                "", 
+                "", 
+                ""
+            )
+        default:
+            return undefined
+    }
+}
+
 function battleDifficulty(zoneId = undefined) {
     zoneId = zoneId ?? currentZoneId()
     switch (zoneId) {
@@ -74,19 +160,16 @@ function battleDifficulty(zoneId = undefined) {
                     {
                         id: "ignite",
                         roll: function(level) {
-                            var base = (level >= 50) ? 1 : (level >= 25) ? 0.4 : 0
+                            var base = (level >= 50) ? 1 : ((level >= 25) ? 0.4 : 0)
                             return clamp(base + nightValue() * 0.2, 0, 1)
                         },
                         statMult: { strength: 10, hp: 6, maxHp: 6 },
                         mark: "isIgnited",
                         chanceField: "igniteEffectChance",
                         effectChance: 0.1,
-                        // Боевые спрайты ignite по анимациям:
-                        // sprites: { idle: sprIgniteIdle, attack: sprIgniteAttack,
-                        //            cast: sprIgniteCast, spell: sprIgniteSpell,
-                        //            dance: sprIgniteDance, ko: sprIgniteKO }
                         sprites: undefined,
-                        blend: undefined 
+                        spritesForKind: igniteSpritesForKind,
+                        blend: undefined
                     }
                 ],
                 enemyCount: [
@@ -95,8 +178,8 @@ function battleDifficulty(zoneId = undefined) {
                     { maxLevel: 50, mn: 3, mx: 5 },
                     { maxLevel: 1000000, mn: 4, mx: 5 }
                 ],
-                enemyPool: [createCrackerNut, createMushroom, createFlower],
-                limitedEnemy: createLeaf,
+                enemyPool: [createCrackerNut, createMushroom, createFlower, createLeaf],
+                limitedEnemy: undefined,
                 limitedChance: 3
             }
     }

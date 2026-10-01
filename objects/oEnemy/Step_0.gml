@@ -9,7 +9,6 @@ depth = -bbox_bottom
 // Квест не активен (копьё уже украдено / квест завершён) - моб больше не носитель
 if (carriesSpear && questSpearState() != QuestSpearState.Active) {
     carriesSpear = false
-    image_blend = c_white
     global.spearCarrierExists = false
 }
 

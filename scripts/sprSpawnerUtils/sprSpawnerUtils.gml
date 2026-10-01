@@ -92,11 +92,43 @@ function forestCompositions() {
 }
 
 function worldIgniteChance() {
-    
+
     var difficulty = battleDifficulty()
     var affix = findAffixById(difficulty, "ignite")
     if (affix == undefined) { return 0 }
     return affix.roll(difficultyLevel())
+}
+
+// Вид мирового мини-врага по его объекту
+function worldEnemyKind(obj) {
+    switch (obj) {
+        case oCrakerNutSmall: return EnemyKind.CrackerNut
+        case oMushroomSmall: return EnemyKind.Mushroom
+        case oFlowerSmall: return EnemyKind.Flower
+        case oLeafSmall: return EnemyKind.Leaf
+        default: return EnemyKind.None
+    }
+}
+
+// Игнайт-спрайт для открытого мира по виду врага
+function worldIgniteSprite(kind) {
+    var spriteName = ""
+    switch (kind) {
+        case EnemyKind.CrackerNut: 
+            spriteName = "sprCrackerNutIgnite"
+        break
+        case EnemyKind.Mushroom: 
+            spriteName = "sprIgniteMashroom"
+        break
+        case EnemyKind.Flower: 
+            spriteName = "sprIgniteFlower"
+        break
+        case EnemyKind.Leaf: 
+            spriteName = "sprIgniteLeaf"
+        break
+    }
+    var asset = asset_get_index(spriteName)
+    return (asset >= 0 && sprite_exists(asset)) ? asset : noone
 }
 
 function winScaledComposition() {
@@ -106,7 +138,7 @@ function winScaledComposition() {
     var composition = []
     var leafUsed = false
     for (var enemyIndex = 0; enemyIndex < enemyCount; enemyIndex++) {
-        if (!leafUsed && irandom(difficulty.limitedChance) == 0) {
+        if (!leafUsed && difficulty.limitedEnemy != undefined && irandom(difficulty.limitedChance) == 0) {
             array_push(composition, difficulty.limitedEnemy)
             leafUsed = true
         } else {

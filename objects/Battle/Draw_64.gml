@@ -92,7 +92,7 @@ if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == Bat
                     angle: angle, index: i
                 })
 
-                if (isSelected && focusArea == FocusArea.Deck) {
+                if (isSelected && focusArea == FocusArea.Deck && battleState == BattleStates.CharacterPlay) {
                     var selectedCardWidth = drawCardW * scale
                     draw_sprite_ext(sPointer, 0, cardCenterX - selectedCardWidth / 2, cardCenterY, scaleToGui, scaleToGui, 0, c_white, 1)
                 }

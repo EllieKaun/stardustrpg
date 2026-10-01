@@ -182,6 +182,9 @@ enum EffectVisualizerType {
 
 enum CardCategory { Attack, Magic, Heal, Buff, Special }
 
+// Вид врага
+enum EnemyKind { None, CrackerNut, Leaf, Mushroom, Flower, PuppetMaster }
+
 // Категория карты — данные реестра
 function cardCategoryOf(_card) {
     if (is_struct(_card) && variable_struct_exists(_card, "cardId") && cardExists(_card.cardId)) {
