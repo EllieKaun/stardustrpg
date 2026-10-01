@@ -14,5 +14,5 @@ function smoothstep(edge0, edge1, x) {
 function nightValue() {
     var time = global.timeOfDay
     var dayFactor = smoothstep(0.20, 0.30, time) * (1 - smoothstep(0.70, 0.8, time))
-    return 1 - dayFactor
+    return dayFactor
 }
