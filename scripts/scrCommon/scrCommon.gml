@@ -200,7 +200,7 @@ function initGameGlobals() {
     }
     
     global.timeOfDay = 0.5 // Полдень
-    global.timeSpeed = 1 / 120 // Скорость  движения времени
+    global.timeSpeed = 1 / 360 // Скорость  движения времени
     global.timePaused = false // Можно остановить изменение времени
     
      if (!instance_exists(oLighting)) { instance_create_depth(0, 0, -100000, oLighting) }
