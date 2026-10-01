@@ -47,10 +47,10 @@ function guiScale() {
 // Прибавить врагу бонус к урону и здоровью
 function applyEnemyStatBonus(enemy, points, weights = undefined) {
     var w = weights ?? { strength: 1, intelligence: 1, hp: 1, maxHp: 1 }
-    enemy.strength     += points * w.strength
+    enemy.strength += points * w.strength
     enemy.intelligence += points * w.intelligence
-    enemy.hp           += points * w.hp
-    enemy.maxHp        += points * w.maxHp
+    enemy.hp += points * w.hp
+    enemy.maxHp += points * w.maxHp
 }
 
 // Раннер анимация и действий после их проигрывания
@@ -183,6 +183,9 @@ function initGameGlobals() {
     global.battleNoFlee = false
     global.spearCarrierExists = false
     global.battleHasSpear = false
+    global.battleIsNight = false // снимается на входе в бой
+    global.battleIsIgnited = false // ставит ignite-враг на триггере боя
+    global.battleEnemyFirst = false // враги ходят первыми
 
     global.mpGrid = -1
     global.battleSection = 1
@@ -195,6 +198,12 @@ function initGameGlobals() {
         global.chestsGenerated = false
         global.chests = []
     }
+    
+    global.timeOfDay = 0.5 // Полдень
+    global.timeSpeed = 1 / 360 // Скорость  движения времени
+    global.timePaused = false // Можно остановить изменение времени
+    
+     if (!instance_exists(oLighting)) { instance_create_depth(0, 0, -100000, oLighting) }
 }
 
 function startTransition(targetRoom) {

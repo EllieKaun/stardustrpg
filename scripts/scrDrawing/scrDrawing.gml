@@ -711,3 +711,16 @@ function drawPartyPanelBody(panelX, panelY, panelWidth, panelHeight, panelScale,
         }
     }
 }
+
+// Значок над головой персонажа когда есть квест (в draw end)
+function drawQuestMarker(markerSprite, anchorX, anchorY) {
+    if (markerSprite == noone || !sprite_exists(markerSprite)) { return }
+    var frameCount = sprite_get_number(markerSprite)
+    var framesPerSecond = sprite_get_speed(markerSprite)
+    if (sprite_get_speed_type(markerSprite) == spritespeed_framespergameframe) {
+        framesPerSecond *= game_get_speed(gamespeed_fps)
+    }
+    var frame = floor(current_time / 1000 * framesPerSecond) mod frameCount
+    var bobOffset = round(sin(current_time / 250) * 1.5)
+    draw_sprite(markerSprite, frame, round(anchorX), round(anchorY) + bobOffset)
+}

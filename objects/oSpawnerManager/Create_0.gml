@@ -92,6 +92,13 @@ trySpawnEnemy = function(minDist, maxDist) {
         enemy.spawnSection = sectionAt(spawnX, spawnY) // определение секции
         enemy.spawnedDynamically = true // заспавненный 
         enemy.my_spawner = segment 
+        enemy.isIgnited = (random(1) < worldIgniteChance())
+        if (enemy.isIgnited) {
+            if (enemy.igniteSprite != noone) {
+                enemy.sprite_index = enemy.igniteSprite
+                enemy.mask_index = enemy.igniteSprite
+            }
+        }
         ds_list_add(enemyList, enemy)
         if (spawnDebug) { show_debug_message("CREATING ENEMY SUCCESS") }
         spawned = true

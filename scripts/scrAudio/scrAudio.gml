@@ -33,23 +33,29 @@ function playSfx(track, prio, loop) {
 
 // Музыка и фоновые звуки
 
-function playMusic(track) {
+// currentMusic — id звука (инстанса), currentMusicAsset — id ассета (какой трек играет)
+function ensureMusicState() {
     if (!variable_global_exists("currentMusic")) { global.currentMusic = noone }
+    if (!variable_global_exists("currentMusicAsset")) { global.currentMusicAsset = noone }
+    if (!variable_global_exists("musicFadingOut")) { global.musicFadingOut = [] }
+}
+
+function playMusic(track) {
+    ensureMusicState()
     if (track < 0) { return }
-    if (global.currentMusic == track && audio_is_playing(track)) { return }
-    if (global.currentMusic >= 0) { audio_stop_sound(global.currentMusic) }
-    global.currentMusic = track
+    if (global.currentMusicAsset == track && audio_is_playing(global.currentMusic)) { return }
+    if (global.currentMusic != noone && global.currentMusic >= 0) { audio_stop_sound(global.currentMusic) }
     var sound = audio_play_sound(track, 10, true)
     audio_sound_gain(sound, global.volMusic, 0)
+    global.currentMusic = sound
+    global.currentMusicAsset = track
 }
 
 function stopMusic() {
-    if (!variable_global_exists("currentMusic")) { 
-        global.currentMusic = noone
-        return 
-    }
-    if (global.currentMusic >= 0) { audio_stop_sound(global.currentMusic) }
+    ensureMusicState()
+    if (global.currentMusic != noone && global.currentMusic >= 0) { audio_stop_sound(global.currentMusic) }
     global.currentMusic = noone
+    global.currentMusicAsset = noone
 }
 
 function playAmbient(track) {
@@ -92,4 +98,59 @@ function playCardPlaySound() {
 
 function playChestOpenSound() {
     playSfx(SND_CHEST_OPEN, 8, false)
+}
+
+
+function crossfadeMusic(track, fadeMs = 1500) {
+    ensureMusicState()
+    if (track < 0) { return }
+    if (global.currentMusicAsset == track && audio_is_playing(global.currentMusic)) { return }
+
+    if (global.currentMusic != noone && global.currentMusic >= 0 && audio_is_playing(global.currentMusic)) {
+        audio_sound_gain(global.currentMusic, 0, fadeMs)
+        var stopFrames = ceil(fadeMs / 1000 * game_get_speed(gamespeed_fps)) + 2
+        array_push(global.musicFadingOut, { sound: global.currentMusic, framesLeft: stopFrames })
+    }
+
+    var sound = audio_play_sound(track, 10, true)
+    audio_sound_gain(sound, 0, 0)
+    audio_sound_gain(sound, global.volMusic, fadeMs)
+    global.currentMusic = sound
+    global.currentMusicAsset = track
+}
+
+function updateMusicFades() {
+    ensureMusicState()
+    for (var fadeIndex = array_length(global.musicFadingOut) - 1; fadeIndex >= 0; fadeIndex--) {
+        var fade = global.musicFadingOut[fadeIndex]
+        fade.framesLeft -= 1
+        if (fade.framesLeft <= 0) {
+            if (audio_is_playing(fade.sound)) { audio_stop_sound(fade.sound) }
+            array_delete(global.musicFadingOut, fadeIndex, 1)
+        }
+    }
+}
+
+// Трек по времени суток
+function musicTrackForTime() {
+    return (nightValue() >= 0.5) ? asset_get_index("ForestNightMusic") : asset_get_index("ForestDayMusic")
+}
+
+function syncMusicToTime() {
+    global.musicIsNight = (nightValue() >= 0.5)
+    crossfadeMusic(musicTrackForTime(), 0)
+}
+
+function updateDayNightMusic() {
+    updateMusicFades()
+    var night = nightValue()
+    if (!variable_global_exists("musicIsNight")) { global.musicIsNight = (night >= 0.5) }
+   
+    if (!global.musicIsNight && night > 0.6) {
+        global.musicIsNight = true
+        crossfadeMusic(asset_get_index("ForestNightMusic"))
+    } else if (global.musicIsNight && night < 0.4) {
+        global.musicIsNight = false
+        crossfadeMusic(asset_get_index("ForestDayMusic"))
+    }
 }

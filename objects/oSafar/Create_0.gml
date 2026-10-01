@@ -5,7 +5,8 @@ if (!variable_global_exists("safarJoined")) { global.safarJoined = false }
 spoke = false
 
 sprIdle = sprSafar
-sprWalk = sprSafar
+image_xscale = -1
+sprWalk = sprSafarWalk
 
 joinParty = function() {
     mask_index = sLana

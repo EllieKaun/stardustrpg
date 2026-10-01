@@ -85,8 +85,8 @@ function grantBattleRewards() {
     addWin()
     analyticsWin() // аналитика: победа в бою
 
-    // Золото за победу 6 за каждого побеждённого врага
-    addGold(GOLD_PER_ENEMY * array_length(enemies))
+    var goldMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
+    addGold(round(GOLD_PER_ENEMY * array_length(enemies) * goldMult))
 
     var spec = global.battleEncounter.reward;
     var choices = rollRewardChoices(spec, 3)

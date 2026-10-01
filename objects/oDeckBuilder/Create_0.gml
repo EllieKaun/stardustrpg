@@ -161,6 +161,22 @@ deckPanel = new Panel({
 })
 deckPanel.tag = Panels.Deck
 
+markSlotDragging = function(panel, slotIndex) {
+    if (slotIndex >= 0 && slotIndex < array_length(panel.slots)) {
+        panel.slots[slotIndex].dragging = true
+    }
+}
+
+clearDragFlags = function() {
+    var panels = [collectionPanel, deckPanel]
+    for (var panelIndex = 0; panelIndex < array_length(panels); panelIndex++) {
+        var slots = panels[panelIndex].slots
+        for (var slotIndex = 0; slotIndex < array_length(slots); slotIndex++) {
+            slots[slotIndex].dragging = false
+        }
+    }
+}
+
 // Сфокусировать конкретную панель (используется мышью)
 focusPanel = function(panel) {
     collectionPanel.focused = (panel == collectionPanel)
@@ -280,8 +296,12 @@ collectionSource = {
             }
         }
     },
-    onDragStart: function(payload) {},
-    onDragEnd: function(payload, dropped) {}
+    onDragStart: function(payload) {
+        with (oDeckBuilder) { markSlotDragging(collectionPanel, payload.data.slotIndex) }
+    },
+    onDragEnd: function(payload, dropped) {
+        with (oDeckBuilder) { clearDragFlags() }
+    }
 }
 
 deckSource = {
@@ -308,8 +328,12 @@ deckSource = {
             }
         }
     },
-    onDragStart: function(payload) { },
-    onDragEnd: function(payload, dropped) { }
+    onDragStart: function(payload) {
+        with (oDeckBuilder) { markSlotDragging(deckPanel, payload.data.slotIndex) }
+    },
+    onDragEnd: function(payload, dropped) {
+        with (oDeckBuilder) { clearDragFlags() }
+    }
 }
 
 collectionTarget = {

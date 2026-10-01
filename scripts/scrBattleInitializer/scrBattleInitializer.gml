@@ -1,8 +1,23 @@
 function generateLevel(zoneH, screenW, spacing, encounter) {
     initStarriorsFromEncounter(encounter)
     initStarriorsPositions(zoneH, screenW, spacing)
+    
+    if (variable_global_exists("battleEnemyFirst") && global.battleEnemyFirst) {
+        orderEnemiesFirst()
+    }
     selectNextCharacter()
-    changeBattleState(BattleStates.CharacterPlay)
+    startTurnFor(selectedCharacter)
+}
+
+function orderEnemiesFirst() {
+    array_resize(playOrder, 0)
+    for (var i = 0; i < array_length(enemies); i++) { 
+        array_push(playOrder, enemies[i]) 
+    }
+    for (var i = 0; i < array_length(heroes);  i++) { 
+        array_push(playOrder, heroes[i]) 
+    }
+    selectedCharacterNumber = -1
 }
 
 function initStarriorsFromEncounter(encounter) {
@@ -37,6 +52,17 @@ function initStarriorsFromEncounter(encounter) {
     var difficulty = battleDifficulty()
     var level = difficultyLevel(encounter)
     var statPoints = difficulty.statPoints(level)
+    
+    var igniteBattle = (variable_global_exists("battleIsIgnited") && global.battleIsIgnited)
+    var igniteAffix = igniteBattle ? findAffixById(difficulty, "ignite") : undefined
+    var igniteFlags = array_create(array_length(enemies), false)
+    if (igniteAffix != undefined && !isRaw && array_length(enemies) > 0) {
+        var anyIgnited = false
+        for (var i = 0; i < array_length(enemies); i++) {
+            if (random(1) < igniteAffix.roll(level)) { igniteFlags[i] = true; anyIgnited = true }
+        }
+        if (!anyIgnited) { igniteFlags[irandom(array_length(enemies) - 1)] = true } // хотя бы один
+    }
     for (var i = 0; i < array_length(enemies); i++) {
         var enemy = enemies[i]
         enemy.isEnemy = true
@@ -44,11 +70,17 @@ function initStarriorsFromEncounter(encounter) {
         if (isRaw) {
             continue
         }
-        var affix = rollEnemyAffix(difficulty, level)
-        if (affix != undefined) {
-            applyEnemyAffix(enemy, affix)
-        } else {
+        if (igniteFlags[i]) {
+            applyEnemyAffix(enemy, igniteAffix)
+        } else if (igniteAffix != undefined) {
             applyEnemyStatBonus(enemy, statPoints, difficulty.statWeights)
+        } else {
+            var affix = rollEnemyAffix(difficulty, level)
+            if (affix != undefined) {
+                applyEnemyAffix(enemy, affix)
+            } else {
+                applyEnemyStatBonus(enemy, statPoints, difficulty.statWeights)
+            }
         }
     }
 
@@ -83,6 +115,14 @@ function rollEnemyAffix(difficulty, level) {
     return undefined
 }
 
+function findAffixById(difficulty, affixId) {
+    var affixes = difficulty.affixes
+    for (var i = 0; i < array_length(affixes); i++) {
+        if (affixes[i].id == affixId) { return affixes[i] }
+    }
+    return undefined
+}
+
 function applyEnemyAffix(enemy, affix) {
     var mult = affix.statMult
     var stats = variable_struct_get_names(mult)
@@ -92,11 +132,31 @@ function applyEnemyAffix(enemy, affix) {
     }
     if (affix.mark != undefined) { variable_instance_set(enemy, affix.mark, true) }
     if (affix.chanceField != undefined) { variable_instance_set(enemy, affix.chanceField, affix.effectChance) }
-    if (affix.sprite != undefined) {
+
+    var affixSprites = affix[$ "sprites"]
+    var spritesForKind = affix[$ "spritesForKind"]
+    if (spritesForKind != undefined && variable_instance_exists(enemy, "kind")) {
+        var kindSet = spritesForKind(enemy.kind)
+        if (kindSet != undefined) { affixSprites = kindSet }
+    }
+    if (affixSprites != undefined) {
+        if (affixSprites[$ "idle"] != undefined) {
+            enemy.spriteActionIdle = affixSprites.idle
+            enemy.sprite_index = affixSprites.idle
+            enemy.mask_index = affixSprites.idle
+        }
+        if (affixSprites[$ "attack"] != undefined) { enemy.spriteActionAttack = affixSprites.attack }
+        if (affixSprites[$ "cast"]   != undefined) { enemy.spriteActionCast   = affixSprites.cast }
+        if (affixSprites[$ "spell"]  != undefined) { enemy.spriteActionSpell  = affixSprites.spell }
+        if (affixSprites[$ "dance"]  != undefined) { enemy.spriteActionDance  = affixSprites.dance }
+        if (affixSprites[$ "ko"]     != undefined) { enemy.spriteActionKO     = affixSprites.ko }
+    } else if (affix[$ "sprite"] != undefined) {
+     
         enemy.spriteActionIdle = affix.sprite
         enemy.sprite_index = affix.sprite
         enemy.mask_index = affix.sprite
     }
+
     if (affix.blend != undefined) { enemy.image_blend = affix.blend }
 }
 
