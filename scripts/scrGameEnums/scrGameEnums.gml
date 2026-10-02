@@ -18,11 +18,24 @@ enum DeckTutorialStage { // Стадии прохождения туториал
     Done
 }
 
-enum QuestSpearState { // Состояние квеста копья
+enum QuestSpearState { // Состояние квеста Cафара
     Inactive,
     Active,
     SpearObtained,
     Completed
+}
+
+enum QuestFoxState { // Состояние квеста Лисички
+    Inactive,
+    Active,
+    ItemsCollected,
+    Completed
+}
+
+enum QuestFoxItem {
+    PineCone,
+    Petunia,
+    Cauldron
 }
 
 enum ShopItemKind { // Виды товаров в магазине
