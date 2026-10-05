@@ -31,10 +31,6 @@
 
 #macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману
 
-// Сколько нужно предметов для квеста Лисички
-#macro FOX_PINE_CONES_NEEDED 3
-#macro FOX_PETUNIAS_NEEDED 1
-#macro FOX_CAULDRONS_NEEDED 1
 
 function cardBalance() {
     return {

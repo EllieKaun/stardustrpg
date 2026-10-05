@@ -51,7 +51,12 @@ function questCompleteSpear() {
 }
 
 
-//// Квест Лисий 
+//// Квест Лисички 
+
+// Сколько нужно предметов для квеста Лисички
+#macro FOX_PINE_CONES_NEEDED 3
+#macro FOX_PETUNIAS_NEEDED 1
+#macro FOX_CAULDRONS_NEEDED 1
 
 function questFoxState() {
     if (!variable_struct_exists(global.playerData, "questFox")) { global.playerData.questFox = QuestSpearState.Inactive }
@@ -66,14 +71,55 @@ function questSetFoxState(state) {
 function questFoxItemCount(item) {
     switch (item) {
         case QuestFoxItem.Cauldron:
-            
+            return global.playerData.questFoxCauldrons
+        
+        case QuestFoxItem.Petunia:
+            return global.playerData.questFoxPetunias
+        
+        case QuestFoxItem.PineCone:
+            return global.playerData.questFoxPineCones
+        
+    }
+}
+
+function questFoxItemNeeded(item) {
+    switch (item) {
+        case QuestFoxItem.Cauldron:
+            return FOX_CAULDRONS_NEEDED
+        
+        case QuestFoxItem.Petunia:
+            return FOX_PETUNIAS_NEEDED
+        
+        case QuestFoxItem.PineCone:
+            return FOX_PINE_CONES_NEEDED
+        
+    }
+}
+
+function questFoxItemDone(item) {
+    return questFoxItemCount(item) >= questFoxItemNeeded(item)
+}
+
+function questFoxAddItem(item) {
+    switch (item) {
+        case QuestFoxItem.Cauldron:
+            global.playerData.questFoxCauldrons = global.playerData.questFoxCauldrons + 1
         break
         case QuestFoxItem.Petunia:
-            
+            global.playerData.questFoxPetunias = global.playerData.questFoxPetunias + 1
         break
         case QuestFoxItem.PineCone:
-            
+             global.playerData.questFoxPineCones = global.playerData.questFoxPineCones + 1
         break
-    	
     }
+    if (questFoxAllCollected()) {
+        questSetFoxState(QuestFoxState.ItemsCollected)
+    }
+    playerDataSave()
+}
+
+function questFoxAllCollected() {
+    return questFoxItemDone(QuestFoxItem.Cauldron)
+        && questFoxItemDone(QuestFoxItem.Petunia)
+        && questFoxItemDone(QuestFoxItem.PineCone)
 }

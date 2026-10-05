@@ -168,7 +168,8 @@ function stepWaitBars(targets) {
 
 // инициализация глобальных переменных игры
 function initGameGlobals() {
-    global.safarJoined = (questSpearState() == QuestSpearState.Completed)
+    global.safarJoined = (questSpearState() == QuestSpearState.Completed) 
+    global.safarJoined = (questFoxState() == QuestFoxState.Completed)
     global.walkSound = asset_get_index("GrassWalk")
 
     global.returningFromBattle = false

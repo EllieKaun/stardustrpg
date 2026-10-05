@@ -33,9 +33,21 @@ function playerDataInit() {
         var joined = variable_global_exists("safarJoined") && global.safarJoined
         global.playerData.questSafarSpear = joined ? QuestSpearState.Completed : QuestSpearState.Inactive
     }
-      if (!variable_struct_exists(global.playerData, "questFox")) {
+    if (!variable_struct_exists(global.playerData, "questFox")) {
         var joined = variable_global_exists("foxJoined") && global.foxJoined
         global.playerData.questFox = joined ? QuestFoxState.Completed : QuestFoxState.Inactive
+    }
+    if (!variable_struct_exists(global.playerData, "questFoxPineCones")) {
+        global.playerData.questFoxPineCones = 0
+    }
+    if (!variable_struct_exists(global.playerData, "questFoxPetunias")) {
+        global.playerData.questFoxPetunias = 0
+    }
+    if (!variable_struct_exists(global.playerData, "questFoxCauldrons")) {
+        global.playerData.questFoxCauldrons = 0
+    }
+    if (!variable_struct_exists(global.playerData, "questFoxPickedIds")) {
+        global.playerData.questFoxPickedIds = []
     }
     // Миграция старых строковых сейвов в enum
     if (is_string(global.playerData.questSafarSpear)) {
@@ -88,7 +100,7 @@ function playerDataDefault() {
         questFoxPineCones: 0,
         questFoxPetunias: 0,
         questFoxCauldrons: 0,
-        questFoxOuckedIds: [],
+        questFoxPickedIds: [],
         wins: 0,
         collection: {}, // key "id@rarity" -> { id, rarity, count }
         decks: {
