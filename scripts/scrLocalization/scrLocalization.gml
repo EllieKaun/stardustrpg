@@ -149,6 +149,7 @@ function locDefineEn() {
     translations[$ "ui.pressTabDeck"] = "Press TAB to open your deck"
     translations[$ "ui.noCardsYet"] = "No cards yet"
     translations[$ "ui.spaceNext"] = "SPACE >"
+    translations[$ "ui.returnToFox"] = "Return to Fira"
 
     translations[$ "screen.mainMenu"] = "MAIN MENU"
     translations[$ "screen.paused"] = "PAUSED"
@@ -427,6 +428,7 @@ function locDefineRu() {
     translations[$ "ui.pressTabDeck"] = "Нажмите TAB, чтобы открыть колоду"
     translations[$ "ui.noCardsYet"] = "Пока нет карт"
     translations[$ "ui.spaceNext"] = "ПРОБЕЛ >"
+    translations[$ "ui.returnToFox"] = "Вернитесь к Фире"
 
     translations[$ "screen.mainMenu"] = "ГЛАВНОЕ МЕНЮ"
     translations[$ "screen.paused"] = "ПАУЗА"
@@ -686,5 +688,21 @@ function locDefineRu() {
     translations[$ "card.desc.summonBuffPuppet"] = "создаёт усиливающую марионетку"
     translations[$ "card.desc.bossClone"] = "клонирует себя во все пустые слоты"
 
+    translations[$"dlg.fox.greet"] = "Привет, Лиса, все в порядке?"
+    translations[$"dlg.fox.q1"] = "Привет Лана, привет Вив, вы как раз вовремя."
+    translations[$"dlg.fox.q2"] = "Мне не хватает ингредиентов..."
+    translations[$"dlg.fox.q3"] = "Не поможете?"
+    translations[$"dlg.fox.optYes"] = "Что необходимо найти?"
+    translations[$"dlg.fox.optNo"] = "Мы сейчас сильно заняты"
+    translations[$"dlg.fox.accept1..6"] = ""
+    translations[$"dlg.fox.decline"] = "Хорошо, вы знаете где меня найти"
+    translations[$"dlg.fox.waitIntro"] = ""
+    translations[$"dlg.fox.needCones"] = ""
+    translations[$"lg.fox.done1..2"] = ""
+    translations[$"dlg.fox.join"] = ""
+    translations[$"dlg.fox.joinYes"] = ""
+    translations[$"speaker.Fox"] = "Фира"
+    translations[$"unit.Fox"] = "Фира"
+    
     global.locStrings[$ "ru"] = translations
 }

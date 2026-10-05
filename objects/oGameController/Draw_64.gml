@@ -23,9 +23,8 @@ if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
     draw_set_color(c_white)
 }
 
-var shopOpen = instance_exists(oShop) && oShop.open
-var deckOpen = instance_exists(oDeckBuilder) && oDeckBuilder.open
-if (!shopOpen && !deckOpen && !global.cutsceneActive) {
+if (worldHudVisible()) {
+    // Рисуем монетки (правый верхний угол)
     var guiWidth = display_get_gui_width()
     var guiHeight = display_get_gui_height()
     var goldMargin = guiHeight * 0.03
@@ -47,6 +46,85 @@ if (!shopOpen && !deckOpen && !global.cutsceneActive) {
     draw_text_transformed(goldX, coinCenterY, goldStr, goldScale, goldScale, 0)
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
+}
+
+// HUD прогресса квеста Фиры (левый верхний угол).
+// Иконка автосохранения рисуется в левом НИЖНЕМ углу (см. autosaveDrawIcon),
+// поэтому конфликта с этим HUD нет.
+var foxState = questFoxState()
+if (worldHudVisible()
+    && (foxState == QuestFoxState.Active || foxState == QuestFoxState.ItemsCollected)) {
+    var guiWidth = display_get_gui_width()
+    var guiHeight = display_get_gui_height()
+    var margin = floor(guiHeight * 0.03)
+    var iconH = floor(guiHeight * 0.06)
+    var gap = floor(guiHeight * 0.02)       // промежуток между предметами
+    var slotW = iconH + gap                 // ширина ячейки одного предмета
+    var countH = floor(iconH * 0.42)        // высота текста счётчика
+    var countY = margin + iconH + floor(gap * 0.25)
+
+    var items = [QuestFoxItem.PineCone, QuestFoxItem.Petunia, QuestFoxItem.Cauldron]
+    for (var i = 0; i < array_length(items); i++) {
+        var item = items[i]
+        var iconCenterX = margin + i * slotW + iconH * 0.5
+        var iconCenterY = margin + iconH * 0.5
+        var done = questFoxItemDone(item)
+        var pop = questFoxItemPickupScale(item)   // отклик на подбор (5.5)
+
+        var spr = questFoxItemSprite(item)
+        if (spr != noone) {
+            var sprScale = (iconH / sprite_get_height(spr)) * pop
+            draw_sprite_ext(spr, 0, floor(iconCenterX), floor(iconCenterY),
+                sprScale, sprScale, 0, c_white, done ? 1 : 0.85)
+        } else {
+            // Заглушка, пока художник не добавил спрайт предмета
+            var half = iconH * 0.5 * pop
+            draw_set_color(done ? c_lime : make_color_rgb(92, 82, 70))
+            draw_set_alpha(0.85)
+            draw_roundrect(floor(iconCenterX - half), floor(iconCenterY - half),
+                floor(iconCenterX + half), floor(iconCenterY + half), false)
+            draw_set_alpha(1)
+            draw_set_color(c_white)
+        }
+
+        // Подсветка собранного предмета (галочка-рамка)
+        if (done) {
+            var doneHalf = iconH * 0.5
+            draw_set_color(c_lime)
+            draw_set_alpha(0.9)
+            draw_rectangle(floor(iconCenterX - doneHalf), floor(iconCenterY - doneHalf),
+                floor(iconCenterX + doneHalf), floor(iconCenterY + doneHalf), true)
+            draw_set_alpha(1)
+            draw_set_color(c_white)
+        }
+
+        // Счётчик n/need под иконкой, с тенью, через drawUiText
+        var countStr = string(questFoxItemCount(item)) + "/" + string(questFoxItemNeeded(item))
+        draw_set_halign(fa_center)
+        draw_set_valign(fa_top)
+        draw_set_color(c_black)
+        drawUiText(iconCenterX + 1, countY + 1, countStr, countH, iconH * 1.4)
+        draw_set_color(done ? c_lime : c_white)
+        drawUiText(iconCenterX, countY, countStr, countH, iconH * 1.4)
+        draw_set_color(c_white)
+        draw_set_halign(fa_left)
+        draw_set_valign(fa_top)
+    }
+
+    // Подсказка «Вернитесь к Фире», когда всё собрано
+    if (foxState == QuestFoxState.ItemsCollected) {
+        var hint = loc("ui.returnToFox")
+        var hintH = floor(iconH * 0.5)
+        var hintY = countY + countH + gap
+        var hintMaxW = 3 * slotW
+        draw_set_halign(fa_left)
+        draw_set_valign(fa_top)
+        draw_set_color(c_black)
+        drawUiText(margin + 1, hintY + 1, hint, hintH, hintMaxW)
+        draw_set_color(c_yellow)
+        drawUiText(margin, hintY, hint, hintH, hintMaxW)
+        draw_set_color(c_white)
+    }
 }
 
 // Катсцена появления босса

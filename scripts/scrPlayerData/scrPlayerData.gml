@@ -217,11 +217,11 @@ function autosaveDrawIcon() {
     var screenScale = max(1, round(window_get_height() * 0.09 / sprite_get_height(LanaIcon)))
     var iconScale = screenScale * guiPerScreenPixel
     var margin = guiHeight * 0.03
-    var bobOffset = sin(current_time / 200) * screenScale * guiPerScreenPixel * 2
-
+    var bobOffset = guiHeight - (sin(current_time / 200) * screenScale * guiPerScreenPixel * 2)
+    var spriteHeight = sprite_get_height(LanaIcon) * iconScale
     draw_sprite_ext(LanaIcon, 0,
         margin + sprite_get_xoffset(LanaIcon) * iconScale,
-        margin + sprite_get_yoffset(LanaIcon) * iconScale + bobOffset,
+       sprite_get_yoffset(LanaIcon) * iconScale + bobOffset - margin - spriteHeight,
         iconScale, iconScale, 0, c_white, alpha)
 }
 

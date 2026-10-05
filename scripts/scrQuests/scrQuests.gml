@@ -82,6 +82,34 @@ function questFoxItemCount(item) {
     }
 }
 
+// Иконка предмета для HUD. Спрайты рисует художник — пока их нет,
+// возвращаем noone, и HUD рисует заглушку (см. oGameController/Draw_64).
+function questFoxItemSprite(item) {
+    var spriteName = ""
+    switch (item) {
+        case QuestFoxItem.PineCone: spriteName = "PineConeIcon" break
+        case QuestFoxItem.Petunia:  spriteName = "PetuniaIcon"  break
+        case QuestFoxItem.Cauldron: spriteName = "CauldronIcon" break
+    }
+    var spr = asset_get_index(spriteName)
+    return sprite_exists(spr) ? spr : noone
+}
+
+// Запоминаем момент подбора, чтобы HUD мог «подпрыгнуть» иконкой
+function questFoxRegisterPickupFx(item) {
+    if (!variable_global_exists("foxItemPickupTime")) { global.foxItemPickupTime = [0, 0, 0] }
+    global.foxItemPickupTime[item] = current_time
+}
+
+// Масштаб иконки для отклика на подбор: первые 0.3 сек крупнее, затем 1
+function questFoxItemPickupScale(item) {
+    if (!variable_global_exists("foxItemPickupTime")) { return 1 }
+    var popDuration = 0.3
+    var elapsed = (current_time - global.foxItemPickupTime[item]) / 1000
+    if (elapsed < 0 || elapsed >= popDuration) { return 1 }
+    return lerp(1.4, 1, elapsed / popDuration)
+}
+
 function questFoxItemNeeded(item) {
     switch (item) {
         case QuestFoxItem.Cauldron:
@@ -112,6 +140,7 @@ function questFoxAddItem(item) {
              global.playerData.questFoxPineCones = global.playerData.questFoxPineCones + 1
         break
     }
+    questFoxRegisterPickupFx(item)
     if (questFoxAllCollected()) {
         questSetFoxState(QuestFoxState.ItemsCollected)
     }
@@ -122,4 +151,22 @@ function questFoxAllCollected() {
     return questFoxItemDone(QuestFoxItem.Cauldron)
         && questFoxItemDone(QuestFoxItem.Petunia)
         && questFoxItemDone(QuestFoxItem.PineCone)
+}
+
+function foxShowsQuestMarker() {
+    if (global.uiModal) { return false }
+        
+    var state = questFoxState()
+    return state == QuestFoxState.Inactive 
+        || state == QuestFoxState.ItemsCollected
+}
+
+function questFoxAccept() {
+    questSetFoxState(QuestFoxState.Active)
+    unlockCard(global.CardId.stealCard, CardsRarity.Default, 1)
+    var slot = firstFreeDeckSlot(Characters.Lana)
+    if (slot >= 0) { setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default) }
+    playerDataSave()
+    var rewardCard = cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default })
+    showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
 }
