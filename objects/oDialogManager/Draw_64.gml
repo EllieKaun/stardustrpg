@@ -82,12 +82,15 @@ draw_text_ext(drawX, drawY, shown, lineSep, textW)
 if (answerOptions != undefined && fullyRevealed()) {
     // Варианты ответа
     var optionY = drawY + fullH + lineSep * 0.5
+    optionRects = []
     for (var i = 0; i < array_length(answerOptions); i++) {
         var isSelected = (i == selectedOption)
         draw_set_color(isSelected ? c_yellow : c_white)
         var optStr = (isSelected ? "> " : "   ") + answerOptions[i].text
         draw_text_ext(textX, optionY, optStr, lineSep, textW)
-        optionY += string_height_ext(optStr, lineSep, textW)
+        var optionHeight = string_height_ext(optStr, lineSep, textW)
+        array_push(optionRects, { x: textX, y: optionY, w: textW, h: optionHeight })
+        optionY += optionHeight
     }
     draw_set_color(c_white)
 } else if (fullyRevealed()) {

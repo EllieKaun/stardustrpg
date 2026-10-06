@@ -39,11 +39,10 @@ var isChasing = false
 if (!triggered && isIgnited && isNight()
     && point_distance(x, y, leader.x, leader.y) <= IGNITE_CHASE_RADIUS) {
     isChasing = true
-    var chaseX = clamp(leader.x - x, -IGNITE_CHASE_SPEED, IGNITE_CHASE_SPEED)
-    var chaseY = clamp(leader.y - y, -IGNITE_CHASE_SPEED, IGNITE_CHASE_SPEED)
-    if (!place_meeting(x + chaseX, y, oWall)) { x += chaseX }
-    if (!place_meeting(x, y + chaseY, oWall)) { y += chaseY }
-    if (chaseX != 0) { image_xscale = (chaseX < 0) ? 1 : -1 }
+    var chaseStep = stepTowardsPoint(x, y, leader.x, leader.y, IGNITE_CHASE_SPEED)
+    if (!place_meeting(x + chaseStep.x, y, oWall)) { x += chaseStep.x }
+    if (!place_meeting(x, y + chaseStep.y, oWall)) { y += chaseStep.y }
+    if (chaseStep.x != 0) { image_xscale = (chaseStep.x < 0) ? 1 : -1 }
 }
 
 // логика прогулки

@@ -126,7 +126,8 @@ enum BattleStates {
     GameOver,
     PuppetTurn,
     CardAnimating,
-    StunnedTurn
+    StunnedTurn,
+    RunConfirm // окно подтверждения побега
 }
 
 enum StateHook {
@@ -143,7 +144,8 @@ enum StateHook {
 enum BattleMenuAction {
     Shuffle,
     Run,
-    Info
+    Info,
+    Skip
 }
 
 enum BattleOutcome {

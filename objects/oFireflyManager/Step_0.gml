@@ -9,8 +9,20 @@ spawnTimer = 0
 
 if (instance_number(oFirefly) >= fireflyLimit()) { exit }
 
-var point = randomSpawnerPoint(0, FIREFLY_DESPAWN_DISTANCE - 40)
+var point = randomSpawnerPoint(0, FIREFLY_SPAWN_DISTANCE)
 if (point == undefined) { exit }
+
+// Не спавним рядом с уже существующим светлячком
+var pointX = point.x
+var pointY = point.y
+var tooClose = false
+with (oFirefly) {
+    if (point_distance(x, y, pointX, pointY) < FIREFLY_MIN_SPACING) {
+        tooClose = true
+        break
+    }
+}
+if (tooClose) { exit }
 
 var firefly = instance_create_layer(point.x, point.y, "Instances", oFirefly)
 firefly.homeSpawner = point.spawner

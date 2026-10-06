@@ -32,13 +32,19 @@
 #macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману
 
 // Константы светлячков
-#macro FIREFLY_MAX 24 // максимальное количество светлячков
+#macro HERO_TORCH_RADIUS 36 // радиус света вокруг выделенного героя ночью
+#macro HERO_TORCH_INTENSITY 0.7 // яркость света героя (0..1)
+#macro FIREFLY_MAX 12 // максимальное количество светлячков
 #macro FIREFLY_SPAWN_INTERVAL 20 // кадров между попытками спавна
 #macro FIREFLY_SPEED 0.15 // скорость 
 #macro FIREFLY_PATROL_RANGE 20 // как далеко улетает от точки появления
-#macro FIREFLY_LIGHT_RADIUS 14 // радиус пятна света
+#macro FIREFLY_LIGHT_RADIUS 8 // радиус пятна света
+#macro FIREFLY_MIN_SPACING 64 // минимальное расстояние между светлячками при появлении
+#macro FIREFLY_WOBBLE_RANGE 3 // размах виляния в пикселях
+#macro FIREFLY_WOBBLE_SPEED 1.6 // скорость виляния
 #macro FIREFLY_FADE_SPEED 0.04 // скорость разгорания и угасания
-#macro FIREFLY_DESPAWN_DISTANCE 420 // дальность уничтожения
+#macro FIREFLY_SPAWN_DISTANCE 240 // светлячки появляются не дальше этого расстояния от героя
+#macro FIREFLY_DESPAWN_DISTANCE 300 // дальше этого расстояния от героя светлячок гаснет
 
 
 function cardBalance() {

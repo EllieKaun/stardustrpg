@@ -24,9 +24,8 @@ function dialogChoice(speaker, portrait, text, options) {
 function activeSpeaker() {
     var leader = oGameController.selected_character
     switch (leader) {
-        case oLana: return { id: "Lana", portrait: portraitLana }
-            
     	case oViv: return { id: "Viv", portrait: portraitViv }
+        default: return { id: "Lana", portrait: portraitLana }
     }
 }
 
@@ -35,6 +34,7 @@ function activeLine(text) {
     return dialogLine(speaker.id, speaker.portrait, text)
 }
 
-function foxLine(text) { 
-    dialogLine("Fox", portraitFira, text)
+function foxLine(text) {
+    var portrait = asset_get_index("portraitFira")
+    return dialogLine("Fox", sprite_exists(portrait) ? portrait : noone, text)
 }

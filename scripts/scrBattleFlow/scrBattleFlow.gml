@@ -236,15 +236,28 @@ function doMenuAction(action) {
         break
         case BattleMenuAction.Run:
             if (variable_global_exists("battleNoFlee") && global.battleNoFlee) { break }
-            analyticsRetreat() // аналитика: побег из боя
-            var fleeMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
-            addGold(-round(GOLD_RUN_PENALTY * fleeMult)) // штраф за побег (ночью ×1.5)
-            startTransition(global.returnRoom)
+            changeBattleState(BattleStates.RunConfirm) // сначала спрашиваем подтверждение
         break
         case BattleMenuAction.Info:
             changeBattleState(BattleStates.EnemyInfoSelection)
         break
+        case BattleMenuAction.Skip:
+            skipTurn()
+        break
     }
+}
+
+// Сколько золота игрок реально потеряет при побеге (ночью штраф выше, меньше нуля не уйдёт)
+function battleFleePenalty() {
+    var fleeMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
+    return min(getGold(), round(GOLD_RUN_PENALTY * fleeMult))
+}
+
+// Побег после подтверждения
+function confirmBattleFlee() {
+    analyticsRetreat() // аналитика: побег из боя
+    addGold(-battleFleePenalty())
+    startTransition(global.returnRoom)
 }
 
 // Инициализация выборки - отбор персонажей для выбора (исключение ko)
