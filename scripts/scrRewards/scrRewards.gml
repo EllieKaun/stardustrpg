@@ -85,6 +85,9 @@ function grantBattleRewards() {
     addWin()
     analyticsWin() // аналитика: победа в бою
 
+    var wonEncounter = global.battleEncounter
+    if (variable_struct_exists(wonEncounter, "isBoss") && wonEncounter.isBoss) { markBossDefeated() }
+
     if (variable_global_exists("battleCauldronStolen") && global.battleCauldronStolen) {
         global.battleCauldronStolen = false
         questFoxAddItem(QuestFoxItem.Cauldron)

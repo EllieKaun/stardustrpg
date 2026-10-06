@@ -35,10 +35,25 @@ function buildShopItems(category) {
     var items = []
 
     if (category == ShopCategory.Cards) {
+        // Особые карты: продаются всегда, по своей цене, и в наградах не выпадают
+        var shopCards = zoneContent().shopCards
+        var shopCardIds = []
+        for (var shopIndex = 0; shopIndex < array_length(shopCards); shopIndex++) {
+            var shopEntry = shopCards[shopIndex]
+            array_push(shopCardIds, shopEntry.id)
+            var specialCard = cardFromRef({ id: shopEntry.id, rarity: CardsRarity.Default })
+            if (specialCard == undefined) { continue }
+            var specialItem = new ShopItem(ShopItemKind.Card, shopEntry.price)
+            specialItem.card = specialCard
+            specialItem.ref = { id: shopEntry.id, rarity: CardsRarity.Default }
+            array_push(items, specialItem)
+        }
+
         // Карты, которые игрок уже открыл
         var refs = getCollectionRefs()
         for (var i = 0; i < array_length(refs); i++) {
             if (!cardShopSellable(refs[i].id)) { continue }
+            if (array_contains(shopCardIds, refs[i].id)) { continue } // уже выставлена выше по особой цене
             var card = cardFromRef(refs[i])
             if (card == undefined) { continue }
             var shopItem = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)

@@ -41,33 +41,27 @@ function createEncounterForSection(section) {
     return result
 }
 
-// создание пула наград для зоны для секции при победе
+// Пул наград секции. Сейчас у всех секций пул общий - см. forestRewardPool()
 function rewardPoolForSection(section) {
-    var content = zoneContent()
-    var s = content.sections[section]
-    var ids = (s != undefined) ? s.rewardIds : [global.CardId.physicalDamageSingleTarget]
-    return { ids: ids, rarities: content.rewardRarities }
+    return forestRewardPool()
 }
 
-// Единый пул наград демо
-function rewardIdAllowed(id) {
-    if (!cardExists(id)) { return false }
-    var card = cardFromRef({ id: id, rarity: CardsRarity.Default })
-    if (card == undefined) { return false }
-    return card.target != TargetTypes.AllEnemies
+// Добавить в список только существующие карты, без повторов
+function appendRewardIds(targetIds, sourceIds) {
+    for (var idIndex = 0; idIndex < array_length(sourceIds); idIndex++) {
+        var cardId = sourceIds[idIndex]
+        if (cardExists(cardId) && !array_contains(targetIds, cardId)) { array_push(targetIds, cardId) }
+    }
 }
 
+// Пул наград леса (бой и сундуки) на текущий момент:
+// дневные карты всегда, ночные - только ночью, карты марионеток - после победы над боссом
 function forestRewardPool() {
     var content = zoneContent()
     var ids = []
-    var order = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
-    for (var sectionIndex = 0; sectionIndex < array_length(order); sectionIndex++) {
-        var s = content.sections[order[sectionIndex]]
-        if (s == undefined) { continue }
-        for (var idIndex = 0; idIndex < array_length(s.rewardIds); idIndex++) {
-            if (rewardIdAllowed(s.rewardIds[idIndex])) { array_push(ids, s.rewardIds[idIndex]) }
-        }
-    }
+    appendRewardIds(ids, content.rewardAlways)
+    if (isNight()) { appendRewardIds(ids, content.rewardNightOnly) }
+    if (isBossDefeated()) { appendRewardIds(ids, content.rewardAfterBoss) }
     return { ids: ids, rarities: content.rewardRarities }
 }
 
@@ -167,6 +161,7 @@ function puppetMasterEncounter() {
         PuppetMasterCutScene
     )
     encounter.raw = true
+    encounter.isBoss = true
     return encounter
 }
 

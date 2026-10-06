@@ -223,13 +223,6 @@ function zoneContent(zoneId = undefined) {
                     [createCrackerNut, createLeaf],
                     [createCrackerNut, createLeaf, createCrackerNut],
                     [createCrackerNut, createCrackerNut, createCrackerNut]
-                ],
-                rewardIds: [
-                    cardIds.physicalDamageSingleTarget, // атака одного врага
-                    cardIds.physicalDamageMultipleTarget, // атака группы
-                    cardIds.physicalDamageWeakenChanceSingleTarget, // шанс слабости
-                    cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
-                    cardIds.buffPhysicalDamageSingleTarget // усиление физ урона
                 ]
             }
             sections[Section.TopRight] = {
@@ -238,13 +231,6 @@ function zoneContent(zoneId = undefined) {
                     [createMushroom, createFlower],
                     [createMushroom, createLeaf, createFlower],
                     [createMushroom, createMushroom, createMushroom]
-                ],
-                rewardIds: [
-                    cardIds.physicalDamageBleedChanceSingleTarget, // шанс кровотечения
-                    cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
-                    cardIds.debuffPhysicalDamageSingleTarget, // снижение физ атаки
-                    cardIds.instantManaGainSingleTarget, // восстановление mp
-                    cardIds.magicalDamageStunChanceSingleTarget // атака молнией
                 ]
             }
             sections[Section.BottomRight] = {
@@ -253,13 +239,6 @@ function zoneContent(zoneId = undefined) {
                     [createMushroom, createFlower],
                     [createMushroom, createLeaf, createFlower],
                     [createFlower, createFlower, createFlower]
-                ],
-                rewardIds: [
-                    cardIds.magicalDamageFreezeChanceSingleTarget, // атака льдом
-                    cardIds.weaknessMagicalDamageSingleTarget, // слабость к маг урону
-                    cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
-                    cardIds.debuffMagicalDamageSingleTarget, // снижение маг атаки
-                    cardIds.instantHealMultiTarget // восстановление
                 ]
             }
             sections[Section.BottomLeft] = {
@@ -268,17 +247,49 @@ function zoneContent(zoneId = undefined) {
                     [createCrackerNut, createLeaf, createMushroom],
                     [createMushroom, createCrackerNut, createFlower],
                     [createLeaf, createLeaf, createFlower]
-                ],
-                rewardIds: [
-                    cardIds.magicalDamageSingleTarget, // звёздная энергия
-                    cardIds.magicalDamageStunChanceMultiTarget, // молния группе
-                    cardIds.magicalDamageBurnChanceMultiTarget, // огонь группе
-                    cardIds.magicalDamageFreezeChanceMultiTarget, // лёд группе
-                    cardIds.overtimeHealSingleTarget, // постепенное hp
-                    cardIds.overtimeManaGainSingleTarget // постепенное mp
                 ]
             }
             return {
+                // Карты-награды (бой и сундуки). Итоговый пул собирает forestRewardPool():
+                // всегда + ночные (если ночь) + после босса (если босс побеждён)
+                rewardAlways: [
+                    cardIds.physicalDamageSingleTarget, // атака одного врага
+                    cardIds.physicalDamageStunChanceSingleTarget, // атака с шансом оглушения
+                    cardIds.physicalDamageBleedChanceSingleTarget, // атака с шансом кровотечения
+                    cardIds.physicalDamageWeakenChanceSingleTarget, // атака с шансом слабости
+                    cardIds.instantHealSingleTarget, // восстановление hp
+                    cardIds.instantManaGainSingleTarget, // восстановление mp
+                    cardIds.buffPhysicalDamageSingleTarget, // усиление физ урона
+                    cardIds.buffMagicalDamageSingleTarget, // усиление маг урона
+                    cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
+                    cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
+                    cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
+                    cardIds.magicalDamageSingleTarget // атака звёздной энергией
+                ],
+                rewardNightOnly: [
+                    cardIds.physicalDamageBombChanceSingleTarget, // атака с шансом взрыва
+                    cardIds.physicalDamageVampChanceSingleTarget, // атака с шансом вампиризма
+                    cardIds.overtimeHealSingleTarget, // постепенное восстановление hp
+                    cardIds.overtimeManaGainSingleTarget, // постепенное восстановление mp
+                    cardIds.debuffPhysicalDamageSingleTarget, // снижение физ атаки врага
+                    cardIds.debuffMagicalDamageSingleTarget, // снижение маг атаки врага
+                    cardIds.debuffPhysicalProtectionSingleTarget, // снижение физ защиты врага
+                    cardIds.debuffMagicalProtectionSingleTarget, // снижение маг защиты врага
+                    cardIds.magicalDamageStunChanceSingleTarget, // атака молнией
+                    cardIds.magicalDamageFreezeChanceSingleTarget // атака льдом
+                ],
+                rewardAfterBoss: [
+                    cardIds.summonAttackPuppet,
+                    cardIds.summonMagicPuppet,
+                    cardIds.summonHealPuppet,
+                    cardIds.summonBuffPuppet
+                ],
+                // Карты, которые продаются в магазине всегда и не выпадают в наградах
+                shopCards: [
+                    { id: cardIds.shuffleDeck, price: 600 }, // перемешивает колоду
+                    { id: cardIds.resurrection, price: 1000 }, // воскрешение павшего союзника
+                    { id: cardIds.copyNextPlayedCard, price: 1000 } // усиление следующей разыгранной карты
+                ],
                 rewardRarities: [CardsRarity.Default, CardsRarity.Unusual],
                 regionEnemyTypes: [oCrakerNutSmall, oMushroomSmall, oFlowerSmall, oLeafSmall],
                 sections: sections
