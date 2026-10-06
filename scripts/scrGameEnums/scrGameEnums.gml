@@ -42,3 +42,9 @@ enum ShopItemKind { // Виды товаров в магазине
     Card,
     Slot
 }
+
+enum FireflyState { // Состояния светлячков
+    Appearing, 
+    Flying, 
+    Fading 
+}

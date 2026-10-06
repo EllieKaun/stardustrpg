@@ -1,0 +1,10 @@
+state = FireflyState.Appearing
+homeX = x
+homeY = y 
+homeSpawner = noone 
+patrolAxis = choose(0, 1)
+patrolDir = choose(-1, 1)
+brightness = 0
+blinkPhase = random(6.28)
+bodyColor = make_colour_rgb(230, 255, 140)
+light = undefined

@@ -31,6 +31,15 @@
 
 #macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману
 
+// Константы светлячков
+#macro FIREFLY_MAX 24 // максимальное количество светлячков
+#macro FIREFLY_SPAWN_INTERVAL 20 // кадров между попытками спавна
+#macro FIREFLY_SPEED 0.15 // скорость 
+#macro FIREFLY_PATROL_RANGE 20 // как далеко улетает от точки появления
+#macro FIREFLY_LIGHT_RADIUS 14 // радиус пятна света
+#macro FIREFLY_FADE_SPEED 0.04 // скорость разгорания и угасания
+#macro FIREFLY_DESPAWN_DISTANCE 420 // дальность уничтожения
+
 
 function cardBalance() {
     return {
