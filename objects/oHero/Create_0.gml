@@ -17,6 +17,8 @@ sprWalk = sVivWalk
 
 introSpeed = 0.9
 
+torchLight = undefined
+
 stepScriptedApproach = function() {
     path_end()
     speed = 0

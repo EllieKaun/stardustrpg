@@ -170,6 +170,27 @@ function puppetMasterEncounter() {
     return encounter
 }
 
+function randomSpawnerPoint(minDist, maxDist, maxAttempts = 30) {
+    var leader = oGameController.selected_character
+    if (!instance_exists(leader)) { return undefined }
+    var zoneCount = instance_number(oSpawner)
+    if (zoneCount == 0) { return undefined }
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+        var zone = instance_find(oSpawner, irandom(zoneCount - 1))
+        var pointX = zone.bbox_left + random(zone.bbox_right - zone.bbox_left)
+        var pointY = zone.bbox_top + random(zone.bbox_bottom - zone.bbox_top)
+        if (!collision_point(pointX, pointY, oSpawner, false, true)) { continue }
+        var dist = point_distance(leader.x, leader.y, pointX, pointY)
+        if (dist < minDist || dist > maxDist) { continue }
+        return { x: pointX, y: pointY, spawner: zone }
+    }
+    return undefined
+}
+
+function fireflyLimit() {
+    return round(FIREFLY_MAX * nightValue())
+}
+
 // Зацикленный звук ходьбы по траве выделенного персонажа.
 function updateWalkSound(active) {
     if (!variable_global_exists("walkSound") || global.walkSound < 0) { return }

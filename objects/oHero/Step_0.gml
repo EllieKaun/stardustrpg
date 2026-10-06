@@ -1,5 +1,21 @@
 var selected = (oGameController.selected_character.id == id)
 
+if (torchLight == undefined && instance_exists(oLighting)) {
+    torchLight = oLighting.addLight({
+        x: x,
+        y: y,
+        radius: 56,
+        color: make_color_rgb(255, 170, 70),
+        intensity: 0,
+        flicker: 0.08
+    })
+}
+if (torchLight != undefined) {
+    torchLight.x = x
+    torchLight.y = (bbox_top + bbox_bottom) / 2
+    torchLight.intensity = selected ? nightValue() : 0
+}
+
 if (global.uiModal || !can_move) {
     path_end()
     speed = 0

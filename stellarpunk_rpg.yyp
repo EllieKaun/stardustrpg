@@ -149,6 +149,7 @@
     {"id":{"name":"oEnemy","path":"objects/oEnemy/oEnemy.yy",},},
     {"id":{"name":"oFira","path":"objects/oFira/oFira.yy",},},
     {"id":{"name":"oFirefly","path":"objects/oFirefly/oFirefly.yy",},},
+    {"id":{"name":"oFireflyManager","path":"objects/oFireflyManager/oFireflyManager.yy",},},
     {"id":{"name":"oFlowerSmall","path":"objects/oFlowerSmall/oFlowerSmall.yy",},},
     {"id":{"name":"oGameController","path":"objects/oGameController/oGameController.yy",},},
     {"id":{"name":"oHero","path":"objects/oHero/oHero.yy",},},

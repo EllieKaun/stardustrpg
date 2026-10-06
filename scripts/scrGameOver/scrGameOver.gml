@@ -111,7 +111,9 @@ function drawVictoryScreen() {
 
         array_push(rewardHitRects, { x: cardX, y: cardY, w: cardW, h: cardH, index: rewardIndex })
 
-        drawCard(rewardChoices[rewardIndex], cardX, cardDrawY, cardW, cardH)
+        var reward = rewardChoices[rewardIndex]
+        var ownedAlready = variable_struct_exists(reward, "cardRef") && getOwnedCount(reward.cardRef.id, reward.cardRef.rarity) > 0
+        drawCard(reward, cardX, cardDrawY, cardW, cardH, false, ownedAlready ? 0.4 : 1)
 
         if (isSelected) {
             draw_sprite_ext(sPointer, 0, floor(cardX - 10 * guiScaleFactor), floor(cardDrawY + cardH / 2), guiScaleFactor, guiScaleFactor, 0, c_white, 1)

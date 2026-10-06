@@ -207,6 +207,7 @@ function initGameGlobals() {
     global.timePaused = false // Можно остановить изменение времени
     
      if (!instance_exists(oLighting)) { instance_create_depth(0, 0, -100000, oLighting) }
+     if (!instance_exists(oFireflyManager)) { instance_create_depth(0, 0, 0, oFireflyManager) }
 }
 
 function startTransition(targetRoom) {

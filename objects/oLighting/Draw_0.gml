@@ -14,7 +14,11 @@ draw_clear_alpha(ambient, 1)
 gpu_set_blendmode(bm_add)
 for (var index = 0; index < array_length(lights); index++) {
     var light = lights[index]
-    var localX = light.x - viewX 
+    if (light.x + light.radius < viewX) { continue }
+    if (light.x - light.radius > viewX + viewWidth) { continue }
+    if (light.y + light.radius < viewY) { continue }
+    if (light.y - light.radius > viewY + viewHeight) { continue }
+    var localX = light.x - viewX
     var localY = light.y - viewY
     var flick = 1
     if (light.flicker > 0){ 
