@@ -168,8 +168,8 @@ function stepWaitBars(targets) {
 
 // инициализация глобальных переменных игры
 function initGameGlobals() {
-    global.safarJoined = (questSpearState() == QuestSpearState.Completed) 
-    global.safarJoined = (questFoxState() == QuestFoxState.Completed)
+    global.safarJoined = (questSpearState() == QuestSpearState.Completed)
+    global.foxJoined = (questFoxState() == QuestFoxState.Completed)
     global.walkSound = asset_get_index("GrassWalk")
 
     global.returningFromBattle = false
@@ -184,6 +184,8 @@ function initGameGlobals() {
     global.battleNoFlee = false
     global.spearCarrierExists = false
     global.battleHasSpear = false
+    global.cauldronCarrierExists = false
+    global.battleCauldronStolen = false
     global.battleIsNight = false // снимается на входе в бой
     global.battleIsIgnited = false // ставит ignite-враг на триггере боя
     global.battleEnemyFirst = false // враги ходят первыми

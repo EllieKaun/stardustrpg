@@ -82,26 +82,33 @@ function questFoxItemCount(item) {
     }
 }
 
-// Иконка предмета для HUD. Спрайты рисует художник — пока их нет,
-// возвращаем noone, и HUD рисует заглушку (см. oGameController/Draw_64).
+// Иконка предмета
 function questFoxItemSprite(item) {
     var spriteName = ""
     switch (item) {
-        case QuestFoxItem.PineCone: spriteName = "PineConeIcon" break
-        case QuestFoxItem.Petunia:  spriteName = "PetuniaIcon"  break
-        case QuestFoxItem.Cauldron: spriteName = "CauldronIcon" break
+        case QuestFoxItem.PineCone: 
+            spriteName = "PineConeIcon" 
+        break
+        case QuestFoxItem.Petunia:  
+            spriteName = "PetuniaIcon"  
+        break
+        case QuestFoxItem.Cauldron: 
+            spriteName = "CauldronIcon" 
+        break
     }
     var spr = asset_get_index(spriteName)
     return sprite_exists(spr) ? spr : noone
 }
 
-// Запоминаем момент подбора, чтобы HUD мог «подпрыгнуть» иконкой
+// Подбор предмета в мире
 function questFoxRegisterPickupFx(item) {
-    if (!variable_global_exists("foxItemPickupTime")) { global.foxItemPickupTime = [0, 0, 0] }
+    if (!variable_global_exists("foxItemPickupTime")) { 
+        global.foxItemPickupTime = [0, 0, 0] 
+    }
     global.foxItemPickupTime[item] = current_time
 }
 
-// Масштаб иконки для отклика на подбор: первые 0.3 сек крупнее, затем 1
+// Масштаб иконки для отклика на подбор
 function questFoxItemPickupScale(item) {
     if (!variable_global_exists("foxItemPickupTime")) { return 1 }
     var popDuration = 0.3
@@ -168,5 +175,34 @@ function questFoxAccept() {
     if (slot >= 0) { setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default) }
     playerDataSave()
     var rewardCard = cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default })
+    showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
+}
+
+function questFoxIsPicked(pickId) {
+    if (pickId == "") { return false }
+    if (!variable_struct_exists(global.playerData, "questFoxPickedIds")) { global.playerData.questFoxPickedIds = [] }
+    return array_contains(global.playerData.questFoxPickedIds, pickId)
+}
+
+function questFoxMarkPicked(pickId) {
+    if (pickId == "") { return }
+    if (!variable_struct_exists(global.playerData, "questFoxPickedIds")) { global.playerData.questFoxPickedIds = [] }
+    if (!array_contains(global.playerData.questFoxPickedIds, pickId)) {
+        array_push(global.playerData.questFoxPickedIds, pickId)
+        playerDataSave()
+    }
+}
+
+function cauldronSprite() {
+    var sprite = asset_get_index("sprCauldronSmall")
+    return sprite_exists(sprite) ? sprite : noone
+}
+
+function questFoxComplete() {
+    questSetFoxState(QuestFoxState.Completed)
+    global.foxJoined = true
+    unlockCard(global.CardId.instantManaGainSingleTarget, CardsRarity.Unusual, 1)
+    playerDataSave()
+    var rewardCard = cardFromRef({ id: global.CardId.instantManaGainSingleTarget, rarity: CardsRarity.Unusual })
     showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
 }

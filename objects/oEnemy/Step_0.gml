@@ -18,6 +18,19 @@ if (canCarrySpear && !carriesSpear && questSpearState() == QuestSpearState.Activ
     if (spearSprite() == noone) { image_blend = c_yellow }
 }
 
+if (carriesCauldron && (questFoxState() != QuestFoxState.Active || questFoxItemDone(QuestFoxItem.Cauldron))) {
+    carriesCauldron = false
+    global.cauldronCarrierExists = false
+}
+
+if (canCarryCauldron && !carriesCauldron && !carriesSpear
+    && questFoxState() == QuestFoxState.Active
+    && !questFoxItemDone(QuestFoxItem.Cauldron)
+    && !global.cauldronCarrierExists) {
+    carriesCauldron = true
+    global.cauldronCarrierExists = true
+}
+
 var leader = oGameController.selected_character
 if (!instance_exists(leader)) { exit }
 
@@ -87,16 +100,18 @@ if (place_meeting(x, y, leader)) {
         // spearCarrierExists не сбрасываем: носитель остаётся на карте, если от него убежали или проиграли.
         // Флаг сбросит кража копья (questGrantSpear) или удаление носителя (Destroy)
         if (carriesSpear) { global.battleHasSpear = true }
+        if (carriesCauldron) { global.battleNoFlee = true }
         global.battleIsIgnited = isIgnited // ignite-враг делает весь бой ignite
         global.battleSection = spawnSection
-        global.battleEncounter = getEncounter()
+        var encounter = getEncounter()
+        encounter.hasCauldron = carriesCauldron
+        global.battleEncounter = encounter
         global.returnRoom = room
         global.returnX = leader.x
         global.returnY = leader.y
         leader.can_move = false
 
         // Проверка на наличие катсцены. если есть, сначала проигрываем ее
-        var encounter = global.battleEncounter
         var intro = variable_struct_exists(encounter, "introSprite") ? encounter.introSprite : undefined
         var started = false
         if (intro != undefined && intro != noone && instance_exists(oGameController)) {
@@ -114,6 +129,7 @@ if (place_meeting(x, y, leader)) {
     if (triggered && distance > rearmDistance) { triggered = false }
     if (spawnedDynamically && distance > oSpawnerManager.spawnDistance) {
         if (carriesSpear) { global.spearCarrierExists = false }
+        if (carriesCauldron) { global.cauldronCarrierExists = false }
         instance_destroy()
     }
 }

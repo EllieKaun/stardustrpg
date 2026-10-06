@@ -159,6 +159,9 @@ followSequence = function() {
     if (global.safarJoined && instance_exists(oSafar)) {
         array_push(sequence, oSafar)
     }
+    if (global.foxJoined && instance_exists(oFira)) {
+        array_push(sequence, oFira)
+    }
     return sequence
 }
 

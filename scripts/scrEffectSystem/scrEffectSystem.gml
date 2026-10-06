@@ -103,7 +103,10 @@ function initEffectRegistry() {
             var target = is_array(targets) ? (array_length(targets) > 0 ? targets[0] : noone) : targets
             if (target == noone) { return }
 
-            if (variable_instance_exists(target, "hasSpear") && target.hasSpear) {
+            if (variable_instance_exists(target, "hasCauldron") && target.hasCauldron) {
+                target.hasCauldron = false
+                global.battleCauldronStolen = true
+            } else if (variable_instance_exists(target, "hasSpear") && target.hasSpear) {
                 target.hasSpear = false
                 target.image_blend = c_white
                 questGrantSpear()

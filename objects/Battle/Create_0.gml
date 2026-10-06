@@ -17,6 +17,7 @@ if (backgroundLayer != -1) {
 }
 
 global.battleIsNight = isNight()
+global.battleCauldronStolen = false
 selectedCard = 0
 maxCardsOnDeskNumber = 4
 copyNextCard = false

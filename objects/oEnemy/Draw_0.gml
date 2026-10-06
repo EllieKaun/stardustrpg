@@ -15,3 +15,10 @@ if (carriesSpear) {
         draw_sprite_ext(sprite, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 2, 1, 1, 90, c_white, 1)
     }
 }
+
+if (carriesCauldron) {
+    var cauldron = cauldronSprite()
+    if (cauldron != noone) {
+        draw_sprite_ext(cauldron, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 2, 1, 1, 0, c_white, 1)
+    }
+}

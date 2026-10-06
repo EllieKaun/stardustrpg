@@ -35,6 +35,9 @@ function initStarriorsFromEncounter(encounter) {
         if (variable_global_exists("safarJoined") && global.safarJoined) {
             array_push(heroes, createSafar())
         }
+        if (variable_global_exists("foxJoined") && global.foxJoined) {
+            array_push(heroes, createFox())
+        }
     }
     enemies = []
     var creators = encounter.enemyCreators
@@ -67,6 +70,7 @@ function initStarriorsFromEncounter(encounter) {
         var enemy = enemies[i]
         enemy.isEnemy = true
         enemy.hasSpear = false
+        enemy.hasCauldron = false
         if (isRaw) {
             continue
         }
@@ -103,6 +107,14 @@ function initStarriorsFromEncounter(encounter) {
             applyEnemyStatBonus(enemies[i], damageBonus)
         }
         global.battleHasSpear = false
+    }
+
+    if (!isRaw
+        && variable_struct_exists(encounter, "hasCauldron")
+        && encounter.hasCauldron
+        && array_length(enemies) > 0) {
+        var cauldronIdx = irandom(array_length(enemies) - 1)
+        enemies[cauldronIdx].hasCauldron = true
     }
 }
 

@@ -21,8 +21,7 @@ function guiSyncCrisp() {
     setCrispGui(camera_get_view_width(camera), camera_get_view_height(camera))
 }
 
-// Видны ли HUD-элементы мира (монеты, прогресс квеста): скрываем в магазине,
-// колоде и во время катсцены. Единое условие для всех элементов HUD мира.
+// Видны ли HUD-элементы мира (монеты, прогресс квеста)
 function worldHudVisible() {
     var shopOpen = instance_exists(oShop) && oShop.open
     var deckOpen = instance_exists(oDeckBuilder) && oDeckBuilder.open

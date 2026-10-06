@@ -85,6 +85,12 @@ function grantBattleRewards() {
     addWin()
     analyticsWin() // аналитика: победа в бою
 
+    if (variable_global_exists("battleCauldronStolen") && global.battleCauldronStolen) {
+        global.battleCauldronStolen = false
+        questFoxAddItem(QuestFoxItem.Cauldron)
+        if (variable_global_exists("cauldronCarrierExists")) { global.cauldronCarrierExists = false }
+    }
+
     var goldMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
     addGold(round(GOLD_PER_ENEMY * array_length(enemies) * goldMult))
 

@@ -81,6 +81,13 @@ if (variable_instance_exists(id, "hasSpear") && hasSpear) {
     }
 }
 
+if (variable_instance_exists(id, "hasCauldron") && hasCauldron) {
+    var cauldronSpr = cauldronSprite()
+    if (cauldronSpr != noone) {
+        draw_sprite_ext(cauldronSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 6, 1, 1, 0, c_white, 1)
+    }
+}
+
 // Рисование наложенных эффектов
 var statusIcons = []
 var seenIcons = {}
