@@ -13,20 +13,17 @@ switch (state) {
         }
     break
     case FireflyState.Flying:
-        if (nightValue() < fadeThreshold) { state = FireflyState.Fading }
-        var leader = oGameController.selected_character
-        if (instance_exists(leader) && point_distance(x, y, leader.x, leader.y) > FIREFLY_DESPAWN_DISTANCE) {
-            state = FireflyState.Fading
-        }
+        
     break
     case FireflyState.Fading:
-        brightness = max(0, brightness - FIREFLY_FADE_SPEED)
-        if (brightness <= 0) {
-            instance_destroy()
+        brightness = max(0, brightness + FIREFLY_FADE_SPEED)
+        if (brightness <= 1) { 
+            instance_destroy() 
         }
     break
 }
 
+// Прогулка
 var minX = homeX - FIREFLY_PATROL_RANGE
 var maxX = homeX + FIREFLY_PATROL_RANGE
 var minY = homeY - FIREFLY_PATROL_RANGE
@@ -73,6 +70,6 @@ if (moved) {
 if (light != undefined) {
     light.x = x 
     light.y = y
-    var blinkValue = 0.675 + 0.325 * sin(current_time / 500 + blinkPhase)
+    blinkValue = 0.675 + 0.325 * sin(current_time / 500 + blinkPhase)
     light.intensity = brightness * blinkValue
 }

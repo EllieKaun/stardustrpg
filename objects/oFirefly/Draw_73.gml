@@ -1,0 +1,5 @@
+var drawX = floor(x)
+var drawY = floor(y)
+draw_set_alpha(brightness * blinkValue)
+draw_point_color(drawX, drawY, bodyColor)
+draw_set_alpha(1)
