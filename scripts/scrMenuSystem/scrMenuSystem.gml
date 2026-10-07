@@ -284,8 +284,7 @@ function menuGetResolutions() {
 // Применить режим окна: фуллскрин, либо оконный размер с центрированием
 function applyWindowMode(winW, winH, fullscreen) {
     if (fullscreen) {
-        // Полный экран как окно без рамки, а не эксклюзивный режим: в эксклюзивном
-        // игра сворачивается при потере фокуса (скриншот Win+Shift+S, Alt+Tab, оверлеи)
+     
         window_enable_borderless_fullscreen(true)
         window_set_fullscreen(true)
         return

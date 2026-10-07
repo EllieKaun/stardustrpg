@@ -236,7 +236,7 @@ function doMenuAction(action) {
         break
         case BattleMenuAction.Run:
             if (variable_global_exists("battleNoFlee") && global.battleNoFlee) { break }
-            changeBattleState(BattleStates.RunConfirm) // сначала спрашиваем подтверждение
+            changeBattleState(BattleStates.RunConfirm)
         break
         case BattleMenuAction.Info:
             changeBattleState(BattleStates.EnemyInfoSelection)
@@ -247,7 +247,7 @@ function doMenuAction(action) {
     }
 }
 
-// Сколько золота игрок реально потеряет при побеге (ночью штраф выше, меньше нуля не уйдёт)
+// Сколько золота игрок потеряет
 function battleFleePenalty() {
     var fleeMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
     return min(getGold(), round(GOLD_RUN_PENALTY * fleeMult))
@@ -260,9 +260,8 @@ function confirmBattleFlee() {
     startTransition(global.returnRoom)
 }
 
-// Инициализация выборки - отбор персонажей для выбора (исключение ko)
+// Инициализация выбора
 function initTargetSelection(targets) {
-    // isActive не снимаем: обводка ходящего персонажа остаётся на выборе цели и в анимациях
     var aliveTargets = []
     for(var i = 0; i < array_length(targets); i++) {
         if !targets[i].isKO() { array_push(aliveTargets, targets[i]) }

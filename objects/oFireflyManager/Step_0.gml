@@ -12,7 +12,6 @@ if (instance_number(oFirefly) >= fireflyLimit()) { exit }
 var point = randomSpawnerPoint(0, FIREFLY_SPAWN_DISTANCE)
 if (point == undefined) { exit }
 
-// Не спавним рядом с уже существующим светлячком
 var pointX = point.x
 var pointY = point.y
 var tooClose = false

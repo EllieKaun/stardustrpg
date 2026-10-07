@@ -213,7 +213,7 @@ function enemyCountForLevel(difficulty, level) {
 function zoneContent(zoneId = undefined) {
     zoneId = zoneId ?? currentZoneId()
     var cardIds = global.CardId
-    var sections = array_create(4, undefined) // индекс = enum Section
+    var sections = array_create(4, undefined)
     switch (zoneId) {
         case ZoneId.Forest:
         default:
@@ -250,8 +250,7 @@ function zoneContent(zoneId = undefined) {
                 ]
             }
             return {
-                // Карты-награды (бой и сундуки). Итоговый пул собирает forestRewardPool():
-                // всегда + ночные (если ночь) + после босса (если босс побеждён)
+                // Карты-награды 
                 rewardAlways: [
                     cardIds.physicalDamageSingleTarget, // атака одного врага
                     cardIds.physicalDamageStunChanceSingleTarget, // атака с шансом оглушения
@@ -284,11 +283,11 @@ function zoneContent(zoneId = undefined) {
                     cardIds.summonHealPuppet,
                     cardIds.summonBuffPuppet
                 ],
-                // Карты, которые продаются в магазине всегда и не выпадают в наградах
+                // Карты, которые продаются только в магазине
                 shopCards: [
                     { id: cardIds.shuffleDeck, price: 600 }, // перемешивает колоду
                     { id: cardIds.resurrection, price: 1000 }, // воскрешение павшего союзника
-                    { id: cardIds.copyNextPlayedCard, price: 1000 } // усиление следующей разыгранной карты
+                    { id: cardIds.copyNextPlayedCard, price: 1000 } // копирование следующей разыгранной карты
                 ],
                 rewardRarities: [CardsRarity.Default, CardsRarity.Unusual],
                 regionEnemyTypes: [oCrakerNutSmall, oMushroomSmall, oFlowerSmall, oLeafSmall],

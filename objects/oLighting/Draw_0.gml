@@ -12,8 +12,6 @@ var ambient = merge_color(dayColor, nightColor, nightValue())
 surface_set_target(lightSurface)
 draw_clear_alpha(ambient, 1)
 gpu_set_blendmode(bm_add)
-// Пятна света сильно уменьшаются и стоят на дробных координатах. Без сглаживания
-// маленькое пятно прилипает к сетке пикселей и выглядит смещённым от источника
 var prevTexFilter = gpu_get_texfilter()
 gpu_set_texfilter(true)
 for (var index = 0; index < array_length(lights); index++) {

@@ -11,11 +11,13 @@ if (opts != undefined) {
         if (confirm || mouseClicked) { charProgress = string_length(currentText()) }
     } else {
         var n = array_length(opts)
-        if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) { selectedOption = (selectedOption - 1 + n) mod n }
-        if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { selectedOption = (selectedOption + 1) mod n }
+        if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) { 
+            selectedOption = (selectedOption - 1 + n) mod n 
+        }
+        if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { 
+            selectedOption = (selectedOption + 1) mod n 
+        }
 
-        // Мышь: наведение выбирает вариант, клик по варианту подтверждает.
-        // Клик мимо вариантов ничего не выбирает, чтобы не ответить случайно
         var mouseGuiX = device_mouse_x_to_gui(0)
         var mouseGuiY = device_mouse_y_to_gui(0)
         var mouseMoved = (mouseGuiX != mouseLastX || mouseGuiY != mouseLastY)

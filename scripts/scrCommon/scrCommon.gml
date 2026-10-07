@@ -32,8 +32,7 @@ function drawScreenDim(alpha) {
     draw_set_color(c_white)
 }
 
-// Шаг к точке с постоянной скоростью в любом направлении (без ускорения по диагонали).
-// Возвращает смещение { x, y } длиной не больше maxStep
+// Шаг к точке
 function stepTowardsPoint(fromX, fromY, toX, toY, maxStep) {
     var distance = point_distance(fromX, fromY, toX, toY)
     if (distance <= 0) { return { x: 0, y: 0 } }

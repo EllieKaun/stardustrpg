@@ -37,9 +37,12 @@ stepControlled = function() {
     path_end()
     speed = 0 
 
-    var horizontalInput = (keyboard_check(ord("D")) || keyboard_check(vk_right)) - (keyboard_check(ord("A")) || keyboard_check(vk_left))
-    var verticalInput = (keyboard_check(ord("S")) || keyboard_check(vk_down)) - (keyboard_check(ord("W")) || keyboard_check(vk_up))
-    // По диагонали делим скорость на корень из двух, иначе герой идёт в 1.41 раза быстрее
+    var horizontalInput = (keyboard_check(ord("D")) 
+        || keyboard_check(vk_right)) - (keyboard_check(ord("A")) 
+        || keyboard_check(vk_left))
+    var verticalInput = (keyboard_check(ord("S")) 
+        || keyboard_check(vk_down)) - (keyboard_check(ord("W")) 
+        || keyboard_check(vk_up))
     var moveSpeed = (horizontalInput != 0 && verticalInput != 0) ? spdWalk * 0.7071 : spdWalk
     var moveX = horizontalInput * moveSpeed
     var moveY = verticalInput * moveSpeed

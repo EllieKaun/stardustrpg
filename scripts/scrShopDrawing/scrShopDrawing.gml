@@ -35,7 +35,7 @@ function buildShopItems(category) {
     var items = []
 
     if (category == ShopCategory.Cards) {
-        // Особые карты: продаются всегда, по своей цене, и в наградах не выпадают
+        // Карты которые только продаются и в наградах не выпадают
         var shopCards = zoneContent().shopCards
         var shopCardIds = []
         for (var shopIndex = 0; shopIndex < array_length(shopCards); shopIndex++) {
@@ -53,7 +53,7 @@ function buildShopItems(category) {
         var refs = getCollectionRefs()
         for (var i = 0; i < array_length(refs); i++) {
             if (!cardShopSellable(refs[i].id)) { continue }
-            if (array_contains(shopCardIds, refs[i].id)) { continue } // уже выставлена выше по особой цене
+            if (array_contains(shopCardIds, refs[i].id)) { continue } // выставлена по особой цене
             var card = cardFromRef(refs[i])
             if (card == undefined) { continue }
             var shopItem = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)

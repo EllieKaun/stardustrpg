@@ -13,8 +13,6 @@ switch (state) {
         }
     break
     case FireflyState.Flying:
-        // Гаснет, когда герой ушёл далеко (как враги) или когда светает.
-        // Освободившееся место в лимите займут новые светлячки рядом с героем
         var leader = oGameController.selected_character
         var isFarAway = instance_exists(leader)
             && point_distance(x, y, leader.x, leader.y) > FIREFLY_DESPAWN_DISTANCE
@@ -30,7 +28,7 @@ switch (state) {
     break
 }
 
-// Полёт вдоль одной оси вокруг точки появления. Стены не проверяем: светлячок летает над ними
+// Полёт 
 var minX = homeX - FIREFLY_PATROL_RANGE
 var maxX = homeX + FIREFLY_PATROL_RANGE
 var minY = homeY - FIREFLY_PATROL_RANGE
@@ -57,8 +55,7 @@ if (patrolAxis == 0) {
     }
 }
 
-// Виляние: плавное смещение поперёк движения и чуть вдоль него. Две несовпадающие волны,
-// чтобы траектория не повторялась. Логические x/y остаются на прямой - границы считаются по ним
+// Виляние
 var wobbleTime = current_time / 1000
 var wobbleSide = sin(wobbleTime * FIREFLY_WOBBLE_SPEED + blinkPhase) * FIREFLY_WOBBLE_RANGE
     + sin(wobbleTime * FIREFLY_WOBBLE_SPEED * 2.3 + blinkPhase * 1.7) * FIREFLY_WOBBLE_RANGE * 0.4
@@ -73,7 +70,6 @@ if (patrolAxis == 0) {
 
 blinkValue = 0.675 + 0.325 * sin(current_time / 500 + blinkPhase)
 if (light != undefined) {
-    // центр пятна - центр пикселя светлячка (origin спрайта в левом верхнем углу)
     light.x = drawX + sprite_width * 0.5
     light.y = drawY + sprite_height * 0.5
     light.intensity = brightness * blinkValue

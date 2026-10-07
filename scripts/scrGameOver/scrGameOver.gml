@@ -86,7 +86,6 @@ function drawVictoryScreen() {
     var count = array_length(rewardChoices)
     rewardHitRects = []
 
-    // С наградой заголовок выше, под ним пояснение, что карту нужно выбрать
     if (count > 0) {
         drawUiText(screenWidth / 2, floor(screenHeight * 0.055), loc("ui.victory"), screenHeight * 0.06)
         draw_set_color(merge_color(c_white, c_yellow, 0.4))

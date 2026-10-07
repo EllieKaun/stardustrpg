@@ -267,7 +267,6 @@ function rebuildPlayOrder() {
     for (var i = 0; i < array_length(sortedHeroes); i++)  array_push(playOrder, sortedHeroes[i])
     for (var i = 0; i < array_length(sortedEnemies); i++) array_push(playOrder, sortedEnemies[i])
 
-    // очередь сдвинулась - указатель хода должен остаться на том же персонаже
     var selectedIndex = array_get_index(playOrder, selectedCharacter)
     if (selectedIndex >= 0) { selectedCharacterNumber = selectedIndex }
 }
@@ -495,7 +494,6 @@ function initBattleStates() {
     stateDef[StateHook.Step] = method(self, function(input) { stepGameOverScreen() })
     battleStates[BattleStates.GameOver] = stateDef
 
-    // Подтверждение побега. Курсор по умолчанию на "Остаться", чтобы случайный Enter не увёл из боя
     stateDef = array_create(StateHook.Count, undefined)
     stateDef[StateHook.OnEnter] = method(self, function() { runConfirmCursor = 0 })
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
@@ -545,7 +543,6 @@ function initBattleStates() {
         drawMenuBadge(infoX, infoY, badgeScale, loc("battle.info"), "I", true, colMain, colPanel)
         array_push(menuHitRects, { x: infoX, y: infoY, w: infoSize.w, h: infoSize.h, action: BattleMenuAction.Info })
 
-        // Слева: пропуск хода и (если побег разрешён) побег над ним
         var skipSize = menuBadgeSize(loc("battle.skip"), badgeScale)
         var canFlee = !(variable_global_exists("battleNoFlee") && global.battleNoFlee)
         var leftStackH = canFlee ? (runSize.h + badgeGap + skipSize.h) : skipSize.h
@@ -563,7 +560,7 @@ function initBattleStates() {
         array_push(menuHitRects, { x: skipX, y: leftY, w: skipSize.w, h: skipSize.h, action: BattleMenuAction.Skip })
     })
 
-    // Окно подтверждения побега: явно показывает, сколько золота будет потеряно
+    // Окно подтверждения побега
     drawRunConfirm = method(self, function() {
         var screenWidth = display_get_gui_width()
         var screenHeight = display_get_gui_height()

@@ -548,7 +548,8 @@ function playerDataResetForTesting() {
     global.playerData = playerDataDefault()
     playerDataSave()
 }
-// Побеждён ли босс (после этого в наградах появляются карты марионеток)
+
+// Побеждён ли босс 
 function isBossDefeated() {
     if (!variable_struct_exists(global.playerData, "bossDefeated")) { global.playerData.bossDefeated = false }
     return global.playerData.bossDefeated

@@ -41,12 +41,12 @@ function createEncounterForSection(section) {
     return result
 }
 
-// Пул наград секции. Сейчас у всех секций пул общий - см. forestRewardPool()
+// Пул наград секции
 function rewardPoolForSection(section) {
     return forestRewardPool()
 }
 
-// Добавить в список только существующие карты, без повторов
+// Добавить в список только существующие карты без повторов
 function appendRewardIds(targetIds, sourceIds) {
     for (var idIndex = 0; idIndex < array_length(sourceIds); idIndex++) {
         var cardId = sourceIds[idIndex]
@@ -54,8 +54,8 @@ function appendRewardIds(targetIds, sourceIds) {
     }
 }
 
-// Пул наград леса (бой и сундуки) на текущий момент:
-// дневные карты всегда, ночные - только ночью, карты марионеток - после победы над боссом
+// Пул наград леса на текущий момент
+// Дневные, ночные и босс карты
 function forestRewardPool() {
     var content = zoneContent()
     var ids = []
