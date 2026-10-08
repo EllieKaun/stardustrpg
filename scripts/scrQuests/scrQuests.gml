@@ -1,4 +1,226 @@
-//// Квест сафара
+//// Квестовый движок (data-driven)
+
+// Хранилище прогресса: playerData.quests[$ string(questId)] = { state, counters, picked }
+function questStore() {
+    if (!variable_struct_exists(global.playerData, "quests")) { global.playerData.quests = {} }
+    return global.playerData.quests
+}
+
+function questRecord(questId) {
+    var store = questStore()
+    var key = string(questId)
+    if (!variable_struct_exists(store, key)) {
+        store[$ key] = { state: QuestState.Inactive, counters: {}, picked: [] }
+    }
+    return store[$ key]
+}
+
+function questState(questId) {
+    return questRecord(questId).state
+}
+
+function questSetState(questId, state) {
+    questRecord(questId).state = state
+    playerDataSave()
+}
+
+function questCounter(questId, key) {
+    var counters = questRecord(questId).counters
+    var counterKey = string(key)
+    return variable_struct_exists(counters, counterKey) ? counters[$ counterKey] : 0
+}
+
+function questSetCounter(questId, key, value) {
+    questRecord(questId).counters[$ string(key)] = value
+}
+
+function questIsPicked(questId, pickId) {
+    if (pickId == "") { return false }
+    return array_contains(questRecord(questId).picked, pickId)
+}
+
+function questMarkPicked(questId, pickId) {
+    if (pickId == "") { return }
+    var picked = questRecord(questId).picked
+    if (!array_contains(picked, pickId)) {
+        array_push(picked, pickId)
+        playerDataSave()
+    }
+}
+
+// Реестр определений квестов
+function questEnsureRegistry() {
+    if (variable_global_exists("questRegistry")) { return }
+    global.questRegistry = {}
+    global.questOrderList = []
+    questRegisterAll()
+}
+
+function questRegister(def) {
+    global.questRegistry[$ string(def.id)] = def
+    array_push(global.questOrderList, def.id)
+}
+
+function questDef(questId) {
+    questEnsureRegistry()
+    return global.questRegistry[$ string(questId)]
+}
+
+// Определения квестов
+function questRegisterAll() {
+    questRegister({
+        id: QuestId.Fox,
+        objectives: [
+            { type: QuestObjectiveType.Collect, key: QuestFoxItem.PineCone, count: FOX_PINE_CONES_NEEDED, sprite: "PineConeIcon" },
+            { type: QuestObjectiveType.Collect, key: QuestFoxItem.Petunia,  count: FOX_PETUNIAS_NEEDED,  sprite: "PetuniaIcon" },
+            { type: QuestObjectiveType.Collect, key: QuestFoxItem.Cauldron, count: FOX_CAULDRONS_NEEDED,  sprite: "CauldronIcon" }
+        ],
+        readyHint: "ui.returnToFox",
+        onAccept: function() {
+            questGrantCardReward(global.CardId.stealCard, CardsRarity.Default, Characters.Lana)
+        },
+        onComplete: function() {
+            global.foxJoined = true
+            questGrantCardReward(global.CardId.instantManaGainSingleTarget, CardsRarity.Unusual, undefined)
+        }
+    })
+
+    questRegister({
+        id: QuestId.Safar,
+        objectives: [
+            { type: QuestObjectiveType.ObtainItem, key: QuestSafarItem.Spear, count: 1, sprite: "" }
+        ],
+        readyHint: "",
+        onAccept: function() {
+            analyticsStartSafarQuest()
+            questGrantCardReward(global.CardId.stealCard, CardsRarity.Default, Characters.Lana)
+        },
+        onComplete: function() {
+            global.safarJoined = true
+            analyticsCompleteSafarQuest()
+        }
+    })
+}
+
+// Награда картой: открыть, по желанию положить в деку героя, показать награду
+function questGrantCardReward(cardId, rarity, character) {
+    unlockCard(cardId, rarity, 1)
+    if (character != undefined) {
+        var slot = firstFreeDeckSlot(character)
+        if (slot >= 0) { setDeckSlot(character, slot, cardId, rarity) }
+    }
+    playerDataSave()
+    var rewardCard = cardFromRef({ id: cardId, rarity: rarity })
+    showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
+}
+
+function questObjectiveSprite(objective) {
+    if (!variable_struct_exists(objective, "sprite") || objective.sprite == "") { return noone }
+    var spr = asset_get_index(objective.sprite)
+    return sprite_exists(spr) ? spr : noone
+}
+
+function questObjectiveDone(questId, objective) {
+    return questCounter(questId, objective.key) >= objective.count
+}
+
+function questAllObjectivesDone(questId) {
+    var objs = questDef(questId).objectives
+    for (var i = 0; i < array_length(objs); i++) {
+        if (!questObjectiveDone(questId, objs[i])) { return false }
+    }
+    return true
+}
+
+// Переходы состояний
+function questAccept(questId) {
+    questSetState(questId, QuestState.Active)
+    var def = questDef(questId)
+    if (variable_struct_exists(def, "onAccept") && def.onAccept != undefined) { def.onAccept() }
+}
+
+function questAddProgress(questId, key, amount = 1) {
+    if (questState(questId) != QuestState.Active) { return }
+    questSetCounter(questId, key, questCounter(questId, key) + amount)
+    questRegisterPickupFx(questId, key)
+    if (questAllObjectivesDone(questId)) { questSetState(questId, QuestState.Ready) }
+    playerDataSave()
+}
+
+function questComplete(questId) {
+    questSetState(questId, QuestState.Completed)
+    var def = questDef(questId)
+    if (variable_struct_exists(def, "onComplete") && def.onComplete != undefined) { def.onComplete() }
+    playerDataSave()
+}
+
+// Отклик на подбор (масштаб иконки), эфемерно, не сохраняется
+function questRegisterPickupFx(questId, key) {
+    if (!variable_global_exists("questPickupFxTime")) { global.questPickupFxTime = {} }
+    var questKey = string(questId)
+    if (!variable_struct_exists(global.questPickupFxTime, questKey)) { global.questPickupFxTime[$ questKey] = {} }
+    global.questPickupFxTime[$ questKey][$ string(key)] = current_time
+}
+
+function questPickupFxScale(questId, key) {
+    if (!variable_global_exists("questPickupFxTime")) { return 1 }
+    var questKey = string(questId)
+    if (!variable_struct_exists(global.questPickupFxTime, questKey)) { return 1 }
+    var times = global.questPickupFxTime[$ questKey]
+    var itemKey = string(key)
+    if (!variable_struct_exists(times, itemKey)) { return 1 }
+    var popDuration = 0.3
+    var elapsed = (current_time - times[$ itemKey]) / 1000
+    if (elapsed < 0 || elapsed >= popDuration) { return 1 }
+    return lerp(1.4, 1, elapsed / popDuration)
+}
+
+// Маркер над выдающим квест NPC: до начала и когда готов сдать
+function questShowsGiverMarker(questId) {
+    if (global.uiModal) { return false }
+    var st = questState(questId)
+    return st == QuestState.Inactive || st == QuestState.Ready
+}
+
+// Для HUD: все отслеживаемые Collect-цели активных/готовых квестов
+function questActiveTrackables() {
+    questEnsureRegistry()
+    var result = []
+    for (var i = 0; i < array_length(global.questOrderList); i++) {
+        var questId = global.questOrderList[i]
+        var st = questState(questId)
+        if (st != QuestState.Active && st != QuestState.Ready) { continue }
+        var objs = questDef(questId).objectives
+        for (var j = 0; j < array_length(objs); j++) {
+            var obj = objs[j]
+            if (obj.type != QuestObjectiveType.Collect) { continue }
+            array_push(result, {
+                questId: questId,
+                count: questCounter(questId, obj.key),
+                needed: obj.count,
+                done: questObjectiveDone(questId, obj),
+                sprite: questObjectiveSprite(obj),
+                scale: questPickupFxScale(questId, obj.key)
+            })
+        }
+    }
+    return result
+}
+
+// Подсказка "сдай квест" для первого готового квеста, у которого она задана
+function questFirstReadyHint() {
+    questEnsureRegistry()
+    for (var i = 0; i < array_length(global.questOrderList); i++) {
+        var questId = global.questOrderList[i]
+        if (questState(questId) == QuestState.Ready) {
+            var def = questDef(questId)
+            if (variable_struct_exists(def, "readyHint") && def.readyHint != "") { return def.readyHint }
+        }
+    }
+    return ""
+}
+
+//// Спрайты и бонусы квеста Сафара
 
 function spearSprite() {
     var sprite = asset_get_index("spear")
@@ -14,195 +236,60 @@ function spearBattleBonus() {
     return SPEAR_BATTLE_BONUS
 }
 
-function questSpearState() {
-    if (!variable_struct_exists(global.playerData, "questSafarSpear")) { global.playerData.questSafarSpear = QuestSpearState.Inactive }
-    return global.playerData.questSafarSpear
-}
-
-function questSetSpearState(state) {
-    global.playerData.questSafarSpear = state
-    playerDataSave()
-}
-
-function questAcceptSpear() {
-    questSetSpearState(QuestSpearState.Active)
-    analyticsStartSafarQuest() // аналитика: начат квест Safar
-    unlockCard(global.CardId.stealCard, CardsRarity.Default, 1)
-    var slot = firstFreeDeckSlot(Characters.Lana)
-    if (slot >= 0) { setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default) }
-    playerDataSave()
-    var rewardCard = cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default })
-    showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
-}
-
-function questGrantSpear() {
-    if (questSpearState() == QuestSpearState.Active) {
-        questSetSpearState(QuestSpearState.SpearObtained)
-    }
-    if (variable_global_exists("spearCarrierExists")) { global.spearCarrierExists = false }
-    if (variable_global_exists("battleHasSpear")) { global.battleHasSpear = false }
-}
-
-function questCompleteSpear() {
-    questSetSpearState(QuestSpearState.Completed)
-    global.safarJoined = true
-    analyticsCompleteSafarQuest() // аналитика
-    playerDataSave()
-}
-
-
-//// Квест Лисички 
-
-// Сколько нужно предметов для квеста Лисички
-#macro FOX_PINE_CONES_NEEDED 3
-#macro FOX_PETUNIAS_NEEDED 1
-#macro FOX_CAULDRONS_NEEDED 1
-
-function questFoxState() {
-    if (!variable_struct_exists(global.playerData, "questFox")) { global.playerData.questFox = QuestSpearState.Inactive }
-    return global.playerData.questFox
-}
-
-function questSetFoxState(state) {
-    global.playerData.questFox = state
-    playerDataSave()
-}
-
-function questFoxItemCount(item) {
-    switch (item) {
-        case QuestFoxItem.Cauldron:
-            return global.playerData.questFoxCauldrons
-        
-        case QuestFoxItem.Petunia:
-            return global.playerData.questFoxPetunias
-        
-        case QuestFoxItem.PineCone:
-            return global.playerData.questFoxPineCones
-        
-    }
-}
-
-// Иконка предмета
-function questFoxItemSprite(item) {
-    var spriteName = ""
-    switch (item) {
-        case QuestFoxItem.PineCone: 
-            spriteName = "PineConeIcon" 
-        break
-        case QuestFoxItem.Petunia:  
-            spriteName = "PetuniaIcon"  
-        break
-        case QuestFoxItem.Cauldron: 
-            spriteName = "CauldronIcon" 
-        break
-    }
-    var spr = asset_get_index(spriteName)
-    return sprite_exists(spr) ? spr : noone
-}
-
-// Подбор предмета в мире
-function questFoxRegisterPickupFx(item) {
-    if (!variable_global_exists("foxItemPickupTime")) { 
-        global.foxItemPickupTime = [0, 0, 0] 
-    }
-    global.foxItemPickupTime[item] = current_time
-}
-
-// Масштаб иконки для отклика на подбор
-function questFoxItemPickupScale(item) {
-    if (!variable_global_exists("foxItemPickupTime")) { return 1 }
-    var popDuration = 0.3
-    var elapsed = (current_time - global.foxItemPickupTime[item]) / 1000
-    if (elapsed < 0 || elapsed >= popDuration) { return 1 }
-    return lerp(1.4, 1, elapsed / popDuration)
-}
-
-function questFoxItemNeeded(item) {
-    switch (item) {
-        case QuestFoxItem.Cauldron:
-            return FOX_CAULDRONS_NEEDED
-        
-        case QuestFoxItem.Petunia:
-            return FOX_PETUNIAS_NEEDED
-        
-        case QuestFoxItem.PineCone:
-            return FOX_PINE_CONES_NEEDED
-        
-    }
-}
-
-function questFoxItemDone(item) {
-    return questFoxItemCount(item) >= questFoxItemNeeded(item)
-}
-
-function questFoxAddItem(item) {
-    switch (item) {
-        case QuestFoxItem.Cauldron:
-            global.playerData.questFoxCauldrons = global.playerData.questFoxCauldrons + 1
-        break
-        case QuestFoxItem.Petunia:
-            global.playerData.questFoxPetunias = global.playerData.questFoxPetunias + 1
-        break
-        case QuestFoxItem.PineCone:
-             global.playerData.questFoxPineCones = global.playerData.questFoxPineCones + 1
-        break
-    }
-    questFoxRegisterPickupFx(item)
-    if (questFoxAllCollected()) {
-        questSetFoxState(QuestFoxState.ItemsCollected)
-    }
-    playerDataSave()
-}
-
-function questFoxAllCollected() {
-    return questFoxItemDone(QuestFoxItem.Cauldron)
-        && questFoxItemDone(QuestFoxItem.Petunia)
-        && questFoxItemDone(QuestFoxItem.PineCone)
-}
-
-function foxShowsQuestMarker() {
-    if (global.uiModal) { return false }
-        
-    var state = questFoxState()
-    return state == QuestFoxState.Inactive 
-        || state == QuestFoxState.ItemsCollected
-}
-
-function questFoxAccept() {
-    questSetFoxState(QuestFoxState.Active)
-    unlockCard(global.CardId.stealCard, CardsRarity.Default, 1)
-    var slot = firstFreeDeckSlot(Characters.Lana)
-    if (slot >= 0) { setDeckSlot(Characters.Lana, slot, global.CardId.stealCard, CardsRarity.Default) }
-    playerDataSave()
-    var rewardCard = cardFromRef({ id: global.CardId.stealCard, rarity: CardsRarity.Default })
-    showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
-}
-
-function questFoxIsPicked(pickId) {
-    if (pickId == "") { return false }
-    if (!variable_struct_exists(global.playerData, "questFoxPickedIds")) { global.playerData.questFoxPickedIds = [] }
-    return array_contains(global.playerData.questFoxPickedIds, pickId)
-}
-
-function questFoxMarkPicked(pickId) {
-    if (pickId == "") { return }
-    if (!variable_struct_exists(global.playerData, "questFoxPickedIds")) { global.playerData.questFoxPickedIds = [] }
-    if (!array_contains(global.playerData.questFoxPickedIds, pickId)) {
-        array_push(global.playerData.questFoxPickedIds, pickId)
-        playerDataSave()
-    }
-}
-
 function cauldronSprite() {
     var sprite = asset_get_index("sprCauldronSmall")
     return sprite_exists(sprite) ? sprite : noone
 }
 
-function questFoxComplete() {
-    questSetFoxState(QuestFoxState.Completed)
-    global.foxJoined = true
-    unlockCard(global.CardId.instantManaGainSingleTarget, CardsRarity.Unusual, 1)
-    playerDataSave()
-    var rewardCard = cardFromRef({ id: global.CardId.instantManaGainSingleTarget, rarity: CardsRarity.Unusual })
-    showCardReward(rewardCard, loc("ui.newCard") + " " + cardDisplayName(rewardCard))
+//// Сколько предметов нужно для квеста Лисички
+#macro FOX_PINE_CONES_NEEDED 3
+#macro FOX_PETUNIAS_NEEDED 1
+#macro FOX_CAULDRONS_NEEDED 1
+
+//// Адаптеры к старому API (внешний код не трогаем)
+
+function questSpearState() { return questState(QuestId.Safar) }
+function questSetSpearState(state) { questSetState(QuestId.Safar, state) }
+function questAcceptSpear() { questAccept(QuestId.Safar) }
+function questCompleteSpear() { questComplete(QuestId.Safar) }
+function questGrantSpear() {
+    if (questState(QuestId.Safar) == QuestState.Active) {
+        questAddProgress(QuestId.Safar, QuestSafarItem.Spear)
+    }
+    if (variable_global_exists("spearCarrierExists")) { global.spearCarrierExists = false }
+    if (variable_global_exists("battleHasSpear")) { global.battleHasSpear = false }
+}
+
+function questFoxState() { return questState(QuestId.Fox) }
+function questSetFoxState(state) { questSetState(QuestId.Fox, state) }
+function questFoxAccept() { questAccept(QuestId.Fox) }
+function questFoxComplete() { questComplete(QuestId.Fox) }
+function questFoxAddItem(item) { questAddProgress(QuestId.Fox, item) }
+function questFoxAllCollected() { return questAllObjectivesDone(QuestId.Fox) }
+function questFoxItemCount(item) { return questCounter(QuestId.Fox, item) }
+function questFoxItemPickupScale(item) { return questPickupFxScale(QuestId.Fox, item) }
+function foxShowsQuestMarker() { return questShowsGiverMarker(QuestId.Fox) }
+function questFoxIsPicked(pickId) { return questIsPicked(QuestId.Fox, pickId) }
+function questFoxMarkPicked(pickId) { questMarkPicked(QuestId.Fox, pickId) }
+
+function questFoxObjective(item) {
+    var objs = questDef(QuestId.Fox).objectives
+    for (var i = 0; i < array_length(objs); i++) {
+        if (objs[i].key == item) { return objs[i] }
+    }
+    return undefined
+}
+
+function questFoxItemNeeded(item) {
+    var obj = questFoxObjective(item)
+    return (obj != undefined) ? obj.count : 0
+}
+
+function questFoxItemSprite(item) {
+    var obj = questFoxObjective(item)
+    return (obj != undefined) ? questObjectiveSprite(obj) : noone
+}
+
+function questFoxItemDone(item) {
+    return questFoxItemCount(item) >= questFoxItemNeeded(item)
 }

@@ -48,10 +48,9 @@ if (worldHudVisible()) {
     draw_set_valign(fa_top)
 }
 
-// Предметы для квеста лисички
-var foxState = questFoxState()
-if (worldHudVisible()
-    && (foxState == QuestFoxState.Active || foxState == QuestFoxState.ItemsCollected)) {
+// Трекер целей активных квестов (сбор предметов)
+var questTrackables = questActiveTrackables()
+if (worldHudVisible() && array_length(questTrackables) > 0) {
     var guiWidth = display_get_gui_width()
     var guiHeight = display_get_gui_height()
     var margin = floor(guiHeight * 0.03)
@@ -61,15 +60,14 @@ if (worldHudVisible()
     var countH = floor(iconH * 0.42) // высота текста счётчика
     var countY = margin + iconH + floor(gap * 0.25)
 
-    var items = [QuestFoxItem.PineCone, QuestFoxItem.Petunia, QuestFoxItem.Cauldron]
-    for (var i = 0; i < array_length(items); i++) {
-        var item = items[i]
+    for (var i = 0; i < array_length(questTrackables); i++) {
+        var trackable = questTrackables[i]
         var iconCenterX = margin + i * slotW + iconH * 0.5
         var iconCenterY = margin + iconH * 0.5
-        var done = questFoxItemDone(item)
-        var pop = questFoxItemPickupScale(item) // отклик на подбор 
+        var done = trackable.done
+        var pop = trackable.scale // отклик на подбор
 
-        var spr = questFoxItemSprite(item)
+        var spr = trackable.sprite
         if (spr != noone) {
             var sprScale = (iconH / sprite_get_height(spr)) * pop
             draw_sprite_ext(spr, 0, floor(iconCenterX), floor(iconCenterY),
@@ -96,7 +94,7 @@ if (worldHudVisible()
         }
 
         // Счётчик n/need под иконкой, с тенью, через drawUiText
-        var countStr = string(questFoxItemCount(item)) + "/" + string(questFoxItemNeeded(item))
+        var countStr = string(trackable.count) + "/" + string(trackable.needed)
         draw_set_halign(fa_center)
         draw_set_valign(fa_top)
         draw_set_color(c_black)
@@ -108,9 +106,10 @@ if (worldHudVisible()
         draw_set_valign(fa_top)
     }
 
-    // Подсказка когда всё собрано
-    if (foxState == QuestFoxState.ItemsCollected) {
-        var hint = loc("ui.returnToFox")
+    // Подсказка когда квест готов к сдаче
+    var readyHint = questFirstReadyHint()
+    if (readyHint != "") {
+        var hint = loc(readyHint)
         var hintH = floor(iconH * 0.5)
         var hintY = countY + countH + gap
         var hintMaxW = 3 * slotW

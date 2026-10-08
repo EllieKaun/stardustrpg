@@ -38,6 +38,27 @@ enum QuestFoxItem {
     Cauldron
 }
 
+enum QuestSafarItem {
+    Spear
+}
+
+enum QuestId {
+    Fox,
+    Safar
+}
+
+enum QuestState {
+    Inactive,
+    Active,
+    Ready,
+    Completed
+}
+
+enum QuestObjectiveType {
+    Collect,
+    ObtainItem
+}
+
 enum ShopItemKind { // Виды товаров в магазине
     Card,
     Slot

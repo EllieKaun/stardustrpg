@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrLocaleEn",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrLocaleEn",
+  "parent":{
+    "name":"Data",
+    "path":"folders/Data.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

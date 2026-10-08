@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrQuestMigration",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrQuestMigration",
+  "parent":{
+    "name":"Quests",
+    "path":"folders/Quests.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

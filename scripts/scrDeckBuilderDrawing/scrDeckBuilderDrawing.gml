@@ -28,21 +28,6 @@ function slotAt(panel, guiX, guiY) {
     return -1
 }
 
-// Подобрать шрифт и отрисовать текст центрировано
-function drawFitTextCentered(text, areaX, areaY, areaW, areaH, fonts = undefined) {
-    if (fonts != undefined && array_length(fonts) > 0) {
-        for (var fontIndex = 0; fontIndex < array_length(fonts); fontIndex++) {
-            draw_set_font(fonts[fontIndex]);
-            if (string_width(text) <= areaW && string_height(text) <= areaH) { break }
-        }
-    }
-    draw_set_halign(fa_center)
-    draw_set_valign(fa_middle)
-
-    draw_text(floor(areaX + areaW / 2), floor(areaY + areaH / 2), text)
-    draw_set_halign(fa_left)
-    draw_set_valign(fa_top)
-}
 
 // Попадание точки в прямоугольник
 function pointInRect(pointX, pointY, rectX, rectY, rectWidth, rectHeight) {
