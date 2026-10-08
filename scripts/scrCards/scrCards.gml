@@ -595,8 +595,9 @@ function handScalingMultiplier(effect, caster) {
         case HandScaling.MoreCard:
             return cardsInHand * HAND_SCALING_STEP
         case HandScaling.FewerCards:
-            return 1
+            var missing = max(0, CARDS_DRAW_COUNT - 1 - cardsInHand)
+            return 1 + missing * HAND_SCALING_STEP
         default:
-            return 1	
+            return 1
     }
 }

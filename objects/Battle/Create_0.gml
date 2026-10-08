@@ -19,7 +19,7 @@ if (backgroundLayer != -1) {
 global.battleIsNight = isNight()
 global.battleCauldronStolen = false
 selectedCard = 0
-maxCardsOnDeskNumber = 4
+maxCardsOnDeskNumber = MAX_CARDS_IN_HAND
 copyNextCard = false
 
 // Хит-боксы для управления мышью

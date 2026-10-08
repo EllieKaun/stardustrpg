@@ -17,6 +17,7 @@ function cardIdsInit() {
 
         // Магические
         magicalDamageSingleTarget: "magicalDamageSingleTarget",
+        magicalDamageHandScalingSingleTarget: "magicalDamageHandScalingSingleTarget",
         magicalDamageMultipleTarget: "magicalDamageMultipleTarget",
         magicalDamageStunChanceSingleTarget: "magicalDamageStunChanceSingleTarget",
         magicalDamageStunChanceMultiTarget: "magicalDamageStunChanceMultiTarget",
@@ -94,6 +95,7 @@ function cardRegistryInit() {
 
     // Магические
     registerCard(cardIds.magicalDamageSingleTarget, true, CardCategory.Magic, function(rarity) { return createMagicalDamageSingleTargetCard(rarity) })
+    registerCard(cardIds.magicalDamageHandScalingSingleTarget, true, CardCategory.Magic, function(rarity) { return createMagicalDamageHandScalingSingleTargetCard(rarity) })
     registerCard(cardIds.magicalDamageMultipleTarget, true, CardCategory.Magic, function(rarity) { return createMagicalDamageMultipleTargetCard(rarity) })
     registerCard(cardIds.magicalDamageStunChanceSingleTarget, true, CardCategory.Magic, function(rarity) { return createMagicalDamageStunChanseSingleTargetCard(rarity) })
     registerCard(cardIds.magicalDamageStunChanceMultiTarget, true, CardCategory.Magic, function(rarity) { return createMagicalDamageStunChanseMultipleTargetsCard(rarity) })
