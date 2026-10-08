@@ -63,7 +63,8 @@ enum EffectTypes {
     Resurrection,
     IgnoreWeakness,
     CreateTemporaryWeakness,
-    CreatePuppet
+    CreatePuppet,
+    Deflect
 }
 
 function effectTypeToString(type) {
@@ -80,7 +81,8 @@ function effectTypeToString(type) {
         case EffectTypes.AddEnergy: return loc("effect.AddEnergy")
         case EffectTypes.ShuffleDeck: return loc("effect.ShuffleDeck")
         case EffectTypes.Resurrection: return loc("effect.Resurrection")
-        case EffectTypes.CreatePuppet: return loc("effect.CreatePuppet")
+        case EffectTypes.CreatePuppet: return loc("effect.CreatePuppet") 
+        case EffectTypes.Deflect: return loc("effect.Deflect")
         default: return loc("effect.Unknown")
     }
 }
@@ -93,7 +95,8 @@ enum StatusNames {
     Stun,
     Bomb,
     Vampirism,
-    Weakening
+    Weakening,
+    Deflect
 }
 
 enum ModifiersToBuff {
@@ -239,4 +242,11 @@ function categoryColor(category) {
         case CardCategory.Special: return #c4c4c4
         default: return #c4c4c4
     }
+}
+
+// Сила зависящая от карт в руке
+enum HandScaling {
+    None,
+    MoreCard,
+    FewerCards
 }

@@ -132,6 +132,8 @@ function initEffectRegistry() {
     variable_struct_set(effectsRepository, "IgnoreWeakness", { icon: noone })
     variable_struct_set(effectsRepository, "CreateTemporaryWeakness", { icon: noone })
 
+    
+    variable_struct_set(effectsRepository, "Deflect", { icon: stunned })
     global.effectRegistry = effectsRepository
 }
 
@@ -162,6 +164,7 @@ function effectKindFromType(type) {
         case EffectTypes.IgnoreWeakness: return "IgnoreWeakness"
         case EffectTypes.CreateTemporaryWeakness: return "CreateTemporaryWeakness"
         case EffectTypes.CreatePuppet: return "CreatePuppet"
+        case EffectTypes.Deflect: return "Deflect"
         default: return undefined
     }
 }
@@ -295,6 +298,14 @@ function DamageEffect(damageType, value, sprite = attackEffect, sound = PhysicaD
     return { type: EffectTypes.Damage, damageType: damageType, value: value,
              timing: Timing.Instant, sprite: sprite, sound: sound }
 }
+
+function HandScalingDamageEffect(damageType, baseValue, handScaling,
+    sprite = attackEffect, sound = PhysicaDamage) {
+    var effect = DamageEffect(damageType, baseValue, sprite, sound)
+    effect.handScaling = handScaling    
+    return effect
+}
+
 // Урон со временем времени со статусом (Burn, Bleeding)
 function DamageOverTimeEffect(damageType, value, duration, statusName, chance, sprite = noone, sound = noone) {
     var effect = { type: EffectTypes.Damage, damageType: damageType, value: value,
@@ -413,4 +424,66 @@ function BossClone(maxSlots) {
 
 function StealEffect() {
     return { kind: "Steal", timing: Timing.Instant, sprite: attackEffect }
+}
+
+function DeflectEffect(duration, sprite = buffEffect, sound = MagicBuff) {
+    return {
+        type: EffectTypes.Deflect, statusName: StatusNames.Deflect,
+        duration: duration, timing: Timing.Overtime,
+        sprite: sprite, sound: sound
+    }
+}
+
+
+function effectStatusKey(effect) {
+    if (!variable_instance_exists(effect, "statusName")) { return "" }
+    switch (effect.statusName) {
+        case StatusNames.Burn: return "Burn"
+        case StatusNames.Bleeding: return "Bleeding"
+        case StatusNames.Stun: return "Stun"
+        case StatusNames.Freeze: return "Freeze"
+        case StatusNames.Shock: return "Shock"
+        case StatusNames.Bomb: return "Bomb"
+        case StatusNames.Vampirism: return "Vampirism"
+        case StatusNames.Weakening: return "Weakening"
+        case StatusNames.Deflect: return "Deflect"
+    }
+    return ""
+}
+
+function effectBuffKey(effect) {
+    if (!variable_instance_exists(effect, "type")) { return "" }
+    var prefix = ""
+    if (effect.type == EffectTypes.Buff) { prefix = "Buff" }
+    else if (effect.type == EffectTypes.Debuff) { prefix = "Debuff" }
+    if (prefix == "" || !variable_instance_exists(effect, "buffType")) { return "" }
+    switch (effect.buffType) {
+        case ModifiersToBuff.PhysicalDamage: return prefix + "PhysicalDamage"
+        case ModifiersToBuff.MagicalDamage: return prefix + "MagicalDamage"
+        case ModifiersToBuff.AnyDamage: return prefix + "AnyDamage"
+        case ModifiersToBuff.PhysicalProtection: return prefix + "PhysicalProtection"
+        case ModifiersToBuff.MagicalProtection: return prefix + "MagicalProtection"
+        case ModifiersToBuff.AnyProtection: return prefix + "AnyProtection"
+    }
+    return ""
+}
+
+function effectDisplayName(effect) {
+    var statusKey = effectStatusKey(effect)
+    if (statusKey != "") { return loc("status.name." + statusKey) }
+    var buffKey = effectBuffKey(effect)
+    if (buffKey != "") { return loc("status.name." + buffKey) }
+    return loc("status.name.Unknown")
+}
+
+function effectDescription(effect) {
+    var statusKey = effectStatusKey(effect)
+    if (statusKey != "") { return loc("status.desc." + statusKey) }
+    var buffKey = effectBuffKey(effect)
+    if (buffKey != "") {
+        var text = loc("status.desc." + buffKey)
+        if (variable_instance_exists(effect, "value")) { return text + string(effect.value) }
+        return text
+    }
+    return loc("status.desc.Unknown")
 }

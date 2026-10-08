@@ -46,6 +46,8 @@
 #macro FIREFLY_SPAWN_DISTANCE 240 // светлячки появляются не дальше этого расстояния от героя
 #macro FIREFLY_DESPAWN_DISTANCE 300 // дальше этого расстояния от героя светлячок гаснет
 
+// Скейл карт от руки 
+#macro HAND_SCALING_STEP 2 
 
 function cardBalance() {
     return {

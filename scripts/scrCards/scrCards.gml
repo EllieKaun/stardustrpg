@@ -460,12 +460,18 @@ function executeDamageEffect(
 
     var damage = cardMultiplier * casterStat
 
+    damage *= handScalingMultiplier(effect, caster)
+    
     // Ослабление кастера
     if (checkIfHasEffectType(caster, EffectTypes.Weakening)) { damage *= 0.9 }
 
     // Модификация на стороне ЦЕЛИ: защита (+ баффы и дебаффы), слабости и сопротивления
     damage = mitigateDamage(targets, effect, damage)
-
+    if (checkIfHasEffectType(targets, EffectTypes.Deflect)) {
+        reduceOrRemoveEffectType(targets, EffectTypes.Deflect)
+        caster.applyDamage(damage * 2)
+        return
+    }
     show_debug_message("damage " + string(damage) )
     targets.applyDamage(damage)
     targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
@@ -576,4 +582,21 @@ function mitigateDamage(target, effect, rawDamage) {
 
     damage += damage * modifier
     return max(round(damage), 1)
+}
+
+// Изменение урона в зависимости от руки
+
+function handScalingMultiplier(effect, caster) {
+    if (!variable_struct_exists(effect, "handScaling")) {
+        return 1
+    }
+    var cardsInHand = array_length(caster.getCardsInHand())
+    switch (effect.handScaling) {
+        case HandScaling.MoreCard:
+            return cardsInHand * HAND_SCALING_STEP
+        case HandScaling.FewerCards:
+            return 1
+        default:
+            return 1	
+    }
 }

@@ -219,3 +219,21 @@ function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget(rarity = Ca
         sprHighResDamageExhaustChanseSIngleTarget
     )
 }
+
+// Отражение урона
+function createCardDamageDeflectStatus(rarity = CardsRarity.Default) {
+    return new Card(
+        "Applies status of damage deflect",
+        rarity,
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        1,
+        [ DeflectEffect(1) ],
+        buffCard,
+        strWeakness,
+        commonBorder,
+        hpCostToken,
+        "applies ability to deflect damage",
+        undefined
+    )
+}

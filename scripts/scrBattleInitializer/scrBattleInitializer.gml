@@ -335,7 +335,7 @@ function initBattleStates() {
             if (input.clicked && overTarget) { mouseConfirm = true }
         }
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed  = keyboard_check_pressed(vk_left)  || keyboard_check_pressed(ord("A"))
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
         var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         var changeIndex = leftPressed - rightPressed
         if (changeIndex != 0) {
@@ -383,17 +383,35 @@ function initBattleStates() {
         }
 
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed  = keyboard_check_pressed(vk_left)  || keyboard_check_pressed(ord("A"))
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
         var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
 
-        if (keyboard_check_pressed(ord("R"))) { doMenuAction(BattleMenuAction.Run);     return }
-        if (keyboard_check_pressed(ord("S"))) { doMenuAction(BattleMenuAction.Shuffle); return }
-        if (keyboard_check_pressed(ord("I"))) { doMenuAction(BattleMenuAction.Info);    return }
-        if (keyboard_check_pressed(ord("P"))) { doMenuAction(BattleMenuAction.Skip);    return }
+        if (keyboard_check_pressed(ord("R"))) { 
+            doMenuAction(BattleMenuAction.Run)
+            return 
+        }
+        if (keyboard_check_pressed(ord("S"))) { 
+            doMenuAction(BattleMenuAction.Shuffle)
+            return 
+        }
+        if (keyboard_check_pressed(ord("I"))) { 
+            doMenuAction(BattleMenuAction.Info) 
+            return 
+        }
+        if (keyboard_check_pressed(ord("P"))) { 
+            doMenuAction(BattleMenuAction.Skip)
+            return 
+        }
 
         var handLen = array_length(selectedCharacter.getCardsInHand())
-        if (leftPressed  && selectedCard > 0)           { selectedCard--; playCardSelectSound() }
-        if (rightPressed && selectedCard < handLen - 1) { selectedCard++; playCardSelectSound() }
+        if (leftPressed && handLen > 0) { 
+            selectedCard = (selectedCard - 1 + handLen) mod handLen
+            playCardSelectSound() 
+        }
+        if (rightPressed && handLen > 0) { 
+            selectedCard = (selectedCard + 1) mod handLen       
+            playCardSelectSound() 
+        }
 
         if (enterPressed) {
             if (handLen > 0) {
@@ -420,35 +438,43 @@ function initBattleStates() {
     battleStates[BattleStates.CharacterPlay] = stateDef
 
     stateDef = array_create(StateHook.Count, undefined)
-    stateDef[StateHook.OnEnter]  = method(self, function() { initTargetSelection(enemies) })
+    stateDef[StateHook.OnEnter] = method(self, function() { initTargetSelection(enemies) })
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
-    stateDef[StateHook.Step]     = targetSelectStep
+    stateDef[StateHook.Step] = targetSelectStep
     battleStates[BattleStates.EnemyTargetSelection] = stateDef
 
     stateDef = array_create(StateHook.Count, undefined)
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
-    stateDef[StateHook.Step]     = targetSelectStep
+    stateDef[StateHook.Step] = targetSelectStep
     battleStates[BattleStates.AllyTargetSelection] = stateDef
 
     stateDef = array_create(StateHook.Count, undefined)
-    stateDef[StateHook.OnEnter]  = method(self, function() { initTargetSelection(enemies) })
+    stateDef[StateHook.OnEnter] = method(self, function() { initTargetSelection(array_concat(enemies, heroes)) })
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
-    stateDef[StateHook.Step]     = method(self, function(input) {
+    stateDef[StateHook.Step] = method(self, function(input) {
         var mouseConfirm = false
         if (input.moved || input.clicked) {
             var overTarget = selectTargetAtMouse()
-            if (input.clicked && overTarget) { mouseConfirm = true }
+            if (input.clicked && overTarget) { 
+                mouseConfirm = true 
+            }
         }
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        if (keyboard_check_pressed(vk_left)  || keyboard_check_pressed(ord("A"))) { selectPreviousTarget() }
-        if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { selectNextTarget() }
-        if (enterPressed) { changeBattleState(BattleStates.EnemyInfoDisplay) }
+        if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) { 
+            selectPreviousTarget() 
+        }
+        if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { 
+            selectNextTarget() 
+        }
+        if (enterPressed) { 
+            changeBattleState(BattleStates.EnemyInfoDisplay) 
+        }
     })
     battleStates[BattleStates.EnemyInfoSelection] = stateDef
 
     stateDef = array_create(StateHook.Count, undefined)
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
-    stateDef[StateHook.Step]     = method(self, function(input) {
+    stateDef[StateHook.Step] = method(self, function(input) {
         var mouseConfirm = false
         if (input.clicked && infoCloseRect != undefined
             && pointInRect(input.guiX, input.guiY, infoCloseRect.x, infoCloseRect.y, infoCloseRect.w, infoCloseRect.h)) {
@@ -477,7 +503,7 @@ function initBattleStates() {
     stateDef[StateHook.Reentrant] = true
     stateDef[StateHook.OnEnter] = method(self, function() {
         alarm_set(STUN_TURN, game_get_speed(gamespeed_fps) * STUN_TURN_SECONDS)
-        with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow)
+        with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow, bbox_right - bbox_left)
     })
     battleStates[BattleStates.StunnedTurn] = stateDef
 
@@ -499,7 +525,7 @@ function initBattleStates() {
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
     stateDef[StateHook.Step] = method(self, function(input) {
         var confirm = keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)
-        if (keyboard_check_pressed(vk_left)  || keyboard_check_pressed(ord("A"))) { runConfirmCursor = 0 }
+        if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) { runConfirmCursor = 0 }
         if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { runConfirmCursor = 1 }
         for (var buttonIndex = 0; buttonIndex < array_length(runConfirmHitRects); buttonIndex++) {
             var hitRect = runConfirmHitRects[buttonIndex]
@@ -627,7 +653,7 @@ function initBattleStates() {
         var scaleToGui = guiScale()
 
         var popupWidth = screenWidth * 0.6
-        var popupHeight = screenHeight * 0.5
+        var popupHeight = screenHeight * 0.72
         var popupX = (screenWidth - popupWidth) / 2
         var popupY = (screenHeight - popupHeight) / 2
 
@@ -655,18 +681,32 @@ function initBattleStates() {
         var statsY = spriteBoxY
         var lineH = 14 * scaleToGui
         var popupTextH = lineH * 0.72
+        var contentRight = popupX + popupWidth - margin
         draw_set_color(c_white)
         draw_set_halign(fa_left)
         var targetName = unitDisplayName(selectedTarget.name)
         if (variable_instance_exists(selectedTarget, "isIgnited") && selectedTarget.isIgnited) { targetName = loc("unit.ignitePrefix") + targetName }
-        drawUiText(statsX, statsY, loc("battle.name") + targetName, popupTextH)
-        drawUiText(statsX, statsY + lineH, loc("battle.hp") + string(selectedTarget.hp) + "/" + string(selectedTarget.maxHp), popupTextH)
-        drawUiText(statsX, statsY + lineH * 2, loc("battle.mp") + string(selectedTarget.mana) + "/" + string(selectedTarget.maxMana), popupTextH)
-        drawUiText(statsX, statsY + lineH * 3, loc("battle.aura") + string(selectedTarget.aura), popupTextH)
-        drawUiText(statsX, statsY + lineH * 4, loc("battle.guts") + string(selectedTarget.guts), popupTextH)
+        var rowY = statsY
+        drawUiText(statsX, rowY, loc("battle.name") + targetName, popupTextH)
+        rowY += lineH
+        drawUiText(statsX, rowY, loc("battle.hp") + string(selectedTarget.hp) + "/" + string(selectedTarget.maxHp), popupTextH)
+        rowY += lineH
+        drawUiText(statsX, rowY, loc("battle.mp") + string(selectedTarget.mana) + "/" + string(selectedTarget.maxMana), popupTextH)
+        rowY += lineH
+        drawUiText(statsX, rowY, loc("battle.aura") + string(selectedTarget.aura), popupTextH)
+        rowY += lineH
+        drawUiText(statsX, rowY, loc("battle.guts") + string(selectedTarget.guts), popupTextH)
+        rowY += lineH
+        if (!selectedTarget.isEnemy) {
+            drawUiText(statsX, rowY, loc("battle.strength") + string(selectedTarget.strength), popupTextH)
+            rowY += lineH
+            drawUiText(statsX, rowY, loc("battle.intelligence") + string(selectedTarget.intelligence), popupTextH)
+            rowY += lineH
+            drawUiText(statsX, rowY, loc("battle.energy") + string(selectedTarget.energy) + "/" + string(selectedTarget.maxEnergy), popupTextH)
+            rowY += lineH
+        }
 
-        // Слабости врага
-        var weaknessY = statsY + lineH * 5
+        var weaknessY = rowY
         draw_set_halign(fa_left)
         var weaknessLabelText = loc("battle.weakness")
         var lblScale = drawUiText(statsX, weaknessY, weaknessLabelText, popupTextH)
@@ -690,6 +730,39 @@ function initBattleStates() {
         }
         draw_set_color(c_white)
 
+        var effectY = weaknessY + lineH * 1.5
+        draw_set_halign(fa_left)
+        drawUiText(statsX, effectY, loc("battle.statuses"), popupTextH)
+        effectY += lineH
+        var targetEffects = selectedTarget.effects
+        if (array_length(targetEffects) == 0) {
+            drawUiText(statsX, effectY, loc("ui.none"), popupTextH)
+        } else {
+            for (var effectIndex = 0; effectIndex < array_length(targetEffects); effectIndex++) {
+                var targetEffect = targetEffects[effectIndex]
+                var icon = effectIcon(targetEffect)
+                var textX = statsX
+                if (icon != noone) {
+                    draw_sprite_stretched(icon, 0, statsX, effectY, popupTextH, popupTextH)
+                    textX = statsX + popupTextH + 4 * scaleToGui
+                }
+                var nameText = effectDisplayName(targetEffect)
+                if (variable_instance_exists(targetEffect, "duration")) {
+                    nameText += " (" + loc("status.turnsPre") + string(targetEffect.duration) + loc("status.turnsPost") + ")"
+                }
+                drawUiText(textX, effectY, nameText, popupTextH, contentRight - textX)
+                effectY += lineH
+                var descText = effectDescription(targetEffect)
+                if (descText != "") {
+                    var descResult = fitWrappedText(descText, contentRight - statsX, lineH * 2)
+                    draw_set_font(descResult.font)
+                    draw_text_transformed(floor(statsX), floor(effectY), descResult.text, descResult.scale, descResult.scale, 0)
+                    effectY += string_height(descResult.text) * descResult.scale + 2 * scaleToGui
+                }
+            }
+        }
+        draw_set_color(c_white)
+
         // Close Button
         var btnWidth = 48 * scaleToGui
         var btnHeight = 16 * scaleToGui
@@ -708,11 +781,11 @@ function initBattleStates() {
         draw_sprite_ext(sPointer, 0, btnX - 12 * scaleToGui, btnY + btnHeight / 2, scaleToGui, scaleToGui, 0, c_white, 1)
     })
 
-    battleStates[BattleStates.CharacterPlay][StateHook.DrawUnder]        = drawCharacterMenu
+    battleStates[BattleStates.CharacterPlay][StateHook.DrawUnder] = drawCharacterMenu
     battleStates[BattleStates.EnemyTargetSelection][StateHook.DrawUnder] = drawCancelBadge
-    battleStates[BattleStates.AllyTargetSelection][StateHook.DrawUnder]  = drawCancelBadge
-    battleStates[BattleStates.EnemyInfoDisplay][StateHook.DrawOver]      = drawEnemyInfo
-    battleStates[BattleStates.Victory][StateHook.DrawOver]  = method(self, function() { drawVictoryScreen() })
+    battleStates[BattleStates.AllyTargetSelection][StateHook.DrawUnder] = drawCancelBadge
+    battleStates[BattleStates.EnemyInfoDisplay][StateHook.DrawOver] = drawEnemyInfo
+    battleStates[BattleStates.Victory][StateHook.DrawOver] = method(self, function() { drawVictoryScreen() })
     battleStates[BattleStates.GameOver][StateHook.DrawOver] = method(self, function() { drawGameOverScreen() })
     battleStates[BattleStates.RunConfirm][StateHook.DrawOver] = drawRunConfirm
 
