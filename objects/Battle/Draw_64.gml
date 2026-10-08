@@ -137,4 +137,11 @@ if (tutorialActive && battleState == BattleStates.CharacterPlay && tutorial.isAc
     tutorial.draw()
 }
 
+draw_set_halign(fa_left)
+draw_set_valign(fa_top)
+draw_set_font(fnUI_12)
+draw_set_color(c_lime)
+draw_text(8 * scaleToGui, 8 * scaleToGui, "fps " + string(fps) + "   real " + string(round(fps_real)) + "   deck " + string((selectedCharacter != noone) ? array_length(selectedCharacter.getShuffeledDeck()) : 0))
+draw_set_color(c_white)
+
 autosaveDrawIcon()

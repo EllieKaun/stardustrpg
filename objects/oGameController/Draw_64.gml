@@ -136,3 +136,10 @@ if (global.cutsceneActive && sprite_exists(cutsceneSprite)) {
 }
 
 autosaveDrawIcon()
+
+draw_set_halign(fa_left)
+draw_set_valign(fa_top)
+draw_set_font(fnUI_12)
+draw_set_color(c_lime)
+draw_text(8, 8, "fps " + string(fps) + "   real " + string(round(fps_real)) + "   fireflies " + string(instance_number(oFirefly)) + "   enemies " + string(instance_number(oEnemy)))
+draw_set_color(c_white)
