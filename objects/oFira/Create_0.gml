@@ -4,9 +4,9 @@ if (!variable_global_exists("foxJoined")) { global.foxJoined = false }
 
 spoke = false
 
-sprIdle = sprSafar
+sprIdle = sprFoxyIdle
 image_xscale = -1
-sprWalk = sprSafarWalk
+sprWalk = sprFoxyWalk
 
 joinParty = function() {
     mask_index = sLana
