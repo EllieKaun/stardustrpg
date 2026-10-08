@@ -74,6 +74,17 @@ function initEffectRegistry() {
             with (Battle) { shuffleDeckAndTake4(selectedCharacter) }
         },
     })
+    variable_struct_set(effectsRepository, "DrawCard", {
+        onPlay: function(effect, caster, targets) {
+            with (Battle) {
+                var casterDeck = caster.deck
+                if (array_length(casterDeck.shuffeledDeck) > 0
+                    && array_length(casterDeck.cardsInHand) < maxCardsOnDeskNumber) {
+                    array_push(casterDeck.cardsInHand, array_shift(casterDeck.shuffeledDeck))
+                }
+            }
+        },
+    })
     variable_struct_set(effectsRepository, "CreatePuppet", {
         onPlay: function(effect, caster, targets) {
             with (Battle) { spawnPuppet(effect.puppetCategory, caster) }
@@ -165,6 +176,7 @@ function effectKindFromType(type) {
         case EffectTypes.CreateTemporaryWeakness: return "CreateTemporaryWeakness"
         case EffectTypes.CreatePuppet: return "CreatePuppet"
         case EffectTypes.Deflect: return "Deflect"
+        case EffectTypes.DrawCard: return "DrawCard"
         default: return undefined
     }
 }
@@ -410,6 +422,9 @@ function AddEnergyEffect(value) {
 }
 function ShuffleDeckEffect() {
     return { type: EffectTypes.ShuffleDeck, timing: Timing.OnActions, sprite: attackEffect }
+}
+function DrawCardEffect() {
+    return { type: EffectTypes.DrawCard, timing: Timing.OnActions, sprite: attackEffect }
 }
 function CopyCardEffect() {
     return { type: EffectTypes.CopyCard, timing: Timing.OnActions, sprite: attackEffect }

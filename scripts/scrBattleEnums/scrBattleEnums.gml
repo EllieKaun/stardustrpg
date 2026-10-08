@@ -64,7 +64,8 @@ enum EffectTypes {
     IgnoreWeakness,
     CreateTemporaryWeakness,
     CreatePuppet,
-    Deflect
+    Deflect,
+    DrawCard
 }
 
 function effectTypeToString(type) {
@@ -83,6 +84,7 @@ function effectTypeToString(type) {
         case EffectTypes.Resurrection: return loc("effect.Resurrection")
         case EffectTypes.CreatePuppet: return loc("effect.CreatePuppet") 
         case EffectTypes.Deflect: return loc("effect.Deflect")
+        case EffectTypes.DrawCard: return loc("effect.DrawCard")
         default: return loc("effect.Unknown")
     }
 }

@@ -16,6 +16,22 @@ function createCopyNextPlayedCardCard(rarity = CardsRarity.Default) {
     )
 }
 
+function createDrawCardCard(rarity = CardsRarity.Default) {
+    return new Card(
+        "DrawCard",
+        rarity,
+        TargetTypes.Self,
+        StarriorStates.Cast,
+        0,
+        [ DrawCardEffect() ],
+        mgcCard,
+        cardCopy,
+        commonBorder,
+        hpCostToken,
+        "draw a card from your deck"
+    )
+}
+
 // Дает дополнительный ход герою - уникальная
 function createAddEnergyCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.SingleAllyTarget
