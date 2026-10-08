@@ -111,7 +111,53 @@ function cardDisplayName(card) {
 // Описание карты
 function cardDisplayDesc(card) {
     var fallback = (is_struct(card) && variable_struct_exists(card, "description")) ? card.description : ""
-    return locDef("card.desc." + locKeyForCard(card), fallback)
+    return cardDescFill(locDef("card.desc." + locKeyForCard(card), fallback), card)
+}
+
+//// Подстановки в описаниях карт
+// В тексте описания можно писать метки, они заменяются данными самой карты:
+//   {turns}    - длительность: "1 ход", "2 хода", "5 ходов"   ("... (4 хода)")
+//   {turnsGen} - длительность в родительном падеже: "1 хода", "2 ходов" ("в течение 2 ходов")
+// Число берётся из эффектов карты, поэтому текст не расходится с балансом и редкостью
+
+// Длительность карты: первый её эффект, у которого есть duration. Нет таких - undefined
+function cardDurationTurns(card) {
+    if (!is_struct(card) || !variable_struct_exists(card, "effects")) { return undefined }
+    var effects = card.effects
+    for (var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
+        var effect = effects[effectIndex]
+        if (is_struct(effect) && variable_struct_exists(effect, "duration") && is_real(effect.duration)) {
+            return effect.duration
+        }
+    }
+    return undefined
+}
+
+// Форма слова для числа: "one" / "few" / "many" по правилам текущего языка
+function locPluralForm(count) {
+    if (global.language == "ru") {
+        var lastDigit = count mod 10
+        var lastTwoDigits = count mod 100
+        if (lastDigit == 1 && lastTwoDigits != 11) { return "one" }
+        if (lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14)) { return "few" }
+        return "many"
+    }
+    return (count == 1) ? "one" : "many"
+}
+
+// "4 хода" / "4 turns": число и слово из ключей <wordKey>.one / .few / .many
+function locCountPhrase(count, wordKey) {
+    return string(count) + " " + loc(wordKey + "." + locPluralForm(count))
+}
+
+// Заменить метки в описании данными карты
+function cardDescFill(text, card) {
+    if (string_pos("{", text) == 0) { return text } // меток нет - быстрый выход
+    var turns = cardDurationTurns(card)
+    if (turns == undefined) { return text }
+    text = string_replace_all(text, "{turnsGen}", locCountPhrase(turns, "turnsGen"))
+    text = string_replace_all(text, "{turns}", locCountPhrase(turns, "turns"))
+    return text
 }
 
 // Имя игрока
@@ -145,6 +191,12 @@ function locDefineEn() {
     translations[$ "ui.exit"] = "EXIT"
     translations[$ "ui.close"] = "CLOSE"
     translations[$ "ui.none"] = "None"
+    translations[$ "turns.one"] = "turn"
+    translations[$ "turns.few"] = "turns"
+    translations[$ "turns.many"] = "turns"
+    translations[$ "turnsGen.one"] = "turn"
+    translations[$ "turnsGen.few"] = "turns"
+    translations[$ "turnsGen.many"] = "turns"
     translations[$ "ui.clickContinue"] = "Click to continue"
     translations[$ "ui.newCard"] = "New card!"
     translations[$ "ui.pressTabDeck"] = "Press TAB to open your deck"
@@ -455,25 +507,25 @@ function locDefineEn() {
     translations[$ "card.desc.magicalDamageBurnChanceMultiTarget"] = "deals minor fire damage (group)"
     translations[$ "card.desc.magicalDamageFreezeChanceSingleTarget"] = "deals minor ice damage (single)"
     translations[$ "card.desc.magicalDamageFreezeChanceMultiTarget"] = "deals minor ice damage (group)"
-    translations[$ "card.desc.buffPhysicalDamageSingleTarget"] = "slightly boosts physical damage (4 turns)"
-    translations[$ "card.desc.buffMagicalDamageSingleTarget"] = "slightly boosts magic damage (1 turn)"
-    translations[$ "card.desc.buffAnyDamageMultiTarget"] = "slightly boosts damage (1 turn)"
-    translations[$ "card.desc.buffPhysicalProtectionSingleTarget"] = "slightly boosts physical defense (1 turn)"
-    translations[$ "card.desc.buffMagicalProtectionSingleTarget"] = "slightly boosts magical defense (1 turn)"
-    translations[$ "card.desc.buffAnyProtectionMultiTarget"] = "slightly boosts defense (1 turn)"
-    translations[$ "card.desc.debuffPhysicalDamageSingleTarget"] = "slightly reduces physical damage (1 turn)"
-    translations[$ "card.desc.debuffMagicalDamageSingleTarget"] = "slightly reduces magic damage (1 turn)"
-    translations[$ "card.desc.debuffPhysicalProtectionSingleTarget"] = "slightly reduces physical defense (1 turn)"
-    translations[$ "card.desc.debuffMagicalProtectionSingleTarget"] = "slightly reduces magical defense (1 turn)"
-    translations[$ "card.desc.weaknessMagicalDamageSingleTarget"] = "vulnerability to magic damage (1 turn)"
-    translations[$ "card.desc.weaknessPhysicalDamageSingleTarget"] = "vulnerability to physical damage (1 turn)"
-    translations[$ "card.desc.ignoreWeaknessSingleTarget"] = "ignores weaknesses (2 turns)"
+    translations[$ "card.desc.buffPhysicalDamageSingleTarget"] = "slightly boosts physical damage ({turns})"
+    translations[$ "card.desc.buffMagicalDamageSingleTarget"] = "slightly boosts magic damage ({turns})"
+    translations[$ "card.desc.buffAnyDamageMultiTarget"] = "slightly boosts damage ({turns})"
+    translations[$ "card.desc.buffPhysicalProtectionSingleTarget"] = "slightly boosts physical defense ({turns})"
+    translations[$ "card.desc.buffMagicalProtectionSingleTarget"] = "slightly boosts magical defense ({turns})"
+    translations[$ "card.desc.buffAnyProtectionMultiTarget"] = "slightly boosts defense ({turns})"
+    translations[$ "card.desc.debuffPhysicalDamageSingleTarget"] = "slightly reduces physical damage ({turns})"
+    translations[$ "card.desc.debuffMagicalDamageSingleTarget"] = "slightly reduces magic damage ({turns})"
+    translations[$ "card.desc.debuffPhysicalProtectionSingleTarget"] = "slightly reduces physical defense ({turns})"
+    translations[$ "card.desc.debuffMagicalProtectionSingleTarget"] = "slightly reduces magical defense ({turns})"
+    translations[$ "card.desc.weaknessMagicalDamageSingleTarget"] = "vulnerability to magic damage ({turns})"
+    translations[$ "card.desc.weaknessPhysicalDamageSingleTarget"] = "vulnerability to physical damage ({turns})"
+    translations[$ "card.desc.ignoreWeaknessSingleTarget"] = "ignores weaknesses ({turns})"
     translations[$ "card.desc.instantHealSingleTarget"] = "restores a small amount of health (single)"
     translations[$ "card.desc.instantHealMultiTarget"] = "restores a small amount of health (group)"
-    translations[$ "card.desc.overtimeHealSingleTarget"] = "restores a small amount of health over 2 turns"
+    translations[$ "card.desc.overtimeHealSingleTarget"] = "restores a small amount of health over {turns}"
     translations[$ "card.desc.instantManaGainSingleTarget"] = "restores a small amount of mana (single)"
     translations[$ "card.desc.instantManaGainMultiTarget"] = "restores a small amount of mana (group)"
-    translations[$ "card.desc.overtimeManaGainSingleTarget"] = "restores a small amount of mana over 2 turns"
+    translations[$ "card.desc.overtimeManaGainSingleTarget"] = "restores a small amount of mana over {turns}"
     translations[$ "card.desc.copyNextPlayedCard"] = "copy next played card in hand"
     translations[$ "card.desc.addEnergy"] = "adds extra energy"
     translations[$ "card.desc.shuffleDeck"] = "shuffle"
@@ -509,6 +561,12 @@ function locDefineRu() {
     translations[$ "ui.exit"] = "ВЫЙТИ"
     translations[$ "ui.close"] = "ЗАКРЫТЬ"
     translations[$ "ui.none"] = "Нет"
+    translations[$ "turns.one"] = "ход"
+    translations[$ "turns.few"] = "хода"
+    translations[$ "turns.many"] = "ходов"
+    translations[$ "turnsGen.one"] = "хода"
+    translations[$ "turnsGen.few"] = "ходов"
+    translations[$ "turnsGen.many"] = "ходов"
     translations[$ "ui.clickContinue"] = "Нажмите, чтобы продолжить"
     translations[$ "ui.newCard"] = "Новая карта!"
     translations[$ "ui.pressTabDeck"] = "Нажмите TAB, чтобы открыть колоду"
@@ -798,25 +856,25 @@ function locDefineRu() {
     translations[$ "card.desc.magicalDamageBurnChanceMultiTarget"] = "урон огнём (группа)"
     translations[$ "card.desc.magicalDamageFreezeChanceSingleTarget"] = "урон льдом (одна цель)"
     translations[$ "card.desc.magicalDamageFreezeChanceMultiTarget"] = "урон льдом (группа)"
-    translations[$ "card.desc.buffPhysicalDamageSingleTarget"] = "немного усиливает физ. урон (4 хода)"
-    translations[$ "card.desc.buffMagicalDamageSingleTarget"] = "немного усиливает маг. урон (1 ход)"
-    translations[$ "card.desc.buffAnyDamageMultiTarget"] = "немного усиливает урон (1 ход)"
-    translations[$ "card.desc.buffPhysicalProtectionSingleTarget"] = "немного усиливает физ. защиту (1 ход)"
-    translations[$ "card.desc.buffMagicalProtectionSingleTarget"] = "немного усиливает маг. защиту (1 ход)"
-    translations[$ "card.desc.buffAnyProtectionMultiTarget"] = "немного усиливает защиту (1 ход)"
-    translations[$ "card.desc.debuffPhysicalDamageSingleTarget"] = "немного снижает физ. урон врага (1 ход)"
-    translations[$ "card.desc.debuffMagicalDamageSingleTarget"] = "немного снижает маг. урон врага (1 ход)"
-    translations[$ "card.desc.debuffPhysicalProtectionSingleTarget"] = "немного снижает физ. защиту врага (1 ход)"
-    translations[$ "card.desc.debuffMagicalProtectionSingleTarget"] = "немного снижает маг. защиту врага (1 ход)"
-    translations[$ "card.desc.weaknessMagicalDamageSingleTarget"] = "уязвимость к маг. урону (1 ход)"
-    translations[$ "card.desc.weaknessPhysicalDamageSingleTarget"] = "уязвимость к физ. урону (1 ход)"
-    translations[$ "card.desc.ignoreWeaknessSingleTarget"] = "игнорирует слабости (2 хода)"
+    translations[$ "card.desc.buffPhysicalDamageSingleTarget"] = "немного усиливает физ. урон ({turns})"
+    translations[$ "card.desc.buffMagicalDamageSingleTarget"] = "немного усиливает маг. урон ({turns})"
+    translations[$ "card.desc.buffAnyDamageMultiTarget"] = "немного усиливает урон ({turns})"
+    translations[$ "card.desc.buffPhysicalProtectionSingleTarget"] = "немного усиливает физ. защиту ({turns})"
+    translations[$ "card.desc.buffMagicalProtectionSingleTarget"] = "немного усиливает маг. защиту ({turns})"
+    translations[$ "card.desc.buffAnyProtectionMultiTarget"] = "немного усиливает защиту ({turns})"
+    translations[$ "card.desc.debuffPhysicalDamageSingleTarget"] = "немного снижает физ. урон врага ({turns})"
+    translations[$ "card.desc.debuffMagicalDamageSingleTarget"] = "немного снижает маг. урон врага ({turns})"
+    translations[$ "card.desc.debuffPhysicalProtectionSingleTarget"] = "немного снижает физ. защиту врага ({turns})"
+    translations[$ "card.desc.debuffMagicalProtectionSingleTarget"] = "немного снижает маг. защиту врага ({turns})"
+    translations[$ "card.desc.weaknessMagicalDamageSingleTarget"] = "уязвимость к маг. урону ({turns})"
+    translations[$ "card.desc.weaknessPhysicalDamageSingleTarget"] = "уязвимость к физ. урону ({turns})"
+    translations[$ "card.desc.ignoreWeaknessSingleTarget"] = "игнорирует слабости ({turns})"
     translations[$ "card.desc.instantHealSingleTarget"] = "восстанавливает немного здоровья (одна цель)"
     translations[$ "card.desc.instantHealMultiTarget"] = "восстанавливает немного здоровья (группа)"
-    translations[$ "card.desc.overtimeHealSingleTarget"] = "восстанавливает здоровье в течение 2 ходов"
+    translations[$ "card.desc.overtimeHealSingleTarget"] = "восстанавливает здоровье в течение {turnsGen}"
     translations[$ "card.desc.instantManaGainSingleTarget"] = "восстанавливает немного маны (одна цель)"
     translations[$ "card.desc.instantManaGainMultiTarget"] = "восстанавливает немного маны (группа)"
-    translations[$ "card.desc.overtimeManaGainSingleTarget"] = "восстанавливает ману в течение 2 ходов"
+    translations[$ "card.desc.overtimeManaGainSingleTarget"] = "восстанавливает ману в течение {turnsGen}"
     translations[$ "card.desc.copyNextPlayedCard"] = "копирует следующую сыгранную карту"
     translations[$ "card.desc.addEnergy"] = "даёт дополнительную энергию"
     translations[$ "card.desc.shuffleDeck"] = "перемешивает колоду"
