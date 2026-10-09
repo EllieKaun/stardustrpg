@@ -190,9 +190,7 @@ function initGameGlobals() {
     global.deckTutorialStage = DeckTutorialStage.Inactive
 
     global.battleNoFlee = false
-    global.spearCarrierExists = false
-    global.battleHasSpear = false
-    global.cauldronCarrierExists = false
+    global.carrierExists = {}
     global.battleCauldronStolen = false
     global.battleIsNight = false // снимается на входе в бой
     global.battleIsIgnited = false // ставит ignite-враг на триггере боя

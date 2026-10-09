@@ -4,7 +4,9 @@ depth = -bbox_bottom
 
 if (pickId != "" && questIsPicked(questId, pickId)) { instance_destroy(); exit }
 
-if (questState(questId) != QuestState.Active) { exit }
+var questActive = (questState(questId) == QuestState.Active)
+visible = questActive
+if (!questActive) { exit }
 
 if (!canBePicked()) { exit }
 

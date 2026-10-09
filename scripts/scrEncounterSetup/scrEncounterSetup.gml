@@ -69,8 +69,7 @@ function initStarriorsFromEncounter(encounter) {
     for (var i = 0; i < array_length(enemies); i++) {
         var enemy = enemies[i]
         enemy.isEnemy = true
-        enemy.hasSpear = false
-        enemy.hasCauldron = false
+        enemy.carryItem = noone
         if (isRaw) {
             continue
         }
@@ -88,33 +87,22 @@ function initStarriorsFromEncounter(encounter) {
         }
     }
 
-    // Копьё в бою только пока квест активен
-    var spearQuestActive = (questSpearState() == QuestSpearState.Active)
-    if (variable_global_exists("battleHasSpear") && global.battleHasSpear && !spearQuestActive) {
-        global.battleHasSpear = false
-    }
+    // Носимый предмет попадает в бой только пока он доступен (квест активен)
+    var carryItem = variable_struct_exists(encounter, "carryItem") ? encounter.carryItem : noone
+    if (carryItem != noone && !carryItemDef(carryItem).available()) { carryItem = noone }
 
-    if (!isRaw
-        && variable_global_exists("battleHasSpear")
-        && global.battleHasSpear
-        && array_length(enemies) > 0) {
-        var spearIdx = irandom(array_length(enemies) - 1)
-        enemies[spearIdx].hasSpear = true
-        if (spearBattleSprite() == noone) { enemies[spearIdx].image_blend = c_yellow }
+    if (!isRaw && carryItem != noone && array_length(enemies) > 0) {
+        var carryDef = carryItemDef(carryItem)
+        var carryIdx = irandom(array_length(enemies) - 1)
+        enemies[carryIdx].carryItem = carryItem
+        if (carryDef.battleSprite() == noone) { enemies[carryIdx].image_blend = c_yellow }
 
-        var damageBonus = spearBattleBonus()
-        for (var i = 0; i < array_length(enemies); i++) {
-            applyEnemyStatBonus(enemies[i], damageBonus)
+        var carryBonus = carryDef.battleBonusAll()
+        if (carryBonus != 0) {
+            for (var i = 0; i < array_length(enemies); i++) {
+                applyEnemyStatBonus(enemies[i], carryBonus)
+            }
         }
-        global.battleHasSpear = false
-    }
-
-    if (!isRaw
-        && variable_struct_exists(encounter, "hasCauldron")
-        && encounter.hasCauldron
-        && array_length(enemies) > 0) {
-        var cauldronIdx = irandom(array_length(enemies) - 1)
-        enemies[cauldronIdx].hasCauldron = true
     }
 }
 

@@ -114,13 +114,10 @@ function initEffectRegistry() {
             var target = is_array(targets) ? (array_length(targets) > 0 ? targets[0] : noone) : targets
             if (target == noone) { return }
 
-            if (variable_instance_exists(target, "hasCauldron") && target.hasCauldron) {
-                target.hasCauldron = false
-                global.battleCauldronStolen = true
-            } else if (variable_instance_exists(target, "hasSpear") && target.hasSpear) {
-                target.hasSpear = false
+            if (variable_instance_exists(target, "carryItem") && target.carryItem != noone) {
+                carryItemDef(target.carryItem).onSteal()
+                target.carryItem = noone
                 target.image_blend = c_white
-                questGrantSpear()
             } else {
                 var hand = target.getCardsInHand()
                 if (array_length(hand) > 0) {

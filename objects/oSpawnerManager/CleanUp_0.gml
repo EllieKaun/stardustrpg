@@ -1,1 +1,2 @@
 ds_list_destroy(enemyList)
+ds_list_destroy(pineconeList)

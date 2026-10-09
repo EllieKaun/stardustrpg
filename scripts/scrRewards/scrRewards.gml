@@ -91,7 +91,7 @@ function grantBattleRewards() {
     if (variable_global_exists("battleCauldronStolen") && global.battleCauldronStolen) {
         global.battleCauldronStolen = false
         questFoxAddItem(QuestFoxItem.Cauldron)
-        if (variable_global_exists("cauldronCarrierExists")) { global.cauldronCarrierExists = false }
+        carrySetCarrierExists(CarryItem.Cauldron, false)
     }
 
     var goldMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1

@@ -243,6 +243,7 @@ function cauldronSprite() {
 
 //// Сколько предметов нужно для квеста Лисички
 #macro FOX_PINE_CONES_NEEDED 3
+#macro FOX_PINE_CONES_IN_WORLD 8
 #macro FOX_PETUNIAS_NEEDED 1
 #macro FOX_CAULDRONS_NEEDED 1
 
@@ -256,8 +257,7 @@ function questGrantSpear() {
     if (questState(QuestId.Safar) == QuestState.Active) {
         questAddProgress(QuestId.Safar, QuestSafarItem.Spear)
     }
-    if (variable_global_exists("spearCarrierExists")) { global.spearCarrierExists = false }
-    if (variable_global_exists("battleHasSpear")) { global.battleHasSpear = false }
+    carrySetCarrierExists(CarryItem.Spear, false)
 }
 
 function questFoxState() { return questState(QuestId.Fox) }
@@ -292,4 +292,59 @@ function questFoxItemSprite(item) {
 
 function questFoxItemDone(item) {
     return questFoxItemCount(item) >= questFoxItemNeeded(item)
+}
+
+//// Реестр носимых мобами предметов
+
+function carryItemsEnsure() {
+    if (variable_global_exists("carryItemDefs")) { return }
+    global.carryItemDefs = {}
+
+    carryItemRegister({
+        id: CarryItem.Spear,
+        available: function() { return questState(QuestId.Safar) == QuestState.Active },
+        worldSprite: function() { return spearSprite() },
+        worldAngle: 90,
+        worldTint: c_yellow,
+        battleSprite: function() { return spearBattleSprite() },
+        battleAngle: 90,
+        battleYOffset: 2,
+        battleNoFlee: false,
+        battleBonusAll: function() { return spearBattleBonus() },
+        onSteal: function() { questGrantSpear() }
+    })
+
+    carryItemRegister({
+        id: CarryItem.Cauldron,
+        available: function() { return questState(QuestId.Fox) == QuestState.Active && !questFoxItemDone(QuestFoxItem.Cauldron) },
+        worldSprite: function() { return cauldronSprite() },
+        worldAngle: 0,
+        worldTint: c_white,
+        battleSprite: function() { return cauldronSprite() },
+        battleAngle: 0,
+        battleYOffset: -6,
+        battleNoFlee: true,
+        battleBonusAll: function() { return 0 },
+        onSteal: function() { global.battleCauldronStolen = true }
+    })
+}
+
+function carryItemRegister(def) {
+    global.carryItemDefs[$ string(def.id)] = def
+}
+
+function carryItemDef(id) {
+    carryItemsEnsure()
+    return global.carryItemDefs[$ string(id)]
+}
+
+function carryCarrierExists(id) {
+    if (!variable_global_exists("carrierExists")) { global.carrierExists = {} }
+    var key = string(id)
+    return variable_struct_exists(global.carrierExists, key) ? global.carrierExists[$ key] : false
+}
+
+function carrySetCarrierExists(id, value) {
+    if (!variable_global_exists("carrierExists")) { global.carrierExists = {} }
+    global.carrierExists[$ string(id)] = value
 }

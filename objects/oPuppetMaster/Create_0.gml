@@ -1,5 +1,5 @@
 event_inherited()
-canCarrySpear = false
+carryInventory = [CarryItem.Cauldron]
 getEncounter = function() {
     return puppetMasterEncounter()
 }

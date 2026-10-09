@@ -59,6 +59,12 @@ enum QuestObjectiveType {
     ObtainItem
 }
 
+// Предметы, которые носят мобы (порядок = приоритет в инвентаре)
+enum CarryItem {
+    Spear,
+    Cauldron
+}
+
 enum ShopItemKind { // Виды товаров в магазине
     Card,
     Slot

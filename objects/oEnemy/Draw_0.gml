@@ -9,16 +9,10 @@ draw_sprite_stretched(
 
 draw_self()
 
-if (carriesSpear) {
-    var sprite = spearSprite()
-    if (sprite != noone) {
-        draw_sprite_ext(sprite, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 2, 1, 1, 90, c_white, 1)
-    }
-}
-
-if (carriesCauldron) {
-    var cauldron = cauldronSprite()
-    if (cauldron != noone) {
-        draw_sprite_ext(cauldron, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 2, 1, 1, 0, c_white, 1)
+if (carriedItem != noone) {
+    var carryDef = carryItemDef(carriedItem)
+    var carrySpr = carryDef.worldSprite()
+    if (carrySpr != noone) {
+        draw_sprite_ext(carrySpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 2, 1, 1, carryDef.worldAngle, c_white, 1)
     }
 }

@@ -73,18 +73,12 @@ if (showHealthBar && !isKO()) {
     }
 }
 
-// Копье
-if (variable_instance_exists(id, "hasSpear") && hasSpear) {
-    var spearSpr = spearBattleSprite()
-    if (spearSpr != noone) {
-        draw_sprite_ext(spearSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top + 2, 1, 1, 90, c_white, 1)
-    }
-}
-
-if (variable_instance_exists(id, "hasCauldron") && hasCauldron) {
-    var cauldronSpr = cauldronSprite()
-    if (cauldronSpr != noone) {
-        draw_sprite_ext(cauldronSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top - 6, 1, 1, 0, c_white, 1)
+// Носимый предмет над головой
+if (variable_instance_exists(id, "carryItem") && carryItem != noone) {
+    var carryDef = carryItemDef(carryItem)
+    var carrySpr = carryDef.battleSprite()
+    if (carrySpr != noone) {
+        draw_sprite_ext(carrySpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top + carryDef.battleYOffset, 1, 1, carryDef.battleAngle, c_white, 1)
     }
 }
 

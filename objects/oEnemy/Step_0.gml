@@ -6,29 +6,25 @@ if (variable_global_exists("cutsceneActive") && global.cutsceneActive) { exit }
 
 depth = -bbox_bottom
 
-// Квест не активен (копьё уже украдено / квест завершён) - моб больше не носитель
-if (carriesSpear && questSpearState() != QuestSpearState.Active) {
-    carriesSpear = false
-    global.spearCarrierExists = false
+// Предмет больше недоступен (добыт / квест сменился) - моб перестаёт быть носителем
+if (carriedItem != noone && !carryItemDef(carriedItem).available()) {
+    carrySetCarrierExists(carriedItem, false)
+    carriedItem = noone
+    image_blend = c_white
 }
 
-if (canCarrySpear && !carriesSpear && questSpearState() == QuestSpearState.Active && !global.spearCarrierExists) {
-    carriesSpear = true
-    global.spearCarrierExists = true
-    if (spearSprite() == noone) { image_blend = c_yellow }
-}
-
-if (carriesCauldron && (questFoxState() != QuestFoxState.Active || questFoxItemDone(QuestFoxItem.Cauldron))) {
-    carriesCauldron = false
-    global.cauldronCarrierExists = false
-}
-
-if (canCarryCauldron && !carriesCauldron && !carriesSpear
-    && questFoxState() == QuestFoxState.Active
-    && !questFoxItemDone(QuestFoxItem.Cauldron)
-    && !global.cauldronCarrierExists) {
-    carriesCauldron = true
-    global.cauldronCarrierExists = true
+// Берём первый доступный предмет из инвентаря, у которого ещё нет носителя
+if (carriedItem == noone) {
+    for (var carryIndex = 0; carryIndex < array_length(carryInventory); carryIndex++) {
+        var carryCandidate = carryInventory[carryIndex]
+        var carryDef = carryItemDef(carryCandidate)
+        if (carryDef.available() && !carryCarrierExists(carryCandidate)) {
+            carriedItem = carryCandidate
+            carrySetCarrierExists(carryCandidate, true)
+            if (carryDef.worldSprite() == noone) { image_blend = carryDef.worldTint }
+            break
+        }
+    }
 }
 
 var leader = oGameController.selected_character
@@ -96,14 +92,13 @@ if (place_meeting(x, y, leader)) {
         global.returningFromBattle = true
         global.battleNoFlee = false
         global.battleEnemyFirst = false // обычная встреча — первыми ходят герои
-        // spearCarrierExists не сбрасываем: носитель остаётся на карте, если от него убежали или проиграли.
-        // Флаг сбросит кража копья (questGrantSpear) или удаление носителя (Destroy)
-        if (carriesSpear) { global.battleHasSpear = true }
-        if (carriesCauldron) { global.battleNoFlee = true }
+        // Носитель остаётся на карте, если от него убежали или проиграли.
+        // Флаг сбросит кража (onSteal) или удаление носителя (Destroy)
+        if (carriedItem != noone && carryItemDef(carriedItem).battleNoFlee) { global.battleNoFlee = true }
         global.battleIsIgnited = isIgnited // ignite-враг делает весь бой ignite
         global.battleSection = spawnSection
         var encounter = getEncounter()
-        encounter.hasCauldron = carriesCauldron
+        encounter.carryItem = carriedItem
         global.battleEncounter = encounter
         global.returnRoom = room
         global.returnX = leader.x
@@ -127,8 +122,7 @@ if (place_meeting(x, y, leader)) {
     var distance = point_distance(x, y, leader.x, leader.y)
     if (triggered && distance > rearmDistance) { triggered = false }
     if (spawnedDynamically && distance > oSpawnerManager.spawnDistance) {
-        if (carriesSpear) { global.spearCarrierExists = false }
-        if (carriesCauldron) { global.cauldronCarrierExists = false }
+        if (carriedItem != noone) { carrySetCarrierExists(carriedItem, false) }
         instance_destroy()
     }
 }
