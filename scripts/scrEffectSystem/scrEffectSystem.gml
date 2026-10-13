@@ -30,7 +30,11 @@ function initEffectRegistry() {
         },
         onEndOfTurn: function(effect, character) {
             var rawValue = is_method(effect.value) ? effect.value() : effect.value
-            character.applyDamage(mitigateDamage(character, effect, rawValue))
+            if (effect.damageType == DamageTypes.True) {
+                character.applyDamage(rawValue)
+            } else {
+                character.applyDamage(mitigateDamage(character, effect, rawValue))
+            }
         },
     })
 
@@ -142,6 +146,24 @@ function initEffectRegistry() {
 
     
     variable_struct_set(effectsRepository, "Deflect", { icon: stunned })
+    
+    variable_struct_set(effectsRepository, "GainIngredient", { 
+        onPlay: function(effect, caster, targets) {
+            repeat (effect.value) {
+            	ingredientAddRandom(caster)
+            }
+        }
+    })
+    
+    variable_struct_set(effectsRepository, "DiscardRandomCard", { 
+        onPlay: function(effect, caster, targets) {
+            var hand = caster.getCardsInHand()
+            if (array_length(hand) == 0) { return }
+                
+            var lost = hand[irandom(array_length(hand) - 1)]
+            removeCardFromHand(caster, lost)
+        }
+    })
     global.effectRegistry = effectsRepository
 }
 
@@ -173,7 +195,8 @@ function effectKindFromType(type) {
         case EffectTypes.CreateTemporaryWeakness: return "CreateTemporaryWeakness"
         case EffectTypes.CreatePuppet: return "CreatePuppet"
         case EffectTypes.Deflect: return "Deflect"
-        case EffectTypes.DrawCard: return "DrawCard"
+        case EffectTypes.DrawCard: return "DrawCard" 
+        case EffectTypes.GainIngredient: return "GainIngredient"
         default: return undefined
     }
 }
@@ -216,12 +239,13 @@ function statusNameIcon(effect) {
         case StatusNames.Burn: return BurnIcon
         case StatusNames.Bleeding: return BleedIcon
         case StatusNames.Freeze: return FreezeIcon
-        case StatusNames.Shock: return ShockIcon
+        case StatusNames.Shock: return ShockIcon 
+        case StatusNames.Poison: return BurnIcon    
     }
     return noone
 }
 
-// Иконка слабости по сырому значению StatusNames (для инфы о враге)
+// Иконка слабости по значению StatusNames (для инфы о враге)
 function weaknessIcon(statusName) {
     switch (statusName) {
         case StatusNames.Stun: return StunIcon
@@ -229,6 +253,7 @@ function weaknessIcon(statusName) {
         case StatusNames.Bleeding: return BleedIcon
         case StatusNames.Freeze: return FreezeIcon
         case StatusNames.Shock: return ShockIcon
+        case StatusNames.Poison: return ShockIcon
     }
     return noone
 }
@@ -243,6 +268,7 @@ function weaknessLabel(statusName) {
         case StatusNames.Bomb: return loc("weakness.Bomb")
         case StatusNames.Vampirism: return loc("weakness.Vampirism")
         case StatusNames.Weakening: return loc("weakness.Weakening")
+        case StatusNames.Poison: return loc("weakness.Poison")    
     }
     return loc("weakness.Unknown")
 }
@@ -372,6 +398,9 @@ function Burn(value, duration, chance, sound = FireMagic) {
 function Bleeding(value, duration, chance, sound = SliceAtc) {
     return DamageOverTimeEffect(DamageTypes.Physical, value, duration, StatusNames.Bleeding, chance, slice, sound)
 }
+function Poison(value, duration, chance, sound = SliceAtc) {
+    return DamageOverTimeEffect(DamageTypes.True, value, duration, StatusNames.Poison, chance, slice, sound)
+}
 
 // Лечение, мана
 function HealEffect(value, sprite = hphealEffect, sound = HealMagic) {
@@ -433,7 +462,6 @@ function IgnoreWeaknessEffect(duration) {
 function BossClone(maxSlots) {
     return { kind: "BossClone", timing: Timing.OnActions, maxSlots: maxSlots }
 }
-
 function StealEffect() {
     return { kind: "Steal", timing: Timing.Instant, sprite: attackEffect }
 }
@@ -444,6 +472,17 @@ function DeflectEffect(duration, sprite = buffEffect, sound = MagicBuff) {
         duration: duration, timing: Timing.Overtime,
         sprite: sprite, sound: sound
     }
+}
+
+function DiscardRandomCardEffect() { 
+    return { type: EffectTypes.DiscardRandomCard, timing: Timing.OnActions } 
+}
+
+// Лесные карты
+function GainIngredientEffect(count = 1) {
+    return { type: EffectTypes.GainIngredient, 
+        value: count, 
+        timing: Timing.OnActions }
 }
 
 

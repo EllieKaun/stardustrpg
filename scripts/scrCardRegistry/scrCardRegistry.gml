@@ -67,7 +67,12 @@ function cardIdsInit() {
         summonMagicPuppet: "summonMagicPuppet",
         summonHealPuppet: "summonHealPuppet",
         summonBuffPuppet: "summonBuffPuppet",
-        bossClone: "bossClone"
+        bossClone: "bossClone",
+        
+        // Лесные
+        forestSupplyBag: "forestSupplyBag",
+        forestGather: "forestGather",
+        
     }
 }
 
@@ -75,10 +80,15 @@ function cardRegistryInit() {
     global.cardRegistry = {};
     var cardIds = global.CardId;
 
-    var registerCard = function(id, canVary, category, buildFunc) {
-        global.cardRegistry[$ id] = { id: id, canVaryRarity: canVary, category: category, build: buildFunc };
-    };
-
+    var registerCard = function(id, canVary, category, buildFunc, set = CardSet.Base) {
+            global.cardRegistry[$ id] = { id: id, 
+            canVaryRarity: canVary, 
+            category: category, 
+            build: buildFunc,
+            cardSet: set  
+        }
+    }
+    
     // Физические
     registerCard(cardIds.physicalDamageSingleTarget, true, CardCategory.Attack, function(rarity) { return createPhysicalDamageSingleTargetCard(rarity) })
     registerCard(cardIds.physicalDamageMultipleTarget, true, CardCategory.Attack, function(rarity) { return createPhysicalDamageMultipleTargetCard(rarity) })
@@ -144,6 +154,14 @@ function cardRegistryInit() {
     registerCard(cardIds.ignoreWeaknessSingleTarget, true, CardCategory.Special, function(rarity) { return createCardIgnoreWeaknessSingleTarget(rarity) })
     registerCard(cardIds.stealCard, false, CardCategory.Special, function(rarity) { return createStealCard(rarity) })
     registerCard(cardIds.drawCard, false, CardCategory.Special, function(rarity) { return createDrawCardCard(rarity) })
+    
+    // Лесные
+    registerCard(cardIds.forestSupplyBag, true, CardCategory.Special,
+                 function(rarity) { return createForestSupplyBagCard(rarity) }, 
+                CardSet.Forest)
+    registerCard(cardIds.forestGather, true, CardCategory.Special,
+                 function(rarity) { return createForestGatherCard(rarity) }, 
+                CardSet.Forest)
 }
 
 // Проверка существования карты по ид (чекает регистратор)
@@ -179,4 +197,11 @@ function cardFromRef(cardDefinition) {
 // Проверка может ли карта иметь разные редкости или уникальная
 function cardCanVaryRarity(cardIdentifier) {
     return cardExists(cardIdentifier) ? global.cardRegistry[$ cardIdentifier].canVaryRarity : false
+}
+
+// Вытащить информацию из какого набора карта
+function cardSetOf(cardId) {
+    if (!cardExists(cardId)) { return CardSet.Base }
+    var def = global.cardRegistry[$ cardId]
+    return variable_struct_exists(def, "cardSet") ? def.cardSet : CardSet.Base
 }

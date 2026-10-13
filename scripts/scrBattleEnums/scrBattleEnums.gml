@@ -15,7 +15,8 @@ enum TargetTypes {
 
 enum DamageTypes {
     Physical,
-    Magical
+    Magical,
+    True
 }
 
 enum ProtectionTypes {
@@ -40,7 +41,9 @@ enum EffectTypes {
     CreateTemporaryWeakness,
     CreatePuppet,
     Deflect,
-    DrawCard
+    DrawCard,
+    GainIngredient,
+    DiscardRandomCard
 }
 
 function effectTypeToString(type) {
@@ -60,6 +63,7 @@ function effectTypeToString(type) {
         case EffectTypes.CreatePuppet: return loc("effect.CreatePuppet") 
         case EffectTypes.Deflect: return loc("effect.Deflect")
         case EffectTypes.DrawCard: return loc("effect.DrawCard")
+        case EffectTypes.GainIngredient: return loc("effect.GainIngredient")
         default: return loc("effect.Unknown")
     }
 }
@@ -73,7 +77,8 @@ enum StatusNames {
     Bomb,
     Vampirism,
     Weakening,
-    Deflect
+    Deflect,
+    Poison
 }
 
 enum ModifiersToBuff {
@@ -227,3 +232,9 @@ enum HandScaling {
     MoreCard,
     FewerCards
 }
+
+// Ингредиенты в Лесном наборе
+enum Ingredient {
+	Flower, Mushroom, Leaf
+}
+

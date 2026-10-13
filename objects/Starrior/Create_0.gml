@@ -36,7 +36,9 @@ effects = []
 weaknesses = []
 strengths = []
 effectNotifications = []
-
+ingredients = [] // ингредиенты
+activeIngredient = undefined // текущий ингредиент
+bonusHp = 0 // Избыточное хп
 deck = new Deck([])
 
 // Исчезновение врага при смерти
@@ -134,6 +136,10 @@ function hasWeakness(weaknessType) {
 }
 
 function applyDamage(value) {
+    var absorbed = min(bonusHp, value) // урон по оверхелзу
+    bonusHp -= absorbed
+    value -= absorbed
+    
     hp -= value
     if hp <= 0 && actionState != StarriorStates.KnockOut {
         changeActionState(StarriorStates.KnockOut, undefined)

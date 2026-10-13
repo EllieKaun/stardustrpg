@@ -119,6 +119,7 @@ function locDefineEn() {
     translations[$ "effect.DrawCard"] = "Draw Card"
     translations[$ "effect.Resurrection"] = "Resurrection"
     translations[$ "effect.CreatePuppet"] = "CreatePuppet"
+    translations[$ "effect.GainIngredient"] = "Gain Ingredient"
     translations[$ "effect.Unknown"] = "Unknown"
 
     translations[$ "weakness.Stun"] = "Stun"
@@ -129,6 +130,7 @@ function locDefineEn() {
     translations[$ "weakness.Bomb"] = "Bomb"
     translations[$ "weakness.Vampirism"] = "Vampirism"
     translations[$ "weakness.Weakening"] = "Weaken"
+    translations[$ "weakness.Poison"] = "Poison"
     translations[$ "weakness.Unknown"] = "?"
 
     translations[$ "status.turnsPre"] = ""

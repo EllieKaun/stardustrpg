@@ -60,7 +60,12 @@ function casterIsIgnited(caster) {
 function effectChanceForCaster(caster, target, effect) {
     if (!variable_instance_exists(effect, "chance")) { return 1 }
     var base = casterIsIgnited(caster) ? caster.igniteEffectChance : effect.chance
-    if (checkIfHasWeaknesses(target, effect)) { base += WEAKNESS_STATUS_CHANCE_BONUS }
+    if (checkIfHasWeaknesses(target, effect)) { 
+        base += WEAKNESS_STATUS_CHANCE_BONUS 
+    }
+    if (caster.activeIngredient == Ingredient.Leaf) { 
+        base += INGREDIENT_STATUS_CHANCE_BONUS 
+    }
     return clamp(base, 0, 1)
 }
 
@@ -84,6 +89,9 @@ function effectApplyStatus(effect, caster, targets) {
         if (prob <= effectChanceForCaster(caster, targets, effect)) {
             anyProc = true
             var applied = refreshOrPushEffect(targets, effect)
+            if (caster.activeIngredient == Ingredient.Leaf && variable_instance_exists(applied, "duration")) {
+                applied.duration += 1
+            }
             runOnApply(applied, caster, targets)
             if variable_instance_exists(targets, "showEffectNotification") {
                 targets.showEffectNotification(applied, EffectVisualizerType.TimeBased, 1)
@@ -153,6 +161,25 @@ function executeDamageEffect(
     targets
 ) {
     var damageType = effect.damageType
+    
+    //// Чистый урон
+    if (damageType == DamageTypes.True) {
+        var trueDamamge = is_method(effect.value) ? effect.value() : effect.value 
+        if (is_array(targets)) { 
+            for (var i = 0; i < array_length(targets); i++) {
+                if (!targets[i].isKO()) {
+                    targets[i].applyDamage(pure)
+                    targets[i].showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
+                }
+            }
+        } else if (!targets.isKO()) {
+            targets.applyDamage(pure)
+            targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
+        }
+        return
+    } 
+    
+    ///// Физический магический урон
     var cardMultiplier = is_method(effect.value) ? effect.value() : effect.value
 
     // Характеристика кастера + баффы и дебаффы атаки
@@ -173,7 +200,9 @@ function executeDamageEffect(
     casterStat = max(casterStat, 0)
 
     var damage = cardMultiplier * casterStat
-
+    if (caster.activeIngredient == Ingredient.Mushroom) { 
+        damage *= INGREDIENT_DAMAGE_MULT 
+    }
     damage *= handScalingMultiplier(effect, caster)
     
     // Ослабление кастера
@@ -228,16 +257,20 @@ function reduceOrRemoveEffectType(target, effectType) {
 }
 
 function executeHealing(effect, caster, targets) {
+    var healValue = effect.value
+    if (caster.activeIngredient == Ingredient.Flower) { 
+        healValue = round(healValue * INGREDIENT_HEAL_MULT) 
+    }
     if (is_array(targets)) {
         for(var targetIndex = 0; targetIndex < array_length(targets); targetIndex++) {
             if !targets[targetIndex].isKO() {
-                targets[targetIndex].applyHeal(effect.value)
+                targets[targetIndex].applyHeal(healValue)
                 targets[targetIndex].showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
             }
         }
     } else {
         if !targets.isKO() {
-            targets.applyHeal(effect.value)
+            targets.applyHeal(healValue)
             targets.showEffectNotification(effect, EffectVisualizerType.TimeBased, 1)
         }
     }
@@ -313,5 +346,56 @@ function handScalingMultiplier(effect, caster) {
             return 1 + missing * HAND_SCALING_STEP
         default:
             return 1
+    }
+}
+
+// Оверхелз
+function applyBonusHp(value) {
+    var cap = floor(maxHp * BONUS_HP_CAP_FRACTION)
+    bonusHp = min(bonusHp + value, cap)
+    var spawnX = irandom_range(bbox_left, bbox_right)
+    var spawnY = irandom_range(bbox_top, bbox_bottom)
+    drawDamageNumber(spawnX, spawnY, value, c_aqua)  
+}
+
+// Негативный ли эффект
+function effectIsNegative(effect) {
+    // дебаффы
+    switch (effect.type) {
+        case EffectTypes.Debuff:
+        case EffectTypes.Stun:
+        case EffectTypes.Weakening:
+        case EffectTypes.CreateTemporaryWeakness:
+            return true
+    }
+    // урон по времени
+    if (effect.type == EffectTypes.Damage && variable_struct_exists(effect, "duration")) { return true }
+    // Freeze или Shock по имени статуса
+    if (variable_struct_exists(effect, "statusName")) {
+        if (effect.statusName == StatusNames.Freeze || effect.statusName == StatusNames.Shock) { return true }
+    }
+    return false
+}
+
+// Продлить длительность эффектов
+function extendNegativeEffects(target, turns) {
+    var effects = target.effects
+    for (var i = 0; i < array_length(effects); i++) {
+        if (effectIsNegative(effects[i]) && variable_struct_exists(effects[i], "duration")) {
+            effects[i].duration += turns
+        }
+    }
+}
+
+// Удалить негативный эффект
+function removeOneNegativeEffect(target) {
+    var effects = target.effects
+    for (var i = 0; i < array_length(effects); i++) {
+        if (effectIsNegative(effects[i])) {
+            target.showEffectNotification(effects[i], 
+                EffectVisualizerType.TimeBased, 1)
+            array_delete(effects, i, 1)
+            return
+        }
     }
 }

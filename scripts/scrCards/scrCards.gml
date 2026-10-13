@@ -6,6 +6,13 @@
 #macro CARD_TEXT_W 258 // 318 - 60
 #macro CARD_TEXT_H 125 // 500 - 375
 
+
+// Наборы карт
+enum CardSet {
+    Base,
+    Forest
+}
+
 function Card(name,
             rarity,
             target,
@@ -17,7 +24,8 @@ function Card(name,
             cardBorderSpr,
             cardTokenSpr,
             description = "",
-            cardAlbumSpr = noone) constructor {
+            cardAlbumSpr = noone,
+            cardSet = CardSet.Base) constructor {
     self.name = name
     self.rarity = rarity
     self.target = target
@@ -30,9 +38,9 @@ function Card(name,
     self.description = description // текст на карте
     self.cardAlbumSpr = cardAlbumSpr
     self.energy = energy
-
+    self.cardSet = cardSet
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana
-  
+    self.spendsAllEnergy = false
     self.cardTokenSpr = (self.costTypeCached == CostType.Health) ? hpCostToken : mpCostToken
     // Рамка по редкости
     self.cardBorderSpr = cardBorderForRarity(rarity)
@@ -218,7 +226,17 @@ function cardPlaySequence(card, caster, targets) {
             with (Battle) {
                 global.suppressEffectVisual = true
                 var effects = ctx.card.effects
-                for (var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
+                
+                //// выбор ингредиента для лесного набора если подходит карте
+                var topIngredient = ingredientPeek(ctx.caster)
+                if (topIngredient != undefined 
+                    && ingredientFitsCard(topIngredient)) {
+                    ctx.caster.activeIngredient = ingredientTake(ctx.caster)    
+                }
+                
+                for (var effectIndex = 0; 
+                    effectIndex < array_length(effects); 
+                    effectIndex++) {
                     var effect = effects[effectIndex]
                     switch (effect.timing) {
                         case Timing.Instant:
@@ -235,7 +253,11 @@ function cardPlaySequence(card, caster, targets) {
                         break
                     }
                 }
-                ctx.caster.energy -= ctx.card.energy
+                // Ресет флага активного игредиента 
+                ctx.caster.activeIngredient = undefined
+                
+                if (ctx.card.spendsAllEnergy) { ctx.caster.energy = 0 }
+                else { ctx.caster.energy -= ctx.card.energy }
                 if (copyNextCard) {
                     copyNextCard = false
                     array_push(ctx.caster.deck.cardsInHand, ctx.card)

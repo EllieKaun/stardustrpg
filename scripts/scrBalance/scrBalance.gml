@@ -51,6 +51,17 @@
 #macro MAX_CARDS_IN_HAND 8
 #macro CARDS_DRAW_COUNT 4
 
+// Максимальное количество игредиентов в лесном наборе
+#macro INGREDIENT_MAX 2 
+
+// Баланс ингредиентов
+#macro INGREDIENT_HEAL_MULT 1.5
+#macro INGREDIENT_DAMAGE_MULT 1.5
+#macro INGREDIENT_STATUS_CHANCE_BONUS 0.4
+
+// Максимальная доля оверхелза
+#macro BONUS_HP_CAP_FRACTION 0.5
+
 function cardBalance() {
     return {
         instantHeal: [10, 20, 30, HEAL_FULL],
@@ -62,6 +73,20 @@ function cardBalance() {
         buff: [2, 4, 6, 8],
         damageMulSingle: [1, 2, 3, 4],
         damageMulGroup: [1, 1, 2, 3],
+        forestBagIngredients: [1, 1, 2, 2], // Сумка: сколько ингредиентов
+        forestGatherIngredients: [1, 1, 1, 2], // Сбор: сколько ингредиентов
+        provokeDuration: [2, 2, 3, 3], // Зелье провокации: длительность
+        flaskEmptyMul: [0.3, 0.4, 0.5, 0.6], // колба: слабый физ. удар
+        flaskShield: [8, 12, 16, 20], // колба: щит за цветок
+        flaskPure: [6, 9, 12, 15], // колба: чистый урон за гриб
+        flaskExtend: [1, 1, 2, 2], // колба: +ходы негативным эффектам(лист)
+        flaskLifestealMul: [1, 2, 3, 4], // колба: цветок+гриб, множитель урона
+        flaskLifestealShare: [0.5, 0.5, 0.6, 0.6], // доля урона в лечение/щит
+        flaskHeal: [10, 15, 20, 25], // колба: цветок+лист, лечение
+        flaskPoisonMul: [1, 2, 3, 4], // колба: гриб+лист, множитель удара
+        flaskPoisonValue: [4, 5, 6, 7], // колба: сила яда
+        flaskPoisonDur: [2, 2, 3, 3], // колба: длительность яда
+        flaskPoisonChance: [0.6, 0.7, 0.8, 0.9], // колба: шанс яда
         cost: {
             physicalSingle: [2, 3, 4, 5],
             physicalMulti: [4, 5, 6, 7],
@@ -293,7 +318,7 @@ function zoneContent(zoneId = undefined) {
                     { id: cardIds.resurrection, price: 1000 }, // воскрешение павшего союзника
                     { id: cardIds.copyNextPlayedCard, price: 1000 } // копирование следующей разыгранной карты
                 ],
-                rewardRarities: [CardsRarity.Default, CardsRarity.Unusual],
+                rewardRarities: [CardsRarity.Default],
                 regionEnemyTypes: [oCrakerNutSmall, oMushroomSmall, oFlowerSmall, oLeafSmall],
                 sections: sections
             }

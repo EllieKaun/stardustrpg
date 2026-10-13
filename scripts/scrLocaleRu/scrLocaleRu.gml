@@ -119,6 +119,7 @@ function locDefineRu() {
     translations[$ "effect.DrawCard"] = "Взять карту"
     translations[$ "effect.Resurrection"] = "Воскрешение"
     translations[$ "effect.CreatePuppet"] = "Марионетка"
+    translations[$ "effect.GainIngredient"] = "Добавить ингредиент"
     translations[$ "effect.Unknown"] = "Неизвестно"
 
     translations[$ "weakness.Stun"] = "Оглушение"
@@ -129,6 +130,7 @@ function locDefineRu() {
     translations[$ "weakness.Bomb"] = "Взрыв"
     translations[$ "weakness.Vampirism"] = "Вампиризм"
     translations[$ "weakness.Weakening"] = "Слабость"
+    translations[$ "weakness.Poison"] = "Яд"
     translations[$ "weakness.Unknown"] = "?"
 
     translations[$ "status.turnsPre"] = "осталось "

@@ -61,7 +61,8 @@ function forestRewardPool() {
     var ids = []
     appendRewardIds(ids, content.rewardAlways)
     if (isNight()) { appendRewardIds(ids, content.rewardNightOnly) }
-    if (isBossDefeated()) { appendRewardIds(ids, content.rewardAfterBoss) }
+    if (isBossDefeated()) { appendRewardIds(ids, content.rewardAfterBoss) } 
+    if (global.foxJoined) { appendRewardIds(ids, content.rewardForestSet) }
     return { ids: ids, rarities: content.rewardRarities }
 }
 
@@ -75,11 +76,15 @@ function makeEncounter(enemyCreators, reward, introSprite = undefined) {
 function forestCompositions() {
     var content = zoneContent()
     var allCompositions = []
-    for (var sectionIndex = 0; sectionIndex < array_length(content.sections); sectionIndex++) {
-        var s = content.sections[sectionIndex]
-        if (s == undefined) { continue }
-        for (var compositionIndex = 0; compositionIndex < array_length(s.compositions); compositionIndex++) {
-            array_push(allCompositions, s.compositions[compositionIndex])
+    for (var sectionIndex = 0; 
+        sectionIndex < array_length(content.sections); 
+        sectionIndex++) {
+        var section = content.sections[sectionIndex]
+        if (section == undefined) { continue }
+        for (var compositionIndex = 0; 
+            compositionIndex < array_length(section.compositions); 
+            compositionIndex++) {
+            array_push(allCompositions, section.compositions[compositionIndex])
         }
     }
     return allCompositions
