@@ -1,5 +1,5 @@
 event_inherited()
-carryInventory = [CarryItem.Cauldron]
+carryInventory = [] // босс не носит квестовые предметы
 getEncounter = function() {
     return puppetMasterEncounter()
 }

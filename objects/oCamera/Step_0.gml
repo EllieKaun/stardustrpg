@@ -10,8 +10,8 @@ if (instance_exists(follow)) {
 }
 
 
-x += (xTo - x) / 15;
-y += (yTo - y) / 15;
+x += (xTo - x) / CAMERA_FOLLOW_SMOOTHING;
+y += (yTo - y) / CAMERA_FOLLOW_SMOOTHING;
 
 
 x = clamp(x, viewWHalf, room_width-viewWHalf);

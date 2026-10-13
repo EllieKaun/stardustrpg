@@ -71,9 +71,9 @@ function questRegisterAll() {
     questRegister({
         id: QuestId.Fox,
         objectives: [
-            { type: QuestObjectiveType.Collect, key: QuestFoxItem.PineCone, count: FOX_PINE_CONES_NEEDED, sprite: "PineConeIcon" },
-            { type: QuestObjectiveType.Collect, key: QuestFoxItem.Petunia,  count: FOX_PETUNIAS_NEEDED,  sprite: "PetuniaIcon" },
-            { type: QuestObjectiveType.Collect, key: QuestFoxItem.Cauldron, count: FOX_CAULDRONS_NEEDED,  sprite: "CauldronIcon" }
+            { type: QuestObjectiveType.Collect, key: QuestFoxItem.PineCone, count: FOX_PINE_CONES_NEEDED, sprite: "sprBigPineCone" },
+            { type: QuestObjectiveType.Collect, key: QuestFoxItem.Petunia,  count: FOX_PETUNIAS_NEEDED,  sprite: "sprBigNightPetunia" },
+            { type: QuestObjectiveType.Collect, key: QuestFoxItem.Cauldron, count: FOX_CAULDRONS_NEEDED,  sprite: "sprBigPot" }
         ],
         readyHint: "ui.returnToFox",
         onAccept: function() {
@@ -237,7 +237,7 @@ function spearBattleBonus() {
 }
 
 function cauldronSprite() {
-    var sprite = asset_get_index("sprCauldronSmall")
+    var sprite = asset_get_index("sprPot")
     return sprite_exists(sprite) ? sprite : noone
 }
 

@@ -35,7 +35,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"sprDayPetunia",
+    "path":"sprites/sprDayPetunia/sprDayPetunia.yy",
+  },
   "spriteMaskId":null,
   "visible":true,
 }

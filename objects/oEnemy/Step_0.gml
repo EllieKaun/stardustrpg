@@ -92,8 +92,6 @@ if (place_meeting(x, y, leader)) {
         global.returningFromBattle = true
         global.battleNoFlee = false
         global.battleEnemyFirst = false // обычная встреча — первыми ходят герои
-        // Носитель остаётся на карте, если от него убежали или проиграли.
-        // Флаг сбросит кража (onSteal) или удаление носителя (Destroy)
         if (carriedItem != noone && carryItemDef(carriedItem).battleNoFlee) { global.battleNoFlee = true }
         global.battleIsIgnited = isIgnited // ignite-враг делает весь бой ignite
         global.battleSection = spawnSection

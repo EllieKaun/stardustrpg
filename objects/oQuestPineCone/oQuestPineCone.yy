@@ -32,7 +32,13 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
-  "spriteMaskId":null,
+  "spriteId":{
+    "name":"sprPineCone",
+    "path":"sprites/sprPineCone/sprPineCone.yy",
+  },
+  "spriteMaskId":{
+    "name":"sprPineCone",
+    "path":"sprites/sprPineCone/sprPineCone.yy",
+  },
   "visible":true,
 }
