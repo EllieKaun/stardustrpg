@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrLocalization",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/BattleDomain/Scripts.yy",
+    "name":"Locales",
+    "path":"folders/Locales.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
