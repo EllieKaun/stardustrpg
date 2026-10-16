@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrLocaleEn",
   "parent":{
-    "name":"Data",
-    "path":"folders/Data.yy",
+    "name":"Locales",
+    "path":"folders/Locales.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

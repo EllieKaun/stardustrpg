@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrQuests",
   "parent":{
-    "name":"Data",
-    "path":"folders/Data.yy",
+    "name":"Quests",
+    "path":"folders/Quests.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

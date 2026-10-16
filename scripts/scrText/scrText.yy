@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrText",
   "parent":{
-    "name":"Data",
-    "path":"folders/Data.yy",
+    "name":"CommonUI",
+    "path":"folders/CommonUI.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -10,8 +10,8 @@
   "name":"oDamageNumber",
   "overriddenProperties":[],
   "parent":{
-    "name":"Objects",
-    "path":"folders/BattleDomain/Objects.yy",
+    "name":"CommonUI",
+    "path":"folders/CommonUI.yy",
   },
   "parentObjectId":null,
   "persistent":false,

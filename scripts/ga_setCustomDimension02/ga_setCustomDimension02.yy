@@ -6,7 +6,7 @@
   "name":"ga_setCustomDimension02",
   "parent":{
     "name":"ScriptsAnalytics",
-    "path":"folders/ScriptsAnalytics.yy",
+    "path":"folders/Objects/ScriptsAnalytics.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

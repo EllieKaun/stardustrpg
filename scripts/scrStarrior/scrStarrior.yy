@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrStarrior",
   "parent":{
-    "name":"Data",
-    "path":"folders/Data.yy",
+    "name":"Starriors",
+    "path":"folders/BattleDomain/Scripts/Starriors.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
