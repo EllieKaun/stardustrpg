@@ -155,15 +155,44 @@ function initEffectRegistry() {
         }
     })
     
-    variable_struct_set(effectsRepository, "DiscardRandomCard", { 
+    variable_struct_set(effectsRepository, "DiscardRandomCard", {
         onPlay: function(effect, caster, targets) {
             var hand = caster.getCardsInHand()
             if (array_length(hand) == 0) { return }
-                
+
             var lost = hand[irandom(array_length(hand) - 1)]
             removeCardFromHand(caster, lost)
         }
     })
+
+    // Провокация
+    variable_struct_set(effectsRepository, "Provoke", {
+        onEndOfTurn: function(effect, character) { ingredientAddRandom(character) },
+    })
+
+    // Формы колбы
+    variable_struct_set(effectsRepository, "BonusHp", {
+        onInstant: function(effect, caster, targets) {
+            if (is_array(targets)) {
+                for (var i = 0; i < array_length(targets); i++) { targets[i].applyBonusHp(effect.value) }
+            } else { targets.applyBonusHp(effect.value) }
+        },
+    })
+    variable_struct_set(effectsRepository, "ExtendNegative", {
+        onInstant: function(effect, caster, targets) {
+            if (is_array(targets)) {
+                for (var i = 0; i < array_length(targets); i++) { extendNegativeEffects(targets[i], effect.value) }
+            } else { extendNegativeEffects(targets, effect.value) }
+        },
+    })
+    variable_struct_set(effectsRepository, "RemoveNegative", {
+        onInstant: function(effect, caster, targets) {
+            if (is_array(targets)) {
+                for (var i = 0; i < array_length(targets); i++) { removeOneNegativeEffect(targets[i]) }
+            } else { removeOneNegativeEffect(targets) }
+        },
+    })
+
     global.effectRegistry = effectsRepository
 }
 
@@ -195,8 +224,12 @@ function effectKindFromType(type) {
         case EffectTypes.CreateTemporaryWeakness: return "CreateTemporaryWeakness"
         case EffectTypes.CreatePuppet: return "CreatePuppet"
         case EffectTypes.Deflect: return "Deflect"
-        case EffectTypes.DrawCard: return "DrawCard" 
+        case EffectTypes.DrawCard: return "DrawCard"
         case EffectTypes.GainIngredient: return "GainIngredient"
+        case EffectTypes.Provoke: return "Provoke"
+        case EffectTypes.BonusHp: return "BonusHp"
+        case EffectTypes.ExtendNegative: return "ExtendNegative"
+        case EffectTypes.RemoveNegative: return "RemoveNegative"
         default: return undefined
     }
 }
@@ -480,9 +513,26 @@ function DiscardRandomCardEffect() {
 
 // Лесные карты
 function GainIngredientEffect(count = 1) {
-    return { type: EffectTypes.GainIngredient, 
-        value: count, 
+    return { type: EffectTypes.GainIngredient,
+        value: count,
         timing: Timing.OnActions }
+}
+
+// Провокация
+function ProvokeEffect(duration) {
+    return { type: EffectTypes.Provoke, statusName: StatusNames.Provoke,
+             duration: duration, timing: Timing.EndOfTurn, sprite: buffEffect }
+}
+
+// Формы колбы
+function BonusHpEffect(value) {
+    return { type: EffectTypes.BonusHp, value: value, timing: Timing.Instant, sprite: buffEffect }
+}
+function ExtendNegativeEffect(turns) {
+    return { type: EffectTypes.ExtendNegative, value: turns, timing: Timing.Instant, sprite: debuffEffect }
+}
+function RemoveNegativeEffect() {
+    return { type: EffectTypes.RemoveNegative, timing: Timing.Instant, sprite: hphealEffect }
 }
 
 
@@ -498,6 +548,8 @@ function effectStatusKey(effect) {
         case StatusNames.Vampirism: return "Vampirism"
         case StatusNames.Weakening: return "Weakening"
         case StatusNames.Deflect: return "Deflect"
+        case StatusNames.Poison: return "Poison"
+        case StatusNames.Provoke: return "Provoke"
     }
     return ""
 }

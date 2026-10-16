@@ -391,6 +391,41 @@ function drawPartyPanelBody(panelX, panelY, panelWidth, panelHeight, panelScale,
             draw_set_color(c_white)
         }
     }
+
+    // оверхелз
+    if (variable_instance_exists(member, "bonusHp") && member.bonusHp > 0 && member.maxHp > 0) {
+        var shieldFrac = clamp(member.bonusHp / member.maxHp, 0, 1)
+        draw_set_color(c_aqua)
+        draw_rectangle(barX, barY - 3 * panelScale, barX + barWidth * shieldFrac, barY - 1 * panelScale, false)
+        draw_set_color(c_white)
+    }
+
+    // ингредиенты
+    if (variable_instance_exists(member, "ingredients") && array_length(member.ingredients) > 0) {
+        var ingredientCount = array_length(member.ingredients)
+        var ingSlot = barHeight * 0.85
+        var ingGap = 3 * panelScale
+        var ingY = barY + barHeight + 2 * panelScale
+        for (var ingIndex = 0; ingIndex < INGREDIENT_MAX; ingIndex++) {
+            var ingX = barX + ingIndex * (ingSlot + ingGap)
+            var hasIngredient = (ingIndex < ingredientCount)
+            var isTop = (ingIndex == ingredientCount - 1)
+            if (hasIngredient) {
+                var panelIngIcon = ingredientIcon(member.ingredients[ingIndex])
+                if (panelIngIcon != noone) { draw_sprite_stretched(panelIngIcon, 0, ingX, ingY, ingSlot, ingSlot) }
+                if (isTop) {
+                    draw_set_color(c_yellow)
+                    draw_rectangle(ingX, ingY, ingX + ingSlot - 1, ingY + ingSlot - 1, true)
+                    draw_set_color(c_white)
+                }
+            } else {
+                draw_set_alpha(0.4)
+                draw_set_color(c_white)
+                draw_rectangle(ingX, ingY, ingX + ingSlot - 1, ingY + ingSlot - 1, true)
+                draw_set_alpha(1)
+            }
+        }
+    }
 }
 
 // Значок над головой персонажа когда есть квест (в draw end)

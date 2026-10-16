@@ -47,16 +47,37 @@ function ingredientFitsCard(ingredient, card) {
         }
         if (ingredient == Ingredient.Leaf) {
             if (variable_struct_exists(effect, "chance")) { return true }
-                
-            if (effect.type == EffectTypes.Debuff 
+
+            if (effect.type == EffectTypes.Debuff
                 || effect.type == EffectTypes.Weakening
                 || effect.type == EffectTypes.CreateTemporaryWeakness) {
                     return true
             }
         }
-        return false 
     }
+    return false
 }
 
 
-function refreshDynamicCards(character) { /* заполнится в части 8 */ }
+// Перестроить все динамические карты персонажа под текущие условия
+function refreshDynamicCards(character) {
+    var lists = [ character.getCardsInHand(), character.getOriginalDeck(), character.getShuffeledDeck() ]
+    for (var l = 0; l < array_length(lists); l++) {
+        var cards = lists[l]
+        for (var i = 0; i < array_length(cards); i++) {
+            if (variable_struct_exists(cards[i], "isFlask") && cards[i].isFlask) {
+                flaskRefresh(cards[i], character)
+            }
+        }
+    }
+}
+
+// Иконка ингредиента 
+function ingredientIcon(ingredient) {
+    switch (ingredient) {
+        case Ingredient.Flower: return sFlower
+        case Ingredient.Mushroom: return sMushroom
+        case Ingredient.Leaf: return sLeaf
+    }
+    return noone
+}

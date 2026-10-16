@@ -111,7 +111,11 @@ function cardDisplayName(card) {
 // Описание карты
 function cardDisplayDesc(card) {
     var fallback = (is_struct(card) && variable_struct_exists(card, "description")) ? card.description : ""
-    return cardDescFill(locDef("card.desc." + locKeyForCard(card), fallback), card)
+    var key = "card.desc." + locKeyForCard(card)
+    if (is_struct(card) && variable_struct_exists(card, "isFlask") && card.isFlask) {
+        key = "card.desc.emptyFlask." + flaskFormName(card.flaskForm)
+    }
+    return cardDescFill(locDef(key, fallback), card)
 }
 
 //// Подстановки в описаниях карт

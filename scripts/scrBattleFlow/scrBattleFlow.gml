@@ -90,7 +90,15 @@ function checkIfHasEffectType(character, effectType) {
     return false
 }
 
-// Есть ли на персонаже бафф определенного модификатор 
+// Первый стариор со статусом провокации из выбора
+function provokingFoe(foes) {
+    for (var i = 0; i < array_length(foes); i++) {
+        if (checkIfHasEffectType(foes[i], EffectTypes.Provoke)) { return foes[i] }
+    }
+    return noone
+}
+
+// Есть ли на персонаже бафф определенного модификатор
 function checkIfHasBuff(character, effectType, modifierToBuff) {
     var effects = character.effects 
     for(var i = 0; i < array_length(effects); i++) {
@@ -153,6 +161,8 @@ function enemyPlayableCards(enemy, cards) {
     var playable = []
     for (var i = 0; i < array_length(cards); i++) {
         var card = cards[i]
+        // Лесной набор — только для героев: динамические карты сбивают ИИ
+        if (is_struct(card) && variable_struct_exists(card, "cardSet") && card.cardSet == CardSet.Forest) { continue }
         if (is_struct(card) && variable_struct_exists(card, "cardBaseSpr") && variable_struct_exists(card, "effects")
             && checkIfCanPlayCard(enemy, card)) {
             array_push(playable, card)
@@ -374,7 +384,7 @@ function removeDeadPuppets() {
 
             if (i <= selectedCharacterNumber) { selectedCharacterNumber-- }
 
-            // Даём марионетке растаять, инстанс удалится сам в конце анимации
+            // инстанс удалится в конце анимации
             if (puppet.disappearing) { puppet.destroyWhenGone = true }
             else { instance_destroy(puppet) }
         }

@@ -388,6 +388,24 @@ function initBattleStates() {
             rowY += lineH
             drawUiText(statsX, rowY, loc("battle.energy") + string(selectedTarget.energy) + "/" + string(selectedTarget.maxEnergy), popupTextH)
             rowY += lineH
+            if (variable_instance_exists(selectedTarget, "ingredients") && array_length(selectedTarget.ingredients) > 0) {
+                var ingLabel = loc("battle.ingredients")
+                var ingLblScale = drawUiText(statsX, rowY, ingLabel, popupTextH)
+                var ingIconX = statsX + string_width(ingLabel) * ingLblScale + 6 * scaleToGui
+                var ingIconSize = popupTextH
+                for (var ingIndex = 0; ingIndex < array_length(selectedTarget.ingredients); ingIndex++) {
+                    var ingInfoIcon = ingredientIcon(selectedTarget.ingredients[ingIndex])
+                    if (ingInfoIcon != noone) {
+                        draw_sprite_stretched(ingInfoIcon, 0, ingIconX, rowY, ingIconSize, ingIconSize)
+                        ingIconX += ingIconSize + 3 * scaleToGui
+                    }
+                }
+                rowY += lineH
+            }
+        }
+        if (variable_instance_exists(selectedTarget, "bonusHp") && selectedTarget.bonusHp > 0) {
+            drawUiText(statsX, rowY, loc("battle.bonusHp") + string(selectedTarget.bonusHp), popupTextH)
+            rowY += lineH
         }
 
         var weaknessY = rowY

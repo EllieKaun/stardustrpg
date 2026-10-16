@@ -51,6 +51,12 @@ function playerGrantStarterCards() {
     unlockCard(cardIds.instantHealSingleTarget) // Лана: лечащая
     unlockCard(cardIds.buffPhysicalDamageSingleTarget, CardsRarity.Default, 2) // Лана и Вив усиливающая
 
+    // Лесной набор — по три экземпляра каждой
+    unlockCard(cardIds.forestSupplyBag, CardsRarity.Default, 3)
+    unlockCard(cardIds.forestGather, CardsRarity.Default, 3)
+    unlockCard(cardIds.forestProvoke, CardsRarity.Default, 3)
+    unlockCard(cardIds.forestFlask, CardsRarity.Default, 3)
+
     setDeckSlot(Characters.Lana, 0, cardIds.magicalDamageSingleTarget)
     setDeckSlot(Characters.Lana, 1, cardIds.buffPhysicalDamageSingleTarget)
     setDeckSlot(Characters.Lana, 2, cardIds.instantHealSingleTarget)

@@ -69,7 +69,7 @@ function cardFaceLayout(card, faceW, faceH) {
     if (!variable_global_exists("cardFaceLayouts")) { global.cardFaceLayouts = {} }
 
     var bucketH = max(CARD_FACE_BUCKET_PX, round(faceH / CARD_FACE_BUCKET_PX) * CARD_FACE_BUCKET_PX)
-    var cacheKey = string(card.name) + "|" + string(card.rarity) + "|" + global.language + "|" + string(bucketH) + "|" + string(cardDurationTurns(card))
+    var cacheKey = string(card.name) + "|" + string(card.rarity) + "|" + global.language + "|" + string(bucketH) + "|" + string(cardDurationTurns(card)) + "|" + string(card[$ "flaskForm"])
     if (variable_struct_exists(global.cardFaceLayouts, cacheKey)) { return global.cardFaceLayouts[$ cacheKey] }
 
     var baseW = sprite_get_width(card.cardBaseSpr)

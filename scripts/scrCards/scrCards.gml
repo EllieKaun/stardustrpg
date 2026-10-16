@@ -41,6 +41,7 @@ function Card(name,
     self.cardSet = cardSet
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana
     self.spendsAllEnergy = false
+    self.isFlask = false
     self.cardTokenSpr = (self.costTypeCached == CostType.Health) ? hpCostToken : mpCostToken
     // Рамка по редкости
     self.cardBorderSpr = cardBorderForRarity(rarity)
@@ -226,14 +227,17 @@ function cardPlaySequence(card, caster, targets) {
             with (Battle) {
                 global.suppressEffectVisual = true
                 var effects = ctx.card.effects
-                
-                //// выбор ингредиента для лесного набора если подходит карте
-                var topIngredient = ingredientPeek(ctx.caster)
-                if (topIngredient != undefined 
-                    && ingredientFitsCard(topIngredient)) {
-                    ctx.caster.activeIngredient = ingredientTake(ctx.caster)    
+
+                //// Расход ингредиентов
+                if (ctx.card.isFlask) {
+                    ingredientTakeAll(ctx.caster)
+                } else {
+                    var topIngredient = ingredientPeek(ctx.caster)
+                    if (topIngredient != undefined && ingredientFitsCard(topIngredient, ctx.card)) {
+                        ctx.caster.activeIngredient = ingredientTake(ctx.caster)
+                    }
                 }
-                
+
                 for (var effectIndex = 0; 
                     effectIndex < array_length(effects); 
                     effectIndex++) {

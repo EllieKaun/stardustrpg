@@ -43,7 +43,11 @@ enum EffectTypes {
     Deflect,
     DrawCard,
     GainIngredient,
-    DiscardRandomCard
+    DiscardRandomCard,
+    Provoke,
+    BonusHp,
+    ExtendNegative,
+    RemoveNegative
 }
 
 function effectTypeToString(type) {
@@ -78,7 +82,8 @@ enum StatusNames {
     Vampirism,
     Weakening,
     Deflect,
-    Poison
+    Poison,
+    Provoke
 }
 
 enum ModifiersToBuff {
@@ -237,4 +242,7 @@ enum HandScaling {
 enum Ingredient {
 	Flower, Mushroom, Leaf
 }
+
+// Комбинации ингредиентов для пустой колбы в зависимости от запаса ингредиентов
+enum FlaskForm { Empty, Flower, Mushroom, Leaf, FlowerMushroom, FlowerLeaf, MushroomLeaf }
 

@@ -72,7 +72,9 @@ function cardIdsInit() {
         // Лесные
         forestSupplyBag: "forestSupplyBag",
         forestGather: "forestGather",
-        
+        forestProvoke: "forestProvoke",
+        forestFlask: "forestFlask",
+
     }
 }
 
@@ -160,7 +162,13 @@ function cardRegistryInit() {
                  function(rarity) { return createForestSupplyBagCard(rarity) }, 
                 CardSet.Forest)
     registerCard(cardIds.forestGather, true, CardCategory.Special,
-                 function(rarity) { return createForestGatherCard(rarity) }, 
+                 function(rarity) { return createForestGatherCard(rarity) },
+                CardSet.Forest)
+    registerCard(cardIds.forestProvoke, true, CardCategory.Buff,
+                 function(rarity) { return createForestProvokeCard(rarity) },
+                CardSet.Forest)
+    registerCard(cardIds.forestFlask, true, CardCategory.Special,
+                 function(rarity) { return createForestFlaskCard(rarity) },
                 CardSet.Forest)
 }
 

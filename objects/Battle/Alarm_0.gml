@@ -84,14 +84,14 @@ if (cardToPlay == noone && buffChoice != noone && irandom(1) == 0) {
 
 // Атакуем
 if (cardToPlay == noone && attackChoice != noone) {
-    target = enemyResolveTarget(attackChoice, currentEnemy, aliveHeroes, aliveEnemies, noone, noone)
+    target = enemyResolveTarget(attackChoice, currentEnemy, aliveHeroes, aliveEnemies, noone, provokingFoe(aliveHeroes))
     if (target != noone) { cardToPlay = attackChoice }
 }
 
 // Если ничего не выполнилось, случайная карта из руки
 if (cardToPlay == noone) {
     cardToPlay = cards[irandom(array_length(cards) - 1)]
-    target = enemyResolveTarget(cardToPlay, currentEnemy, aliveHeroes, aliveEnemies, woundedAlly, noone)
+    target = enemyResolveTarget(cardToPlay, currentEnemy, aliveHeroes, aliveEnemies, woundedAlly, provokingFoe(aliveHeroes))
     if (target == noone) {
         skipTurn()
         return

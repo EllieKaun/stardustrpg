@@ -12,6 +12,7 @@ function shuffleDeckAndTake4(character) {
     var top4Cards = take4CardsFromDeckTop(shuffeledDeck, [])
     character.deck.shuffeledDeck = shuffeledDeck
     character.deck.cardsInHand = top4Cards
+    refreshDynamicCards(character) // обновление колб
 }
 
 function take4CardsFromDeckTop(shuffledDeck, cardsInHand) {

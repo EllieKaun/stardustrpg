@@ -113,3 +113,47 @@ if (iconCount > 0) {
         draw_sprite_stretched(statusIcons[i], 0, iconX, rowY, iconSize, iconSize)
     }
 }
+
+// Игредиенты персонажа
+var ingredientCount = array_length(ingredients)
+if (ingredientCount > 0) {
+    var slotSize = 12
+    var slotGap = 2
+    var barTopIng = bbox_top
+    if (showHealthBar) { barTopIng = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6) }
+    var ingRowY = barTopIng - slotSize - 2
+    if (iconCount > 0) { ingRowY -= (12 + 2) } // над строкой статусов
+
+    for (var ii = 0; ii < INGREDIENT_MAX; ii++) {
+        var hasIngredient = (ii < ingredientCount)
+        var isTop = (ii == ingredientCount - 1)
+        var slotDrawSize = isTop ? (slotSize + 3) : slotSize
+        var slotX = bbox_left + ii * (slotSize + slotGap)
+        var slotY = ingRowY - (slotDrawSize - slotSize)
+        if (hasIngredient) {
+            var ingIcon = ingredientIcon(ingredients[ii])
+            if (ingIcon != noone) { draw_sprite_stretched(ingIcon, 0, slotX, slotY, slotDrawSize, slotDrawSize) }
+            if (isTop) {
+                draw_set_color(c_yellow)
+                draw_rectangle(slotX, slotY, slotX + slotDrawSize - 1, slotY + slotDrawSize - 1, true)
+                draw_set_color(c_white)
+            }
+        } else {
+            draw_set_alpha(0.4)
+            draw_set_color(c_white)
+            draw_rectangle(slotX, slotY, slotX + slotDrawSize - 1, slotY + slotDrawSize - 1, true)
+            draw_set_alpha(1)
+        }
+    }
+}
+
+// Избыточное здоровье
+if (showHealthBar && !isKO() && bonusHp > 0) {
+    var shieldFrac = clamp(bonusHp / maxHp, 0, 1)
+    var shieldBarX = bbox_left
+    var shieldBarW = bbox_right - bbox_left
+    var shieldBarY = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6)
+    draw_set_color(c_aqua)
+    draw_rectangle(shieldBarX, shieldBarY - 3, shieldBarX + shieldBarW * shieldFrac, shieldBarY - 1, false)
+    draw_set_color(c_white)
+}

@@ -164,20 +164,20 @@ function executeDamageEffect(
     
     //// Чистый урон
     if (damageType == DamageTypes.True) {
-        var trueDamamge = is_method(effect.value) ? effect.value() : effect.value 
-        if (is_array(targets)) { 
+        var trueDamamge = is_method(effect.value) ? effect.value() : effect.value
+        if (is_array(targets)) {
             for (var i = 0; i < array_length(targets); i++) {
                 if (!targets[i].isKO()) {
-                    targets[i].applyDamage(pure)
+                    targets[i].applyDamage(trueDamamge)
                     targets[i].showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
                 }
             }
         } else if (!targets.isKO()) {
-            targets.applyDamage(pure)
+            targets.applyDamage(trueDamamge)
             targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
         }
         return
-    } 
+    }
     
     ///// Физический магический урон
     var cardMultiplier = is_method(effect.value) ? effect.value() : effect.value
@@ -218,6 +218,13 @@ function executeDamageEffect(
     show_debug_message("damage " + string(damage) )
     targets.applyDamage(damage)
     targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
+    // Колба цветок + гриб
+    if (variable_struct_exists(effect, "lifesteal")) {
+        var stolen  = round(damage * effect.lifesteal)
+        var missing = caster.maxHp - caster.hp
+        caster.applyHeal(min(stolen, missing))
+        if (stolen > missing) { caster.applyBonusHp(stolen - missing) }
+    }
     if variable_instance_exists(effect, "chance")
        && variable_instance_exists(effect, "statusName") {
         var prob = random(1)
