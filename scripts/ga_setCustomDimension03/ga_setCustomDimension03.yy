@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"ga_setCustomDimension03",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"ScriptsAnalytics",
+    "path":"folders/ScriptsAnalytics.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -97,7 +97,7 @@
     {"$GMFolder":"","%Name":"Quests","folderPath":"folders/Quests.yy","name":"Quests","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"FoxQuest","folderPath":"folders/Quests/FoxQuest.yy","name":"FoxQuest","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Quests/FoxQuest/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
-    {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"ScriptsAnalytics","folderPath":"folders/ScriptsAnalytics.yy","name":"ScriptsAnalytics","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Shop","folderPath":"folders/Shop.yy","name":"Shop","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Shop/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Shop/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},

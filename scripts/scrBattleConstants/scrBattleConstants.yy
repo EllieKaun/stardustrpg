@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrBattleConstants",
   "parent":{
-    "name":"Data",
-    "path":"folders/Data.yy",
+    "name":"BattleLogic",
+    "path":"folders/BattleDomain/Scripts/BattleLogic.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

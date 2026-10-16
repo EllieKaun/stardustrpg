@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrCardRender",
   "parent":{
-    "name":"Data",
-    "path":"folders/Data.yy",
+    "name":"Drawing",
+    "path":"folders/BattleDomain/Scripts/Drawing.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
