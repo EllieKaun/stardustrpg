@@ -102,15 +102,25 @@ function createStealCard(rarity = CardsRarity.Default) {
     )
 }
 
+function puppetBaseByCategory(category) {
+    switch (category) {
+        case CardCategory.Attack: return atcCard
+        case CardCategory.Magic:  return mgcCard
+        case CardCategory.Heal:   return healCard
+        case CardCategory.Buff:   return buffCard
+        default: return mgcCard
+    }
+}
+
 // Создать марионетку базовый метод
 function createSummonPuppetCard(category, name, sprite) {
     return new Card(
         name, CardsRarity.Default,
-        TargetTypes.Self, 
+        TargetTypes.Self,
         StarriorStates.Cast,
         1,
         [ CreatePuppetEffect(category) ],
-        mgcCard,
+        puppetBaseByCategory(category),
         sprite,
         commonBorder,
         hpCostToken,

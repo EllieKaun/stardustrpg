@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrTutorial",
   "parent":{
-    "name":"BattleLogic",
-    "path":"folders/BattleDomain/Scripts/BattleLogic.yy",
+    "name":"Tutorial",
+    "path":"folders/Tutorial.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
