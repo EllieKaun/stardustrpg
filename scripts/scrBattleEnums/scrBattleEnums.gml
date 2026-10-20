@@ -246,3 +246,5 @@ enum Ingredient {
 // Комбинации ингредиентов для пустой колбы в зависимости от запаса ингредиентов
 enum FlaskForm { Empty, Flower, Mushroom, Leaf, FlowerMushroom, FlowerLeaf, MushroomLeaf }
 
+// Виды чармов
+enum HandCharmKind { StatBonus }

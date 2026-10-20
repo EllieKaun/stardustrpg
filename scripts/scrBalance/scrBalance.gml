@@ -72,6 +72,7 @@ function cardBalance() {
         overtimeMana: [6, 8, 12, 16],
         overtimeManaDur: [2, 2, 3, 3],
         buff: [2, 4, 6, 8],
+        handCharmStat: [1, 2, 3, 4],
         damageMulSingle: [1, 2, 3, 4],
         damageMulGroup: [1, 1, 2, 3],
         forestBagIngredients: [1, 1, 2, 2], // Сумка: сколько ингредиентов
@@ -292,6 +293,7 @@ function zoneContent(zoneId = undefined) {
                     cardIds.buffMagicalDamageSingleTarget, // усиление маг урона
                     cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
                     cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
+                    cardIds.handCharmStrength, // пассивный чарм силы
                     cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
                     cardIds.magicalDamageSingleTarget // атака звёздной энергией
                 ],

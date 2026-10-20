@@ -535,6 +535,10 @@ function RemoveNegativeEffect() {
     return { type: EffectTypes.RemoveNegative, timing: Timing.Instant, sprite: hphealEffect }
 }
 
+// Чарм
+function HandAuraStatBonus(modifier, value) {
+    return { kind: HandCharmKind.StatBonus, modifier: modifier, value: value }
+}
 
 function effectStatusKey(effect) {
     if (!variable_instance_exists(effect, "statusName")) { return "" }

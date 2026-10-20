@@ -237,3 +237,21 @@ function createCardDamageDeflectStatus(rarity = CardsRarity.Default) {
         undefined
     )
 }
+
+function createHandCharmStrengthCard(rarity = CardsRarity.Default) {
+    var card = new Card(
+        "Hand Charm Strength",
+        rarity,
+        TargetTypes.Self,
+        StarriorStates.Cast,
+        1,
+        [ BuffEffect(ModifiersToBuff.PhysicalDamage, getBuffValueOnRarity(rarity) * 2, 2) ],
+        buffCard,
+        strBuff,
+        commonBorder,
+        mpCostToken,
+        "while in hand: +strength; play: big strength buff"
+    )
+    card.handCharms = [ HandAuraStatBonus(ModifiersToBuff.PhysicalDamage, cardBalance().handCharmStat[rarity]) ]
+    return card
+}

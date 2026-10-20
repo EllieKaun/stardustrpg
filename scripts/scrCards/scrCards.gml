@@ -49,6 +49,7 @@ function Card(name,
     if (self.costTypeCached == CostType.Mana) { self.costValueCached *= CARD_MANA_COST_MULTIPLIER }
     self.costType  = function() { return self.costTypeCached }
     self.costValue = function() { return self.costValueCached }
+    self.handCharms = []
 }
 
 // Рамка карты по редкости
@@ -309,3 +310,43 @@ function executeEndOfTurn(character) {
     }
 }
 
+// Бонсы от ауры
+function handAuraBonus(character, modifier) {
+    if (!instance_exists(character)) { return 0 }
+        
+    if (character.isKO()) { return 0 }
+        
+    var total = 0 
+    var hand = character.getCardsInHand()
+    for(var cardIndex = 0; cardIndex < array_length(hand); cardIndex++) {
+        var charms = hand[cardIndex].handCharms
+        for(var charmIndex = 0; charmIndex < array_length(charms); charmIndex++) {
+            var charm = charms[charmIndex]
+            if (charm.kind != HandCharmKind.StatBonus) {
+                continue
+            }
+            if (handCharmMatches(charm.modifier, modifier)) {
+                total += charm.value
+            }
+        }
+        
+    }
+    return total
+}
+
+
+// Подходит ли чарм под характеристику
+function handCharmMatches(charmModifier, wantedModifier) {
+    if (charmModifier == wantedModifier) { return true }
+    if (charmModifier == ModifiersToBuff.AnyDamage 
+        && (wantedModifier == ModifiersToBuff.PhysicalDamage 
+        || wantedModifier == ModifiersToBuff.MagicalDamage)) { 
+            return true 
+    }
+    if (charmModifier == ModifiersToBuff.AnyProtection 
+        && (wantedModifier == ModifiersToBuff.PhysicalProtection || 
+            wantedModifier == ModifiersToBuff.MagicalProtection)) { 
+            return true
+    }
+    return false
+}

@@ -196,6 +196,8 @@ function executeDamageEffect(
     var attackDebuff = checkIfHasBuff(caster, EffectTypes.Debuff, attackModifier)
     if (attackBuff != undefined && is_real(attackBuff.value)) { casterStat += attackBuff.value }
     if (attackDebuff != undefined && is_real(attackDebuff.value)) { casterStat -= attackDebuff.value }
+        
+    casterStat += handAuraBonus(caster, attackModifier)
     if (!is_real(casterStat)) { casterStat = 0 }
     casterStat = max(casterStat, 0)
 
@@ -322,7 +324,8 @@ function mitigateDamage(target, effect, rawDamage) {
     var protectionBuff = checkIfHasBuff(target, EffectTypes.Buff, protectionModifier)
     var protectionDebuff = checkIfHasBuff(target, EffectTypes.Debuff, protectionModifier)
     if (protectionBuff != undefined && is_real(protectionBuff.value)) { defense += protectionBuff.value }
-    if (protectionDebuff != undefined && is_real(protectionDebuff.value)) { defense -= protectionDebuff.value }
+    if (protectionDebuff != undefined && is_real(protectionDebuff.value)) { defense -= protectionDebuff.value } 
+    defense += handAuraBonus(target, protectionModifier)
     if (!is_real(defense)) { defense = 0 }
     damage -= max(defense, 0)
 

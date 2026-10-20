@@ -61,7 +61,8 @@ function cardIdsInit() {
         removeBleeding: "removeBleeding",
         removeStun: "removeStun",
         resurrection: "resurrection",
-        
+        handCharmStrength: "handCharmStrength",
+
         // Куклы
         summonAttackPuppet: "summonAttackPuppet",
         summonMagicPuppet: "summonMagicPuppet",
@@ -156,6 +157,7 @@ function cardRegistryInit() {
     registerCard(cardIds.ignoreWeaknessSingleTarget, true, CardCategory.Special, function(rarity) { return createCardIgnoreWeaknessSingleTarget(rarity) })
     registerCard(cardIds.stealCard, false, CardCategory.Special, function(rarity) { return createStealCard(rarity) })
     registerCard(cardIds.drawCard, false, CardCategory.Special, function(rarity) { return createDrawCardCard(rarity) })
+    registerCard(cardIds.handCharmStrength, true, CardCategory.Special, function(rarity) { return createHandCharmStrengthCard(rarity) })
     
     // Лесные
     registerCard(cardIds.forestSupplyBag, true, CardCategory.Special,
