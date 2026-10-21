@@ -18,7 +18,7 @@
 
 // Награды
 #macro REWARD_DUPLICATE_FALLOFF 0.5 // падение шанса выпадения дубликата карты как награды
-#macro REWARD_DEFAULT_RARITY_ONLY true // в наградах только обычная редкость
+#macro REWARD_DEFAULT_RARITY_ONLY true
 
 // Сложность врагов
 #macro ENEMY_WIN_BONUS 2 // рост силы врагов
@@ -29,27 +29,28 @@
 #macro WEAKNESS_DAMAGE_MODIFIER 0.1
 #macro WEAKNESS_STATUS_CHANCE_BONUS 0.1
 
-#macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману
+#macro CARD_MANA_COST_MULTIPLIER 2
 
 // Константы светлячков
-#macro CAMERA_FOLLOW_SMOOTHING 6 // плавность камеры: 1 - жёстко за героем, больше - мягче и с большим отставанием (было 15)
-#macro HERO_TORCH_RADIUS 36 // радиус света вокруг выделенного героя ночью
-#macro HERO_TORCH_INTENSITY 0.7 // яркость света героя (0..1)
+#macro CAMERA_FOLLOW_SMOOTHING 6
+#macro HERO_TORCH_RADIUS 36
+#macro HERO_TORCH_INTENSITY 0.7
 #macro FIREFLY_MAX 12 // максимальное количество светлячков
 #macro FIREFLY_SPAWN_INTERVAL 20 // кадров между попытками спавна
 #macro FIREFLY_SPEED 0.15 // скорость 
 #macro FIREFLY_PATROL_RANGE 20 // как далеко улетает от точки появления
-#macro FIREFLY_LIGHT_RADIUS 8 // радиус пятна света
-#macro FIREFLY_MIN_SPACING 64 // минимальное расстояние между светлячками при появлении
-#macro FIREFLY_WOBBLE_RANGE 3 // размах виляния в пикселях
-#macro FIREFLY_WOBBLE_SPEED 1.6 // скорость виляния
+#macro FIREFLY_LIGHT_RADIUS 4 // радиус пятна света
+#macro FIREFLY_MIN_SPACING 64
+#macro FIREFLY_WOBBLE_RANGE 3
+#macro FIREFLY_WOBBLE_SPEED 1.6
 #macro FIREFLY_FADE_SPEED 0.04 // скорость разгорания и угасания
-#macro FIREFLY_SPAWN_DISTANCE 240 // светлячки появляются не дальше этого расстояния от героя
-#macro FIREFLY_DESPAWN_DISTANCE 300 // дальше этого расстояния от героя светлячок гаснет
+#macro FIREFLY_SPAWN_DISTANCE 240
+#macro FIREFLY_DESPAWN_DISTANCE 300
 
 // Скейл карт от руки
 #macro HAND_SCALING_STEP 2
 #macro MAX_CARDS_IN_HAND 8
+#macro FOREST_RANDOM_POTION_CARDS 3
 #macro CARDS_DRAW_COUNT 4
 
 // Максимальное количество игредиентов в лесном наборе
@@ -109,13 +110,11 @@ function difficultyLevel(encounter = undefined) {
     return getWins() + bonus
 }
 
-// Вернуть спрайт по имени ассета
 function affixSpriteSlot(assetName) {
     var asset = asset_get_index(assetName)
     return (asset >= 0 && sprite_exists(asset)) ? asset : undefined
 }
 
-// Собрать набор анимаций из имён ассетов
 function affixSpriteSet(idle, attack, cast, spell, dance, ko) {
     var set = {}
     var value
@@ -151,7 +150,6 @@ function affixSpriteSet(idle, attack, cast, spell, dance, ko) {
     return set
 }
 
-// Игнайт-спрайты под конкретный вид врага
 function igniteSpritesForKind(kind) {
     switch (kind) {
         case EnemyKind.CrackerNut:
@@ -281,7 +279,6 @@ function zoneContent(zoneId = undefined) {
                 ]
             }
             return {
-                // Карты-награды 
                 rewardAlways: [
                     cardIds.physicalDamageSingleTarget, // атака одного врага
                     cardIds.physicalDamageStunChanceSingleTarget, // атака с шансом оглушения
@@ -314,6 +311,13 @@ function zoneContent(zoneId = undefined) {
                     cardIds.summonMagicPuppet,
                     cardIds.summonHealPuppet,
                     cardIds.summonBuffPuppet
+                ],
+                rewardForestSet: [
+                    cardIds.forestSupplyBag,
+                    cardIds.forestGather,
+                    cardIds.forestProvoke,
+                    cardIds.forestFlask,
+                    cardIds.forestRandomPotion // случайное зелье
                 ],
                 // Карты, которые продаются только в магазине
                 shopCards: [

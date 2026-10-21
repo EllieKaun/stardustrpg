@@ -13,7 +13,8 @@ enum ChestState { // Состояние сундука
 enum BattleEntryState { // Виды нимации перед входом в бой
     Idle,
     Intro, // катсцена появления врага
-    Transition // спрайт перехода
+    Transition, // спрайт перехода
+    Leaving
 }
 
 enum DeckTutorialStage { // Стадии прохождения туториала

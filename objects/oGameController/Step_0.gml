@@ -1,11 +1,14 @@
 autosaveUpdate()
-updateTimeOfDay() // продвигаем время суток (день/ночь)
+updateTimeOfDay()
 
 // Анимации входа в бой
+if (battleEntryState == BattleEntryState.Leaving) { exit }
 if (battleEntryState != BattleEntryState.Idle) {
     entryAnimFrame += entryAnimFramesPerStep(entryAnimSprite)
     if (entryAnimFrame >= sprite_get_number(entryAnimSprite)) {
-        if (battleEntryState == BattleEntryState.Intro && sprite_exists(asset_get_index("sprBattleTransition"))) {
+        if (battleEntryState == BattleEntryState.Transition) {
+            goToBattleAfterTransition()
+        } else if (battleStartSprite() != noone) {
             changeBattleEntryState(BattleEntryState.Transition)
         } else {
             startFadeToBattle()

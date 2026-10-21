@@ -43,7 +43,6 @@ function Card(name,
     self.spendsAllEnergy = false
     self.isFlask = false
     self.cardTokenSpr = (self.costTypeCached == CostType.Health) ? hpCostToken : mpCostToken
-    // Рамка по редкости
     self.cardBorderSpr = cardBorderForRarity(rarity)
     self.costValueCached = computeCardCost(rarity, effects)
     if (self.costTypeCached == CostType.Mana) { self.costValueCached *= CARD_MANA_COST_MULTIPLIER }
@@ -52,7 +51,14 @@ function Card(name,
     self.handCharms = []
 }
 
-// Рамка карты по редкости
+function cardSetBackground(card) {
+    var set = variable_struct_exists(card, "cardSet") ? card.cardSet : CardSet.Base
+    switch (set) {
+        case CardSet.Forest: return sprCardBgLeaf
+        default: return sprCardBgStar
+    }
+}
+
 function cardBorderForRarity(rarity) {
     switch (rarity) {
         case CardsRarity.Unusual: return uncommonBorder

@@ -304,7 +304,6 @@ function playerDataResetForTesting() {
     playerDataSave()
 }
 
-// Побеждён ли босс 
 function isBossDefeated() {
     if (!variable_struct_exists(global.playerData, "bossDefeated")) { global.playerData.bossDefeated = false }
     return global.playerData.bossDefeated

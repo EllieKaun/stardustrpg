@@ -26,7 +26,6 @@ function uiFont() {
     return global.uiFontCurrent
 }
 
-// Подбирает шрифт под высоту targetH и ширину maxW
 function uiTextScale(text, targetH, maxW) {
     if (!variable_global_exists("uiFontLadder")) { uiFontInit() }
     var ladder = global.uiFontLadder
@@ -45,7 +44,6 @@ function uiTextScale(text, targetH, maxW) {
         return textScale
     }
 
-    // пока текст не влезет по ширине без масштабирования
     while (pickIndex > 0) {
         draw_set_font(ladder[pickIndex].font)
         if (string_width(text) <= maxW) { break }
@@ -55,7 +53,7 @@ function uiTextScale(text, targetH, maxW) {
     global.uiFontCurrent = pick.font
     draw_set_font(pick.font)
     var overflowWidth = string_width(text)
-    if (overflowWidth > maxW) { return maxW / max(1, overflowWidth) } // не влез даже самый мелкий
+    if (overflowWidth > maxW) { return maxW / max(1, overflowWidth) }
     return 1
 }
 
@@ -95,8 +93,8 @@ function fitWrappedText(text, areaW, areaH) {
     if (!variable_global_exists("uiFontLadder")) { uiFontInit() }
     var ladder = global.uiFontLadder
     var prevFont = draw_get_font()
-    var best = undefined // лучший без масштабирования
-    var fallback = undefined // запасной с ужатием
+    var best = undefined
+    var fallback = undefined
     var fallbackSize = -1
     for (var index = 0; index < array_length(ladder); index++) {
         draw_set_font(ladder[index].font)

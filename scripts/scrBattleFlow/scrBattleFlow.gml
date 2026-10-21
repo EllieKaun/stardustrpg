@@ -36,9 +36,6 @@ function afterPlayChecks() {
 // Отложенный конец боя
 function battleEndDelayed(outcome) {
     var runner = new SequenceRunner()
-    // outcome передаём через ctx: шаг выполняется позже, когда параметр функции
-    // уже недоступен (замыкание его не держит). ctx.outcome читаем в локальную
-    // до with — внутри with (Battle) голое имя искалось бы как поле Battle
     runner.play([
         stepWait(BATTLE_END_FRAMES),
         stepDo(function(ctx) {
@@ -263,7 +260,6 @@ function battleFleePenalty() {
     return min(getGold(), round(GOLD_RUN_PENALTY * fleeMult))
 }
 
-// Побег после подтверждения
 function confirmBattleFlee() {
     analyticsRetreat() // аналитика: побег из боя
     addGold(-battleFleePenalty())

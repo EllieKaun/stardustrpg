@@ -41,5 +41,4 @@ if (opts != undefined) {
     exit
 }
 
-// Обычная реплика листается и клавишей, и кликом в любом месте
 if (confirm || mouseClicked) { advance() }

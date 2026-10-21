@@ -124,26 +124,12 @@ if (ingredientCount > 0) {
     var ingRowY = barTopIng - slotSize - 2
     if (iconCount > 0) { ingRowY -= (12 + 2) } // над строкой статусов
 
-    for (var ii = 0; ii < INGREDIENT_MAX; ii++) {
-        var hasIngredient = (ii < ingredientCount)
-        var isTop = (ii == ingredientCount - 1)
-        var slotDrawSize = isTop ? (slotSize + 3) : slotSize
-        var slotX = bbox_left + ii * (slotSize + slotGap)
-        var slotY = ingRowY - (slotDrawSize - slotSize)
-        if (hasIngredient) {
-            var ingIcon = ingredientIcon(ingredients[ii])
-            if (ingIcon != noone) { draw_sprite_stretched(ingIcon, 0, slotX, slotY, slotDrawSize, slotDrawSize) }
-            if (isTop) {
-                draw_set_color(c_yellow)
-                draw_rectangle(slotX, slotY, slotX + slotDrawSize - 1, slotY + slotDrawSize - 1, true)
-                draw_set_color(c_white)
-            }
-        } else {
-            draw_set_alpha(0.4)
-            draw_set_color(c_white)
-            draw_rectangle(slotX, slotY, slotX + slotDrawSize - 1, slotY + slotDrawSize - 1, true)
-            draw_set_alpha(1)
-        }
+    var rowWidth = ingredientCount * slotSize + (ingredientCount - 1) * slotGap
+    var rowStartX = round((bbox_left + bbox_right) * 0.5 - rowWidth * 0.5)
+    for (var ii = 0; ii < ingredientCount; ii++) {
+        var slotX = rowStartX + ii * (slotSize + slotGap)
+        var ingIcon = ingredientIcon(ingredients[ii])
+        if (ingIcon != noone) { draw_sprite_stretched(ingIcon, 0, slotX, ingRowY, slotSize, slotSize) }
     }
 }
 

@@ -295,6 +295,7 @@ function locDefineRu() {
     translations[$ "card.name.forestGather"] = "Сбор припасов"
     translations[$ "card.name.forestProvoke"] = "Зелье провокации"
     translations[$ "card.name.forestFlask"] = "Пустая колба"
+    translations[$ "card.name.forestRandomPotion"] = "Случайное зелье"
 
     translations[$ "card.desc.physicalDamageSingleTarget"] = "наносит небольшой физический урон (одна цель)"
     translations[$ "card.desc.physicalDamageMultipleTarget"] = "наносит небольшой физический урон (группа)"
@@ -363,6 +364,7 @@ function locDefineRu() {
     translations[$ "card.desc.emptyFlask.flowerMushroom"] = "физическая атака с похищением здоровья (излишек — в щит)"
     translations[$ "card.desc.emptyFlask.flowerLeaf"] = "лечит союзника и снимает негативный эффект"
     translations[$ "card.desc.emptyFlask.mushroomLeaf"] = "физическая атака с шансом отравления"
+    translations[$ "card.desc.forestRandomPotion"] = "даёт в руку 3 случайные лечебные карты"
 
     translations[$ "card.desc.physicalDamageHandScalingSingleTarget"] = "наносит небольшой физический урон в зависимсоти от количества карт в руке (одна цель)"
     

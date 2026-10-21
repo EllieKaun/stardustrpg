@@ -1,5 +1,5 @@
 event_inherited()
-carryInventory = [] // босс не носит квестовые предметы
+carryInventory = []
 getEncounter = function() {
     return puppetMasterEncounter()
 }

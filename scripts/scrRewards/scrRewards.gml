@@ -1,4 +1,3 @@
-// Редкости наград
 function rewardRarities(spec) {
     if (REWARD_DEFAULT_RARITY_ONLY) { return [CardsRarity.Default] }
     return spec.rarities

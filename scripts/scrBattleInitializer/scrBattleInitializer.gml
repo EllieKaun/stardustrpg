@@ -1,5 +1,5 @@
 function initBattleStates() {
-    runConfirmCursor = 0 // 0 - остаться, 1 - сбежать
+    runConfirmCursor = 0
     runConfirmHitRects = []
     wantsCancel = method(self, function(input) {
         var cancelClicked = (input.clicked && cancelHitRect != undefined
@@ -270,7 +270,6 @@ function initBattleStates() {
         array_push(menuHitRects, { x: skipX, y: leftY, w: skipSize.w, h: skipSize.h, action: BattleMenuAction.Skip })
     })
 
-    // Окно подтверждения побега
     drawRunConfirm = method(self, function() {
         var screenWidth = display_get_gui_width()
         var screenHeight = display_get_gui_height()

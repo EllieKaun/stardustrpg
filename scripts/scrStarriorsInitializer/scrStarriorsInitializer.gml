@@ -81,12 +81,12 @@ function foxFixedDeck() {
 function createFox(){
     var starrior = createStarrior(
         "Fox",
-        foxBattleSprite("FoxIdle",   SafarIdle),
-        foxBattleSprite("FoxAttack", SafarAttack),
-        foxBattleSprite("FoxSpell",  SafarCast),
-        foxBattleSprite("FoxCast",   SafarCast),
-        foxBattleSprite("FoxKO",     SafarKO),
-        noone,
+        foxBattleSprite("FiraIdle",   SafarIdle),
+        foxBattleSprite("FiraAttack", SafarAttack),
+        foxBattleSprite("FiraSpell",  SafarCast),
+        foxBattleSprite("FiraCast",   SafarCast),
+        foxBattleSprite("FiraKO",     SafarKO),
+        foxBattleSprite("FiraDance",  noone),
         45,
         45,
         50,

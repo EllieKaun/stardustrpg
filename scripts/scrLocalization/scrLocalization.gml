@@ -118,13 +118,6 @@ function cardDisplayDesc(card) {
     return cardDescFill(locDef(key, fallback), card)
 }
 
-//// Подстановки в описаниях карт
-// В тексте описания можно писать метки, они заменяются данными самой карты:
-//   {turns}    - длительность: "1 ход", "2 хода", "5 ходов"   ("... (4 хода)")
-//   {turnsGen} - длительность в родительном падеже: "1 хода", "2 ходов" ("в течение 2 ходов")
-// Число берётся из эффектов карты, поэтому текст не расходится с балансом и редкостью
-
-// Длительность карты: первый её эффект, у которого есть duration. Нет таких - undefined
 function cardDurationTurns(card) {
     if (!is_struct(card) || !variable_struct_exists(card, "effects")) { return undefined }
     var effects = card.effects
@@ -137,7 +130,6 @@ function cardDurationTurns(card) {
     return undefined
 }
 
-// Форма слова для числа: "one" / "few" / "many" по правилам текущего языка
 function locPluralForm(count) {
     if (global.language == "ru") {
         var lastDigit = count mod 10
@@ -149,14 +141,12 @@ function locPluralForm(count) {
     return (count == 1) ? "one" : "many"
 }
 
-// "4 хода" / "4 turns": число и слово из ключей <wordKey>.one / .few / .many
 function locCountPhrase(count, wordKey) {
     return string(count) + " " + loc(wordKey + "." + locPluralForm(count))
 }
 
-// Заменить метки в описании данными карты
 function cardDescFill(text, card) {
-    if (string_pos("{", text) == 0) { return text } // меток нет - быстрый выход
+    if (string_pos("{", text) == 0) { return text }
     var turns = cardDurationTurns(card)
     if (turns == undefined) { return text }
     text = string_replace_all(text, "{turnsGen}", locCountPhrase(turns, "turnsGen"))

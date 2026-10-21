@@ -497,7 +497,6 @@ function Panel(config) constructor {
                             slotRect.sh)
                     }
                     if (slot.card != undefined) {
-                         // Пока карту тащат — исходный слот показываем полупрозрачным
                          var cardAlpha = slot.dragging ? 0.3 : 1
                          drawCard(slot.card,
                             slotRect.sx,

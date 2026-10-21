@@ -1,3 +1,4 @@
-if (foxShowsQuestMarker()) {
-    drawQuestMarker(sprQuestMark, x, bbox_top - 2)
+var marker = foxQuestMarkerSprite()
+if (marker != noone) {
+    drawQuestMarker(marker, x, bbox_top - 2)
 }

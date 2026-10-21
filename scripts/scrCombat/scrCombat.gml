@@ -359,15 +359,6 @@ function handScalingMultiplier(effect, caster) {
     }
 }
 
-// Оверхелз
-function applyBonusHp(value) {
-    var cap = floor(maxHp * BONUS_HP_CAP_FRACTION)
-    bonusHp = min(bonusHp + value, cap)
-    var spawnX = irandom_range(bbox_left, bbox_right)
-    var spawnY = irandom_range(bbox_top, bbox_bottom)
-    drawDamageNumber(spawnX, spawnY, value, c_aqua)  
-}
-
 // Негативный ли эффект
 function effectIsNegative(effect) {
     // дебаффы

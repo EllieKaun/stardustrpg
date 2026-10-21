@@ -155,6 +155,20 @@ function initEffectRegistry() {
         }
     })
     
+    variable_struct_set(effectsRepository, "AddRandomCards", {
+        onPlay: function(effect, caster, targets) {
+            var pool = randomCardPool(effect.cardSet, effect.category)
+            if (array_length(pool) == 0) { return }
+            var hand = caster.getCardsInHand()
+            repeat (effect.value) {
+                if (array_length(hand) >= MAX_CARDS_IN_HAND) { break }
+                var pickedId = pool[irandom(array_length(pool) - 1)]
+                var given = cardBuild(pickedId, effect.rarity)
+                if (given != undefined) { array_push(hand, given) }
+            }
+        }
+    })
+
     variable_struct_set(effectsRepository, "DiscardRandomCard", {
         onPlay: function(effect, caster, targets) {
             var hand = caster.getCardsInHand()
@@ -230,6 +244,8 @@ function effectKindFromType(type) {
         case EffectTypes.BonusHp: return "BonusHp"
         case EffectTypes.ExtendNegative: return "ExtendNegative"
         case EffectTypes.RemoveNegative: return "RemoveNegative"
+        case EffectTypes.DiscardRandomCard: return "DiscardRandomCard"
+        case EffectTypes.AddRandomCards: return "AddRandomCards"
         default: return undefined
     }
 }
@@ -512,6 +528,31 @@ function DiscardRandomCardEffect() {
 }
 
 // Лесные карты
+function AddRandomCardsEffect(count, cardSet, category, rarity = CardsRarity.Default) {
+    return { type: EffectTypes.AddRandomCards, value: count, cardSet: cardSet,
+             category: category, rarity: rarity, timing: Timing.OnActions }
+}
+
+function randomCardPool(cardSet, category) {
+    var shopIds = []
+    var shopCards = zoneContent().shopCards
+    for (var shopIndex = 0; shopIndex < array_length(shopCards); shopIndex++) { array_push(shopIds, shopCards[shopIndex].id) }
+
+    var pool = []
+    var ids = variable_struct_get_names(global.cardRegistry)
+    for (var idIndex = 0; idIndex < array_length(ids); idIndex++) {
+        var cardId = ids[idIndex]
+        var definition = global.cardRegistry[$ cardId]
+        if (definition.category != category) { continue }
+        if (cardSetOf(cardId) != cardSet) { continue }
+        if (array_contains(shopIds, cardId)) { continue }
+        var sample = cardBuild(cardId, CardsRarity.Default)
+        if (sample == undefined || cardSummonsPuppet(sample)) { continue }
+        array_push(pool, cardId)
+    }
+    return pool
+}
+
 function GainIngredientEffect(count = 1) {
     return { type: EffectTypes.GainIngredient,
         value: count,

@@ -28,7 +28,6 @@ switch (state) {
     break
 }
 
-// Полёт 
 var minX = homeX - FIREFLY_PATROL_RANGE
 var maxX = homeX + FIREFLY_PATROL_RANGE
 var minY = homeY - FIREFLY_PATROL_RANGE
@@ -55,7 +54,6 @@ if (patrolAxis == 0) {
     }
 }
 
-// Виляние
 var wobbleTime = current_time / 1000
 var wobbleSide = sin(wobbleTime * FIREFLY_WOBBLE_SPEED + blinkPhase) * FIREFLY_WOBBLE_RANGE
     + sin(wobbleTime * FIREFLY_WOBBLE_SPEED * 2.3 + blinkPhase * 1.7) * FIREFLY_WOBBLE_RANGE * 0.4

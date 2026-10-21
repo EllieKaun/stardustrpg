@@ -163,6 +163,15 @@ function applyHeal(value) {
     drawDamageNumber(spawnX, spawnY, healed, c_green)
 }
 
+// Оверхелз
+function applyBonusHp(value) {
+    var cap = floor(maxHp * BONUS_HP_CAP_FRACTION)
+    bonusHp = min(bonusHp + value, cap)
+    var spawnX = irandom_range(bbox_left, bbox_right)
+    var spawnY = irandom_range(bbox_top, bbox_bottom)
+    drawDamageNumber(spawnX, spawnY, value, c_aqua)
+}
+
 function applyMana(value) {
     var gained = min(value, max(0, maxMana - mana)) // не выше максимума
     mana += gained

@@ -82,17 +82,6 @@ if (worldHudVisible() && array_length(questTrackables) > 0) {
             draw_set_color(c_white)
         }
 
-        // Подсветка собранного предмета
-        if (done) {
-            var doneHalf = iconH * 0.5
-            draw_set_color(c_lime)
-            draw_set_alpha(0.9)
-            draw_rectangle(floor(iconCenterX - doneHalf), floor(iconCenterY - doneHalf),
-                floor(iconCenterX + doneHalf), floor(iconCenterY + doneHalf), true)
-            draw_set_alpha(1)
-            draw_set_color(c_white)
-        }
-
         // Счётчик n/need под иконкой, с тенью, через drawUiText
         var countStr = string(trackable.count) + "/" + string(trackable.needed)
         draw_set_halign(fa_center)
@@ -104,22 +93,6 @@ if (worldHudVisible() && array_length(questTrackables) > 0) {
         draw_set_color(c_white)
         draw_set_halign(fa_left)
         draw_set_valign(fa_top)
-    }
-
-    // Подсказка когда квест готов к сдаче
-    var readyHint = questFirstReadyHint()
-    if (readyHint != "") {
-        var hint = loc(readyHint)
-        var hintH = floor(iconH * 0.5)
-        var hintY = countY + countH + gap
-        var hintMaxW = 3 * slotW
-        draw_set_halign(fa_left)
-        draw_set_valign(fa_top)
-        draw_set_color(c_black)
-        drawUiText(margin + 1, hintY + 1, hint, hintH, hintMaxW)
-        draw_set_color(c_yellow)
-        drawUiText(margin, hintY, hint, hintH, hintMaxW)
-        draw_set_color(c_white)
     }
 }
 

@@ -30,7 +30,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"sprCampfire",
+    "path":"sprites/sprCampfire/sprCampfire.yy",
+  },
   "spriteMaskId":null,
   "visible":true,
 }

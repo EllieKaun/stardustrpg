@@ -102,6 +102,7 @@ function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scal
     var spriteScaleX = (cardWidth / baseW) * scale
     var spriteScaleY = (cardHeight / baseH) * scale
     draw_sprite_ext(card.cardBaseSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
+    draw_sprite_ext(cardSetBackground(card), 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     draw_sprite_ext(card.cardIllustrationSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     draw_sprite_ext(card.cardBorderSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
     draw_sprite_ext(card.cardTokenSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)

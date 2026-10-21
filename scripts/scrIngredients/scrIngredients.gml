@@ -1,6 +1,6 @@
 function ingredientAdd(character, ingredient) {
-    if (array_length(character.ingredients) >= INGREDIENT_MAX) {
-        
+    while (array_length(character.ingredients) >= INGREDIENT_MAX) {
+        array_delete(character.ingredients, 0, 1)
     }
     array_push(character.ingredients, ingredient)
     refreshDynamicCards(character)
@@ -39,18 +39,19 @@ function ingredientFitsCard(ingredient, card) {
     var effects = card.effects
     for (var index = 0; index < array_length(effects); index++) {
         var effect = effects[index]
-        if (ingredient == Ingredient.Flower && effect.type == EffectTypes.Heal) {
+        var effectType = variable_struct_exists(effect, "type") ? effect.type : undefined
+        if (ingredient == Ingredient.Flower && effectType == EffectTypes.Heal) {
             return true
         }
-        if (ingredient == Ingredient.Mushroom && effect.type == EffectTypes.Damage) {
+        if (ingredient == Ingredient.Mushroom && effectType == EffectTypes.Damage) {
             return true 
         }
         if (ingredient == Ingredient.Leaf) {
             if (variable_struct_exists(effect, "chance")) { return true }
 
-            if (effect.type == EffectTypes.Debuff
-                || effect.type == EffectTypes.Weakening
-                || effect.type == EffectTypes.CreateTemporaryWeakness) {
+            if (effectType == EffectTypes.Debuff
+                || effectType == EffectTypes.Weakening
+                || effectType == EffectTypes.CreateTemporaryWeakness) {
                     return true
             }
         }
@@ -75,9 +76,9 @@ function refreshDynamicCards(character) {
 // Иконка ингредиента 
 function ingredientIcon(ingredient) {
     switch (ingredient) {
-        case Ingredient.Flower: return sFlower
-        case Ingredient.Mushroom: return sMushroom
-        case Ingredient.Leaf: return sLeaf
+        case Ingredient.Flower: return sprIngredientFlower
+        case Ingredient.Mushroom: return sprIngredientMushroom
+        case Ingredient.Leaf: return sprIngredientPineCone
     }
     return noone
 }

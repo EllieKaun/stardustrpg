@@ -41,7 +41,6 @@ function createEncounterForSection(section) {
     return result
 }
 
-// Пул наград секции
 function rewardPoolForSection(section) {
     return forestRewardPool()
 }
@@ -98,7 +97,6 @@ function worldIgniteChance() {
     return affix.roll(difficultyLevel())
 }
 
-// Вид мирового мини-врага по его объекту
 function worldEnemyKind(obj) {
     switch (obj) {
         case oCrakerNutSmall: return EnemyKind.CrackerNut
@@ -109,7 +107,6 @@ function worldEnemyKind(obj) {
     }
 }
 
-// Игнайт-спрайт для открытого мира по виду врага
 function worldIgniteSprite(kind) {
     var spriteName = ""
     switch (kind) {

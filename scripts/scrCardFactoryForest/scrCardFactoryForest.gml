@@ -153,3 +153,14 @@ function createForestFlaskCard(rarity = CardsRarity.Default) {
     card.costValueCached = 2
     return card
 }
+function createForestRandomPotionCard(rarity = CardsRarity.Default) {
+    var card = new Card(
+        "Random Potion", rarity, TargetTypes.Self, StarriorStates.Cast, 1,
+        [ AddRandomCardsEffect(FOREST_RANDOM_POTION_CARDS, CardSet.Base, CardCategory.Heal, rarity) ],
+        healCard, sprForestRandomPotionArt, commonBorder, mpCostToken,
+        "adds 3 random healing cards to your hand",
+        noone
+    )
+    card.cardSet = CardSet.Forest
+    return card
+}

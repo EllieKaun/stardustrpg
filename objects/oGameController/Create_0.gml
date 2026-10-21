@@ -129,6 +129,11 @@ startTutorialIntro = function() {
 }
 
 // Вход в бой
+battleStartSprite = function() {
+    var asset = asset_get_index("BattleStart")
+    return (asset >= 0 && sprite_exists(asset)) ? asset : noone
+}
+
 battleEntryState = BattleEntryState.Idle
 entryAnimSprite = noone
 entryAnimFrame = 0
@@ -153,7 +158,7 @@ changeBattleEntryState = function(newState) {
             global.uiModal = true
         break
         case BattleEntryState.Transition:
-            entryAnimSprite = asset_get_index("sprBattleTransition")
+            entryAnimSprite = battleStartSprite()
             entryAnimFrame = 0
             global.cutsceneActive = true
             global.uiModal = true
@@ -173,12 +178,17 @@ startFadeToBattle = function() {
     }
 }
 
+goToBattleAfterTransition = function() {
+    battleEntryState = BattleEntryState.Leaving
+    room_goto(entryTargetRoom)
+}
+
 beginBattleEntry = function(introSprite, targetRoom) {
     entryIntroSprite = introSprite
     entryTargetRoom = targetRoom
     if (introSprite != noone && introSprite != undefined && sprite_exists(introSprite)) {
         changeBattleEntryState(BattleEntryState.Intro)
-    } else if (sprite_exists(asset_get_index("sprBattleTransition"))) {
+    } else if (battleStartSprite() != noone) {
         changeBattleEntryState(BattleEntryState.Transition)
     } else {
         startFadeToBattle()
@@ -207,7 +217,6 @@ followSequence = function() {
     return sequence
 }
 
-// За кем идёт member
 followTargetOfMember = function(member) {
     var sequence = followSequence()
     for (var index = 1; index < array_length(sequence); index++) {

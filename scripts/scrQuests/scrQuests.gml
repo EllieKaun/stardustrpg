@@ -175,11 +175,13 @@ function questPickupFxScale(questId, key) {
     return lerp(1.4, 1, elapsed / popDuration)
 }
 
-// Маркер над выдающим квест NPC: до начала и когда готов сдать
-function questShowsGiverMarker(questId) {
-    if (global.uiModal) { return false }
-    var st = questState(questId)
-    return st == QuestState.Inactive || st == QuestState.Ready
+function questGiverMarkerSprite(questId) {
+    if (global.uiModal) { return noone }
+    switch (questState(questId)) {
+        case QuestState.Inactive: return sprQuestMark
+        case QuestState.Ready: return sprQuestReady
+    }
+    return noone
 }
 
 // Для HUD: все отслеживаемые Collect-цели активных/готовых квестов
@@ -268,7 +270,7 @@ function questFoxAddItem(item) { questAddProgress(QuestId.Fox, item) }
 function questFoxAllCollected() { return questAllObjectivesDone(QuestId.Fox) }
 function questFoxItemCount(item) { return questCounter(QuestId.Fox, item) }
 function questFoxItemPickupScale(item) { return questPickupFxScale(QuestId.Fox, item) }
-function foxShowsQuestMarker() { return questShowsGiverMarker(QuestId.Fox) }
+function foxQuestMarkerSprite() { return questGiverMarkerSprite(QuestId.Fox) }
 function questFoxIsPicked(pickId) { return questIsPicked(QuestId.Fox, pickId) }
 function questFoxMarkPicked(pickId) { questMarkPicked(QuestId.Fox, pickId) }
 

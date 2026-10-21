@@ -47,7 +47,8 @@ enum EffectTypes {
     Provoke,
     BonusHp,
     ExtendNegative,
-    RemoveNegative
+    RemoveNegative,
+    AddRandomCards
 }
 
 function effectTypeToString(type) {
@@ -117,7 +118,7 @@ enum BattleStates {
     PuppetTurn,
     CardAnimating,
     StunnedTurn,
-    RunConfirm // окно подтверждения побега
+    RunConfirm
 }
 
 enum StateHook {
@@ -174,7 +175,6 @@ enum EffectVisualizerType {
 
 enum CardCategory { Attack, Magic, Heal, Buff, Special }
 
-// Вид врага
 enum EnemyKind { None, CrackerNut, Leaf, Mushroom, Flower, PuppetMaster }
 
 // Категория карты — данные реестра

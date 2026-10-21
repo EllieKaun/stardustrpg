@@ -316,6 +316,7 @@ function locDefineEn() {
     translations[$ "card.name.forestGather"] = "Gather Supplies"
     translations[$ "card.name.forestProvoke"] = "Provoke Potion"
     translations[$ "card.name.forestFlask"] = "Empty Flask"
+    translations[$ "card.name.forestRandomPotion"] = "Random Potion"
 
     translations[$ "card.desc.physicalDamageSingleTarget"] = "deals minor physical damage (single)"
     translations[$ "card.desc.physicalDamageMultipleTarget"] = "deals minor physical damage (group)"
@@ -384,6 +385,7 @@ function locDefineEn() {
     translations[$ "card.desc.emptyFlask.flowerMushroom"] = "physical attack that drains health (overflow into shield)"
     translations[$ "card.desc.emptyFlask.flowerLeaf"] = "heals an ally and removes a negative effect"
     translations[$ "card.desc.emptyFlask.mushroomLeaf"] = "physical attack with a chance to poison"
+    translations[$ "card.desc.forestRandomPotion"] = "adds 3 random healing cards to your hand"
 
     translations[$ "card.desc.physicalDamageHandScalingSingleTarget"] = "deals minor physical damage scaled by cards number in hand (single)"
     

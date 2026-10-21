@@ -75,6 +75,7 @@ function cardIdsInit() {
         forestGather: "forestGather",
         forestProvoke: "forestProvoke",
         forestFlask: "forestFlask",
+        forestRandomPotion: "forestRandomPotion",
 
     }
 }
@@ -171,6 +172,9 @@ function cardRegistryInit() {
                 CardSet.Forest)
     registerCard(cardIds.forestFlask, true, CardCategory.Special,
                  function(rarity) { return createForestFlaskCard(rarity) },
+                CardSet.Forest)
+    registerCard(cardIds.forestRandomPotion, true, CardCategory.Special,
+                 function(rarity) { return createForestRandomPotionCard(rarity) },
                 CardSet.Forest)
 }
 

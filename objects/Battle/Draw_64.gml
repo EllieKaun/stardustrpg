@@ -30,10 +30,6 @@ if (currentState != undefined) {
 }
 
 // Рисуем карты.
-// Руку показываем только когда ходит управляемый герой. Иначе — "Ожидание".
-// Опираться лишь на battleState нельзя: во время розыгрыша карты врага и на
-// переходных состояниях (AfterPlayChecks/PlayProcess) состояние на кадры выходит
-// из "ход врага", а selectedCharacter ещё враг — тогда мелькала бы его рука
 var opponentTurn = (selectedCharacter != noone
     && (selectedCharacter.isEnemy || selectedCharacter.isPuppet))
 if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn || battleState == BattleStates.StunnedTurn) {
@@ -110,7 +106,6 @@ if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == Bat
             }
         }
 
-        // Колода героя справа — только в его ход, вместе с рукой
         var deckCount = array_length(selectedCharacter.getShuffeledDeck())
         if (deckCount > 0) {
             var deckH = cardDeskHeight * 0.7
