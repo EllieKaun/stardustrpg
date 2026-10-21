@@ -103,13 +103,11 @@ if (place_meeting(x, y, leader)) {
         global.returnY = leader.y
         leader.can_move = false
 
-        // Проверка на наличие катсцены. если есть, сначала проигрываем ее
-        var intro = variable_struct_exists(encounter, "introSprite") ? encounter.introSprite : undefined
-        var started = false
-        if (intro != undefined && intro != noone && instance_exists(oGameController)) {
-            started = oGameController.startBossCutscene(intro, BattleRoom)
-        }
-        if (!started) {
+        // Вход в бой
+        var intro = variable_struct_exists(encounter, "introSprite") ? encounter.introSprite : noone
+        if (instance_exists(oGameController)) {
+            oGameController.beginBattleEntry(intro, BattleRoom)
+        } else {
             with (oTransition) {
                 target_room = BattleRoom
                 state = "fade_out"

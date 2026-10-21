@@ -53,9 +53,13 @@ startChestBattle = function() {
     global.returnX = leader.x
     global.returnY = leader.y
     leader.can_move = false
-    with (oTransition) {
-        target_room = BattleRoom
-        state = "fade_out"
+    if (instance_exists(oGameController)) {
+        oGameController.beginBattleEntry(noone, BattleRoom)
+    } else {
+        with (oTransition) {
+            target_room = BattleRoom
+            state = "fade_out"
+        }
     }
 }
 

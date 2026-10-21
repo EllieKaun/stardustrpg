@@ -123,15 +123,15 @@ if (worldHudVisible() && array_length(questTrackables) > 0) {
     }
 }
 
-// Катсцена появления босса
-if (global.cutsceneActive && sprite_exists(cutsceneSprite)) {
+// Анимации входа в бой
+if (battleEntryState != BattleEntryState.Idle && sprite_exists(entryAnimSprite)) {
     var guiWidth = display_get_gui_width()
     var guiHeight = display_get_gui_height()
 
-    drawScreenDim(0.5)
+    if (battleEntryState == BattleEntryState.Intro) { drawScreenDim(0.5) }
 
-    var frame = min(floor(cutsceneFrame), sprite_get_number(cutsceneSprite) - 1)
-    draw_sprite_stretched(cutsceneSprite, frame, 0, 0, guiWidth, guiHeight)
+    var frame = min(floor(entryAnimFrame), sprite_get_number(entryAnimSprite) - 1)
+    draw_sprite_stretched(entryAnimSprite, frame, 0, 0, guiWidth, guiHeight)
 }
 
 autosaveDrawIcon()

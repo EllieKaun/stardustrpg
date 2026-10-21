@@ -20,11 +20,13 @@ menuConfig = { anchorX: 0.75, startY: 0.45, spacing: 0.11, textH: 0.055, halign:
 
 startNewGameNow = function() {
     global.startNewGame = true
+    global.overworldNeedsReset = true
     analyticsNewGame() // аналитика: новая игра
     room_goto(DemoWorld)
 }
 startContinue = function() {
     global.startNewGame = false
+    global.overworldNeedsReset = true
     analyticsContinue() // аналитика: продолжить игру
     room_goto(DemoWorld)
 }

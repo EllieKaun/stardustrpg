@@ -1,5 +1,12 @@
 guiSyncCrisp()
 
+// Вход из главного меню
+if (variable_global_exists("overworldNeedsReset") && global.overworldNeedsReset) {
+    global.overworldNeedsReset = false
+    room_restart()
+    exit
+}
+
 // Инициализация сетки MP
 var cell = 16
 var cols = ceil(room_width  / cell)
