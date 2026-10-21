@@ -247,6 +247,7 @@
     {"id":{"name":"scrDrawing","path":"scripts/scrDrawing/scrDrawing.yy",},},
     {"id":{"name":"scrEffectSystem","path":"scripts/scrEffectSystem/scrEffectSystem.yy",},},
     {"id":{"name":"scrEncounterSetup","path":"scripts/scrEncounterSetup/scrEncounterSetup.yy",},},
+    {"id":{"name":"scrEnemyAI","path":"scripts/scrEnemyAI/scrEnemyAI.yy",},},
     {"id":{"name":"scrFiraDialog","path":"scripts/scrFiraDialog/scrFiraDialog.yy",},},
     {"id":{"name":"scrGameEnums","path":"scripts/scrGameEnums/scrGameEnums.yy",},},
     {"id":{"name":"scrGameOver","path":"scripts/scrGameOver/scrGameOver.yy",},},
