@@ -20,3 +20,21 @@ function dialogLine(speaker, portrait, text, onEnter = undefined) {
 function dialogChoice(speaker, portrait, text, options) {
     return { speaker: speaker, portrait: portrait, side: dialogSideFor(speaker), text: text, onEnter: undefined, options: options }
 }
+
+function activeSpeaker() {
+    var leader = oGameController.selected_character
+    switch (leader) {
+    	case oViv: return { id: "Viv", portrait: portraitViv }
+        default: return { id: "Lana", portrait: portraitLana }
+    }
+}
+
+function activeLine(text) {
+    var speaker = activeSpeaker()
+    return dialogLine(speaker.id, speaker.portrait, text)
+}
+
+function foxLine(text) {
+    var portrait = asset_get_index("portraitFira")
+    return dialogLine("Fox", sprite_exists(portrait) ? portrait : noone, text)
+}

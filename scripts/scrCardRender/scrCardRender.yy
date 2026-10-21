@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrCardRender",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrCardRender",
+  "parent":{
+    "name":"Drawing",
+    "path":"folders/BattleDomain/Scripts/Drawing.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

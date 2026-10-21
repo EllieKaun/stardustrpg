@@ -1,28 +1,3 @@
-#macro ENEMYS_TURN 0
-#macro PUPPET_TURN 1
-#macro HERO_DRAW_DELAY 2
-#macro STUN_TURN 3 // alarm конца хода оглушённого персонажа
-
-// Сколько секунд ход оглушённого персонажа виден до передачи следующему
-#macro STUN_TURN_SECONDS 3
-
-// Через сколько секунд простоя выбранный герой начинает танцевать
-#macro IDLE_DANCE_SECONDS 5
-#macro MAX_PUPPETS 3
-
-#macro MAX_STARRIORS_PER_SIDE 5
-
-// Тайминги боя в кадрах
-#macro EFFECT_ANIM_FRAMES 14 // длительность анимации эффекта до применения значения
-#macro CARD_RESOLVE_FRAMES 18 // пауза после применения
-#macro BATTLE_END_FRAMES 45 // задержка перед экраном победы или поражения
-
-// Лечение всего здоровья
-#macro HEAL_FULL 999999
-
-// Восстановление всей маны
-#macro MANA_FULL 999999
-
 enum CardsRarity {
     Default,
     Unusual,
@@ -40,7 +15,8 @@ enum TargetTypes {
 
 enum DamageTypes {
     Physical,
-    Magical
+    Magical,
+    True
 }
 
 enum ProtectionTypes {
@@ -63,7 +39,16 @@ enum EffectTypes {
     Resurrection,
     IgnoreWeakness,
     CreateTemporaryWeakness,
-    CreatePuppet
+    CreatePuppet,
+    Deflect,
+    DrawCard,
+    GainIngredient,
+    DiscardRandomCard,
+    Provoke,
+    BonusHp,
+    ExtendNegative,
+    RemoveNegative,
+    AddRandomCards
 }
 
 function effectTypeToString(type) {
@@ -80,7 +65,10 @@ function effectTypeToString(type) {
         case EffectTypes.AddEnergy: return loc("effect.AddEnergy")
         case EffectTypes.ShuffleDeck: return loc("effect.ShuffleDeck")
         case EffectTypes.Resurrection: return loc("effect.Resurrection")
-        case EffectTypes.CreatePuppet: return loc("effect.CreatePuppet")
+        case EffectTypes.CreatePuppet: return loc("effect.CreatePuppet") 
+        case EffectTypes.Deflect: return loc("effect.Deflect")
+        case EffectTypes.DrawCard: return loc("effect.DrawCard")
+        case EffectTypes.GainIngredient: return loc("effect.GainIngredient")
         default: return loc("effect.Unknown")
     }
 }
@@ -93,7 +81,10 @@ enum StatusNames {
     Stun,
     Bomb,
     Vampirism,
-    Weakening
+    Weakening,
+    Deflect,
+    Poison,
+    Provoke
 }
 
 enum ModifiersToBuff {
@@ -126,7 +117,8 @@ enum BattleStates {
     GameOver,
     PuppetTurn,
     CardAnimating,
-    StunnedTurn
+    StunnedTurn,
+    RunConfirm
 }
 
 enum StateHook {
@@ -143,7 +135,8 @@ enum StateHook {
 enum BattleMenuAction {
     Shuffle,
     Run,
-    Info
+    Info,
+    Skip
 }
 
 enum BattleOutcome {
@@ -182,7 +175,6 @@ enum EffectVisualizerType {
 
 enum CardCategory { Attack, Magic, Heal, Buff, Special }
 
-// Вид врага
 enum EnemyKind { None, CrackerNut, Leaf, Mushroom, Flower, PuppetMaster }
 
 // Категория карты — данные реестра
@@ -238,3 +230,21 @@ function categoryColor(category) {
         default: return #c4c4c4
     }
 }
+
+// Сила зависящая от карт в руке
+enum HandScaling {
+    None,
+    MoreCard,
+    FewerCards
+}
+
+// Ингредиенты в Лесном наборе
+enum Ingredient {
+	Flower, Mushroom, Leaf
+}
+
+// Комбинации ингредиентов для пустой колбы в зависимости от запаса ингредиентов
+enum FlaskForm { Empty, Flower, Mushroom, Leaf, FlowerMushroom, FlowerLeaf, MushroomLeaf }
+
+// Виды чармов
+enum HandCharmKind { StatBonus }

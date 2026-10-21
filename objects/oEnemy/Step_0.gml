@@ -6,16 +6,25 @@ if (variable_global_exists("cutsceneActive") && global.cutsceneActive) { exit }
 
 depth = -bbox_bottom
 
-// Квест не активен (копьё уже украдено / квест завершён) - моб больше не носитель
-if (carriesSpear && questSpearState() != QuestSpearState.Active) {
-    carriesSpear = false
-    global.spearCarrierExists = false
+// Предмет больше недоступен (добыт / квест сменился) - моб перестаёт быть носителем
+if (carriedItem != noone && !carryItemDef(carriedItem).available()) {
+    carrySetCarrierExists(carriedItem, false)
+    carriedItem = noone
+    image_blend = c_white
 }
 
-if (canCarrySpear && !carriesSpear && questSpearState() == QuestSpearState.Active && !global.spearCarrierExists) {
-    carriesSpear = true
-    global.spearCarrierExists = true
-    if (spearSprite() == noone) { image_blend = c_yellow }
+// Берём первый доступный предмет из инвентаря, у которого ещё нет носителя
+if (carriedItem == noone) {
+    for (var carryIndex = 0; carryIndex < array_length(carryInventory); carryIndex++) {
+        var carryCandidate = carryInventory[carryIndex]
+        var carryDef = carryItemDef(carryCandidate)
+        if (carryDef.available() && !carryCarrierExists(carryCandidate)) {
+            carriedItem = carryCandidate
+            carrySetCarrierExists(carryCandidate, true)
+            if (carryDef.worldSprite() == noone) { image_blend = carryDef.worldTint }
+            break
+        }
+    }
 }
 
 var leader = oGameController.selected_character
@@ -26,11 +35,10 @@ var isChasing = false
 if (!triggered && isIgnited && isNight()
     && point_distance(x, y, leader.x, leader.y) <= IGNITE_CHASE_RADIUS) {
     isChasing = true
-    var chaseX = clamp(leader.x - x, -IGNITE_CHASE_SPEED, IGNITE_CHASE_SPEED)
-    var chaseY = clamp(leader.y - y, -IGNITE_CHASE_SPEED, IGNITE_CHASE_SPEED)
-    if (!place_meeting(x + chaseX, y, oWall)) { x += chaseX }
-    if (!place_meeting(x, y + chaseY, oWall)) { y += chaseY }
-    if (chaseX != 0) { image_xscale = (chaseX < 0) ? 1 : -1 }
+    var chaseStep = stepTowardsPoint(x, y, leader.x, leader.y, IGNITE_CHASE_SPEED)
+    if (!place_meeting(x + chaseStep.x, y, oWall)) { x += chaseStep.x }
+    if (!place_meeting(x, y + chaseStep.y, oWall)) { y += chaseStep.y }
+    if (chaseStep.x != 0) { image_xscale = (chaseStep.x < 0) ? 1 : -1 }
 }
 
 // логика прогулки
@@ -84,25 +92,22 @@ if (place_meeting(x, y, leader)) {
         global.returningFromBattle = true
         global.battleNoFlee = false
         global.battleEnemyFirst = false // обычная встреча — первыми ходят герои
-        // spearCarrierExists не сбрасываем: носитель остаётся на карте, если от него убежали или проиграли.
-        // Флаг сбросит кража копья (questGrantSpear) или удаление носителя (Destroy)
-        if (carriesSpear) { global.battleHasSpear = true }
+        if (carriedItem != noone && carryItemDef(carriedItem).battleNoFlee) { global.battleNoFlee = true }
         global.battleIsIgnited = isIgnited // ignite-враг делает весь бой ignite
         global.battleSection = spawnSection
-        global.battleEncounter = getEncounter()
+        var encounter = getEncounter()
+        encounter.carryItem = carriedItem
+        global.battleEncounter = encounter
         global.returnRoom = room
         global.returnX = leader.x
         global.returnY = leader.y
         leader.can_move = false
 
-        // Проверка на наличие катсцены. если есть, сначала проигрываем ее
-        var encounter = global.battleEncounter
-        var intro = variable_struct_exists(encounter, "introSprite") ? encounter.introSprite : undefined
-        var started = false
-        if (intro != undefined && intro != noone && instance_exists(oGameController)) {
-            started = oGameController.startBossCutscene(intro, BattleRoom)
-        }
-        if (!started) {
+        // Вход в бой
+        var intro = variable_struct_exists(encounter, "introSprite") ? encounter.introSprite : noone
+        if (instance_exists(oGameController)) {
+            oGameController.beginBattleEntry(intro, BattleRoom)
+        } else {
             with (oTransition) {
                 target_room = BattleRoom
                 state = "fade_out"
@@ -113,7 +118,7 @@ if (place_meeting(x, y, leader)) {
     var distance = point_distance(x, y, leader.x, leader.y)
     if (triggered && distance > rearmDistance) { triggered = false }
     if (spawnedDynamically && distance > oSpawnerManager.spawnDistance) {
-        if (carriesSpear) { global.spearCarrierExists = false }
+        if (carriedItem != noone) { carrySetCarrierExists(carriedItem, false) }
         instance_destroy()
     }
 }

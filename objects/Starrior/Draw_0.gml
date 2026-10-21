@@ -73,11 +73,12 @@ if (showHealthBar && !isKO()) {
     }
 }
 
-// Копье
-if (variable_instance_exists(id, "hasSpear") && hasSpear) {
-    var spearSpr = spearBattleSprite()
-    if (spearSpr != noone) {
-        draw_sprite_ext(spearSpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top + 2, 1, 1, 90, c_white, 1)
+// Носимый предмет над головой
+if (variable_instance_exists(id, "carryItem") && carryItem != noone) {
+    var carryDef = carryItemDef(carryItem)
+    var carrySpr = carryDef.battleSprite()
+    if (carrySpr != noone) {
+        draw_sprite_ext(carrySpr, 0, (bbox_left + bbox_right) * 0.5, bbox_top + carryDef.battleYOffset, 1, 1, carryDef.battleAngle, c_white, 1)
     }
 }
 
@@ -111,4 +112,34 @@ if (iconCount > 0) {
         var iconX = startX + i * (iconSize + iconGap)
         draw_sprite_stretched(statusIcons[i], 0, iconX, rowY, iconSize, iconSize)
     }
+}
+
+// Игредиенты персонажа
+var ingredientCount = array_length(ingredients)
+if (ingredientCount > 0) {
+    var slotSize = 12
+    var slotGap = 2
+    var barTopIng = bbox_top
+    if (showHealthBar) { barTopIng = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6) }
+    var ingRowY = barTopIng - slotSize - 2
+    if (iconCount > 0) { ingRowY -= (12 + 2) } // над строкой статусов
+
+    var rowWidth = ingredientCount * slotSize + (ingredientCount - 1) * slotGap
+    var rowStartX = round((bbox_left + bbox_right) * 0.5 - rowWidth * 0.5)
+    for (var ii = 0; ii < ingredientCount; ii++) {
+        var slotX = rowStartX + ii * (slotSize + slotGap)
+        var ingIcon = ingredientIcon(ingredients[ii])
+        if (ingIcon != noone) { draw_sprite_stretched(ingIcon, 0, slotX, ingRowY, slotSize, slotSize) }
+    }
+}
+
+// Избыточное здоровье
+if (showHealthBar && !isKO() && bonusHp > 0) {
+    var shieldFrac = clamp(bonusHp / maxHp, 0, 1)
+    var shieldBarX = bbox_left
+    var shieldBarW = bbox_right - bbox_left
+    var shieldBarY = (maxMana <= 0) ? (bbox_top - 4) : (bbox_top - 6)
+    draw_set_color(c_aqua)
+    draw_rectangle(shieldBarX, shieldBarY - 3, shieldBarX + shieldBarW * shieldFrac, shieldBarY - 1, false)
+    draw_set_color(c_white)
 }

@@ -1,309 +1,6 @@
-function generateLevel(zoneH, screenW, spacing, encounter) {
-    initStarriorsFromEncounter(encounter)
-    initStarriorsPositions(zoneH, screenW, spacing)
-    
-    if (variable_global_exists("battleEnemyFirst") && global.battleEnemyFirst) {
-        orderEnemiesFirst()
-    }
-    selectNextCharacter()
-    startTurnFor(selectedCharacter)
-}
-
-function orderEnemiesFirst() {
-    array_resize(playOrder, 0)
-    for (var i = 0; i < array_length(enemies); i++) { 
-        array_push(playOrder, enemies[i]) 
-    }
-    for (var i = 0; i < array_length(heroes);  i++) { 
-        array_push(playOrder, heroes[i]) 
-    }
-    selectedCharacterNumber = -1
-}
-
-function initStarriorsFromEncounter(encounter) {
-    if (TEST_BATTLE_ENABLED) {
-        encounter = testBattleEncounter()
-        global.battleEncounter = encounter
-    }
-    if (variable_struct_exists(encounter, "heroCreators")) {
-        heroes = []
-        for (var i = 0; i < array_length(encounter.heroCreators); i++) {
-            array_push(heroes, encounter.heroCreators[i]())
-        }
-    } else {
-        heroes = [createLana(), createViv()]
-        if (variable_global_exists("safarJoined") && global.safarJoined) {
-            array_push(heroes, createSafar())
-        }
-    }
-    enemies = []
-    var creators = encounter.enemyCreators
-    for (var i = 0; i < array_length(creators); i++) {
-        array_push(enemies, creators[i]())
-    }
-
-    array_copy(playOrder, array_length(playOrder), heroes,  0, array_length(heroes))
-    array_copy(playOrder, array_length(playOrder), enemies, 0, array_length(enemies))
-    for (var i = 0; i < array_length(playOrder); i++) {
-        shuffleDeckAndTake4(playOrder[i])
-    }
-    
-    var isRaw = variable_struct_exists(encounter, "raw") && encounter.raw
-    var difficulty = battleDifficulty()
-    var level = difficultyLevel(encounter)
-    var statPoints = difficulty.statPoints(level)
-    
-    var igniteBattle = (variable_global_exists("battleIsIgnited") && global.battleIsIgnited)
-    var igniteAffix = igniteBattle ? findAffixById(difficulty, "ignite") : undefined
-    var igniteFlags = array_create(array_length(enemies), false)
-    if (igniteAffix != undefined && !isRaw && array_length(enemies) > 0) {
-        var anyIgnited = false
-        for (var i = 0; i < array_length(enemies); i++) {
-            if (random(1) < igniteAffix.roll(level)) { igniteFlags[i] = true; anyIgnited = true }
-        }
-        if (!anyIgnited) { igniteFlags[irandom(array_length(enemies) - 1)] = true } // хотя бы один
-    }
-    for (var i = 0; i < array_length(enemies); i++) {
-        var enemy = enemies[i]
-        enemy.isEnemy = true
-        enemy.hasSpear = false
-        if (isRaw) {
-            continue
-        }
-        if (igniteFlags[i]) {
-            applyEnemyAffix(enemy, igniteAffix)
-        } else if (igniteAffix != undefined) {
-            applyEnemyStatBonus(enemy, statPoints, difficulty.statWeights)
-        } else {
-            var affix = rollEnemyAffix(difficulty, level)
-            if (affix != undefined) {
-                applyEnemyAffix(enemy, affix)
-            } else {
-                applyEnemyStatBonus(enemy, statPoints, difficulty.statWeights)
-            }
-        }
-    }
-
-    // Копьё в бою только пока квест активен
-    var spearQuestActive = (questSpearState() == QuestSpearState.Active)
-    if (variable_global_exists("battleHasSpear") && global.battleHasSpear && !spearQuestActive) {
-        global.battleHasSpear = false
-    }
-
-    if (!isRaw
-        && variable_global_exists("battleHasSpear")
-        && global.battleHasSpear
-        && array_length(enemies) > 0) {
-        var spearIdx = irandom(array_length(enemies) - 1)
-        enemies[spearIdx].hasSpear = true
-        if (spearBattleSprite() == noone) { enemies[spearIdx].image_blend = c_yellow }
-
-        var damageBonus = spearBattleBonus()
-        for (var i = 0; i < array_length(enemies); i++) {
-            applyEnemyStatBonus(enemies[i], damageBonus)
-        }
-        global.battleHasSpear = false
-    }
-}
-
-function rollEnemyAffix(difficulty, level) {
-    var affixes = difficulty.affixes
-    for (var i = 0; i < array_length(affixes); i++) {
-        var affix = affixes[i]
-        if (random(1) < affix.roll(level)) { return affix }
-    }
-    return undefined
-}
-
-function findAffixById(difficulty, affixId) {
-    var affixes = difficulty.affixes
-    for (var i = 0; i < array_length(affixes); i++) {
-        if (affixes[i].id == affixId) { return affixes[i] }
-    }
-    return undefined
-}
-
-function applyEnemyAffix(enemy, affix) {
-    var mult = affix.statMult
-    var stats = variable_struct_get_names(mult)
-    for (var i = 0; i < array_length(stats); i++) {
-        var stat = stats[i]
-        variable_instance_set(enemy, stat, variable_instance_get(enemy, stat) * mult[$ stat])
-    }
-    if (affix.mark != undefined) { variable_instance_set(enemy, affix.mark, true) }
-    if (affix.chanceField != undefined) { variable_instance_set(enemy, affix.chanceField, affix.effectChance) }
-
-    var affixSprites = affix[$ "sprites"]
-    var spritesForKind = affix[$ "spritesForKind"]
-    if (spritesForKind != undefined && variable_instance_exists(enemy, "kind")) {
-        var kindSet = spritesForKind(enemy.kind)
-        if (kindSet != undefined) { affixSprites = kindSet }
-    }
-    if (affixSprites != undefined) {
-        if (affixSprites[$ "idle"] != undefined) {
-            enemy.spriteActionIdle = affixSprites.idle
-            enemy.sprite_index = affixSprites.idle
-            enemy.mask_index = affixSprites.idle
-        }
-        if (affixSprites[$ "attack"] != undefined) { enemy.spriteActionAttack = affixSprites.attack }
-        if (affixSprites[$ "cast"]   != undefined) { enemy.spriteActionCast   = affixSprites.cast }
-        if (affixSprites[$ "spell"]  != undefined) { enemy.spriteActionSpell  = affixSprites.spell }
-        if (affixSprites[$ "dance"]  != undefined) { enemy.spriteActionDance  = affixSprites.dance }
-        if (affixSprites[$ "ko"]     != undefined) { enemy.spriteActionKO     = affixSprites.ko }
-    } else if (affix[$ "sprite"] != undefined) {
-     
-        enemy.spriteActionIdle = affix.sprite
-        enemy.sprite_index = affix.sprite
-        enemy.mask_index = affix.sprite
-    }
-
-    if (affix.blend != undefined) { enemy.image_blend = affix.blend }
-}
-
-function createStarrior(
-    name, 
-    spriteIdle, 
-    spriteAttack, 
-    spriteSpell,
-    spriteCast,
-    spriteKO,
-    spriteDance,
-    hp, 
-    maxHp, 
-    mana,
-    maxMana,
-    energy, 
-    maxEnergy,
-    strength,
-    intelligence,
-    aura,
-    guts,
-    deck,
-    weaknesses = undefined,
-    strengths = undefined
-) {
-    var starrior = instance_create_depth(0, 0, depth - 1, Starrior)
-    starrior.name = name
-    starrior.weaknesses = weaknesses ?? []
-    starrior.strengths  = strengths  ?? []
-    starrior.hp = hp 
-    starrior.maxHp = maxHp
-    starrior.mana = mana 
-    starrior.maxMana = maxMana
-    starrior.deck = new Deck(deck) 
-    starrior.energy = energy 
-    starrior.maxEnergy = maxEnergy 
-    starrior.spriteActionAttack = spriteAttack
-    starrior.spriteActionIdle = spriteIdle
-    starrior.spriteActionCast = spriteCast
-    starrior.spriteActionSpell = spriteSpell
-    starrior.spriteActionDance = spriteDance
-    starrior.spriteActionKO = spriteKO
-    starrior.sprite_index = spriteIdle
-    starrior.strength = strength 
-    starrior.intelligence = intelligence 
-    starrior.aura = aura 
-    starrior.guts = guts 
-    starrior.mask_index = spriteIdle
-    starrior.isPuppet = false
-    starrior.isEnemy  = false
-    return starrior
-}
-
-function playerDeckFor(character) {
-    var saved = deckOf(character).cards
-
-    var sorted = array_create(array_length(saved))
-    array_copy(sorted, 0, saved, 0, array_length(saved))
-    array_sort(sorted, function(a, b) { return a.slot - b.slot; })
-
-    var deck = []
-    for (var i = 0; i < array_length(sorted); i++) {
-        array_push(deck, cardFromRef(sorted[i]))
-    }
-    return deck
-}
-
-// Закрепляет за каждым персонажем слот
-function assignStarriorSlots(team) {
-    var used = []
-    for (var i = 0; i < array_length(team); i++) {
-        var slot = team[i].slotIndex
-        if (slot >= 0 && !array_contains(used, slot)) { array_push(used, slot) }
-        else { team[i].slotIndex = -1 } // повторный слот - назначим заново
-    }
-    for (var i = 0; i < array_length(team); i++) {
-        if (team[i].slotIndex >= 0) { continue }
-        var free = 0
-        while (array_contains(used, free)) free++
-        team[i].slotIndex = free
-        array_push(used, free)
-    }
-}
-
-// Порядок ходов по слотам
-function rebuildPlayOrder() {
-    var bySlot = function(a, b) { return a.slotIndex - b.slotIndex }
-    var sortedHeroes  = array_create(array_length(heroes))
-    var sortedEnemies = array_create(array_length(enemies))
-    array_copy(sortedHeroes,  0, heroes,  0, array_length(heroes))
-    array_copy(sortedEnemies, 0, enemies, 0, array_length(enemies))
-    array_sort(sortedHeroes,  bySlot)
-    array_sort(sortedEnemies, bySlot)
-
-    array_resize(playOrder, 0)
-    for (var i = 0; i < array_length(sortedHeroes); i++)  array_push(playOrder, sortedHeroes[i])
-    for (var i = 0; i < array_length(sortedEnemies); i++) array_push(playOrder, sortedEnemies[i])
-
-    // очередь сдвинулась - указатель хода должен остаться на том же персонаже
-    var selectedIndex = array_get_index(playOrder, selectedCharacter)
-    if (selectedIndex >= 0) { selectedCharacterNumber = selectedIndex }
-}
-
-function initStarriorsPositions(
-    starriorsZoneHeight,
-    screenWidth,
-    spacingBetweenStarriors,
-) {
-    var verticalSpacing = (starriorsZoneHeight - 16 * 2) / 2
-    var extraSpread = 8 
-    var startY = starriorsZoneHeight
-    var halfW = screenWidth / 2
-    var heroesCenterX  = halfW * 0.5 // центр левой половины
-    var enemiesCenterX = halfW + halfW * 0.5 // центр правой половины
-
-    var slotCount = MAX_STARRIORS_PER_SIDE
-
-   
-    var edgeMargin = 16
-    var baseStep = spacingBetweenStarriors + 16
-    var fitStep  = (halfW - edgeMargin * 2) / (slotCount - 1)
-    var step = min(baseStep, fitStep)
-
-    assignStarriorSlots(heroes)
-    assignStarriorSlots(enemies)
-    rebuildPlayOrder()
-
-    // Герои — по центру левой половины, заполняются справа налево
-    var heroCount  = array_length(heroes)
-    var heroStartX = heroesCenterX - (slotCount - 1) * step / 2  // центрируем на 5 слотов
-    for (var i = 0; i < heroCount; i++) {
-        var heroSlot = heroes[i].slotIndex
-        heroes[i].x = heroStartX + (slotCount - 1 - heroSlot) * step
-        heroes[i].y = startY + (heroSlot mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
-    }
-
-    // Враги — по центру правой половины
-    var enemyCount  = array_length(enemies)
-    var enemyStartX = enemiesCenterX - (slotCount - 1) * step / 2
-    for (var i = 0; i < enemyCount; i++) {
-        var enemySlot = enemies[i].slotIndex
-        enemies[i].x = enemyStartX + enemySlot * step
-        enemies[i].y = startY + (enemySlot mod 2 == 0 ? verticalSpacing - extraSpread : starriorsZoneHeight - verticalSpacing + extraSpread)
-    }
-}
-
 function initBattleStates() {
+    runConfirmCursor = 0
+    runConfirmHitRects = []
     wantsCancel = method(self, function(input) {
         var cancelClicked = (input.clicked && cancelHitRect != undefined
             && pointInRect(input.guiX, input.guiY, cancelHitRect.x, cancelHitRect.y, cancelHitRect.w, cancelHitRect.h))
@@ -322,7 +19,7 @@ function initBattleStates() {
             if (input.clicked && overTarget) { mouseConfirm = true }
         }
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed  = keyboard_check_pressed(vk_left)  || keyboard_check_pressed(ord("A"))
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
         var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
         var changeIndex = leftPressed - rightPressed
         if (changeIndex != 0) {
@@ -370,16 +67,35 @@ function initBattleStates() {
         }
 
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        var leftPressed  = keyboard_check_pressed(vk_left)  || keyboard_check_pressed(ord("A"))
+        var leftPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))
         var rightPressed = keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
 
-        if (keyboard_check_pressed(ord("R"))) { doMenuAction(BattleMenuAction.Run);     return }
-        if (keyboard_check_pressed(ord("S"))) { doMenuAction(BattleMenuAction.Shuffle); return }
-        if (keyboard_check_pressed(ord("I"))) { doMenuAction(BattleMenuAction.Info);    return }
+        if (keyboard_check_pressed(ord("R"))) { 
+            doMenuAction(BattleMenuAction.Run)
+            return 
+        }
+        if (keyboard_check_pressed(ord("S"))) { 
+            doMenuAction(BattleMenuAction.Shuffle)
+            return 
+        }
+        if (keyboard_check_pressed(ord("I"))) { 
+            doMenuAction(BattleMenuAction.Info) 
+            return 
+        }
+        if (keyboard_check_pressed(ord("P"))) { 
+            doMenuAction(BattleMenuAction.Skip)
+            return 
+        }
 
         var handLen = array_length(selectedCharacter.getCardsInHand())
-        if (leftPressed  && selectedCard > 0)           { selectedCard--; playCardSelectSound() }
-        if (rightPressed && selectedCard < handLen - 1) { selectedCard++; playCardSelectSound() }
+        if (leftPressed && handLen > 0) { 
+            selectedCard = (selectedCard - 1 + handLen) mod handLen
+            playCardSelectSound() 
+        }
+        if (rightPressed && handLen > 0) { 
+            selectedCard = (selectedCard + 1) mod handLen       
+            playCardSelectSound() 
+        }
 
         if (enterPressed) {
             if (handLen > 0) {
@@ -406,35 +122,43 @@ function initBattleStates() {
     battleStates[BattleStates.CharacterPlay] = stateDef
 
     stateDef = array_create(StateHook.Count, undefined)
-    stateDef[StateHook.OnEnter]  = method(self, function() { initTargetSelection(enemies) })
+    stateDef[StateHook.OnEnter] = method(self, function() { initTargetSelection(enemies) })
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
-    stateDef[StateHook.Step]     = targetSelectStep
+    stateDef[StateHook.Step] = targetSelectStep
     battleStates[BattleStates.EnemyTargetSelection] = stateDef
 
     stateDef = array_create(StateHook.Count, undefined)
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
-    stateDef[StateHook.Step]     = targetSelectStep
+    stateDef[StateHook.Step] = targetSelectStep
     battleStates[BattleStates.AllyTargetSelection] = stateDef
 
     stateDef = array_create(StateHook.Count, undefined)
-    stateDef[StateHook.OnEnter]  = method(self, function() { initTargetSelection(enemies) })
+    stateDef[StateHook.OnEnter] = method(self, function() { initTargetSelection(array_concat(enemies, heroes)) })
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
-    stateDef[StateHook.Step]     = method(self, function(input) {
+    stateDef[StateHook.Step] = method(self, function(input) {
         var mouseConfirm = false
         if (input.moved || input.clicked) {
             var overTarget = selectTargetAtMouse()
-            if (input.clicked && overTarget) { mouseConfirm = true }
+            if (input.clicked && overTarget) { 
+                mouseConfirm = true 
+            }
         }
         var enterPressed = keyboard_check_pressed(vk_enter) || mouseConfirm
-        if (keyboard_check_pressed(vk_left)  || keyboard_check_pressed(ord("A"))) { selectPreviousTarget() }
-        if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { selectNextTarget() }
-        if (enterPressed) { changeBattleState(BattleStates.EnemyInfoDisplay) }
+        if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) { 
+            selectPreviousTarget() 
+        }
+        if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { 
+            selectNextTarget() 
+        }
+        if (enterPressed) { 
+            changeBattleState(BattleStates.EnemyInfoDisplay) 
+        }
     })
     battleStates[BattleStates.EnemyInfoSelection] = stateDef
 
     stateDef = array_create(StateHook.Count, undefined)
     stateDef[StateHook.OnCancel] = cancelToCharacterPlay
-    stateDef[StateHook.Step]     = method(self, function(input) {
+    stateDef[StateHook.Step] = method(self, function(input) {
         var mouseConfirm = false
         if (input.clicked && infoCloseRect != undefined
             && pointInRect(input.guiX, input.guiY, infoCloseRect.x, infoCloseRect.y, infoCloseRect.w, infoCloseRect.h)) {
@@ -463,7 +187,7 @@ function initBattleStates() {
     stateDef[StateHook.Reentrant] = true
     stateDef[StateHook.OnEnter] = method(self, function() {
         alarm_set(STUN_TURN, game_get_speed(gamespeed_fps) * STUN_TURN_SECONDS)
-        with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow)
+        with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow, bbox_right - bbox_left)
     })
     battleStates[BattleStates.StunnedTurn] = stateDef
 
@@ -479,6 +203,27 @@ function initBattleStates() {
     })
     stateDef[StateHook.Step] = method(self, function(input) { stepGameOverScreen() })
     battleStates[BattleStates.GameOver] = stateDef
+
+    stateDef = array_create(StateHook.Count, undefined)
+    stateDef[StateHook.OnEnter] = method(self, function() { runConfirmCursor = 0 })
+    stateDef[StateHook.OnCancel] = cancelToCharacterPlay
+    stateDef[StateHook.Step] = method(self, function(input) {
+        var confirm = keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)
+        if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) { runConfirmCursor = 0 }
+        if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { runConfirmCursor = 1 }
+        for (var buttonIndex = 0; buttonIndex < array_length(runConfirmHitRects); buttonIndex++) {
+            var hitRect = runConfirmHitRects[buttonIndex]
+            if (pointInRect(input.guiX, input.guiY, hitRect.x, hitRect.y, hitRect.w, hitRect.h)) {
+                if (input.moved || input.clicked) { runConfirmCursor = hitRect.index }
+                if (input.clicked) { confirm = true }
+                break
+            }
+        }
+        if (!confirm) { return }
+        if (runConfirmCursor == 1) { confirmBattleFlee() }
+        else { changeBattleState(BattleStates.CharacterPlay) }
+    })
+    battleStates[BattleStates.RunConfirm] = stateDef
 
     drawCharacterMenu = method(self, function() {
         if (selectedCharacter == noone) { return }
@@ -508,12 +253,66 @@ function initBattleStates() {
         drawMenuBadge(infoX, infoY, badgeScale, loc("battle.info"), "I", true, colMain, colPanel)
         array_push(menuHitRects, { x: infoX, y: infoY, w: infoSize.w, h: infoSize.h, action: BattleMenuAction.Info })
 
-        if (!(variable_global_exists("battleNoFlee") && global.battleNoFlee)) {
+        var skipSize = menuBadgeSize(loc("battle.skip"), badgeScale)
+        var canFlee = !(variable_global_exists("battleNoFlee") && global.battleNoFlee)
+        var leftStackH = canFlee ? (runSize.h + badgeGap + skipSize.h) : skipSize.h
+        var leftY = centerY - leftStackH * 0.5
+
+        if (canFlee) {
             var runX = leftEdge - runSize.w
-            var runY = centerY - runSize.h * 0.5
-            drawMenuBadge(runX, runY, badgeScale, loc("battle.run"), "R", false, colMain, colPanel)
-            array_push(menuHitRects, { x: runX, y: runY, w: runSize.w, h: runSize.h, action: BattleMenuAction.Run })
+            drawMenuBadge(runX, leftY, badgeScale, loc("battle.run"), "R", false, colMain, colPanel)
+            array_push(menuHitRects, { x: runX, y: leftY, w: runSize.w, h: runSize.h, action: BattleMenuAction.Run })
+            leftY += runSize.h + badgeGap
         }
+
+        var skipX = leftEdge - skipSize.w
+        drawMenuBadge(skipX, leftY, badgeScale, loc("battle.skip"), "P", false, colMain, colPanel)
+        array_push(menuHitRects, { x: skipX, y: leftY, w: skipSize.w, h: skipSize.h, action: BattleMenuAction.Skip })
+    })
+
+    drawRunConfirm = method(self, function() {
+        var screenWidth = display_get_gui_width()
+        var screenHeight = display_get_gui_height()
+        var scaleToGui = guiScale()
+
+        drawScreenDim(0.5)
+
+        var popupWidth = screenWidth * 0.5
+        var popupHeight = screenHeight * 0.34
+        var popupX = floor((screenWidth - popupWidth) / 2)
+        var popupY = floor((screenHeight - popupHeight) / 2)
+        draw_sprite_stretched(box, 0, popupX, popupY, popupWidth, popupHeight)
+
+        draw_set_halign(fa_center)
+        draw_set_valign(fa_middle)
+        draw_set_color(c_white)
+        drawUiText(screenWidth / 2, popupY + popupHeight * 0.22, loc("battle.fleeTitle"), popupHeight * 0.16, popupWidth * 0.9)
+        draw_set_color(merge_color(c_white, c_red, 0.5))
+        drawUiText(screenWidth / 2, popupY + popupHeight * 0.45, loc("battle.fleeLose") + string(battleFleePenalty()),
+            popupHeight * 0.13, popupWidth * 0.9)
+
+        var labels = [loc("battle.fleeStay"), loc("battle.run")]
+        var btnW = 72 * scaleToGui
+        var btnH = 18 * scaleToGui
+        var buttonGap = 16 * scaleToGui
+        var startX = (screenWidth - (btnW * 2 + buttonGap)) / 2
+        var btnY = floor(popupY + popupHeight * 0.66)
+        runConfirmHitRects = []
+        for (var buttonIndex = 0; buttonIndex < 2; buttonIndex++) {
+            var buttonX = floor(startX + buttonIndex * (btnW + buttonGap))
+            var isSelected = (runConfirmCursor == buttonIndex)
+            array_push(runConfirmHitRects, { x: buttonX, y: btnY, w: btnW, h: btnH, index: buttonIndex })
+            drawButtonFrame(buttonX, btnY, btnW, btnH)
+            draw_set_color(isSelected ? c_yellow : c_white)
+            drawUiText(buttonX + btnW / 2, btnY + btnH / 2, labels[buttonIndex], btnH * 0.55, btnW * 0.9)
+            if (isSelected) {
+                draw_sprite_ext(sPointer, 0, floor(buttonX - 10 * scaleToGui), floor(btnY + btnH / 2), scaleToGui, scaleToGui, 0, c_white, 1)
+            }
+        }
+
+        draw_set_halign(fa_left)
+        draw_set_valign(fa_top)
+        draw_set_color(c_white)
     })
 
     drawCancelBadge = method(self, function() {
@@ -537,7 +336,7 @@ function initBattleStates() {
         var scaleToGui = guiScale()
 
         var popupWidth = screenWidth * 0.6
-        var popupHeight = screenHeight * 0.5
+        var popupHeight = screenHeight * 0.72
         var popupX = (screenWidth - popupWidth) / 2
         var popupY = (screenHeight - popupHeight) / 2
 
@@ -565,18 +364,50 @@ function initBattleStates() {
         var statsY = spriteBoxY
         var lineH = 14 * scaleToGui
         var popupTextH = lineH * 0.72
+        var contentRight = popupX + popupWidth - margin
         draw_set_color(c_white)
         draw_set_halign(fa_left)
         var targetName = unitDisplayName(selectedTarget.name)
         if (variable_instance_exists(selectedTarget, "isIgnited") && selectedTarget.isIgnited) { targetName = loc("unit.ignitePrefix") + targetName }
-        drawUiText(statsX, statsY, loc("battle.name") + targetName, popupTextH)
-        drawUiText(statsX, statsY + lineH, loc("battle.hp") + string(selectedTarget.hp) + "/" + string(selectedTarget.maxHp), popupTextH)
-        drawUiText(statsX, statsY + lineH * 2, loc("battle.mp") + string(selectedTarget.mana) + "/" + string(selectedTarget.maxMana), popupTextH)
-        drawUiText(statsX, statsY + lineH * 3, loc("battle.aura") + string(selectedTarget.aura), popupTextH)
-        drawUiText(statsX, statsY + lineH * 4, loc("battle.guts") + string(selectedTarget.guts), popupTextH)
+        var rowY = statsY
+        drawUiText(statsX, rowY, loc("battle.name") + targetName, popupTextH)
+        rowY += lineH
+        drawUiText(statsX, rowY, loc("battle.hp") + string(selectedTarget.hp) + "/" + string(selectedTarget.maxHp), popupTextH)
+        rowY += lineH
+        drawUiText(statsX, rowY, loc("battle.mp") + string(selectedTarget.mana) + "/" + string(selectedTarget.maxMana), popupTextH)
+        rowY += lineH
+        drawUiText(statsX, rowY, loc("battle.aura") + string(selectedTarget.aura), popupTextH)
+        rowY += lineH
+        drawUiText(statsX, rowY, loc("battle.guts") + string(selectedTarget.guts), popupTextH)
+        rowY += lineH
+        if (!selectedTarget.isEnemy) {
+            drawUiText(statsX, rowY, loc("battle.strength") + string(selectedTarget.strength), popupTextH)
+            rowY += lineH
+            drawUiText(statsX, rowY, loc("battle.intelligence") + string(selectedTarget.intelligence), popupTextH)
+            rowY += lineH
+            drawUiText(statsX, rowY, loc("battle.energy") + string(selectedTarget.energy) + "/" + string(selectedTarget.maxEnergy), popupTextH)
+            rowY += lineH
+            if (variable_instance_exists(selectedTarget, "ingredients") && array_length(selectedTarget.ingredients) > 0) {
+                var ingLabel = loc("battle.ingredients")
+                var ingLblScale = drawUiText(statsX, rowY, ingLabel, popupTextH)
+                var ingIconX = statsX + string_width(ingLabel) * ingLblScale + 6 * scaleToGui
+                var ingIconSize = popupTextH
+                for (var ingIndex = 0; ingIndex < array_length(selectedTarget.ingredients); ingIndex++) {
+                    var ingInfoIcon = ingredientIcon(selectedTarget.ingredients[ingIndex])
+                    if (ingInfoIcon != noone) {
+                        draw_sprite_stretched(ingInfoIcon, 0, ingIconX, rowY, ingIconSize, ingIconSize)
+                        ingIconX += ingIconSize + 3 * scaleToGui
+                    }
+                }
+                rowY += lineH
+            }
+        }
+        if (variable_instance_exists(selectedTarget, "bonusHp") && selectedTarget.bonusHp > 0) {
+            drawUiText(statsX, rowY, loc("battle.bonusHp") + string(selectedTarget.bonusHp), popupTextH)
+            rowY += lineH
+        }
 
-        // Слабости врага
-        var weaknessY = statsY + lineH * 5
+        var weaknessY = rowY
         draw_set_halign(fa_left)
         var weaknessLabelText = loc("battle.weakness")
         var lblScale = drawUiText(statsX, weaknessY, weaknessLabelText, popupTextH)
@@ -600,6 +431,39 @@ function initBattleStates() {
         }
         draw_set_color(c_white)
 
+        var effectY = weaknessY + lineH * 1.5
+        draw_set_halign(fa_left)
+        drawUiText(statsX, effectY, loc("battle.statuses"), popupTextH)
+        effectY += lineH
+        var targetEffects = selectedTarget.effects
+        if (array_length(targetEffects) == 0) {
+            drawUiText(statsX, effectY, loc("ui.none"), popupTextH)
+        } else {
+            for (var effectIndex = 0; effectIndex < array_length(targetEffects); effectIndex++) {
+                var targetEffect = targetEffects[effectIndex]
+                var icon = effectIcon(targetEffect)
+                var textX = statsX
+                if (icon != noone) {
+                    draw_sprite_stretched(icon, 0, statsX, effectY, popupTextH, popupTextH)
+                    textX = statsX + popupTextH + 4 * scaleToGui
+                }
+                var nameText = effectDisplayName(targetEffect)
+                if (variable_instance_exists(targetEffect, "duration")) {
+                    nameText += " (" + loc("status.turnsPre") + string(targetEffect.duration) + loc("status.turnsPost") + ")"
+                }
+                drawUiText(textX, effectY, nameText, popupTextH, contentRight - textX)
+                effectY += lineH
+                var descText = effectDescription(targetEffect)
+                if (descText != "") {
+                    var descResult = fitWrappedText(descText, contentRight - statsX, lineH * 2)
+                    draw_set_font(descResult.font)
+                    draw_text_transformed(floor(statsX), floor(effectY), descResult.text, descResult.scale, descResult.scale, 0)
+                    effectY += string_height(descResult.text) * descResult.scale + 2 * scaleToGui
+                }
+            }
+        }
+        draw_set_color(c_white)
+
         // Close Button
         var btnWidth = 48 * scaleToGui
         var btnHeight = 16 * scaleToGui
@@ -618,12 +482,13 @@ function initBattleStates() {
         draw_sprite_ext(sPointer, 0, btnX - 12 * scaleToGui, btnY + btnHeight / 2, scaleToGui, scaleToGui, 0, c_white, 1)
     })
 
-    battleStates[BattleStates.CharacterPlay][StateHook.DrawUnder]        = drawCharacterMenu
+    battleStates[BattleStates.CharacterPlay][StateHook.DrawUnder] = drawCharacterMenu
     battleStates[BattleStates.EnemyTargetSelection][StateHook.DrawUnder] = drawCancelBadge
-    battleStates[BattleStates.AllyTargetSelection][StateHook.DrawUnder]  = drawCancelBadge
-    battleStates[BattleStates.EnemyInfoDisplay][StateHook.DrawOver]      = drawEnemyInfo
-    battleStates[BattleStates.Victory][StateHook.DrawOver]  = method(self, function() { drawVictoryScreen() })
+    battleStates[BattleStates.AllyTargetSelection][StateHook.DrawUnder] = drawCancelBadge
+    battleStates[BattleStates.EnemyInfoDisplay][StateHook.DrawOver] = drawEnemyInfo
+    battleStates[BattleStates.Victory][StateHook.DrawOver] = method(self, function() { drawVictoryScreen() })
     battleStates[BattleStates.GameOver][StateHook.DrawOver] = method(self, function() { drawGameOverScreen() })
+    battleStates[BattleStates.RunConfirm][StateHook.DrawOver] = drawRunConfirm
 
     stateAt = method(self, function(state) {
         return (state >= 0 && state < array_length(battleStates)) ? battleStates[state] : undefined

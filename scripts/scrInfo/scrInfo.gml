@@ -1,54 +1,99 @@
 /*
- * Баффы физ урона
- * Weakness, Buff (Ph, Any), CreatedWeakness 
  * 
- * 
- * Баффы магического урона
- * Weakness, Buff (Mag, Any), CreatedWeakness
- * 
- * 
- * Баффы физической защиты
- * Buff (Ph, Any)
- * 
- * Баффы магической защиты
- * Buff (Mag, Any)
- * 
- * Дебаффы физ урона
- * Debuff (Ph)
- * 
- * Дебаффы магического урона
- * Debuff (Mag)
- * 
- * Дебаффы физической защиты
- * Debuff (Ph)
- * 
- * Дебаффы магической защиты
- * Debuff (Mag)
- * 
- * 
- * Формула физического урона :
- * 
- * силаКарты*силаПерсонажа 
- * + (баффФизУронаИлиЛюбогоУрона 
- *      + 0.1*естьЛиСлабость 
- *      + 0.1*естьЛиСозданнаяСлабость 
- *      - дебаффФизУрона 
- *      - слабость)%
- * - (физическаяЗащита 
- *      + баффФизическойЗащиты
- *      - дебаффФизическойЗащиты)
- * 
- * Формула магического урона :
- * 
- * силаКарты*интеллектПерсонажа
- * + (баффМагУронаИлиЛюбогоУрона
- *      + 0.1*естьЛиСлабость
- *      + 0.1*естьЛиСозданнаяСлабость
- *      - дебаффМагУрона
- *      - слабость)%
- * - (МагическаяЗащита
- *      + баффМагическойЗащиты
- *      - дебаффФизическойЗащиты)%
+РАСЧЕТ УРОНА:
+
+ Константы
+
+weaknessModifier = 0.1 // WEAKNESS_DAMAGE_MODIFIER
+handScalingStep = 2 // HAND_SCALING_STEP
+cardsDrawCount = 4 // CARDS_DRAW_COUNT
+ingredientDamageMult = 1.5 // INGREDIENT_DAMAGE_MULT (гриб)
+weakeningCasterMult = 0.9 // ослабление кастера (хардкод)
+
+1. Чистый урон (True)
+
+finalDamage = cardValue
+
+2. Общая формула физического / магического урона
+
+finalDamage = max(
+    round(
+        (rawCasterDamage - max(targetDefense, 0)) * (1 + targetPercentModifier)
+    ),
+    1
+)
+
+где rawCasterDamage — урон до защиты цели:
+
+rawCasterDamage = cardMultiplier
+                * casterStat
+                * ingredientMultiplier
+                * handScalingMultiplier
+                * weakeningCasterMultiplier
+
+3. Характеристика кастера
+
+casterStat = max(
+    casterBaseStat + attackBuffValue - attackDebuffValue,
+    0
+)
+
+// casterBaseStat = casterStrength (физический урон)
+//                = casterIntelligence (магический урон)
+// attackBuffValue / attackDebuffValue = 0, если баффа/дебаффа нет
+
+4. Множители сырого урона
+
+ingredientMultiplier = (casterActiveIngredient == Mushroom) ? ingredientDamageMult : 1
+weakeningCasterMultiplier = casterHasWeakening ? weakeningCasterMult : 1
+
+5. Защита цели
+
+targetDefense = max(
+    targetBaseDefense + protectionBuffValue - protectionDebuffValue,
+    0
+)
+
+// targetBaseDefense = targetGuts (физический урон)
+//                   = targetAura (магический урон)
+
+6. Процентный модификатор цели
+
+targetPercentModifier = (targetHasWeakening ?  0.1 : 0)
+                      + (targetHasElementStrength ? -weaknessModifier : 0)
+                      + (targetHasElementWeakness ? +weaknessModifier : 0)
+                      + (targetInWeakState ? +weaknessModifier : 0)
+
+7. Множитель руки (три варианта)
+
+// обычная карта (нет handScaling)
+handScalingMultiplier = 1
+
+// MoreCard — «больше карт в руке = больше урон»
+handScalingMultiplier = cardsInHand * handScalingStep          // = cardsInHand * 2
+
+// FewerCards — «меньше карт в руке = больше урон»
+missingCards = max(0, cardsDrawCount - 1 - cardsInHand)  // = max(0, 3 - cardsInHand)
+handScalingMultiplier = 1 + missingCards * handScalingStep        // = 1 + missingCards * 2
+
+// FewerCards — «меньше карт в руке = больше урон»
+missingCards = max(0, cardsDrawCount - 1 - cardsInHand)  // = max(0, 3 - cardsInHand)
+handScalingMultiplier = 1 + missingCards * handScalingStep        // = 1 + missingCards * 2
+
+8. После расчёта finalDamage
+
+// Deflect: цель не получает урон, кастер получает двойной
+if targetHasDeflect:
+    casterIncomingDamage = finalDamage * 2
+    targetIncomingDamage = 0
+
+// Вампиризм / колба (lifesteal)
+healAmount = round(finalDamage * effectLifesteal)
+
+// Применение к цели: сначала щит (bonusHp), потом hp
+absorbedByShield = min(targetBonusHp, finalDamage)
+targetBonusHp = targetBonusHp - absorbedByShield
+targetHp = targetHp - (finalDamage - absorbedByShield)
  *
  */
 

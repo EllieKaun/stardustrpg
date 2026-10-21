@@ -7,6 +7,9 @@ charProgress = 0
 charsPerStep = 0.8
 onComplete = undefined
 selectedOption = 0
+optionRects = []
+mouseLastX = -1
+mouseLastY = -1
 
 currentOptions = function() {
     var line = lines[lineIndex]
@@ -32,6 +35,7 @@ startDialog = function(_lines, _onComplete = undefined) {
     lineIndex = 0
     charProgress = 0
     selectedOption = 0
+    optionRects = []
     onComplete = _onComplete
     active = true
     global.uiModal = true
@@ -68,6 +72,7 @@ advance = function() {
     } else {
         charProgress = 0
         selectedOption = 0
+        optionRects = []
         runLineEnter()
     }
 }

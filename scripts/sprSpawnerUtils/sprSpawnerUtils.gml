@@ -41,33 +41,27 @@ function createEncounterForSection(section) {
     return result
 }
 
-// создание пула наград для зоны для секции при победе
 function rewardPoolForSection(section) {
-    var content = zoneContent()
-    var s = content.sections[section]
-    var ids = (s != undefined) ? s.rewardIds : [global.CardId.physicalDamageSingleTarget]
-    return { ids: ids, rarities: content.rewardRarities }
+    return forestRewardPool()
 }
 
-// Единый пул наград демо
-function rewardIdAllowed(id) {
-    if (!cardExists(id)) { return false }
-    var card = cardFromRef({ id: id, rarity: CardsRarity.Default })
-    if (card == undefined) { return false }
-    return card.target != TargetTypes.AllEnemies
+// Добавить в список только существующие карты без повторов
+function appendRewardIds(targetIds, sourceIds) {
+    for (var idIndex = 0; idIndex < array_length(sourceIds); idIndex++) {
+        var cardId = sourceIds[idIndex]
+        if (cardExists(cardId) && !array_contains(targetIds, cardId)) { array_push(targetIds, cardId) }
+    }
 }
 
+// Пул наград леса на текущий момент
+// Дневные, ночные и босс карты
 function forestRewardPool() {
     var content = zoneContent()
     var ids = []
-    var order = [Section.TopLeft, Section.TopRight, Section.BottomRight, Section.BottomLeft]
-    for (var sectionIndex = 0; sectionIndex < array_length(order); sectionIndex++) {
-        var s = content.sections[order[sectionIndex]]
-        if (s == undefined) { continue }
-        for (var idIndex = 0; idIndex < array_length(s.rewardIds); idIndex++) {
-            if (rewardIdAllowed(s.rewardIds[idIndex])) { array_push(ids, s.rewardIds[idIndex]) }
-        }
-    }
+    appendRewardIds(ids, content.rewardAlways)
+    if (isNight()) { appendRewardIds(ids, content.rewardNightOnly) }
+    if (isBossDefeated()) { appendRewardIds(ids, content.rewardAfterBoss) } 
+    if (global.foxJoined) { appendRewardIds(ids, content.rewardForestSet) }
     return { ids: ids, rarities: content.rewardRarities }
 }
 
@@ -81,11 +75,15 @@ function makeEncounter(enemyCreators, reward, introSprite = undefined) {
 function forestCompositions() {
     var content = zoneContent()
     var allCompositions = []
-    for (var sectionIndex = 0; sectionIndex < array_length(content.sections); sectionIndex++) {
-        var s = content.sections[sectionIndex]
-        if (s == undefined) { continue }
-        for (var compositionIndex = 0; compositionIndex < array_length(s.compositions); compositionIndex++) {
-            array_push(allCompositions, s.compositions[compositionIndex])
+    for (var sectionIndex = 0; 
+        sectionIndex < array_length(content.sections); 
+        sectionIndex++) {
+        var section = content.sections[sectionIndex]
+        if (section == undefined) { continue }
+        for (var compositionIndex = 0; 
+            compositionIndex < array_length(section.compositions); 
+            compositionIndex++) {
+            array_push(allCompositions, section.compositions[compositionIndex])
         }
     }
     return allCompositions
@@ -99,7 +97,6 @@ function worldIgniteChance() {
     return affix.roll(difficultyLevel())
 }
 
-// Вид мирового мини-врага по его объекту
 function worldEnemyKind(obj) {
     switch (obj) {
         case oCrakerNutSmall: return EnemyKind.CrackerNut
@@ -110,7 +107,6 @@ function worldEnemyKind(obj) {
     }
 }
 
-// Игнайт-спрайт для открытого мира по виду врага
 function worldIgniteSprite(kind) {
     var spriteName = ""
     switch (kind) {
@@ -167,7 +163,29 @@ function puppetMasterEncounter() {
         PuppetMasterCutScene
     )
     encounter.raw = true
+    encounter.isBoss = true
     return encounter
+}
+
+function randomSpawnerPoint(minDist, maxDist, maxAttempts = 30) {
+    var leader = oGameController.selected_character
+    if (!instance_exists(leader)) { return undefined }
+    var zoneCount = instance_number(oSpawner)
+    if (zoneCount == 0) { return undefined }
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+        var zone = instance_find(oSpawner, irandom(zoneCount - 1))
+        var pointX = zone.bbox_left + random(zone.bbox_right - zone.bbox_left)
+        var pointY = zone.bbox_top + random(zone.bbox_bottom - zone.bbox_top)
+        if (!collision_point(pointX, pointY, oSpawner, false, true)) { continue }
+        var dist = point_distance(leader.x, leader.y, pointX, pointY)
+        if (dist < minDist || dist > maxDist) { continue }
+        return { x: pointX, y: pointY, spawner: zone }
+    }
+    return undefined
+}
+
+function fireflyLimit() {
+    return round(FIREFLY_MAX * nightValue())
 }
 
 // Зацикленный звук ходьбы по траве выделенного персонажа.

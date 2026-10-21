@@ -1,22 +1,17 @@
 autosaveUpdate()
-updateTimeOfDay() // продвигаем время суток (день/ночь)
+updateTimeOfDay()
 
-// Катсцена босса
-if (global.cutsceneActive) {
-    var csSpd = sprite_get_speed(cutsceneSprite)
-    if (sprite_get_speed_type(cutsceneSprite) == spritespeed_framespersecond) {
-        csSpd /= game_get_speed(gamespeed_fps)
-    }
-    // страховка: если у спрайта нет анимации (ккорость 0 / один кадр) —
-    // показываем 1.5 сек и завершаем, иначе катсцена зависнет
-    if (csSpd <= 0) { csSpd = sprite_get_number(cutsceneSprite) / (1.5 * game_get_speed(gamespeed_fps)) }
-    cutsceneFrame += csSpd
-    if (cutsceneFrame >= sprite_get_number(cutsceneSprite)) {
-        global.cutsceneActive = false
-        global.uiModal = false
-        with (oTransition) {
-            target_room = oGameController.cutsceneTargetRoom
-            state = "fade_out"
+// Анимации входа в бой
+if (battleEntryState == BattleEntryState.Leaving) { exit }
+if (battleEntryState != BattleEntryState.Idle) {
+    entryAnimFrame += entryAnimFramesPerStep(entryAnimSprite)
+    if (entryAnimFrame >= sprite_get_number(entryAnimSprite)) {
+        if (battleEntryState == BattleEntryState.Transition) {
+            goToBattleAfterTransition()
+        } else if (battleStartSprite() != noone) {
+            changeBattleEntryState(BattleEntryState.Transition)
+        } else {
+            startFadeToBattle()
         }
     }
     exit

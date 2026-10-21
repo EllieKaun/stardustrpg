@@ -23,9 +23,8 @@ if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {
     draw_set_color(c_white)
 }
 
-var shopOpen = instance_exists(oShop) && oShop.open
-var deckOpen = instance_exists(oDeckBuilder) && oDeckBuilder.open
-if (!shopOpen && !deckOpen && !global.cutsceneActive) {
+if (worldHudVisible()) {
+    // Рисуем монетки
     var guiWidth = display_get_gui_width()
     var guiHeight = display_get_gui_height()
     var goldMargin = guiHeight * 0.03
@@ -49,15 +48,63 @@ if (!shopOpen && !deckOpen && !global.cutsceneActive) {
     draw_set_valign(fa_top)
 }
 
-// Катсцена появления босса
-if (global.cutsceneActive && sprite_exists(cutsceneSprite)) {
+// Трекер целей активных квестов (сбор предметов)
+var questTrackables = questActiveTrackables()
+if (worldHudVisible() && array_length(questTrackables) > 0) {
+    var guiWidth = display_get_gui_width()
+    var guiHeight = display_get_gui_height()
+    var margin = floor(guiHeight * 0.03)
+    var iconH = floor(guiHeight * 0.06)
+    var gap = floor(guiHeight * 0.02) // промежуток между предметами
+    var slotW = iconH + gap // ширина ячейки одного предмета
+    var countH = floor(iconH * 0.42) // высота текста счётчика
+    var countY = margin + iconH + floor(gap * 0.25)
+
+    for (var i = 0; i < array_length(questTrackables); i++) {
+        var trackable = questTrackables[i]
+        var iconCenterX = margin + i * slotW + iconH * 0.5
+        var iconCenterY = margin + iconH * 0.5
+        var done = trackable.done
+        var pop = trackable.scale // отклик на подбор
+
+        var spr = trackable.sprite
+        if (spr != noone) {
+            var sprScale = (iconH / sprite_get_height(spr)) * pop
+            draw_sprite_ext(spr, 0, floor(iconCenterX), floor(iconCenterY),
+                sprScale, sprScale, 0, c_white, done ? 1 : 0.85)
+        } else {
+            var half = iconH * 0.5 * pop
+            draw_set_color(done ? c_lime : make_color_rgb(92, 82, 70))
+            draw_set_alpha(0.85)
+            draw_roundrect(floor(iconCenterX - half), floor(iconCenterY - half),
+                floor(iconCenterX + half), floor(iconCenterY + half), false)
+            draw_set_alpha(1)
+            draw_set_color(c_white)
+        }
+
+        // Счётчик n/need под иконкой, с тенью, через drawUiText
+        var countStr = string(trackable.count) + "/" + string(trackable.needed)
+        draw_set_halign(fa_center)
+        draw_set_valign(fa_top)
+        draw_set_color(c_black)
+        drawUiText(iconCenterX + 1, countY + 1, countStr, countH, iconH * 1.4)
+        draw_set_color(done ? c_lime : c_white)
+        drawUiText(iconCenterX, countY, countStr, countH, iconH * 1.4)
+        draw_set_color(c_white)
+        draw_set_halign(fa_left)
+        draw_set_valign(fa_top)
+    }
+}
+
+// Анимации входа в бой
+if (battleEntryState != BattleEntryState.Idle && sprite_exists(entryAnimSprite)) {
     var guiWidth = display_get_gui_width()
     var guiHeight = display_get_gui_height()
 
-    drawScreenDim(0.5)
+    if (battleEntryState == BattleEntryState.Intro) { drawScreenDim(0.5) }
 
-    var frame = min(floor(cutsceneFrame), sprite_get_number(cutsceneSprite) - 1)
-    draw_sprite_stretched(cutsceneSprite, frame, 0, 0, guiWidth, guiHeight)
+    var frame = min(floor(entryAnimFrame), sprite_get_number(entryAnimSprite) - 1)
+    draw_sprite_stretched(entryAnimSprite, frame, 0, 0, guiWidth, guiHeight)
 }
 
 autosaveDrawIcon()

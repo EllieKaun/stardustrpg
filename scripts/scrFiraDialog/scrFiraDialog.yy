@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrFiraDialog",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrFiraDialog",
+  "parent":{
+    "name":"Fira",
+    "path":"folders/Overworld/Characters/Fira.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

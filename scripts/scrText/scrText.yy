@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrText",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrText",
+  "parent":{
+    "name":"CommonUI",
+    "path":"folders/CommonUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

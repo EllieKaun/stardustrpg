@@ -34,7 +34,7 @@ function TutorialRunner(_steps) constructor {
     self.step = function() {
         if (self.index >= array_length(self.steps)) { return false }
         var tutorialStep = self.steps[self.index]
-        var shouldAdvance = variable_struct_exists(tutorialStep, "advanceWhen") ? tutorialStep.advanceWhen() : uiConfirmPressed()
+        var shouldAdvance = variable_struct_exists(tutorialStep, "advanceWhen") ? tutorialStep.advanceWhen() : (uiConfirmPressed() || mouse_check_button_pressed(mb_left))
         if (shouldAdvance) {
             self.index++
             if (self.index >= array_length(self.steps)) { return true }

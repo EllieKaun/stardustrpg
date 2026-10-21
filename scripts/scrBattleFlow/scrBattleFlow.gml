@@ -36,9 +36,6 @@ function afterPlayChecks() {
 // Отложенный конец боя
 function battleEndDelayed(outcome) {
     var runner = new SequenceRunner()
-    // outcome передаём через ctx: шаг выполняется позже, когда параметр функции
-    // уже недоступен (замыкание его не держит). ctx.outcome читаем в локальную
-    // до with — внутри with (Battle) голое имя искалось бы как поле Battle
     runner.play([
         stepWait(BATTLE_END_FRAMES),
         stepDo(function(ctx) {
@@ -90,7 +87,15 @@ function checkIfHasEffectType(character, effectType) {
     return false
 }
 
-// Есть ли на персонаже бафф определенного модификатор 
+// Первый стариор со статусом провокации из выбора
+function provokingFoe(foes) {
+    for (var i = 0; i < array_length(foes); i++) {
+        if (checkIfHasEffectType(foes[i], EffectTypes.Provoke)) { return foes[i] }
+    }
+    return noone
+}
+
+// Есть ли на персонаже бафф определенного модификатор
 function checkIfHasBuff(character, effectType, modifierToBuff) {
     var effects = character.effects 
     for(var i = 0; i < array_length(effects); i++) {
@@ -153,6 +158,8 @@ function enemyPlayableCards(enemy, cards) {
     var playable = []
     for (var i = 0; i < array_length(cards); i++) {
         var card = cards[i]
+        // Лесной набор — только для героев: динамические карты сбивают ИИ
+        if (is_struct(card) && variable_struct_exists(card, "cardSet") && card.cardSet == CardSet.Forest) { continue }
         if (is_struct(card) && variable_struct_exists(card, "cardBaseSpr") && variable_struct_exists(card, "effects")
             && checkIfCanPlayCard(enemy, card)) {
             array_push(playable, card)
@@ -236,20 +243,31 @@ function doMenuAction(action) {
         break
         case BattleMenuAction.Run:
             if (variable_global_exists("battleNoFlee") && global.battleNoFlee) { break }
-            analyticsRetreat() // аналитика: побег из боя
-            var fleeMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
-            addGold(-round(GOLD_RUN_PENALTY * fleeMult)) // штраф за побег (ночью ×1.5)
-            startTransition(global.returnRoom)
+            changeBattleState(BattleStates.RunConfirm)
         break
         case BattleMenuAction.Info:
             changeBattleState(BattleStates.EnemyInfoSelection)
         break
+        case BattleMenuAction.Skip:
+            skipTurn()
+        break
     }
 }
 
-// Инициализация выборки - отбор персонажей для выбора (исключение ko)
+// Сколько золота игрок потеряет
+function battleFleePenalty() {
+    var fleeMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
+    return min(getGold(), round(GOLD_RUN_PENALTY * fleeMult))
+}
+
+function confirmBattleFlee() {
+    analyticsRetreat() // аналитика: побег из боя
+    addGold(-battleFleePenalty())
+    startTransition(global.returnRoom)
+}
+
+// Инициализация выбора
 function initTargetSelection(targets) {
-    // isActive не снимаем: обводка ходящего персонажа остаётся на выборе цели и в анимациях
     var aliveTargets = []
     for(var i = 0; i < array_length(targets); i++) {
         if !targets[i].isKO() { array_push(aliveTargets, targets[i]) }
@@ -362,7 +380,7 @@ function removeDeadPuppets() {
 
             if (i <= selectedCharacterNumber) { selectedCharacterNumber-- }
 
-            // Даём марионетке растаять, инстанс удалится сам в конце анимации
+            // инстанс удалится в конце анимации
             if (puppet.disappearing) { puppet.destroyWhenGone = true }
             else { instance_destroy(puppet) }
         }

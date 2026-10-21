@@ -30,7 +30,11 @@ function initEffectRegistry() {
         },
         onEndOfTurn: function(effect, character) {
             var rawValue = is_method(effect.value) ? effect.value() : effect.value
-            character.applyDamage(mitigateDamage(character, effect, rawValue))
+            if (effect.damageType == DamageTypes.True) {
+                character.applyDamage(rawValue)
+            } else {
+                character.applyDamage(mitigateDamage(character, effect, rawValue))
+            }
         },
     })
 
@@ -74,6 +78,17 @@ function initEffectRegistry() {
             with (Battle) { shuffleDeckAndTake4(selectedCharacter) }
         },
     })
+    variable_struct_set(effectsRepository, "DrawCard", {
+        onPlay: function(effect, caster, targets) {
+            with (Battle) {
+                var casterDeck = caster.deck
+                if (array_length(casterDeck.shuffeledDeck) > 0
+                    && array_length(casterDeck.cardsInHand) < maxCardsOnDeskNumber) {
+                    array_push(casterDeck.cardsInHand, array_shift(casterDeck.shuffeledDeck))
+                }
+            }
+        },
+    })
     variable_struct_set(effectsRepository, "CreatePuppet", {
         onPlay: function(effect, caster, targets) {
             with (Battle) { spawnPuppet(effect.puppetCategory, caster) }
@@ -103,10 +118,10 @@ function initEffectRegistry() {
             var target = is_array(targets) ? (array_length(targets) > 0 ? targets[0] : noone) : targets
             if (target == noone) { return }
 
-            if (variable_instance_exists(target, "hasSpear") && target.hasSpear) {
-                target.hasSpear = false
+            if (variable_instance_exists(target, "carryItem") && target.carryItem != noone) {
+                carryItemDef(target.carryItem).onSteal()
+                target.carryItem = noone
                 target.image_blend = c_white
-                questGrantSpear()
             } else {
                 var hand = target.getCardsInHand()
                 if (array_length(hand) > 0) {
@@ -128,6 +143,69 @@ function initEffectRegistry() {
     variable_struct_set(effectsRepository, "Weakening", { icon: noone })
     variable_struct_set(effectsRepository, "IgnoreWeakness", { icon: noone })
     variable_struct_set(effectsRepository, "CreateTemporaryWeakness", { icon: noone })
+
+    
+    variable_struct_set(effectsRepository, "Deflect", { icon: stunned })
+    
+    variable_struct_set(effectsRepository, "GainIngredient", { 
+        onPlay: function(effect, caster, targets) {
+            repeat (effect.value) {
+            	ingredientAddRandom(caster)
+            }
+        }
+    })
+    
+    variable_struct_set(effectsRepository, "AddRandomCards", {
+        onPlay: function(effect, caster, targets) {
+            var pool = randomCardPool(effect.cardSet, effect.category)
+            if (array_length(pool) == 0) { return }
+            var hand = caster.getCardsInHand()
+            repeat (effect.value) {
+                if (array_length(hand) >= MAX_CARDS_IN_HAND) { break }
+                var pickedId = pool[irandom(array_length(pool) - 1)]
+                var given = cardBuild(pickedId, effect.rarity)
+                if (given != undefined) { array_push(hand, given) }
+            }
+        }
+    })
+
+    variable_struct_set(effectsRepository, "DiscardRandomCard", {
+        onPlay: function(effect, caster, targets) {
+            var hand = caster.getCardsInHand()
+            if (array_length(hand) == 0) { return }
+
+            var lost = hand[irandom(array_length(hand) - 1)]
+            removeCardFromHand(caster, lost)
+        }
+    })
+
+    // Провокация
+    variable_struct_set(effectsRepository, "Provoke", {
+        onEndOfTurn: function(effect, character) { ingredientAddRandom(character) },
+    })
+
+    // Формы колбы
+    variable_struct_set(effectsRepository, "BonusHp", {
+        onInstant: function(effect, caster, targets) {
+            if (is_array(targets)) {
+                for (var i = 0; i < array_length(targets); i++) { targets[i].applyBonusHp(effect.value) }
+            } else { targets.applyBonusHp(effect.value) }
+        },
+    })
+    variable_struct_set(effectsRepository, "ExtendNegative", {
+        onInstant: function(effect, caster, targets) {
+            if (is_array(targets)) {
+                for (var i = 0; i < array_length(targets); i++) { extendNegativeEffects(targets[i], effect.value) }
+            } else { extendNegativeEffects(targets, effect.value) }
+        },
+    })
+    variable_struct_set(effectsRepository, "RemoveNegative", {
+        onInstant: function(effect, caster, targets) {
+            if (is_array(targets)) {
+                for (var i = 0; i < array_length(targets); i++) { removeOneNegativeEffect(targets[i]) }
+            } else { removeOneNegativeEffect(targets) }
+        },
+    })
 
     global.effectRegistry = effectsRepository
 }
@@ -159,6 +237,15 @@ function effectKindFromType(type) {
         case EffectTypes.IgnoreWeakness: return "IgnoreWeakness"
         case EffectTypes.CreateTemporaryWeakness: return "CreateTemporaryWeakness"
         case EffectTypes.CreatePuppet: return "CreatePuppet"
+        case EffectTypes.Deflect: return "Deflect"
+        case EffectTypes.DrawCard: return "DrawCard"
+        case EffectTypes.GainIngredient: return "GainIngredient"
+        case EffectTypes.Provoke: return "Provoke"
+        case EffectTypes.BonusHp: return "BonusHp"
+        case EffectTypes.ExtendNegative: return "ExtendNegative"
+        case EffectTypes.RemoveNegative: return "RemoveNegative"
+        case EffectTypes.DiscardRandomCard: return "DiscardRandomCard"
+        case EffectTypes.AddRandomCards: return "AddRandomCards"
         default: return undefined
     }
 }
@@ -201,12 +288,13 @@ function statusNameIcon(effect) {
         case StatusNames.Burn: return BurnIcon
         case StatusNames.Bleeding: return BleedIcon
         case StatusNames.Freeze: return FreezeIcon
-        case StatusNames.Shock: return ShockIcon
+        case StatusNames.Shock: return ShockIcon 
+        case StatusNames.Poison: return BurnIcon    
     }
     return noone
 }
 
-// Иконка слабости по сырому значению StatusNames (для инфы о враге)
+// Иконка слабости по значению StatusNames (для инфы о враге)
 function weaknessIcon(statusName) {
     switch (statusName) {
         case StatusNames.Stun: return StunIcon
@@ -214,6 +302,7 @@ function weaknessIcon(statusName) {
         case StatusNames.Bleeding: return BleedIcon
         case StatusNames.Freeze: return FreezeIcon
         case StatusNames.Shock: return ShockIcon
+        case StatusNames.Poison: return ShockIcon
     }
     return noone
 }
@@ -228,6 +317,7 @@ function weaknessLabel(statusName) {
         case StatusNames.Bomb: return loc("weakness.Bomb")
         case StatusNames.Vampirism: return loc("weakness.Vampirism")
         case StatusNames.Weakening: return loc("weakness.Weakening")
+        case StatusNames.Poison: return loc("weakness.Poison")    
     }
     return loc("weakness.Unknown")
 }
@@ -292,6 +382,14 @@ function DamageEffect(damageType, value, sprite = attackEffect, sound = PhysicaD
     return { type: EffectTypes.Damage, damageType: damageType, value: value,
              timing: Timing.Instant, sprite: sprite, sound: sound }
 }
+
+function HandScalingDamageEffect(damageType, baseValue, handScaling,
+    sprite = attackEffect, sound = PhysicaDamage) {
+    var effect = DamageEffect(damageType, baseValue, sprite, sound)
+    effect.handScaling = handScaling    
+    return effect
+}
+
 // Урон со временем времени со статусом (Burn, Bleeding)
 function DamageOverTimeEffect(damageType, value, duration, statusName, chance, sprite = noone, sound = noone) {
     var effect = { type: EffectTypes.Damage, damageType: damageType, value: value,
@@ -349,6 +447,9 @@ function Burn(value, duration, chance, sound = FireMagic) {
 function Bleeding(value, duration, chance, sound = SliceAtc) {
     return DamageOverTimeEffect(DamageTypes.Physical, value, duration, StatusNames.Bleeding, chance, slice, sound)
 }
+function Poison(value, duration, chance, sound = SliceAtc) {
+    return DamageOverTimeEffect(DamageTypes.True, value, duration, StatusNames.Poison, chance, slice, sound)
+}
 
 // Лечение, мана
 function HealEffect(value, sprite = hphealEffect, sound = HealMagic) {
@@ -397,6 +498,9 @@ function AddEnergyEffect(value) {
 function ShuffleDeckEffect() {
     return { type: EffectTypes.ShuffleDeck, timing: Timing.OnActions, sprite: attackEffect }
 }
+function DrawCardEffect() {
+    return { type: EffectTypes.DrawCard, timing: Timing.OnActions, sprite: attackEffect }
+}
 function CopyCardEffect() {
     return { type: EffectTypes.CopyCard, timing: Timing.OnActions, sprite: attackEffect }
 }
@@ -407,7 +511,127 @@ function IgnoreWeaknessEffect(duration) {
 function BossClone(maxSlots) {
     return { kind: "BossClone", timing: Timing.OnActions, maxSlots: maxSlots }
 }
-
 function StealEffect() {
     return { kind: "Steal", timing: Timing.Instant, sprite: attackEffect }
+}
+
+function DeflectEffect(duration, sprite = buffEffect, sound = MagicBuff) {
+    return {
+        type: EffectTypes.Deflect, statusName: StatusNames.Deflect,
+        duration: duration, timing: Timing.Overtime,
+        sprite: sprite, sound: sound
+    }
+}
+
+function DiscardRandomCardEffect() { 
+    return { type: EffectTypes.DiscardRandomCard, timing: Timing.OnActions } 
+}
+
+// Лесные карты
+function AddRandomCardsEffect(count, cardSet, category, rarity = CardsRarity.Default) {
+    return { type: EffectTypes.AddRandomCards, value: count, cardSet: cardSet,
+             category: category, rarity: rarity, timing: Timing.OnActions }
+}
+
+function randomCardPool(cardSet, category) {
+    var shopIds = []
+    var shopCards = zoneContent().shopCards
+    for (var shopIndex = 0; shopIndex < array_length(shopCards); shopIndex++) { array_push(shopIds, shopCards[shopIndex].id) }
+
+    var pool = []
+    var ids = variable_struct_get_names(global.cardRegistry)
+    for (var idIndex = 0; idIndex < array_length(ids); idIndex++) {
+        var cardId = ids[idIndex]
+        var definition = global.cardRegistry[$ cardId]
+        if (definition.category != category) { continue }
+        if (cardSetOf(cardId) != cardSet) { continue }
+        if (array_contains(shopIds, cardId)) { continue }
+        var sample = cardBuild(cardId, CardsRarity.Default)
+        if (sample == undefined || cardSummonsPuppet(sample)) { continue }
+        array_push(pool, cardId)
+    }
+    return pool
+}
+
+function GainIngredientEffect(count = 1) {
+    return { type: EffectTypes.GainIngredient,
+        value: count,
+        timing: Timing.OnActions }
+}
+
+// Провокация
+function ProvokeEffect(duration) {
+    return { type: EffectTypes.Provoke, statusName: StatusNames.Provoke,
+             duration: duration, timing: Timing.EndOfTurn, sprite: buffEffect }
+}
+
+// Формы колбы
+function BonusHpEffect(value) {
+    return { type: EffectTypes.BonusHp, value: value, timing: Timing.Instant, sprite: buffEffect }
+}
+function ExtendNegativeEffect(turns) {
+    return { type: EffectTypes.ExtendNegative, value: turns, timing: Timing.Instant, sprite: debuffEffect }
+}
+function RemoveNegativeEffect() {
+    return { type: EffectTypes.RemoveNegative, timing: Timing.Instant, sprite: hphealEffect }
+}
+
+// Чарм
+function HandAuraStatBonus(modifier, value) {
+    return { kind: HandCharmKind.StatBonus, modifier: modifier, value: value }
+}
+
+function effectStatusKey(effect) {
+    if (!variable_instance_exists(effect, "statusName")) { return "" }
+    switch (effect.statusName) {
+        case StatusNames.Burn: return "Burn"
+        case StatusNames.Bleeding: return "Bleeding"
+        case StatusNames.Stun: return "Stun"
+        case StatusNames.Freeze: return "Freeze"
+        case StatusNames.Shock: return "Shock"
+        case StatusNames.Bomb: return "Bomb"
+        case StatusNames.Vampirism: return "Vampirism"
+        case StatusNames.Weakening: return "Weakening"
+        case StatusNames.Deflect: return "Deflect"
+        case StatusNames.Poison: return "Poison"
+        case StatusNames.Provoke: return "Provoke"
+    }
+    return ""
+}
+
+function effectBuffKey(effect) {
+    if (!variable_instance_exists(effect, "type")) { return "" }
+    var prefix = ""
+    if (effect.type == EffectTypes.Buff) { prefix = "Buff" }
+    else if (effect.type == EffectTypes.Debuff) { prefix = "Debuff" }
+    if (prefix == "" || !variable_instance_exists(effect, "buffType")) { return "" }
+    switch (effect.buffType) {
+        case ModifiersToBuff.PhysicalDamage: return prefix + "PhysicalDamage"
+        case ModifiersToBuff.MagicalDamage: return prefix + "MagicalDamage"
+        case ModifiersToBuff.AnyDamage: return prefix + "AnyDamage"
+        case ModifiersToBuff.PhysicalProtection: return prefix + "PhysicalProtection"
+        case ModifiersToBuff.MagicalProtection: return prefix + "MagicalProtection"
+        case ModifiersToBuff.AnyProtection: return prefix + "AnyProtection"
+    }
+    return ""
+}
+
+function effectDisplayName(effect) {
+    var statusKey = effectStatusKey(effect)
+    if (statusKey != "") { return loc("status.name." + statusKey) }
+    var buffKey = effectBuffKey(effect)
+    if (buffKey != "") { return loc("status.name." + buffKey) }
+    return loc("status.name.Unknown")
+}
+
+function effectDescription(effect) {
+    var statusKey = effectStatusKey(effect)
+    if (statusKey != "") { return loc("status.desc." + statusKey) }
+    var buffKey = effectBuffKey(effect)
+    if (buffKey != "") {
+        var text = loc("status.desc." + buffKey)
+        if (variable_instance_exists(effect, "value")) { return text + string(effect.value) }
+        return text
+    }
+    return loc("status.desc.Unknown")
 }

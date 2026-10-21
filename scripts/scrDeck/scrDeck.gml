@@ -12,12 +12,13 @@ function shuffleDeckAndTake4(character) {
     var top4Cards = take4CardsFromDeckTop(shuffeledDeck, [])
     character.deck.shuffeledDeck = shuffeledDeck
     character.deck.cardsInHand = top4Cards
+    refreshDynamicCards(character) // обновление колб
 }
 
 function take4CardsFromDeckTop(shuffledDeck, cardsInHand) {
     var top4Cards = []
-    for(var i = array_length(cardsInHand); 
-        i < maxCardsOnDeskNumber && array_length(shuffledDeck) > 0; 
+    for(var i = array_length(cardsInHand);
+        i < CARDS_DRAW_COUNT && array_length(shuffledDeck) > 0;
         i++) {
         array_push(top4Cards, array_shift(shuffledDeck))
     }  

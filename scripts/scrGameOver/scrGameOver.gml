@@ -83,10 +83,17 @@ function drawVictoryScreen() {
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
-    drawUiText(screenWidth / 2, floor(screenHeight * 0.08), loc("ui.victory"), screenHeight * 0.07)
-
     var count = array_length(rewardChoices)
     rewardHitRects = []
+
+    if (count > 0) {
+        drawUiText(screenWidth / 2, floor(screenHeight * 0.055), loc("ui.victory"), screenHeight * 0.06)
+        draw_set_color(merge_color(c_white, c_yellow, 0.4))
+        drawUiText(screenWidth / 2, floor(screenHeight * 0.115), loc("ui.chooseReward"), screenHeight * 0.035, screenWidth * 0.9)
+        draw_set_color(c_white)
+    } else {
+        drawUiText(screenWidth / 2, floor(screenHeight * 0.08), loc("ui.victory"), screenHeight * 0.07)
+    }
 
     // Если нет наград
     if (count == 0) {
@@ -111,7 +118,9 @@ function drawVictoryScreen() {
 
         array_push(rewardHitRects, { x: cardX, y: cardY, w: cardW, h: cardH, index: rewardIndex })
 
-        drawCard(rewardChoices[rewardIndex], cardX, cardDrawY, cardW, cardH)
+        var reward = rewardChoices[rewardIndex]
+        var ownedAlready = variable_struct_exists(reward, "cardRef") && getOwnedCount(reward.cardRef.id, reward.cardRef.rarity) > 0
+        drawCard(reward, cardX, cardDrawY, cardW, cardH, false, ownedAlready ? 0.4 : 1)
 
         if (isSelected) {
             draw_sprite_ext(sPointer, 0, floor(cardX - 10 * guiScaleFactor), floor(cardDrawY + cardH / 2), guiScaleFactor, guiScaleFactor, 0, c_white, 1)

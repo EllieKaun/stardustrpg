@@ -4,8 +4,8 @@ kind = worldEnemyKind(object_index)
 igniteSprite = worldIgniteSprite(kind)
 my_spawner = noone
 spawnedDynamically = false
-carriesSpear = false
-canCarrySpear = true // может ли передавать копье
+carriedItem = noone
+carryInventory = [CarryItem.Spear, CarryItem.Cauldron]
 rearmDistance = 48 // на сколько отойти, чтобы снова можно было драться
 
 shouldWalk = true

@@ -36,7 +36,7 @@ function MenuLayer(spr = noone, params = {}) constructor {
     self.tiled = menuParam(params, "tiled", false)
     self.placeholderColor = menuParam(params, "placeholderColor", make_color_rgb(20, 24, 34))
     self.time = 0 // секунды с создания
-    self.ox = 0 // накопленный горизонтальный скролл
+    self.ox = 0 // горизонтальный скролл
 
     self.update = function() {
         var deltaTime = delta_time / 1000000
@@ -135,15 +135,25 @@ function Menu(items, config = {}) constructor {
         }
         self.index = navIndex
     }
-    self.moveNext = function() { self.moveBy(1) }
-    self.movePrev = function() { self.moveBy(-1) }
-    self.current  = function() { return self.items[self.index] }
+    self.moveNext = function() { 
+        self.moveBy(1) 
+    }
+    self.movePrev = function() { 
+        self.moveBy(-1) 
+    }
+    self.current = function() { 
+        return self.items[self.index] 
+    }
 
     self.confirm = function() {
-        if (array_length(self.items) == 0) { return false }
+        if (array_length(self.items) == 0) { 
+            return false 
+        }
         var item = self.current()
         if (!item.enabled) { return false }
-        if (item.onSelect != undefined) { item.onSelect(item) }
+        if (item.onSelect != undefined) { 
+            item.onSelect(item) 
+        }
         return true
     }
 
@@ -244,9 +254,11 @@ function menuUpdateLayers(backLayers, foreLayers) {
 
 // GUI-слой в аспекте 16:9
 function menuEnsureCrispGui() {
-    // В бою база GUI равна размеру вьюхи, меню поверх боя должно рисоваться в ней же
-    if (instance_exists(Battle)) { setCrispGui(guiBaseWidth(), guiBaseHeight()) }
-    else { setCrispGui(320, 180) }
+    if (instance_exists(Battle)) { 
+        setCrispGui(guiBaseWidth(), guiBaseHeight()) 
+    } else { 
+        setCrispGui(320, 180) 
+    }
 }
 
 // Возвращает список разрешений экрана, не превышающих размер дисплея
@@ -284,6 +296,8 @@ function menuGetResolutions() {
 // Применить режим окна: фуллскрин, либо оконный размер с центрированием
 function applyWindowMode(winW, winH, fullscreen) {
     if (fullscreen) {
+     
+        window_enable_borderless_fullscreen(true)
         window_set_fullscreen(true)
         return
     }
@@ -298,8 +312,11 @@ function applyWindowMode(winW, winH, fullscreen) {
 
 // Применяет настройки дисплея при старте
 function initDisplaySettings() {
-    if (variable_global_exists("displayModeReady") && global.displayModeReady) { return; }
-    global.displayModeReady = true;
+    if (variable_global_exists("displayModeReady")
+         && global.displayModeReady) { 
+        return
+    }
+    global.displayModeReady = true
     
     ini_open("settings.ini")
     var resolutionIndex = ini_read_real("Display", "ResolutionIndex", 2)
@@ -309,7 +326,9 @@ function initDisplaySettings() {
     var resolutions = menuGetResolutions()
     resolutionIndex = min(resolutionIndex, array_length(resolutions) - 1)
     if (resolutionIndex >= 0) {
-        applyWindowMode(resolutions[resolutionIndex][0], resolutions[resolutionIndex][1], fullscreen)
+        applyWindowMode(resolutions[resolutionIndex][0], 
+        resolutions[resolutionIndex][1], 
+        fullscreen)
     }
     global.displayFullscreen = fullscreen
 }

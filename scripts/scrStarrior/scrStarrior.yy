@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrStarrior",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrStarrior",
+  "parent":{
+    "name":"Starriors",
+    "path":"folders/BattleDomain/Scripts/Starriors.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

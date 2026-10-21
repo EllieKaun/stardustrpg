@@ -36,7 +36,9 @@ effects = []
 weaknesses = []
 strengths = []
 effectNotifications = []
-
+ingredients = [] // ингредиенты
+activeIngredient = undefined // текущий ингредиент
+bonusHp = 0 // Избыточное хп
 deck = new Deck([])
 
 // Исчезновение врага при смерти
@@ -134,6 +136,10 @@ function hasWeakness(weaknessType) {
 }
 
 function applyDamage(value) {
+    var absorbed = min(bonusHp, value) // урон по оверхелзу
+    bonusHp -= absorbed
+    value -= absorbed
+    
     hp -= value
     if hp <= 0 && actionState != StarriorStates.KnockOut {
         changeActionState(StarriorStates.KnockOut, undefined)
@@ -155,6 +161,15 @@ function applyHeal(value) {
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
     drawDamageNumber(spawnX, spawnY, healed, c_green)
+}
+
+// Оверхелз
+function applyBonusHp(value) {
+    var cap = floor(maxHp * BONUS_HP_CAP_FRACTION)
+    bonusHp = min(bonusHp + value, cap)
+    var spawnX = irandom_range(bbox_left, bbox_right)
+    var spawnY = irandom_range(bbox_top, bbox_bottom)
+    drawDamageNumber(spawnX, spawnY, value, c_aqua)
 }
 
 function applyMana(value) {

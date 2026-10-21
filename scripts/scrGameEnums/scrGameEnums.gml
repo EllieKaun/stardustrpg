@@ -10,6 +10,13 @@ enum ChestState { // Состояние сундука
     Done
 }
 
+enum BattleEntryState { // Виды нимации перед входом в бой
+    Idle,
+    Intro, // катсцена появления врага
+    Transition, // спрайт перехода
+    Leaving
+}
+
 enum DeckTutorialStage { // Стадии прохождения туториала
     Inactive,
     Dialog,
@@ -18,14 +25,60 @@ enum DeckTutorialStage { // Стадии прохождения туториал
     Done
 }
 
-enum QuestSpearState { // Состояние квеста копья
+enum QuestSpearState { // Состояние квеста Cафара
     Inactive,
     Active,
     SpearObtained,
     Completed
 }
 
+enum QuestFoxState { // Состояние квеста Лисички
+    Inactive,
+    Active,
+    ItemsCollected,
+    Completed
+}
+
+enum QuestFoxItem {
+    PineCone,
+    Petunia,
+    Cauldron
+}
+
+enum QuestSafarItem {
+    Spear
+}
+
+enum QuestId {
+    Fox,
+    Safar
+}
+
+enum QuestState {
+    Inactive,
+    Active,
+    Ready,
+    Completed
+}
+
+enum QuestObjectiveType {
+    Collect,
+    ObtainItem
+}
+
+// Предметы, которые носят мобы (порядок = приоритет в инвентаре)
+enum CarryItem {
+    Spear,
+    Cauldron
+}
+
 enum ShopItemKind { // Виды товаров в магазине
     Card,
     Slot
+}
+
+enum FireflyState { // Состояния светлячков
+    Appearing, 
+    Flying, 
+    Fading 
 }

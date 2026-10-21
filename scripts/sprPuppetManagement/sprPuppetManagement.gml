@@ -187,14 +187,14 @@ function runPuppetTurn(puppet) {
 
     // Атакуем
     if (card == noone && attackChoice != noone) {
-        target = enemyResolveTarget(attackChoice, puppet, foes, allies, noone, noone)
+        target = enemyResolveTarget(attackChoice, puppet, foes, allies, noone, provokingFoe(foes))
         if (target != noone) { card = attackChoice }
     }
 
     // Если не получилось, случайная играбельная карта
     if (card == noone) {
         card = playable[irandom(array_length(playable) - 1)]
-        target = enemyResolveTarget(card, puppet, foes, allies, woundedAlly, noone)
+        target = enemyResolveTarget(card, puppet, foes, allies, woundedAlly, provokingFoe(foes))
         if (target == noone) {
             skipTurn()
             return

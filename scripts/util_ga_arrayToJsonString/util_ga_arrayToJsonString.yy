@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"util_ga_arrayToJsonString",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"ScriptsAnalytics",
+    "path":"folders/Objects/ScriptsAnalytics.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

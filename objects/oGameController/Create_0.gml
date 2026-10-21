@@ -21,7 +21,8 @@ initDisplaySettings()
 uiFontInit() // кэш UI-шрифта и высоты строки
 initEffectRegistry() // регистрация эффектов
 cardIdsInit() // инициализация карт ид
-cardRegistryInit() // регистация карт  
+cardRegistryInit() // регистация карт
+global.overworldNeedsReset = false
 if (variable_global_exists("startNewGame") && global.startNewGame) {
     global.startNewGame = false
     playerDataNewGame() // новая игра
@@ -127,20 +128,71 @@ startTutorialIntro = function() {
     global.introWalk = true
 }
 
-// Катсцена появления босса
-cutsceneSprite = noone
-cutsceneFrame = 0
-cutsceneTargetRoom = noone
+// Вход в бой
+battleStartSprite = function() {
+    var asset = asset_get_index("BattleStart")
+    return (asset >= 0 && sprite_exists(asset)) ? asset : noone
+}
 
-// Запустить катсцену. Возвращает true, если катсцена запущена
-startBossCutscene = function(bossSprite, targetRoom) {
-    if (bossSprite == noone || bossSprite == undefined || !sprite_exists(bossSprite)) { return false }
-    cutsceneSprite = bossSprite
-    cutsceneFrame = 0
-    cutsceneTargetRoom = targetRoom
-    global.cutsceneActive = true
-    global.uiModal = true // блокируем открытие меню/деки/паузы
-    return true
+battleEntryState = BattleEntryState.Idle
+entryAnimSprite = noone
+entryAnimFrame = 0
+entryIntroSprite = noone
+entryTargetRoom = noone
+
+entryAnimFramesPerStep = function(spr) {
+    var spd = sprite_get_speed(spr)
+    if (sprite_get_speed_type(spr) == spritespeed_framespersecond) { spd /= game_get_speed(gamespeed_fps) }
+    if (spd <= 0) { spd = sprite_get_number(spr) / (1.5 * game_get_speed(gamespeed_fps)) }
+    return spd
+}
+
+changeBattleEntryState = function(newState) {
+    if (battleEntryState == newState) { return }
+    battleEntryState = newState
+    switch (battleEntryState) {
+        case BattleEntryState.Intro:
+            entryAnimSprite = entryIntroSprite
+            entryAnimFrame = 0
+            global.cutsceneActive = true
+            global.uiModal = true
+        break
+        case BattleEntryState.Transition:
+            entryAnimSprite = battleStartSprite()
+            entryAnimFrame = 0
+            global.cutsceneActive = true
+            global.uiModal = true
+        break
+        case BattleEntryState.Idle:
+            global.cutsceneActive = false
+            global.uiModal = false
+        break
+    }
+}
+
+startFadeToBattle = function() {
+    changeBattleEntryState(BattleEntryState.Idle)
+    with (oTransition) {
+        target_room = oGameController.entryTargetRoom
+        state = "fade_out"
+    }
+}
+
+goToBattleAfterTransition = function() {
+    battleEntryState = BattleEntryState.Leaving
+    room_goto(entryTargetRoom)
+}
+
+beginBattleEntry = function(introSprite, targetRoom) {
+    entryIntroSprite = introSprite
+    entryTargetRoom = targetRoom
+    if (introSprite != noone && introSprite != undefined && sprite_exists(introSprite)) {
+        changeBattleEntryState(BattleEntryState.Intro)
+    } else if (battleStartSprite() != noone) {
+        changeBattleEntryState(BattleEntryState.Transition)
+    } else {
+        startFadeToBattle()
+    }
 }
 global.zoneConfig = { // нужно для определение секций и зон на карте
     cx: room_width / 2,
@@ -159,10 +211,12 @@ followSequence = function() {
     if (global.safarJoined && instance_exists(oSafar)) {
         array_push(sequence, oSafar)
     }
+    if (global.foxJoined && instance_exists(oFira)) {
+        array_push(sequence, oFira)
+    }
     return sequence
 }
 
-// За кем идёт member
 followTargetOfMember = function(member) {
     var sequence = followSequence()
     for (var index = 1; index < array_length(sequence); index++) {

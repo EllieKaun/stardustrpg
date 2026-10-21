@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scrAudio",
   "parent":{
-    "name":"Data",
-    "path":"folders/Data.yy",
+    "name":"Music",
+    "path":"folders/Music.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

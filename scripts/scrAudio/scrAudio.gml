@@ -131,7 +131,6 @@ function updateMusicFades() {
     }
 }
 
-// Трек по времени суток
 function musicTrackForTime() {
     return (nightValue() >= 0.5) ? asset_get_index("ForestNightMusic") : asset_get_index("ForestDayMusic")
 }

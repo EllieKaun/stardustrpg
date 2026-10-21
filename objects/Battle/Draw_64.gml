@@ -30,10 +30,6 @@ if (currentState != undefined) {
 }
 
 // Рисуем карты.
-// Руку показываем только когда ходит управляемый герой. Иначе — "Ожидание".
-// Опираться лишь на battleState нельзя: во время розыгрыша карты врага и на
-// переходных состояниях (AfterPlayChecks/PlayProcess) состояние на кадры выходит
-// из "ход врага", а selectedCharacter ещё враг — тогда мелькала бы его рука
 var opponentTurn = (selectedCharacter != noone
     && (selectedCharacter.isEnemy || selectedCharacter.isPuppet))
 if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn || battleState == BattleStates.StunnedTurn) {
@@ -48,6 +44,7 @@ if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == Bat
     if (selectedCharacter != noone) {
         var hand = selectedCharacter.getCardsInHand()
         var handSize = min(array_length(hand), maxCardsOnDeskNumber)
+        var topIngredient = ingredientPeek(selectedCharacter) // выбор карт, которым подходит ингредиент
 
         var verticalPadding = 8 * scaleToGui
         var drawCardH = cardDeskHeight - verticalPadding * 2
@@ -85,6 +82,16 @@ if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == Bat
 
                 drawCardFace(card, cardCenterX, cardCenterY, drawCardW, drawCardH, angle, scale, 1, isSelected)
 
+                // Верхний ингредиент подходит этой карте — значок над картой
+                if (topIngredient != undefined && ingredientFitsCard(topIngredient, card)) {
+                    var fitIcon = ingredientIcon(topIngredient)
+                    if (fitIcon != noone) {
+                        var fitSize = drawCardW * scale * 0.3
+                        var fitPoint = cardLocalToScreen(cardCenterX, cardCenterY, 0, -drawCardH * scale * 0.5, angle)
+                        draw_sprite_stretched(fitIcon, 0, fitPoint.x - fitSize * 0.5, fitPoint.y - fitSize * 0.5, fitSize, fitSize)
+                    }
+                }
+
                 // хит-бокс карты для мыши (координаты окна, с учётом наклона)
                 array_push(cardHitRects, {
                     x: cardCenterX, y: cardCenterY,
@@ -99,7 +106,6 @@ if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == Bat
             }
         }
 
-        // Колода героя справа — только в его ход, вместе с рукой
         var deckCount = array_length(selectedCharacter.getShuffeledDeck())
         if (deckCount > 0) {
             var deckH = cardDeskHeight * 0.7

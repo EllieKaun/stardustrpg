@@ -1,4 +1,3 @@
-// Редкости наград
 function rewardRarities(spec) {
     if (REWARD_DEFAULT_RARITY_ONLY) { return [CardsRarity.Default] }
     return spec.rarities
@@ -84,6 +83,15 @@ function rollRewardChoices(spec, count = 3) {
 function grantBattleRewards() {
     addWin()
     analyticsWin() // аналитика: победа в бою
+
+    var wonEncounter = global.battleEncounter
+    if (variable_struct_exists(wonEncounter, "isBoss") && wonEncounter.isBoss) { markBossDefeated() }
+
+    if (variable_global_exists("battleCauldronStolen") && global.battleCauldronStolen) {
+        global.battleCauldronStolen = false
+        questFoxAddItem(QuestFoxItem.Cauldron)
+        carrySetCarrierExists(CarryItem.Cauldron, false)
+    }
 
     var goldMult = (variable_global_exists("battleIsNight") && global.battleIsNight) ? NIGHT_GOLD_MULT : 1
     addGold(round(GOLD_PER_ENEMY * array_length(enemies) * goldMult))

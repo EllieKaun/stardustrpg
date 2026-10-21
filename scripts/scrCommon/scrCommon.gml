@@ -32,6 +32,13 @@ function drawScreenDim(alpha) {
     draw_set_color(c_white)
 }
 
+function stepTowardsPoint(fromX, fromY, toX, toY, maxStep) {
+    var distance = point_distance(fromX, fromY, toX, toY)
+    if (distance <= 0) { return { x: 0, y: 0 } }
+    var stepLength = min(maxStep, distance)
+    return { x: (toX - fromX) / distance * stepLength, y: (toY - fromY) / distance * stepLength }
+}
+
 // Проверка подтверждения enter space
 function uiConfirmPressed() {
     return keyboard_check_pressed(vk_enter)
@@ -169,6 +176,7 @@ function stepWaitBars(targets) {
 // инициализация глобальных переменных игры
 function initGameGlobals() {
     global.safarJoined = (questSpearState() == QuestSpearState.Completed)
+    global.foxJoined = (questFoxState() == QuestFoxState.Completed)
     global.walkSound = asset_get_index("GrassWalk")
 
     global.returningFromBattle = false
@@ -181,8 +189,8 @@ function initGameGlobals() {
     global.deckTutorialStage = DeckTutorialStage.Inactive
 
     global.battleNoFlee = false
-    global.spearCarrierExists = false
-    global.battleHasSpear = false
+    global.carrierExists = {}
+    global.battleCauldronStolen = false
     global.battleIsNight = false // снимается на входе в бой
     global.battleIsIgnited = false // ставит ignite-враг на триггере боя
     global.battleEnemyFirst = false // враги ходят первыми
@@ -204,6 +212,7 @@ function initGameGlobals() {
     global.timePaused = false // Можно остановить изменение времени
     
      if (!instance_exists(oLighting)) { instance_create_depth(0, 0, -100000, oLighting) }
+     if (!instance_exists(oFireflyManager)) { instance_create_depth(0, 0, 0, oFireflyManager) }
 }
 
 function startTransition(targetRoom) {

@@ -17,6 +17,26 @@ function createMagicalDamageSingleTargetCard(rarity = CardsRarity.Default) {
     )
 }
 
+function createMagicalDamageHandScalingSingleTargetCard(rarity = CardsRarity.Default) {
+    var targetType = TargetTypes.SingleEnemyTarget
+    return new Card(
+        "MagicalDamageHandScalingSingleTargetCard",
+        rarity,
+        targetType,
+        StarriorStates.Cast,
+        1,
+        [ HandScalingDamageEffect(DamageTypes.Magical,
+            getDamageMultiplierOnRarityAndTarget(rarity, targetType),
+            HandScaling.FewerCards, StarEnergy, StarMagic) ],
+        mgcCard,
+        starsSingleTarget,
+        commonBorder,
+        mpCostToken,
+        "deals star energy damage, grows the fewer cards in hand (single)",
+        sprHighResMagicalDaageSingleTarget
+    )
+}
+
 // Атака звездной энергией группы врагов
 function createMagicalDamageMultipleTargetCard(rarity = CardsRarity.Default) {
     var targetType = TargetTypes.AllEnemies

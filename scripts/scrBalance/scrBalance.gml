@@ -18,7 +18,7 @@
 
 // Награды
 #macro REWARD_DUPLICATE_FALLOFF 0.5 // падение шанса выпадения дубликата карты как награды
-#macro REWARD_DEFAULT_RARITY_ONLY true // в наградах только обычная редкость
+#macro REWARD_DEFAULT_RARITY_ONLY true
 
 // Сложность врагов
 #macro ENEMY_WIN_BONUS 2 // рост силы врагов
@@ -29,7 +29,40 @@
 #macro WEAKNESS_DAMAGE_MODIFIER 0.1
 #macro WEAKNESS_STATUS_CHANCE_BONUS 0.1
 
-#macro CARD_MANA_COST_MULTIPLIER 2 // множитель цены карт за ману
+#macro CARD_MANA_COST_MULTIPLIER 2
+
+// Константы светлячков
+#macro CAMERA_FOLLOW_SMOOTHING 6
+#macro HERO_TORCH_RADIUS 36
+#macro HERO_TORCH_INTENSITY 0.7
+#macro FIREFLY_MAX 12 // максимальное количество светлячков
+#macro FIREFLY_SPAWN_INTERVAL 20 // кадров между попытками спавна
+#macro FIREFLY_SPEED 0.15 // скорость 
+#macro FIREFLY_PATROL_RANGE 20 // как далеко улетает от точки появления
+#macro FIREFLY_LIGHT_RADIUS 4 // радиус пятна света
+#macro FIREFLY_MIN_SPACING 64
+#macro FIREFLY_WOBBLE_RANGE 3
+#macro FIREFLY_WOBBLE_SPEED 1.6
+#macro FIREFLY_FADE_SPEED 0.04 // скорость разгорания и угасания
+#macro FIREFLY_SPAWN_DISTANCE 240
+#macro FIREFLY_DESPAWN_DISTANCE 300
+
+// Скейл карт от руки
+#macro HAND_SCALING_STEP 2
+#macro MAX_CARDS_IN_HAND 8
+#macro FOREST_RANDOM_POTION_CARDS 3
+#macro CARDS_DRAW_COUNT 4
+
+// Максимальное количество игредиентов в лесном наборе
+#macro INGREDIENT_MAX 2 
+
+// Баланс ингредиентов
+#macro INGREDIENT_HEAL_MULT 1.5
+#macro INGREDIENT_DAMAGE_MULT 1.5
+#macro INGREDIENT_STATUS_CHANCE_BONUS 0.4
+
+// Максимальная доля оверхелза
+#macro BONUS_HP_CAP_FRACTION 0.5
 
 function cardBalance() {
     return {
@@ -40,8 +73,23 @@ function cardBalance() {
         overtimeMana: [6, 8, 12, 16],
         overtimeManaDur: [2, 2, 3, 3],
         buff: [2, 4, 6, 8],
+        handCharmStat: [1, 2, 3, 4],
         damageMulSingle: [1, 2, 3, 4],
         damageMulGroup: [1, 1, 2, 3],
+        forestBagIngredients: [1, 1, 2, 2], // Сумка: сколько ингредиентов
+        forestGatherIngredients: [1, 1, 1, 2], // Сбор: сколько ингредиентов
+        provokeDuration: [2, 2, 3, 3], // Зелье провокации: длительность
+        flaskEmptyMul: [0.3, 0.4, 0.5, 0.6], // колба: слабый физ. удар
+        flaskShield: [8, 12, 16, 20], // колба: щит за цветок
+        flaskPure: [6, 9, 12, 15], // колба: чистый урон за гриб
+        flaskExtend: [1, 1, 2, 2], // колба: +ходы негативным эффектам(лист)
+        flaskLifestealMul: [1, 2, 3, 4], // колба: цветок+гриб, множитель урона
+        flaskLifestealShare: [0.5, 0.5, 0.6, 0.6], // доля урона в лечение/щит
+        flaskHeal: [10, 15, 20, 25], // колба: цветок+лист, лечение
+        flaskPoisonMul: [1, 2, 3, 4], // колба: гриб+лист, множитель удара
+        flaskPoisonValue: [4, 5, 6, 7], // колба: сила яда
+        flaskPoisonDur: [2, 2, 3, 3], // колба: длительность яда
+        flaskPoisonChance: [0.6, 0.7, 0.8, 0.9], // колба: шанс яда
         cost: {
             physicalSingle: [2, 3, 4, 5],
             physicalMulti: [4, 5, 6, 7],
@@ -62,13 +110,11 @@ function difficultyLevel(encounter = undefined) {
     return getWins() + bonus
 }
 
-// Вернуть спрайт по имени ассета
 function affixSpriteSlot(assetName) {
     var asset = asset_get_index(assetName)
     return (asset >= 0 && sprite_exists(asset)) ? asset : undefined
 }
 
-// Собрать набор анимаций из имён ассетов
 function affixSpriteSet(idle, attack, cast, spell, dance, ko) {
     var set = {}
     var value
@@ -104,7 +150,6 @@ function affixSpriteSet(idle, attack, cast, spell, dance, ko) {
     return set
 }
 
-// Игнайт-спрайты под конкретный вид врага
 function igniteSpritesForKind(kind) {
     switch (kind) {
         case EnemyKind.CrackerNut:
@@ -197,7 +242,7 @@ function enemyCountForLevel(difficulty, level) {
 function zoneContent(zoneId = undefined) {
     zoneId = zoneId ?? currentZoneId()
     var cardIds = global.CardId
-    var sections = array_create(4, undefined) // индекс = enum Section
+    var sections = array_create(4, undefined)
     switch (zoneId) {
         case ZoneId.Forest:
         default:
@@ -207,13 +252,6 @@ function zoneContent(zoneId = undefined) {
                     [createCrackerNut, createLeaf],
                     [createCrackerNut, createLeaf, createCrackerNut],
                     [createCrackerNut, createCrackerNut, createCrackerNut]
-                ],
-                rewardIds: [
-                    cardIds.physicalDamageSingleTarget, // атака одного врага
-                    cardIds.physicalDamageMultipleTarget, // атака группы
-                    cardIds.physicalDamageWeakenChanceSingleTarget, // шанс слабости
-                    cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
-                    cardIds.buffPhysicalDamageSingleTarget // усиление физ урона
                 ]
             }
             sections[Section.TopRight] = {
@@ -222,13 +260,6 @@ function zoneContent(zoneId = undefined) {
                     [createMushroom, createFlower],
                     [createMushroom, createLeaf, createFlower],
                     [createMushroom, createMushroom, createMushroom]
-                ],
-                rewardIds: [
-                    cardIds.physicalDamageBleedChanceSingleTarget, // шанс кровотечения
-                    cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
-                    cardIds.debuffPhysicalDamageSingleTarget, // снижение физ атаки
-                    cardIds.instantManaGainSingleTarget, // восстановление mp
-                    cardIds.magicalDamageStunChanceSingleTarget // атака молнией
                 ]
             }
             sections[Section.BottomRight] = {
@@ -237,13 +268,6 @@ function zoneContent(zoneId = undefined) {
                     [createMushroom, createFlower],
                     [createMushroom, createLeaf, createFlower],
                     [createFlower, createFlower, createFlower]
-                ],
-                rewardIds: [
-                    cardIds.magicalDamageFreezeChanceSingleTarget, // атака льдом
-                    cardIds.weaknessMagicalDamageSingleTarget, // слабость к маг урону
-                    cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
-                    cardIds.debuffMagicalDamageSingleTarget, // снижение маг атаки
-                    cardIds.instantHealMultiTarget // восстановление
                 ]
             }
             sections[Section.BottomLeft] = {
@@ -252,18 +276,56 @@ function zoneContent(zoneId = undefined) {
                     [createCrackerNut, createLeaf, createMushroom],
                     [createMushroom, createCrackerNut, createFlower],
                     [createLeaf, createLeaf, createFlower]
-                ],
-                rewardIds: [
-                    cardIds.magicalDamageSingleTarget, // звёздная энергия
-                    cardIds.magicalDamageStunChanceMultiTarget, // молния группе
-                    cardIds.magicalDamageBurnChanceMultiTarget, // огонь группе
-                    cardIds.magicalDamageFreezeChanceMultiTarget, // лёд группе
-                    cardIds.overtimeHealSingleTarget, // постепенное hp
-                    cardIds.overtimeManaGainSingleTarget // постепенное mp
                 ]
             }
             return {
-                rewardRarities: [CardsRarity.Default, CardsRarity.Unusual],
+                rewardAlways: [
+                    cardIds.physicalDamageSingleTarget, // атака одного врага
+                    cardIds.physicalDamageStunChanceSingleTarget, // атака с шансом оглушения
+                    cardIds.physicalDamageBleedChanceSingleTarget, // атака с шансом кровотечения
+                    cardIds.physicalDamageWeakenChanceSingleTarget, // атака с шансом слабости
+                    cardIds.instantHealSingleTarget, // восстановление hp
+                    cardIds.instantManaGainSingleTarget, // восстановление mp
+                    cardIds.buffPhysicalDamageSingleTarget, // усиление физ урона
+                    cardIds.buffMagicalDamageSingleTarget, // усиление маг урона
+                    cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
+                    cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
+                    cardIds.handCharmStrength, // пассивный чарм силы
+                    cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
+                    cardIds.magicalDamageSingleTarget // атака звёздной энергией
+                ],
+                rewardNightOnly: [
+                    cardIds.physicalDamageBombChanceSingleTarget, // атака с шансом взрыва
+                    cardIds.physicalDamageVampChanceSingleTarget, // атака с шансом вампиризма
+                    cardIds.overtimeHealSingleTarget, // постепенное восстановление hp
+                    cardIds.overtimeManaGainSingleTarget, // постепенное восстановление mp
+                    cardIds.debuffPhysicalDamageSingleTarget, // снижение физ атаки врага
+                    cardIds.debuffMagicalDamageSingleTarget, // снижение маг атаки врага
+                    cardIds.debuffPhysicalProtectionSingleTarget, // снижение физ защиты врага
+                    cardIds.debuffMagicalProtectionSingleTarget, // снижение маг защиты врага
+                    cardIds.magicalDamageStunChanceSingleTarget, // атака молнией
+                    cardIds.magicalDamageFreezeChanceSingleTarget // атака льдом
+                ],
+                rewardAfterBoss: [
+                    cardIds.summonAttackPuppet,
+                    cardIds.summonMagicPuppet,
+                    cardIds.summonHealPuppet,
+                    cardIds.summonBuffPuppet
+                ],
+                rewardForestSet: [
+                    cardIds.forestSupplyBag,
+                    cardIds.forestGather,
+                    cardIds.forestProvoke,
+                    cardIds.forestFlask,
+                    cardIds.forestRandomPotion // случайное зелье
+                ],
+                // Карты, которые продаются только в магазине
+                shopCards: [
+                    { id: cardIds.shuffleDeck, price: 600 }, // перемешивает колоду
+                    { id: cardIds.resurrection, price: 1000 }, // воскрешение павшего союзника
+                    { id: cardIds.copyNextPlayedCard, price: 1000 } // копирование следующей разыгранной карты
+                ],
+                rewardRarities: [CardsRarity.Default],
                 regionEnemyTypes: [oCrakerNutSmall, oMushroomSmall, oFlowerSmall, oLeafSmall],
                 sections: sections
             }

@@ -1,5 +1,5 @@
 event_inherited()
-canCarrySpear = false
+carryInventory = []
 getEncounter = function() {
     return puppetMasterEncounter()
 }

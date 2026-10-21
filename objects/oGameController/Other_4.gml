@@ -1,5 +1,12 @@
 guiSyncCrisp()
 
+// Вход из главного меню
+if (variable_global_exists("overworldNeedsReset") && global.overworldNeedsReset) {
+    global.overworldNeedsReset = false
+    room_restart()
+    exit
+}
+
 // Инициализация сетки MP
 var cell = 16
 var cols = ceil(room_width  / cell)
@@ -14,8 +21,12 @@ for (var i = 0; i < array_length(obstacles); i++) {
     mp_grid_add_instances(global.mpGrid, obstacles[i], false)
 }
 
-syncMusicToTime() // музыка по текущему времени суток
+syncMusicToTime()
 playAmbientNamed("ForestAmbience")
+
+if (battleEntryState != BattleEntryState.Idle) {
+    changeBattleEntryState(BattleEntryState.Idle)
+}
 
 // Возврат из боя
 if (global.returningFromBattle) {

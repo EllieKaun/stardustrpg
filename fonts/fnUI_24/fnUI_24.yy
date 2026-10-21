@@ -2854,7 +2854,7 @@
   "name":"fnUI_24",
   "parent":{
     "name":"Fonts",
-    "path":"folders/Fonts.yy",
+    "path":"folders/CommonUI/Fonts.yy",
   },
   "pointRounding":0,
   "ranges":[

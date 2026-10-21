@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrLocaleRu",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrLocaleRu",
+  "parent":{
+    "name":"Locales",
+    "path":"folders/Locales.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

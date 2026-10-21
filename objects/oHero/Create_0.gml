@@ -17,6 +17,8 @@ sprWalk = sVivWalk
 
 introSpeed = 0.9
 
+torchLight = undefined
+
 stepScriptedApproach = function() {
     path_end()
     speed = 0
@@ -25,10 +27,9 @@ stepScriptedApproach = function() {
         return
     }
     var obstacles = worldObstacles()
-    var stepX = clamp(global.introTarget.x - x, -introSpeed, introSpeed)
-    var stepY = clamp(global.introTarget.y - y, -introSpeed, introSpeed)
-    if (!place_meeting(x + stepX, y, obstacles)) { x += stepX }
-    if (!place_meeting(x, y + stepY, obstacles)) { y += stepY }
+    var approachStep = stepTowardsPoint(x, y, global.introTarget.x, global.introTarget.y, introSpeed)
+    if (!place_meeting(x + approachStep.x, y, obstacles)) { x += approachStep.x }
+    if (!place_meeting(x, y + approachStep.y, obstacles)) { y += approachStep.y }
 }
 
 // Движение выбранного персонажа
@@ -36,10 +37,15 @@ stepControlled = function() {
     path_end()
     speed = 0 
 
-    var horizontalInput = (keyboard_check(ord("D")) || keyboard_check(vk_right)) - (keyboard_check(ord("A")) || keyboard_check(vk_left))
-    var verticalInput = (keyboard_check(ord("S")) || keyboard_check(vk_down)) - (keyboard_check(ord("W")) || keyboard_check(vk_up))
-    var moveX = horizontalInput * spdWalk
-    var moveY = verticalInput * spdWalk
+    var horizontalInput = (keyboard_check(ord("D")) 
+        || keyboard_check(vk_right)) - (keyboard_check(ord("A")) 
+        || keyboard_check(vk_left))
+    var verticalInput = (keyboard_check(ord("S")) 
+        || keyboard_check(vk_down)) - (keyboard_check(ord("W")) 
+        || keyboard_check(vk_up))
+    var moveSpeed = (horizontalInput != 0 && verticalInput != 0) ? spdWalk * 0.7071 : spdWalk
+    var moveX = horizontalInput * moveSpeed
+    var moveY = verticalInput * moveSpeed
 
     var obstacles = worldObstacles()
     

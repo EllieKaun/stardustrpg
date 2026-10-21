@@ -219,3 +219,39 @@ function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget(rarity = Ca
         sprHighResDamageExhaustChanseSIngleTarget
     )
 }
+
+// Отражение урона
+function createCardDamageDeflectStatus(rarity = CardsRarity.Default) {
+    return new Card(
+        "Applies status of damage deflect",
+        rarity,
+        TargetTypes.SingleAllyTarget,
+        StarriorStates.Cast,
+        1,
+        [ DeflectEffect(1) ],
+        buffCard,
+        strWeakness,
+        commonBorder,
+        hpCostToken,
+        "applies ability to deflect damage",
+        undefined
+    )
+}
+
+function createHandCharmStrengthCard(rarity = CardsRarity.Default) {
+    var card = new Card(
+        "Hand Charm Strength",
+        rarity,
+        TargetTypes.Self,
+        StarriorStates.Cast,
+        1,
+        [ BuffEffect(ModifiersToBuff.PhysicalDamage, getBuffValueOnRarity(rarity) * 2, 2) ],
+        buffCard,
+        strBuff,
+        commonBorder,
+        mpCostToken,
+        "while in hand: +strength; play: big strength buff"
+    )
+    card.handCharms = [ HandAuraStatBonus(ModifiersToBuff.PhysicalDamage, cardBalance().handCharmStat[rarity]) ]
+    return card
+}

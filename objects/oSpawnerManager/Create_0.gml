@@ -108,3 +108,38 @@ trySpawnEnemy = function(minDist, maxDist) {
     ds_list_destroy(spawners)
     return spawned
 }
+
+pineconeList = ds_list_create()
+pineconeSpawnTimer = 0
+pineconeSpawnInterval = 30
+
+trySpawnPinecone = function(minDist, maxDist) {
+    var leader = oGameController.selected_character
+    if (!instance_exists(leader)) { return false }
+
+    var spawners = ds_list_create()
+    with (oSpawner) { ds_list_add(spawners, id) }
+    if (ds_list_size(spawners) == 0) { ds_list_destroy(spawners); return false }
+
+    var spawned = false
+    for (var attempt = 0; attempt < maxSpawnAttempts; attempt++) {
+        var segment = spawners[| irandom(ds_list_size(spawners) - 1)]
+        var spawnX = segment.bbox_left + random(segment.bbox_right - segment.bbox_left)
+        var spawnY = segment.bbox_top  + random(segment.bbox_bottom - segment.bbox_top)
+
+        if (!collision_point(spawnX, spawnY, oSpawner, false, true)) { continue }
+
+        var dist = point_distance(leader.x, leader.y, spawnX, spawnY)
+        if (dist > maxDist || dist < minDist) { continue }
+
+        if (collision_point(spawnX, spawnY, oWall, false, true) != noone) { continue }
+
+        var cone = instance_create_layer(spawnX, spawnY, "Instances", oQuestPineCone)
+        ds_list_add(pineconeList, cone)
+        spawned = true
+        break
+    }
+
+    ds_list_destroy(spawners)
+    return spawned
+}

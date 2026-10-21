@@ -249,3 +249,24 @@ function createPhysicalDamageVampirismChanceMultipleTargetCard(rarity = CardsRar
         sprHighResDamageVampireChanseGroup
     )
 }
+
+// Атака одного врага
+function createPhysicalDamageHandScalingSingleTargetCard(rarity = CardsRarity.Default) {
+    var targetType = TargetTypes.SingleEnemyTarget
+    return new Card(
+        "PhysicalDamageHandScalingSingleTargetCard",
+        rarity,
+        targetType,
+        StarriorStates.Attack,
+        1,
+        [ HandScalingDamageEffect(DamageTypes.Physical, 
+        getDamageMultiplierOnRarityAndTarget(rarity, targetType), 
+        HandScaling.MoreCard) ],
+        atcCard,
+        atcSingleTarget,
+        commonBorder,
+        hpCostToken,
+        "deals minor physical damage scaled by cards number in hand (single)",
+        sprHighResDamageSingleEnemy
+    )
+}
