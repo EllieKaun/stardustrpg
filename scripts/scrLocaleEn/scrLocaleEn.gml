@@ -107,6 +107,11 @@ function locDefineEn() {
     translations[$ "deck.special"] = "SPECIAL"
     translations[$ "deck.lana"] = "LANA"
     translations[$ "deck.viv"] = "VIV"
+    translations[$ "deck.safar"] = "SAFAR"
+    translations[$ "deck.fox"] = "FIRA"
+    translations[$ "companion.rejoinAsk"] = "Will you take me along again?"
+    translations[$ "companion.rejoinYes"] = "Come with us"
+    translations[$ "companion.rejoinNo"] = "Not now"
 
     translations[$ "effect.Damage"] = "Damage"
     translations[$ "effect.Heal"] = "Heal"

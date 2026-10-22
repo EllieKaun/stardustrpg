@@ -107,6 +107,11 @@ function locDefineRu() {
     translations[$ "deck.special"] = "ОСОБЫЕ"
     translations[$ "deck.lana"] = "ЛАНА"
     translations[$ "deck.viv"] = "ВИВ"
+    translations[$ "deck.safar"] = "САФАР"
+    translations[$ "deck.fox"] = "ФИРА"
+    translations[$ "companion.rejoinAsk"] = "Снова возьмёте меня с собой?"
+    translations[$ "companion.rejoinYes"] = "Идём с нами"
+    translations[$ "companion.rejoinNo"] = "Не сейчас"
 
     translations[$ "effect.Damage"] = "Урон"
     translations[$ "effect.Heal"] = "Лечение"

@@ -208,11 +208,9 @@ followSequence = function() {
     for (var index = 1; index < partyNumber; index++) {
         array_push(sequence, partyMembers[(selectedIndex + index) mod partyNumber])
     }
-    if (global.safarJoined && instance_exists(oSafar)) {
-        array_push(sequence, oSafar)
-    }
-    if (global.foxJoined && instance_exists(oFira)) {
-        array_push(sequence, oFira)
+    var companionObject = companionWorldObject(activeCompanion())
+    if (companionObject != noone && instance_exists(companionObject)) {
+        array_push(sequence, companionObject)
     }
     return sequence
 }

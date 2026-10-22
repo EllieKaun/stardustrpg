@@ -1,9 +1,11 @@
-enum Characters { Lana, Viv }
+enum Characters { Lana, Viv, Safar, Fox }
 
 #macro PLAYER_SAVE_FILE "player_data.json"
 #macro DECK_DEFAULT_UNLOCKED 4 // слотов деки открыто с начала игры
 #macro DECK_CAPACITY 12 // максимум слотов деки
 #macro ZONE_DECK_SLOT_LIMITS [6] // сколько слотов деки можно открыть максимум в зоне
+#macro COMPANION_NONE -1
+#macro COMPANION_DEFAULT_UNLOCKED 6
 
 // Инициализация пользователя (каждый раз на старте)
 function playerDataInit() {
@@ -75,6 +77,7 @@ function playerDataDefault() {
         deckTutorialDone: false,
         quests: {},
         wins: 0,
+        activeCompanion: COMPANION_NONE,
         collection: {}, // key "id@rarity" -> { id, rarity, count }
         decks: {
             lana: { unlocked: DECK_DEFAULT_UNLOCKED, cards: [] },  // cards: [{slot,id,rarity}]

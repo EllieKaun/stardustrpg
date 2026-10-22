@@ -29,6 +29,39 @@ panelSwitchCallback = function(panel, direction) {
 }
 
 editingCharacter = Characters.Lana // Персонаж, чья дека отображается/редактируется
+deckTabCharacters = [Characters.Lana, Characters.Viv]
+
+deckTabFor = function(character) {
+    switch (character) {
+        case Characters.Viv:
+            return { name: loc("deck.viv"), sprite: VivBtn, icon: VivIcon, iconOffsetX: 0, btnOffsetX: 0.5,
+                     color: #44CC88, textInset: 1.3 }
+        case Characters.Safar:
+            return { name: loc("deck.safar"), sprite: LanaBtn, icon: characterIcon(character), iconOffsetX: 0, btnOffsetX: 0.5,
+                     color: #3C91AE, textInset: 1.3 }
+        case Characters.Fox:
+            return { name: loc("deck.fox"), sprite: VivBtn, icon: characterIcon(character), iconOffsetX: 0, btnOffsetX: 0.5,
+                     color: #D67E3C, textInset: 1.3 }
+        default:
+            return { name: loc("deck.lana"), sprite: LanaBtn, icon: LanaIcon, iconOffsetX: 0, btnOffsetX: 0.5,
+                     color: #4488CC, textInset: 1.3 }
+    }
+}
+
+refreshDeckTabs = function() {
+    deckTabCharacters = deckCharacters()
+    var tabs = []
+    for (var tabIndex = 0; tabIndex < array_length(deckTabCharacters); tabIndex++) {
+        array_push(tabs, deckTabFor(deckTabCharacters[tabIndex]))
+    }
+    deckPanel.tabs = tabs
+    var editingIndex = array_get_index(deckTabCharacters, editingCharacter)
+    if (editingIndex < 0) {
+        editingCharacter = Characters.Lana
+        editingIndex = 0
+    }
+    deckPanel.activeTab = editingIndex
+}
 
 categoryForTab = function(tab) { // Мап индекса таба фильтра в категорию карт
     switch (tab) {
@@ -116,21 +149,16 @@ deckPanel = new Panel({
     selectSprite: sprCardSelected,
     pointerSprite: sPointer,
     tabFonts: tabFonts,
-    tabs: [
-        // icon — портрет поверх кнопки
-        // iconOffsetX — сдвиг иконки
-        // btnOffsetX — сдвиг кнопки вправо 
-        // textInset — сдвиг текста вправо
-        { name: loc("deck.lana"), sprite: LanaBtn, icon: LanaIcon, iconOffsetX: 0, btnOffsetX: 0.5,
-          color: #4488CC, textInset: 1.3 },
-        { name: loc("deck.viv"), sprite: VivBtn, icon: VivIcon, iconOffsetX: 0, btnOffsetX: 0.5,
-          color: #44CC88, textInset: 1.3 }
-    ],
+    // icon — портрет поверх кнопки
+    // iconOffsetX — сдвиг иконки
+    // btnOffsetX — сдвиг кнопки вправо 
+    // textInset — сдвиг текста вправо
+    tabs: [deckTabFor(Characters.Lana), deckTabFor(Characters.Viv)],
     scrollable: false, 
     slots: buildDeckSlots(Characters.Lana),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
-            editingCharacter = (tabIndex == 0) ? Characters.Lana : Characters.Viv
+            editingCharacter = deckTabCharacters[tabIndex]
             panel.slots = buildDeckSlots(editingCharacter)
             panel.scrollY = 0
             panel.cursorRow = 0
@@ -150,7 +178,7 @@ deckPanel = new Panel({
             }
             var slot = panel.slots[slotIndex]
             // Если карты нет в слоте, ничего не делаем
-            if (slot.state != "filled") {
+            if (slot.state != "filled" || slot.fixed) {
                  return 
             }
             deckRemoveCard(editingCharacter, slotIndex)
@@ -246,6 +274,7 @@ openBuilder = function() {
     layoutPanels()
     open = true
     global.uiModal = true
+    refreshDeckTabs()
     collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab), 4, editingCharacter)
     collectionPanel.scrollY = 0
     collectionPanel.refreshScroll()
@@ -313,7 +342,7 @@ deckSource = {
             }
                 
             var slot = deckPanel.slots[index]
-            if (slot.state == "filled") {
+            if (slot.state == "filled" && !slot.fixed) {
                 return {
                     kind: "card",
                     card: slot.card, 
@@ -383,7 +412,7 @@ deckSlotTarget = {
     accepts: function(payload, ctx) {
         with (oDeckBuilder) {
             var targetSlot = deckPanel.slots[ctx.slotIndex]
-            if (targetSlot.state == "locked") { return false }
+            if (targetSlot.state == "locked" || targetSlot.fixed) { return false }
             if (payload.data.panel == "collection") { return true }
             if (payload.data.panel == "deck" && ctx.slotIndex != payload.data.slotIndex) { return true }
             return false

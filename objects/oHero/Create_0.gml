@@ -18,6 +18,7 @@ sprWalk = sVivWalk
 introSpeed = 0.9
 
 torchLight = undefined
+returningHome = false
 
 stepScriptedApproach = function() {
     path_end()
@@ -81,25 +82,45 @@ stepFollowing = function() {
         return
     }
 
+    stepWalkTowards(leader.x, leader.y)
+}
+
+stepWalkTowards = function(targetX, targetY) {
     var obstacles = worldObstacles()
 
-    // Прямая линия до лидера 
-    if (collision_line(x, y, leader.x, leader.y, obstacles, true, true) == noone) {
+    // Прямая линия до цели 
+    if (collision_line(x, y, targetX, targetY, obstacles, true, true) == noone) {
         path_end()
-        move_towards_point(leader.x, leader.y, nSpeed)
+        move_towards_point(targetX, targetY, nSpeed)
         return
     }
 
     // Иначе обходим препятствия по MP
     if (calcPathTimer-- <= 0) {
         calcPathTimer = calcPathDelay
-        var found = mp_grid_path(global.mpGrid, path, x, y, leader.x, leader.y, true)
+        var found = mp_grid_path(global.mpGrid, path, x, y, targetX, targetY, true)
         if (found) {
             speed = 0 
             path_start(path, nSpeed, path_action_stop, false)
         } else {
             path_end()
-            move_towards_point(leader.x, leader.y, nSpeed)
+            move_towards_point(targetX, targetY, nSpeed)
         }
     }
+}
+
+isAtHome = function() {
+    return point_distance(x, y, xstart, ystart) < 1
+}
+
+stepReturnHome = function() {
+    var distance = point_distance(x, y, xstart, ystart)
+    if (distance > distanceToTeleport || distance <= nSpeed) {
+        path_end()
+        speed = 0
+        x = xstart
+        y = ystart
+        return
+    }
+    stepWalkTowards(xstart, ystart)
 }

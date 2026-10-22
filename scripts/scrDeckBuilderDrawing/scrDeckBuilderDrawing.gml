@@ -14,6 +14,7 @@ function Slot(initialState, initialCard = undefined) constructor {
     ownerIcon = noone // иконка-метка владельца (LanaIcon/VivIcon)
     addable = true // можно ли добавить эту карту в деку
     dragging = false // перетаскиваемая карта
+    fixed = false
 }
 
 function slotAt(panel, guiX, guiY) {

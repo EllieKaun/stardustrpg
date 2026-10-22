@@ -1,13 +1,26 @@
-if (global.safarJoined) {
+if (companionIsActive(Characters.Safar)) {
     if (mask_index != sLana) { joinParty() }
+    returningHome = false
     event_inherited()
     exit
 }
+
+if (global.safarJoined && !isAtHome()) {
+    returningHome = true
+    event_inherited()
+    exit
+}
+if (returningHome) { leaveParty() }
 
 depth = -bbox_bottom
 if (global.gamePaused || global.uiModal) { exit }
 
 if (!leaderApproached(SAFAR_REARM_DIST)) { exit }
+
+if (global.safarJoined) {
+    companionOfferRejoin(Characters.Safar)
+    exit
+}
 
 var spearState = questSpearState()
 if (spearState == QuestSpearState.Inactive) {

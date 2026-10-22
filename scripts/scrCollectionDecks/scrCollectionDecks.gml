@@ -2,6 +2,8 @@ function characterKey(character) {
     switch (character) {
         case Characters.Lana: return "lana"
         case Characters.Viv: return "viv"
+        case Characters.Safar: return "safar"
+        case Characters.Fox: return "fox"
         default: return "lana"
     }
 }
@@ -14,7 +16,16 @@ function collectionKey(cardIdentifier, rarity) {
 
 // Достать деку по персонажу
 function deckOf(character) {
-    return global.playerData.decks[$ characterKey(character)]
+    var key = characterKey(character)
+    if (!variable_struct_exists(global.playerData.decks, key)) { companionEnsureDeck(character) }
+    return global.playerData.decks[$ key]
+}
+
+function deckCharacters() {
+    var characters = [Characters.Lana, Characters.Viv]
+    var companion = activeCompanion()
+    if (companion != COMPANION_NONE) { array_push(characters, companion) }
+    return characters
 }
 
 //// Работа с картами
@@ -100,8 +111,11 @@ function clearDeckSlot(character, slot) {
 
 // Не занятые ни одной декой копии карты
 function freeCopies(cardIdentifier, rarity = CardsRarity.Default) {
-    var used = countCardInDeck(Characters.Lana, cardIdentifier, rarity)
-             + countCardInDeck(Characters.Viv,  cardIdentifier, rarity)
+    var used = 0
+    var characters = deckCharacters()
+    for (var characterIndex = 0; characterIndex < array_length(characters); characterIndex++) {
+        used += countCardInDeck(characters[characterIndex], cardIdentifier, rarity)
+    }
     return getOwnedCount(cardIdentifier, rarity) - used
 }
 
@@ -110,7 +124,7 @@ function setDeckSlot(character, slot, cardIdentifier, rarity = CardsRarity.Defau
     if (!cardCanVaryRarity(cardIdentifier)) { rarity = CardsRarity.Default }
 
     var deck = deckOf(character)
-    if (slot < 0 || slot >= deck.unlocked) {
+    if (slot < deckFixedSlots(character) || slot >= deck.unlocked) {
         return false
     }
     if (!isCardOwned(cardIdentifier, rarity)) {
@@ -133,7 +147,7 @@ function setDeckSlot(character, slot, cardIdentifier, rarity = CardsRarity.Defau
 // Первый разблокированный и пустой слот деки, иначе -1
 function firstFreeDeckSlot(character) {
     var deck = deckOf(character)
-    for (var slotIndex = 0; slotIndex < deck.unlocked; slotIndex++) {
+    for (var slotIndex = deckFixedSlots(character); slotIndex < deck.unlocked; slotIndex++) {
         if (deckSlotRef(character, slotIndex) == undefined) { return slotIndex }
     }
     return -1
@@ -142,7 +156,16 @@ function firstFreeDeckSlot(character) {
 // Разблокировать слот в деке персонажа
 function unlockDeckSlot(character, _count = 1) {
     var deck = deckOf(character)
-    deck.unlocked = min(deckSlotLimit(), deck.unlocked + _count)
+    deck.unlocked = min(deckSlotLimitFor(character), deck.unlocked + _count)
+}
+
+function unlockDeckSlotForParty(_count = 1) {
+    var characters = [Characters.Lana, Characters.Viv, Characters.Safar, Characters.Fox]
+    for (var characterIndex = 0; characterIndex < array_length(characters); characterIndex++) {
+        if (variable_struct_exists(global.playerData.decks, characterKey(characters[characterIndex]))) {
+            unlockDeckSlot(characters[characterIndex], _count)
+        }
+    }
 }
 
 // Индекс текущей зоны. Пока в игре одна зона
@@ -154,6 +177,11 @@ function currentZoneIndex() {
 function deckSlotLimit() {
     var limits = ZONE_DECK_SLOT_LIMITS
     return min(DECK_CAPACITY, limits[min(currentZoneIndex(), array_length(limits) - 1)])
+}
+
+function deckSlotLimitFor(character) {
+    if (!isCompanion(character)) { return deckSlotLimit() }
+    return min(DECK_CAPACITY, deckSlotLimit() + COMPANION_DEFAULT_UNLOCKED - DECK_DEFAULT_UNLOCKED)
 }
 
 // Очистить деку персонажа 
@@ -168,13 +196,10 @@ function characterIcon(character) {
     switch (character) {
         case Characters.Lana: return LanaIcon
         case Characters.Viv:  return VivIcon
+        case Characters.Safar: return sprCharacterPanelSafarHead
+        case Characters.Fox: return sprCharacterPanelFoxHead
         default: return noone
     }
-}
-
-// Другой персонаж 
-function otherCharacter(character) {
-    return (character == Characters.Lana) ? Characters.Viv : Characters.Lana
 }
 
 function deckPutCard(character, slot, ref) {
@@ -187,6 +212,8 @@ function deckPutCard(character, slot, ref) {
 
 function deckMoveCard(character, slotA, slotB) {
     if (slotA == slotB) { return false }
+    var fixedSlots = deckFixedSlots(character)
+    if (slotA < fixedSlots || slotB < fixedSlots) { return false }
     var refA = deckSlotRef(character, slotA)
     var refB = deckSlotRef(character, slotB)
     if (refA == undefined) { return false }
@@ -214,11 +241,15 @@ function deckRemoveCard(charcter, slot) {
 // Построение слотов панели всех карт.
 // Одинаковые карты (id+редкость) группируются в один слот с числом.
 // Если часть копий занята деками — они выделяются в отдельные слоты:
-// свободные, занятые текущей декой, занятые чужой декой.
+// свободные, занятые текущей декой, занятые чужими деками.
 // currentCharacter — чья дека сейчас открыта.
 function buildCollectionSlots(category = undefined, cols = 4, currentCharacter = Characters.Lana) {
     var refs = getCollectionRefs()
-    var otherChar = otherCharacter(currentCharacter)
+    var otherCharacters = []
+    var characters = deckCharacters()
+    for (var characterIndex = 0; characterIndex < array_length(characters); characterIndex++) {
+        if (characters[characterIndex] != currentCharacter) { array_push(otherCharacters, characters[characterIndex]) }
+    }
     var slots = []
 
     for (var refIndex = 0; refIndex < array_length(refs); refIndex++) {
@@ -229,7 +260,12 @@ function buildCollectionSlots(category = undefined, cols = 4, currentCharacter =
 
         var total = cardRef.count
         var inCurrent = countCardInDeck(currentCharacter, cardRef.id, cardRef.rarity)
-        var inOther = countCardInDeck(otherChar, cardRef.id, cardRef.rarity)
+        var inOthers = array_create(array_length(otherCharacters), 0)
+        var inOther = 0
+        for (var otherIndex = 0; otherIndex < array_length(otherCharacters); otherIndex++) {
+            inOthers[otherIndex] = countCardInDeck(otherCharacters[otherIndex], cardRef.id, cardRef.rarity)
+            inOther += inOthers[otherIndex]
+        }
         var freeCount = max(0, total - inCurrent - inOther)
 
         // свободные копии — обычный слот с числом, можно добавлять
@@ -249,13 +285,14 @@ function buildCollectionSlots(category = undefined, cols = 4, currentCharacter =
             newSlot.addable = false
             array_push(slots, newSlot)
         }
-        // копии в чужой деке — затемнены, добавлять нельзя
-        if (inOther > 0) {
+        // копии в чужих деках — затемнены, добавлять нельзя
+        for (var otherIndex = 0; otherIndex < array_length(otherCharacters); otherIndex++) {
+            if (inOthers[otherIndex] <= 0) { continue }
             var newSlot = new Slot("filled", card)
             newSlot.ref = { id: cardRef.id, rarity: cardRef.rarity }
-            newSlot.count = inOther
+            newSlot.count = inOthers[otherIndex]
             newSlot.dimmed = true
-            newSlot.ownerIcon = characterIcon(otherChar)
+            newSlot.ownerIcon = characterIcon(otherCharacters[otherIndex])
             newSlot.addable = false
             array_push(slots, newSlot)
         }
@@ -272,8 +309,17 @@ function buildCollectionSlots(category = undefined, cols = 4, currentCharacter =
 // Построение слотов для панели деки персонажа, пустые, залоченные и заполненные картой
 function buildDeckSlots(character, total = DECK_CAPACITY) {
     var deck = deckOf(character)
+    var fixedRefs = companionFixedRefs(character)
     var slots = []
     for (var slotIndex = 0; slotIndex < total; slotIndex++) {
+        if (slotIndex < array_length(fixedRefs)) {
+            var fixedSlot = new Slot("filled", cardFromRef(fixedRefs[slotIndex]))
+            fixedSlot.ref = fixedRefs[slotIndex]
+            fixedSlot.fixed = true
+            fixedSlot.ownerIcon = characterIcon(character)
+            array_push(slots, fixedSlot)
+            continue
+        }
         if (slotIndex >= deck.unlocked) { 
             array_push(slots, new Slot("locked"))
             continue 

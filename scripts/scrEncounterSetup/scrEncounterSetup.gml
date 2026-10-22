@@ -32,11 +32,9 @@ function initStarriorsFromEncounter(encounter) {
         }
     } else {
         heroes = [createLana(), createViv()]
-        if (variable_global_exists("safarJoined") && global.safarJoined) {
-            array_push(heroes, createSafar())
-        }
-        if (variable_global_exists("foxJoined") && global.foxJoined) {
-            array_push(heroes, createFox())
+        var companion = createCompanionStarrior(activeCompanion())
+        if (companion != noone) {
+            array_push(heroes, companion)
         }
     }
     enemies = []

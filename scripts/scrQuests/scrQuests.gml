@@ -81,6 +81,7 @@ function questRegisterAll() {
         },
         onComplete: function() {
             global.foxJoined = true
+            companionJoin(Characters.Fox)
             questGrantCardReward(global.CardId.instantManaGainSingleTarget, CardsRarity.Unusual, undefined)
         }
     })
@@ -97,6 +98,7 @@ function questRegisterAll() {
         },
         onComplete: function() {
             global.safarJoined = true
+            companionJoin(Characters.Safar)
             analyticsCompleteSafarQuest()
         }
     })
