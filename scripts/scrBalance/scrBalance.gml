@@ -64,6 +64,12 @@
 // Максимальная доля оверхелза
 #macro BONUS_HP_CAP_FRACTION 0.5
 
+// Дефолтное значение веса принятия решения для ИИ врагов
+#macro AI_DEFAULT_EFFECT_VALUE 1 
+
+#macro AI_PUPPET_VALUE 8
+#macro AI_BOSS_SUMMON_HP_FRACTION 0.3
+
 function cardBalance() {
     return {
         instantHeal: [10, 20, 30, HEAL_FULL],
@@ -329,5 +335,101 @@ function zoneContent(zoneId = undefined) {
                 regionEnemyTypes: [oCrakerNutSmall, oMushroomSmall, oFlowerSmall, oLeafSmall],
                 sections: sections
             }
+    }
+}
+
+function brainPreset(brainType) {
+    switch (brainType) {
+        case AiBrainType.Brute: return { 
+            weights: { 
+                aggression: 1.4, 
+                support: 0.1, 
+                control: 0.3, 
+                lethalBonus: 50, 
+                focusFire: 10, 
+                thrift: 0.2 
+            }, 
+            policy: AiPolicy.Softmax, 
+            temperature: 0.4, 
+            rules: [] 
+        }
+        case AiBrainType.Skirmisher: return { 
+            weights: { 
+                aggression: 1.0, 
+                support: 0.2, 
+                control: 0.5, 
+                lethalBonus: 35, 
+                focusFire: 14, 
+                thrift: 0.4 
+            }, 
+            policy: AiPolicy.Softmax, 
+            temperature: 0.5, 
+            rules: [] 
+        }
+        case AiBrainType.Healer: return { 
+            weights: { 
+                aggression: 0.4, 
+                support: 1.3, 
+                control: 0.4, 
+                lethalBonus: 20, 
+                focusFire: 4, 
+                thrift: 0.6 
+            }, 
+            policy: AiPolicy.Softmax, 
+            temperature: 0.6, 
+            rules: [] 
+        }
+        case AiBrainType.Controller: return { 
+            weights: { 
+                aggression: 0.7, 
+                support: 0.6, 
+                control: 1.2, 
+                lethalBonus: 25, 
+                focusFire: 6, 
+                thrift: 0.8 
+            }, 
+            policy: AiPolicy.Softmax, 
+            temperature: 0.7, 
+            rules: [] 
+        }
+        case AiBrainType.Boss: return { 
+            weights: { 
+                aggression: 1.1, 
+                support: 0.7, 
+                control: 0.6, 
+                lethalBonus: 60, 
+                focusFire: 12, 
+                thrift: 0.3 
+            }, 
+            policy: AiPolicy.Softmax, 
+            temperature: 0.35, 
+            rules: [
+                {
+                    when: function(ctx) { 
+                        return ctx.actor.hp < ctx.actor.maxHp * AI_BOSS_SUMMON_HP_FRACTION 
+                    },
+                    move: function(ctx) {
+                        var card = findCardInHand(ctx.actor, cardSummonsPuppet)
+                        if (card == undefined) {
+                            return undefined
+                        }
+                        return { card: card, target: ctx.actor }
+                    }
+                }
+            ] 
+        }
+        default: return { 
+            weights: { 
+                aggression: 1.0, 
+                support: 0.4, 
+                control: 0.5, 
+                lethalBonus: 40, 
+                focusFire: 8, 
+                thrift: 0.5 
+            }, 
+            policy: AiPolicy.Softmax, 
+            temperature: 0.6, 
+            rules: [] 
+        }
     }
 }

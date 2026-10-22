@@ -177,6 +177,10 @@ enum CardCategory { Attack, Magic, Heal, Buff, Special }
 
 enum EnemyKind { None, CrackerNut, Leaf, Mushroom, Flower, PuppetMaster }
 
+enum AiBrainType { Default, Brute, Skirmisher, Healer, Controller, Boss }
+
+enum AiPolicy { Argmax, Softmax }
+
 // Категория карты — данные реестра
 function cardCategoryOf(_card) {
     if (is_struct(_card) && variable_struct_exists(_card, "cardId") && cardExists(_card.cardId)) {

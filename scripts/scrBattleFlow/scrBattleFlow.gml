@@ -153,43 +153,6 @@ function isEnemysTurn() {
     return array_contains(enemies, selectedCharacter)
 }
 
-// Карты из cards, которые враг может сыграть
-function enemyPlayableCards(enemy, cards) {
-    var playable = []
-    for (var i = 0; i < array_length(cards); i++) {
-        var card = cards[i]
-        // Лесной набор — только для героев: динамические карты сбивают ИИ
-        if (is_struct(card) && variable_struct_exists(card, "cardSet") && card.cardSet == CardSet.Forest) { continue }
-        if (is_struct(card) && variable_struct_exists(card, "cardBaseSpr") && variable_struct_exists(card, "effects")
-            && checkIfCanPlayCard(enemy, card)) {
-            array_push(playable, card)
-        }
-    }
-    return playable
-}
-
-// Выбор цели для карты. foes — противники кастера, allies — союзники
-// preferAlly/preferFoe — предпочтительная одиночная цель (иначе случайная). noone если цели нет.
-function enemyResolveTarget(card, caster, foes, allies, preferAlly, preferFoe) {
-    switch (card.target) {
-        case TargetTypes.SingleEnemyTarget:
-            if (array_length(foes) == 0) { return noone }
-            return (preferFoe != noone) ? preferFoe : foes[irandom(array_length(foes) - 1)]
-        case TargetTypes.AllEnemies:
-            return (array_length(foes) > 0) ? foes : noone
-        case TargetTypes.SingleAllyTarget:
-            if (array_length(allies) == 0) { return noone }
-            return (preferAlly != noone) ? preferAlly : allies[irandom(array_length(allies) - 1)]
-        case TargetTypes.AllAllies:
-            return (array_length(allies) > 0) ? allies : noone
-        case TargetTypes.Self:
-            return caster
-        default:
-            if (array_length(foes) == 0) { return noone }
-            return foes[irandom(array_length(foes) - 1)]
-    }
-}
-
 // Выбор следующего персонажа
 function selectNextCharacter() {
     var count = array_length(playOrder)
