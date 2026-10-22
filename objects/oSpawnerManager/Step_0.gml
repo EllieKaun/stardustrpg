@@ -20,7 +20,7 @@ if (questFoxState() == QuestFoxState.Active && !questFoxItemDone(QuestFoxItem.Pi
             if (trySpawnPinecone(visionRadius, spawnDistance)) { pineconeSpawnTimer = 0 }
         }
     }
-} else {
+} else if (!questFoxItemDone(QuestFoxItem.PineCone)) {
     for (var i = ds_list_size(pineconeList) - 1; i >= 0; i--) {
         if (instance_exists(pineconeList[| i])) { instance_destroy(pineconeList[| i]) }
         ds_list_delete(pineconeList, i)

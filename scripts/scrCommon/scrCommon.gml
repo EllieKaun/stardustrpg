@@ -4,6 +4,9 @@
 #macro CHEST_MAX_COUNT 5 // максимальное количество сундуков на карте
 #macro CHEST_MIN_DISTANCE 180 // минимальная дистанция между сундуками
 #macro CHEST_INTERACT_DIST 24 //
+#macro CAMPFIRE_INTERACT_DIST 24
+#macro SAFAR_REARM_DIST 24
+#macro FIRA_REARM_DIST 24
 
 // Бой
 #macro BATTLE_BACKGROUND_DIM 0.1 // затемнение фона боя
@@ -44,6 +47,22 @@ function uiConfirmPressed() {
     return keyboard_check_pressed(vk_enter)
         || keyboard_check_pressed(vk_space)
         || keyboard_check_pressed(ord("E"))
+}
+
+function leaderApproached(rearmDistance, triggerRadius = undefined) {
+    var leader = oGameController.selected_character
+    if (!instance_exists(leader)) { return false }
+    if (!variable_instance_exists(id, "approachTriggered")) { approachTriggered = false }
+
+    var leaderDist = point_distance(x, y, leader.x, leader.y)
+    var isNear = (triggerRadius == undefined) ? place_meeting(x, y, leader) : (leaderDist <= triggerRadius)
+    if (isNear) {
+        if (approachTriggered) { return false }
+        approachTriggered = true
+        return true
+    }
+    if (approachTriggered && leaderDist > rearmDistance) { approachTriggered = false }
+    return false
 }
 
 // Масштаб GUI до размеров экрана

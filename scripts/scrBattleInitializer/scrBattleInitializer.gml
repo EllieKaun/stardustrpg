@@ -376,62 +376,12 @@ function initBattleStates() {
         rowY += lineH
         drawUiText(statsX, rowY, loc("battle.mp") + string(selectedTarget.mana) + "/" + string(selectedTarget.maxMana), popupTextH)
         rowY += lineH
-        drawUiText(statsX, rowY, loc("battle.aura") + string(selectedTarget.aura), popupTextH)
-        rowY += lineH
-        drawUiText(statsX, rowY, loc("battle.guts") + string(selectedTarget.guts), popupTextH)
-        rowY += lineH
-        if (!selectedTarget.isEnemy) {
-            drawUiText(statsX, rowY, loc("battle.strength") + string(selectedTarget.strength), popupTextH)
-            rowY += lineH
-            drawUiText(statsX, rowY, loc("battle.intelligence") + string(selectedTarget.intelligence), popupTextH)
-            rowY += lineH
-            drawUiText(statsX, rowY, loc("battle.energy") + string(selectedTarget.energy) + "/" + string(selectedTarget.maxEnergy), popupTextH)
-            rowY += lineH
-            if (variable_instance_exists(selectedTarget, "ingredients") && array_length(selectedTarget.ingredients) > 0) {
-                var ingLabel = loc("battle.ingredients")
-                var ingLblScale = drawUiText(statsX, rowY, ingLabel, popupTextH)
-                var ingIconX = statsX + string_width(ingLabel) * ingLblScale + 6 * scaleToGui
-                var ingIconSize = popupTextH
-                for (var ingIndex = 0; ingIndex < array_length(selectedTarget.ingredients); ingIndex++) {
-                    var ingInfoIcon = ingredientIcon(selectedTarget.ingredients[ingIndex])
-                    if (ingInfoIcon != noone) {
-                        draw_sprite_stretched(ingInfoIcon, 0, ingIconX, rowY, ingIconSize, ingIconSize)
-                        ingIconX += ingIconSize + 3 * scaleToGui
-                    }
-                }
-                rowY += lineH
-            }
-        }
         if (variable_instance_exists(selectedTarget, "bonusHp") && selectedTarget.bonusHp > 0) {
             drawUiText(statsX, rowY, loc("battle.bonusHp") + string(selectedTarget.bonusHp), popupTextH)
             rowY += lineH
         }
 
-        var weaknessY = rowY
-        draw_set_halign(fa_left)
-        var weaknessLabelText = loc("battle.weakness")
-        var lblScale = drawUiText(statsX, weaknessY, weaknessLabelText, popupTextH)
-        var weaknessX = statsX + string_width(weaknessLabelText) * lblScale + 6 * scaleToGui
-        var weaknessList = variable_instance_exists(selectedTarget, "weaknesses") ? selectedTarget.weaknesses : []
-        if (array_length(weaknessList) == 0) {
-            drawUiText(weaknessX, weaknessY, loc("ui.none"), popupTextH)
-        } else {
-            var wIconSize = popupTextH
-            for (var weaknessIndex = 0; weaknessIndex < array_length(weaknessList); weaknessIndex++) {
-                var statusName = weaknessList[weaknessIndex]
-                var statusIcon = weaknessIcon(statusName)
-                if (statusIcon != noone) {
-                    draw_sprite_stretched(statusIcon, 0, weaknessX, weaknessY, wIconSize, wIconSize)
-                    weaknessX += wIconSize + 3 * scaleToGui
-                }
-                var statusLabel = weaknessLabel(statusName)
-                var labelScale = drawUiText(weaknessX, weaknessY, statusLabel, popupTextH)
-                weaknessX += string_width(statusLabel) * labelScale + 8 * scaleToGui
-            }
-        }
-        draw_set_color(c_white)
-
-        var effectY = weaknessY + lineH * 1.5
+        var effectY = rowY + lineH * 0.5
         draw_set_halign(fa_left)
         drawUiText(statsX, effectY, loc("battle.statuses"), popupTextH)
         effectY += lineH

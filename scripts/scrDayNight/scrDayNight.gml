@@ -20,3 +20,10 @@ function nightValue() {
 function isNight() {
     return nightValue() >= 0.5
 }
+
+#macro TIME_OF_DAY_MORNING 0.3
+#macro TIME_OF_DAY_NIGHT 0.85
+
+function skipTimeOfDay() {
+    global.timeOfDay = isNight() ? TIME_OF_DAY_MORNING : TIME_OF_DAY_NIGHT
+}

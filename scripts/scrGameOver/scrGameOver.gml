@@ -120,7 +120,14 @@ function drawVictoryScreen() {
 
         var reward = rewardChoices[rewardIndex]
         var ownedAlready = variable_struct_exists(reward, "cardRef") && getOwnedCount(reward.cardRef.id, reward.cardRef.rarity) > 0
-        drawCard(reward, cardX, cardDrawY, cardW, cardH, false, ownedAlready ? 0.4 : 1)
+        drawCard(reward, cardX, cardDrawY, cardW, cardH, false, 1)
+        if (ownedAlready) {
+            draw_set_halign(fa_center)
+            draw_set_valign(fa_middle)
+            draw_set_color(merge_color(c_white, c_black, 0.3))
+            drawUiText(cardX + cardW / 2, cardY + cardH + 8 * guiScaleFactor, loc("reward.alreadyOwned"), 10 * guiScaleFactor, cardW)
+            draw_set_color(c_white)
+        }
 
         if (isSelected) {
             draw_sprite_ext(sPointer, 0, floor(cardX - 10 * guiScaleFactor), floor(cardDrawY + cardH / 2), guiScaleFactor, guiScaleFactor, 0, c_white, 1)
@@ -130,7 +137,7 @@ function drawVictoryScreen() {
     // Панель описания
     var panelX = floor(screenWidth * 0.05)
     var panelW = screenWidth - panelX * 2
-    var panelY = floor(cardY + cardH + 12 * guiScaleFactor)
+    var panelY = floor(cardY + cardH + 18 * guiScaleFactor)
     var panelH = floor(screenHeight * 0.95 - panelY)
     drawRewardDescription(rewardChoices[rewardCursor], panelX, panelY, panelW, panelH)
 

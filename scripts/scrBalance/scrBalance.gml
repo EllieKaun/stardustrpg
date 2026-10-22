@@ -165,7 +165,7 @@ function igniteSpritesForKind(kind) {
                 "sprCrackerNutIgniteCast", 
                 "sprCrackerNutIgniteCast", 
                 "", 
-                ""
+                "sprCrackerNutIgniteIdle"
             )
         case EnemyKind.Mushroom:
             return affixSpriteSet(
@@ -174,25 +174,25 @@ function igniteSpritesForKind(kind) {
                 "sprMushroomIgniteCast", 
                 "sprMushroomIgniteCast", 
                 "", 
-                ""
+                "sprMushroomIgniteIdle"
             )
         case EnemyKind.Flower:
             return affixSpriteSet(
                 "sprPowerFlowerIgniteIdle", 
                 "sprPowerFlowerIgniteHit", 
-                "sprPowerFlowerIgniteSpell", 
                 "sprPowerFlowerIgniteCast", 
+                "sprPowerFlowerIgniteSpell", 
                 "", 
-                ""
+                "sprPowerFlowerIgniteIdle"
             )
         case EnemyKind.Leaf:
             return affixSpriteSet(
                 "sprLeafIgniteIdle", 
                 "sprLeafIgniteHit", 
                 "sprLeafIgniteCast", 
+                "sprLeafIgniteCast", 
                 "", 
-                "", 
-                ""
+                "sprLeafIgniteIdle"
             )
         default:
             return undefined

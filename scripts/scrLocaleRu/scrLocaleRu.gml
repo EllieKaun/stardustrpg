@@ -98,6 +98,7 @@ function locDefineRu() {
     translations[$ "reward.cost"] = "Цена: "
     translations[$ "reward.mp"] = "МАНА"
     translations[$ "reward.hp"] = "ЗДОРОВЬЕ"
+    translations[$ "reward.alreadyOwned"] = "Уже есть"
 
     translations[$ "deck.magic"] = "МАГИЯ"
     translations[$ "deck.buff"] = "БАФФ"
@@ -207,6 +208,10 @@ function locDefineRu() {
     translations[$ "chest.cardPost"] = "!"
     translations[$ "chest.aCard"] = "карту"
     translations[$ "chest.trap"] = "Это ловушка!"
+    translations[$ "campfire.ask"] = "Отдохнуть у костра?"
+    translations[$ "campfire.waitMorning"] = "Переждать до утра"
+    translations[$ "campfire.waitNight"] = "Переждать до ночи"
+    translations[$ "campfire.leave"] = "Идти дальше"
 
     translations[$ "dlg.tut.ow1"] = "Стой, Боец!  Давай научимся сражаться."
     translations[$ "dlg.tut.ow2"] = "Не переживай, с картами всё просто, нужно только освоиться."

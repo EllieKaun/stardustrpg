@@ -98,6 +98,7 @@ function locDefineEn() {
     translations[$ "reward.cost"] = "Cost: "
     translations[$ "reward.mp"] = "MP"
     translations[$ "reward.hp"] = "HP"
+    translations[$ "reward.alreadyOwned"] = "Already owned"
 
     translations[$ "deck.magic"] = "MAGIC"
     translations[$ "deck.buff"] = "BUFF"
@@ -209,6 +210,10 @@ function locDefineEn() {
     translations[$ "chest.cardPost"] = "!"
     translations[$ "chest.aCard"] = "a card"
     translations[$ "chest.trap"] = "It's a trap!"
+    translations[$ "campfire.ask"] = "Rest by the campfire?"
+    translations[$ "campfire.waitMorning"] = "Wait until morning"
+    translations[$ "campfire.waitNight"] = "Wait until night"
+    translations[$ "campfire.leave"] = "Move on"
 
     translations[$ "dlg.tut.ow1"] = "Wait - a wild Starrior! A good chance to learn how to fight."
     translations[$ "dlg.tut.ow2"] = "Don't worry, it's easy once you get the hang of the cards."
