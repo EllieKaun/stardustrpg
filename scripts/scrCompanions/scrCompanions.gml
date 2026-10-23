@@ -64,10 +64,10 @@ function companionFixedRefs(character) {
             { id: cardIds.instantHealSingleTarget, rarity: CardsRarity.Default }
         ]
         case Characters.Fox: return [
-            { id: cardIds.instantManaGainSingleTarget, rarity: CardsRarity.Default },
-            { id: cardIds.instantManaGainMultiTarget, rarity: CardsRarity.Default },
-            { id: cardIds.overtimeManaGainSingleTarget, rarity: CardsRarity.Default },
-            { id: cardIds.magicalDamageSingleTarget, rarity: CardsRarity.Default }
+            { id: cardIds.forestGather, rarity: CardsRarity.Default },
+            { id: cardIds.forestFlask, rarity: CardsRarity.Default },
+            { id: cardIds.forestProvoke, rarity: CardsRarity.Default },
+            { id: cardIds.instantHealSingleTarget, rarity: CardsRarity.Default }
         ]
         default: return []
     }
@@ -80,10 +80,6 @@ function companionStarterRefs(character) {
             { id: cardIds.buffPhysicalDamageSingleTarget, rarity: CardsRarity.Default },
             { id: cardIds.physicalDamageStunChanceSingleTarget, rarity: CardsRarity.Default }
         ]
-        case Characters.Fox: return [
-            { id: cardIds.instantHealSingleTarget, rarity: CardsRarity.Default },
-            { id: cardIds.buffMagicalDamageSingleTarget, rarity: CardsRarity.Default }
-        ]
         default: return []
     }
 }
@@ -92,14 +88,18 @@ function deckFixedSlots(character) {
     return array_length(companionFixedRefs(character))
 }
 
+function deckDefaultUnlocked(character) {
+    if (!isCompanion(character)) { return DECK_DEFAULT_UNLOCKED }
+    return deckFixedSlots(character) + array_length(companionStarterRefs(character))
+}
+
 function companionEnsureDeck(character) {
     if (!isCompanion(character)) { return }
     var decks = global.playerData.decks
     var key = characterKey(character)
     if (variable_struct_exists(decks, key)) { return }
 
-    var purchased = max(0, decks.lana.unlocked - DECK_DEFAULT_UNLOCKED)
-    decks[$ key] = { unlocked: min(COMPANION_DEFAULT_UNLOCKED + purchased, deckSlotLimitFor(character)), cards: [] }
+    decks[$ key] = { unlocked: deckDefaultUnlocked(character), cards: [] }
 
     var starter = companionStarterRefs(character)
     var firstSlot = deckFixedSlots(character)

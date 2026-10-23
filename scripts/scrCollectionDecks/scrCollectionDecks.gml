@@ -159,13 +159,9 @@ function unlockDeckSlot(character, _count = 1) {
     deck.unlocked = min(deckSlotLimitFor(character), deck.unlocked + _count)
 }
 
-function unlockDeckSlotForParty(_count = 1) {
-    var characters = [Characters.Lana, Characters.Viv, Characters.Safar, Characters.Fox]
-    for (var characterIndex = 0; characterIndex < array_length(characters); characterIndex++) {
-        if (variable_struct_exists(global.playerData.decks, characterKey(characters[characterIndex]))) {
-            unlockDeckSlot(characters[characterIndex], _count)
-        }
-    }
+function unlockDeckSlotForHeroes(_count = 1) {
+    unlockDeckSlot(Characters.Lana, _count)
+    unlockDeckSlot(Characters.Viv, _count)
 }
 
 // Индекс текущей зоны. Пока в игре одна зона
@@ -181,7 +177,7 @@ function deckSlotLimit() {
 
 function deckSlotLimitFor(character) {
     if (!isCompanion(character)) { return deckSlotLimit() }
-    return min(DECK_CAPACITY, deckSlotLimit() + COMPANION_DEFAULT_UNLOCKED - DECK_DEFAULT_UNLOCKED)
+    return min(DECK_CAPACITY, deckSlotLimit() + deckDefaultUnlocked(character) - DECK_DEFAULT_UNLOCKED)
 }
 
 // Очистить деку персонажа 
@@ -243,7 +239,7 @@ function deckRemoveCard(charcter, slot) {
 // Если часть копий занята деками — они выделяются в отдельные слоты:
 // свободные, занятые текущей декой, занятые чужими деками.
 // currentCharacter — чья дека сейчас открыта.
-function buildCollectionSlots(category = undefined, cols = 4, currentCharacter = Characters.Lana) {
+function buildCollectionSlots(category = undefined, cols = 4, currentCharacter = Characters.Lana, cardSet = undefined) {
     var refs = getCollectionRefs()
     var otherCharacters = []
     var characters = deckCharacters()
@@ -257,6 +253,7 @@ function buildCollectionSlots(category = undefined, cols = 4, currentCharacter =
         var card = cardFromRef(cardRef)
         if (card == undefined) { continue }
         if (category != undefined && cardCategoryOf(card) != category) { continue }
+        if (cardSet != undefined && cardSetOf(card) != cardSet) { continue }
 
         var total = cardRef.count
         var inCurrent = countCardInDeck(currentCharacter, cardRef.id, cardRef.rarity)
@@ -300,10 +297,34 @@ function buildCollectionSlots(category = undefined, cols = 4, currentCharacter =
 
     // добить пустыми до минимум 20 слотов
     var count = array_length(slots)
-    var totalSlots = max(20, ceil(count / cols) * cols)
+    var totalSlots = max(ceil(20 / cols) * cols, ceil(count / cols) * cols)
     repeat (totalSlots - count) array_push(slots, new Slot("empty"))
 
     return slots
+}
+
+function cardSetOf(card) {
+    return variable_struct_exists(card, "cardSet") ? card.cardSet : CardSet.Base
+}
+
+function ownedCardSets() {
+    var sets = [CardSet.Base]
+    var refs = getCollectionRefs()
+    for (var refIndex = 0; refIndex < array_length(refs); refIndex++) {
+        var card = cardFromRef(refs[refIndex])
+        if (card == undefined) { continue }
+        var set = cardSetOf(card)
+        if (!array_contains(sets, set)) { array_push(sets, set) }
+    }
+    array_sort(sets, true)
+    return sets
+}
+
+function cardSetTab(cardSet) {
+    switch (cardSet) {
+        case CardSet.Forest: return { name: loc("deck.packForest"), color: #3E8E41 }
+        default: return { name: loc("deck.packBase"), color: #5B4BA8 }
+    }
 }
 
 // Построение слотов для панели деки персонажа, пустые, залоченные и заполненные картой

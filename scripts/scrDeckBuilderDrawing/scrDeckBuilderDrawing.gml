@@ -55,7 +55,12 @@ function Panel(config) constructor {
     tabOffsetX = config[$ "tabOffsetX"] ?? 0 // отступ ряда вкладок слева
     activeTab = 0
 
-    cols = 4        
+    sideTabs = config[$ "sideTabs"] ?? []
+    sideTabWidthFraction = config[$ "sideTabWidthFraction"] ?? 0.22
+    activeSideTab = 0
+    onSideTabs = false
+
+    cols = config[$ "cols"] ?? 4
     cardRatio = 2 / 3
     slots = config[$ "slots"] ?? []
     padding = config[$ "padding"] ?? 8
@@ -66,6 +71,7 @@ function Panel(config) constructor {
     onSlotClick = config[$ "onSlotClick"] ?? undefined
     onTabClick = config[$ "onTabClick"] ?? undefined
     onPanelSwitch = config[$ "onPanelSwitch"] ?? undefined
+    onSideTabClick = config[$ "onSideTabClick"] ?? undefined
 
     // Кастомный рендер слота карт (для переиспользования)
     cardRenderer = config[$ "cardRenderer"] ?? undefined
@@ -127,10 +133,11 @@ function Panel(config) constructor {
     // Адаптивный лэайут
    static computeLayout = function() {
         var topPad = padding * 0.75 // верхний отступ меньше бокового
-        var gridX = x + padding
+        var sideW = sideColumnWidth()
+        var gridX = x + padding + sideW
         var gridY = y + topPad
 
-        var gridW = w - padding * 2
+        var gridW = w - padding * 2 - sideW
         var gridH = h - topPad - padding
 
         var ratio = 2 / 3
@@ -167,6 +174,22 @@ function Panel(config) constructor {
         }
     }
     
+    static sideColumnWidth = function() {
+        return (array_length(sideTabs) > 0) ? w * sideTabWidthFraction : 0
+    }
+
+    static getSideTabRect = function(index) {
+        var tabX = x + padding
+        var tabW = sideColumnWidth() - padding * 0.5
+        var tabY = y + padding * 0.75 + index * (tabH + tabGap * 2)
+        return { tx: tabX, ty: tabY, tw: tabW, th: tabH }
+    }
+
+    static selectSideTab = function(index) {
+        activeSideTab = clamp(index, 0, max(0, array_length(sideTabs) - 1))
+        if (onSideTabClick != undefined) { onSideTabClick(self, activeSideTab) }
+    }
+
     // Данные о позиции и размере слота по индексу
     static getSlotRect = function(index) {
         var layout = computeLayout()
@@ -232,6 +255,7 @@ function Panel(config) constructor {
     static enterFromLeft = function(row) { 
         focused = true
         onTabRow = false
+        onSideTabs = false
         cursorCol = 0
         cursorRow = clamp(row, 0, max(0, totalRows - 1))
         selectAtCursor()
@@ -242,6 +266,7 @@ function Panel(config) constructor {
     static enterFromRight = function(row) {
         focused = true
         onTabRow = false
+        onSideTabs = false
         cursorCol = cols - 1
         cursorRow = clamp(row, 0, max(0, totalRows - 1))
         selectAtCursor()
@@ -295,6 +320,22 @@ function Panel(config) constructor {
             return;
         }
 
+        if (onSideTabs) {
+            if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) {
+                selectSideTab(activeSideTab - 1)
+            }
+            if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) {
+                selectSideTab(activeSideTab + 1)
+            }
+            if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D")) ||
+                keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) {
+                onSideTabs = false
+                cursorCol = 0
+                selectAtCursor()
+            }
+            return
+        }
+
         // Когда выделены карты
         var moveX = 0, moveY = 0, moved = false
         if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) { 
@@ -331,6 +372,10 @@ function Panel(config) constructor {
             var newRow = cursorRow + moveY
 
             if (newCol < 0) { 
+                if (array_length(sideTabs) > 0) {
+                    onSideTabs = true
+                    return
+                }
                 if (onPanelSwitch != undefined) { 
                     onPanelSwitch(self, -1)
                 }
@@ -417,6 +462,19 @@ function Panel(config) constructor {
                 return true
             }
         }
+        // Боковые табы с наборами
+        for (var sideIndex = 0; sideIndex < array_length(sideTabs); sideIndex++) {
+            var sideRect = getSideTabRect(sideIndex)
+            if (pointInRect(mouseX, mouseY, sideRect.tx, sideRect.ty, sideRect.tw, sideRect.th)) {
+                if (clicked) {
+                    if (instance_exists(oDeckBuilder)) { oDeckBuilder.focusPanel(self) }
+                    onTabRow = false
+                    onSideTabs = true
+                    selectSideTab(sideIndex)
+                }
+                return true
+            }
+        }
         var slotClicked = instance_exists(oDragManager) ? oDragManager.didClick
                                                         : clicked
         // Видимость слотов
@@ -428,6 +486,7 @@ function Panel(config) constructor {
                 if (slotClicked) {
                     if (instance_exists(oDeckBuilder)) { oDeckBuilder.focusPanel(self) }
                     onTabRow = false
+                    onSideTabs = false
                     cursorRow = slotIndex div cols
                     cursorCol = slotIndex mod cols
                     selectedSlot = slotIndex
@@ -516,7 +575,7 @@ function Panel(config) constructor {
         if (selectedSlot >= first && selectedSlot < last) {
             var slotRect = getSlotRect(selectedSlot)
              
-            if (pointerSprite != undefined && focused && !onTabRow) {
+            if (pointerSprite != undefined && focused && !onTabRow && !onSideTabs) {
                 var pointerX = slotRect.sx + slotRect.sw * 0.10
                 var pointerY = slotRect.sy + (slotRect.sh) / 2
                 draw_sprite_ext(pointerSprite, 0, pointerX, pointerY, uiScale, uiScale, 0, c_white, 1)
@@ -525,6 +584,36 @@ function Panel(config) constructor {
 
         // конец клипа сетки
         guiClipEnd(clipSurface, clipX, clipY)
+        
+        // Боковые табы наборов
+        for (var sideIndex = 0; sideIndex < array_length(sideTabs); sideIndex++) {
+            var sideTab = sideTabs[sideIndex]
+            var sideRect = getSideTabRect(sideIndex)
+            var sideActive = (sideIndex == activeSideTab)
+            var corner = 6 * uiScale
+            draw_set_color(sideTab[$ "color"] ?? c_gray)
+            draw_set_alpha(sideActive ? 1.0 : 0.55)
+            draw_roundrect_ext(sideRect.tx, sideRect.ty, sideRect.tx + sideRect.tw, sideRect.ty + sideRect.th, corner, corner, false)
+            draw_set_alpha(1.0)
+            if (sideActive) {
+                draw_set_color(c_white)
+                draw_roundrect_ext(sideRect.tx, sideRect.ty, sideRect.tx + sideRect.tw, sideRect.ty + sideRect.th, corner, corner, true)
+            }
+
+            draw_set_font(uiFont())
+            draw_set_color(sideTab[$ "textColor"] ?? c_white)
+            draw_set_halign(fa_center)
+            draw_set_valign(fa_middle)
+            var sideLabelScale = uiTextScale(sideTab.name, sideRect.th * 0.6, sideRect.tw - tabPadding * 2)
+            draw_text_transformed(sideRect.tx + sideRect.tw / 2, sideRect.ty + sideRect.th / 2,
+                sideTab.name, sideLabelScale, sideLabelScale, 0)
+            draw_set_halign(fa_left)
+            draw_set_valign(fa_top)
+
+            if (sideActive && focused && onSideTabs && pointerSprite != undefined) {
+                draw_sprite_ext(pointerSprite, 0, sideRect.tx + tabPadding, sideRect.ty + sideRect.th / 2, uiScale, uiScale, 0, c_white, 1)
+            }
+        }
 
         // Табы
         for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {

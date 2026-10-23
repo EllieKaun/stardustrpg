@@ -5,6 +5,8 @@
 #macro CHEST_MIN_DISTANCE 180 // минимальная дистанция между сундуками
 #macro CHEST_INTERACT_DIST 24 //
 #macro CAMPFIRE_INTERACT_DIST 24
+#macro CAMPFIRE_ICON_OFFSET 4
+#macro CAMPFIRE_ICON_CLICK_HEIGHT 24
 #macro SAFAR_REARM_DIST 24
 #macro FIRA_REARM_DIST 24
 

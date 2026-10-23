@@ -56,14 +56,14 @@ if (worldHudVisible() && array_length(questTrackables) > 0) {
     var margin = floor(guiHeight * 0.03)
     var iconH = floor(guiHeight * 0.06)
     var gap = floor(guiHeight * 0.02) // промежуток между предметами
-    var slotW = iconH + gap // ширина ячейки одного предмета
-    var countH = floor(iconH * 0.42) // высота текста счётчика
-    var countY = margin + iconH + floor(gap * 0.25)
+    var slotH = iconH + gap
+    var countH = floor(iconH * 0.75)
+    var countX = margin + iconH + gap
 
     for (var i = 0; i < array_length(questTrackables); i++) {
         var trackable = questTrackables[i]
-        var iconCenterX = margin + i * slotW + iconH * 0.5
-        var iconCenterY = margin + iconH * 0.5
+        var iconCenterX = margin + iconH * 0.5
+        var iconCenterY = margin + i * slotH + iconH * 0.5
         var done = trackable.done
         var pop = trackable.scale // отклик на подбор
 
@@ -82,14 +82,14 @@ if (worldHudVisible() && array_length(questTrackables) > 0) {
             draw_set_color(c_white)
         }
 
-        // Счётчик n/need под иконкой, с тенью, через drawUiText
+        // Счётчик n/need справа от иконки, с тенью, через drawUiText
         var countStr = string(trackable.count) + "/" + string(trackable.needed)
-        draw_set_halign(fa_center)
-        draw_set_valign(fa_top)
+        draw_set_halign(fa_left)
+        draw_set_valign(fa_middle)
         draw_set_color(c_black)
-        drawUiText(iconCenterX + 1, countY + 1, countStr, countH, iconH * 1.4)
+        drawUiText(countX + 2, iconCenterY + 2, countStr, countH, iconH * 2.5)
         draw_set_color(done ? c_lime : c_white)
-        drawUiText(iconCenterX, countY, countStr, countH, iconH * 1.4)
+        drawUiText(countX, iconCenterY, countStr, countH, iconH * 2.5)
         draw_set_color(c_white)
         draw_set_halign(fa_left)
         draw_set_valign(fa_top)

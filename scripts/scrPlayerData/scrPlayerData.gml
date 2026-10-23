@@ -5,7 +5,6 @@ enum Characters { Lana, Viv, Safar, Fox }
 #macro DECK_CAPACITY 12 // максимум слотов деки
 #macro ZONE_DECK_SLOT_LIMITS [6] // сколько слотов деки можно открыть максимум в зоне
 #macro COMPANION_NONE -1
-#macro COMPANION_DEFAULT_UNLOCKED 6
 
 // Инициализация пользователя (каждый раз на старте)
 function playerDataInit() {

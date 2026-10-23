@@ -8,6 +8,7 @@ function aiTeams(actor) {
     }
 }
 
+// Ум врага
 function aiBrain(actor) {
     if (variable_instance_exists(actor, "brain") && is_struct(actor.brain)) {
         return actor.brain
@@ -116,6 +117,7 @@ function estimateDamage(effect, caster, target) {
     return mitigateDamage(target, effect, damage)
 }
 
+// Цена розыгрыша
 function aiPaysCost(actor, card) {
     if (actor.isEnemy) {
         return false
@@ -216,13 +218,13 @@ function chooseMove(actor) {
         return hardCode
     }
 
-    // 2) все рабочие ходы ходы
+    // 2) все рабочие ходы
     var moves = enumerateMoves(actor, ctx.allies, ctx.foes)
     if (array_length(moves) == 0) {
         return undefined
     }
 
-    // 3) Оценить каждый ход
+    // 3) оценить каждый ход
     var scored = []
     for (var i = 0; i < array_length(moves); i++) {
         array_push(scored, { move: moves[i], score: scoreMove(moves[i], ctx) })
