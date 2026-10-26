@@ -1,0 +1,865 @@
+================================================================================
+  ДЕКБИЛДЕР: НАБОРЫ СВЕРХУ, КАТЕГОРИИ СЛЕВА, СЧЁТЧИКИ «СОБРАНО / ВСЕГО»
+  Гайд по реализации. Проект: stardustrpg (GameMaker, GML)
+================================================================================
+
+Гайд в том же формате, что и card_sets_forest_guide.txt, но с готовыми кусками
+кода: их можно вставлять почти как есть. Делай по частям, после каждой части
+запускай игру и проверяй.
+
+Что получится (как на скриншоте):
+  - над коллекцией — ряд вкладок НАБОРОВ: «ЗВЁЗДНЫЙ 13/40», «ЛЕСНОЙ 4/5»;
+  - слева в коллекции — колонка КАТЕГОРИЙ: ВСЕ, МАГ, АТК, БАФФ, ЛЕЧ, ОСОБ,
+    у каждой счётчик «собрано / всего в этом наборе»;
+  - (необязательно) общий счётчик в шапке: «Карты: 17/45».
+
+ВАЖНО: С КАКОЙ ВЕТКОЙ РАБОТАТЬ.
+  В main наборов в декбилдере ещё нет. Всё, на что опирается гайд (вкладки
+  наборов, CardSet, cardSetTab, ownedCardSets, rewardForestSet), лежит в ветке
+  feature/ai-enemy-decision (коммит ff6500d «правки по декбилдеру»). Номера
+  строк ниже — по этой ветке. Если у тебя локально код уже другой (на скриншоте
+  есть вкладка All и короткие подписи, которых в ветке нет), ищи места по
+  именам функций — они те же.
+
+
+--------------------------------------------------------------------------------
+СОДЕРЖАНИЕ
+--------------------------------------------------------------------------------
+  Часть 0.  Принятые решения
+  Часть 1.  Карта кода: как устроено сейчас
+  Часть 2.  Подготовка: две функции cardSetOf (уже сделано)
+  Часть 3.  Panel: подпись со счётчиком и вкладки-«таблетки»
+  Часть 4.  Данные вкладок категорий и локализация
+  Часть 5.  Меняем местами: oDeckBuilder
+  Часть 6.  Счётчики: что считаем и как
+  Часть 7.  Подключаем счётчики к вкладкам
+  Часть 8.  Необязательное: общий счётчик, узкая колонка, клавиатура
+  Часть 9.  Порядок, чек-лист, частые ошибки
+
+
+================================================================================
+  ЧАСТЬ 0. ПРИНЯТЫЕ РЕШЕНИЯ
+================================================================================
+
+0.1. Сам Panel почти не трогаем — меняем, ЧТО в нём лежит.
+  У Panel уже есть два вида вкладок:
+    tabs     — горизонтальный ряд над панелью (сейчас там категории);
+    sideTabs — вертикальная колонка слева внутри панели (сейчас там наборы).
+  «Поменять местами» = положить наборы в tabs, а категории в sideTabs и
+  поменять местами обработчики onTabClick / onSideTabClick. Вся навигация
+  (мышь, стрелки, Q/E) уже написана и продолжит работать.
+
+0.2. Первая категория — «ВСЕ». Она же открыта по умолчанию.
+  buildCollectionSlots уже понимает category = undefined как «без фильтра».
+
+0.3. Порядок категорий как на скриншоте: ВСЕ, МАГ, АТК, БАФФ, ЛЕЧ, ОСОБ.
+  Подписи короткие — колонка узкая. Старые ключи deck.magic и т.д. не удаляем.
+
+0.4. Считаем РАЗНЫЕ карты, а не копии и не редкости.
+  «Собрано» = у игрока есть хотя бы одна копия этой карты любой редкости.
+  Три одинаковых «Удара» — это 1, а не 3. Обычный и редкий «Удар» — тоже 1.
+  (Вариант с редкостями — в 6.5.)
+
+0.5. «Всего» = карты, которые в игре реально можно получить.
+  Источники: все четыре списка наград zoneContent (rewardAlways,
+  rewardNightOnly, rewardAfterBoss, rewardForestSet), магазин (shopCards) и
+  награды квестов. Карты, которые есть только в реестре (bossClone врага,
+  мультитаргеты, которые пока нигде не выдаются), в «всего» не входят —
+  иначе игрок увидит «13/60» и никогда не соберёт.
+  Ночные и «после босса» считаются сразу, а не по мере открытия: знаменатель
+  не должен прыгать.
+
+0.6. Что от чего зависит.
+  Счётчик набора    — по всему набору, от категории не зависит.
+  Счётчик категории — внутри ВЫБРАННОГО набора (ровно то, что видно в сетке).
+  Ни один счётчик не зависит от деки: карта, положенная в деку, остаётся
+  собранной. Поэтому пересчёт нужен только при открытии декбилдера и при
+  смене набора, но не после перетаскивания карт.
+
+0.7. Числитель никогда не больше знаменателя.
+  Карты, которых нет в списке «можно получить» (например, после отладочного
+  unlockAllCards), в «собрано» не попадают.
+
+0.8. Наборы, которых у игрока ещё нет, по-прежнему скрыты (ownedCardSets).
+  Если нужно показывать «ЛЕСНОЙ 0/5» до встречи с Фирой — 8.4.
+
+
+================================================================================
+  ЧАСТЬ 1. КАРТА КОДА: КАК УСТРОЕНО СЕЙЧАС
+================================================================================
+
+objects/oDeckBuilder/Create_0.gml
+  categoryForTab(tab)       (стр. 66)  — индекс вкладки -> CardCategory
+  packTabSets, currentPack, refreshPackTabs (стр. 77–92) — вкладки наборов,
+                                         сейчас пишут в sideTabs/activeSideTab
+  collectionPanel = new Panel({...})  (стр. 102)
+     tabs: категории со спрайтами MagicBtn, BuffBtn, ...
+     sideTabs: [cardSetTab(CardSet.Base)]
+     onTabClick      — смена категории
+     onSideTabClick  — смена набора
+  refreshCollection         (стр. 244) — пересобрать слоты коллекции
+  openBuilder               (стр. 300) — вызывается при открытии
+
+scripts/scrDeckBuilderDrawing/scrDeckBuilderDrawing.gml — конструктор Panel
+  tabs:     getTabWidths, getTabRect (ряд на y - tabH), отрисовка спрайтом,
+            а если спрайта нет — draw_rectangle цветом tab.color
+  sideTabs: sideColumnWidth (w * sideTabWidthFraction, по умолч. 0.22),
+            getSideTabRect, selectSideTab, отрисовка draw_roundrect_ext
+  клавиатура (stepKeyboard):
+    в сетке: вверх с первой строки -> ряд tabs; влево с первого столбца ->
+             колонка sideTabs; Q/E — соседняя вкладка tabs;
+    onTabRow:   влево/вправо — сменить вкладку tabs, вниз/Enter — в сетку;
+    onSideTabs: вверх/вниз — сменить вкладку sideTabs, вправо/Enter — в сетку.
+  Panel также использует альбом (scrAlbum, без вкладок). Магазин — свой
+  конструктор Shop, его правки Panel не заденут.
+
+scripts/scrCollectionDecks/scrCollectionDecks.gml
+  getCollectionRefs()         — [{ id, rarity, count }] всё, что есть у игрока
+  buildCollectionSlots(category, cols, character, cardSet) (стр. 242)
+  cardSetOfCard(card)         (стр. 306)  <- см. часть 2
+  ownedCardSets()             (стр. 310)
+  cardSetTab(cardSet)         (стр. 323)  — { name, color } вкладки набора
+
+scripts/scrCardRegistry/scrCardRegistry.gml
+  global.cardRegistry[$ id] = { id, canVaryRarity, category, build, cardSet }
+  cardSetById(cardId)         (стр. 217)  <- см. часть 2
+
+scripts/scrBalance/scrBalance.gml, zoneContent()
+  rewardAlways, rewardNightOnly, rewardAfterBoss, rewardForestSet, shopCards
+
+scripts/sprSpawnerUtils/sprSpawnerUtils.gml
+  appendRewardIds(targetIds, sourceIds) — добавить существующие id без повторов
+
+scripts/scrQuests/scrQuests.gml
+  questGrantCardReward(global.CardId.stealCard, ...) — карта из квеста Сафара.
+  stealCard больше нигде не выдаётся, поэтому её надо явно внести в «можно
+  получить» (6.1).
+
+
+================================================================================
+  ЧАСТЬ 2. ПОДГОТОВКА: ДВЕ ФУНКЦИИ cardSetOf (УЖЕ СДЕЛАНО)
+================================================================================
+
+В ветке были две глобальные функции с одним именем cardSetOf: одна в
+scrCardRegistry (принимает id), другая в scrCollectionDecks (принимает
+структуру карты). У глобальных функций GML одно пространство имён, и с двумя
+одинаковыми проект не запускался. Теперь имена разные:
+
+  scrCardRegistry:    function cardSetById(cardId)  — по записи реестра
+  scrCollectionDecks: function cardSetOfCard(card)  — по полю cardSet карты
+
+Вызовы переименованы:
+  scrEffectSystem (стр. 602)            -> cardSetById(cardId)
+  buildCollectionSlots (стр. 256)       -> cardSetOfCard(card)
+  ownedCardSets (стр. 316)              -> cardSetOfCard(card)
+
+Правило: есть только id — cardSetById, карта уже построена — cardSetOfCard.
+Дальше в гайде везде, где есть только id (счётчики, 8.4), используется
+cardSetById.
+
+2.1. Необязательно: ownedCardSets без постройки карт
+  Сейчас ownedCardSets строит каждую карту коллекции через cardFromRef только
+  ради набора. Через реестр быстрее:
+
+    function ownedCardSets() {
+        var sets = [CardSet.Base]
+        var refs = getCollectionRefs()
+        for (var refIndex = 0; refIndex < array_length(refs); refIndex++) {
+            var set = cardSetById(refs[refIndex].id)
+            if (!array_contains(sets, set)) { array_push(sets, set) }
+        }
+        array_sort(sets, true)
+        return sets
+    }
+
+Проверка: открой декбилдер, во вкладке «ЛЕСНОЙ» только лесные карты, во
+«ЗВЁЗДНЫЙ» — ни одной лесной. Лесное «случайное зелье» в бою работает как раньше.
+
+
+================================================================================
+  ЧАСТЬ 3. PANEL: ПОДПИСЬ СО СЧЁТЧИКОМ И ВКЛАДКИ-«ТАБЛЕТКИ»
+================================================================================
+
+Все правки — в конструкторе Panel (scrDeckBuilderDrawing). После этой части
+внешне ничего не меняется: поля counter пока ни у кого нет.
+
+3.1. Подпись вкладки
+  У вкладки появляется необязательное поле counter (строка вида "3/12").
+  Подпись = имя + счётчик. Добавь метод рядом с getTabWidths:
+
+    static tabLabel = function(tab) {
+        var counter = tab[$ "counter"]
+        return (counter == undefined) ? tab.name : tab.name + " " + counter
+    }
+
+  tab[$ "counter"] — безопасное чтение: если поля нет, вернёт undefined, а не
+  упадёт. Вкладки Ланы/Вив и альбом счётчика не имеют — у них всё как было.
+
+3.2. Ширина верхних вкладок — getTabWidths
+  Ширина считается по тексту, значит, должна учитывать счётчик. Было:
+
+            var textScale = uiTextScale(tabs[tabIndex].name, tabH * 0.8, 1000000)
+            var inset = (tabs[tabIndex][$ "textInset"] ?? 0) * tabH
+            var textWidth = inset + string_width(tabs[tabIndex].name) * textScale + tabPadding
+
+  стало:
+
+            var label = tabLabel(tabs[tabIndex])
+            var textScale = uiTextScale(label, tabH * 0.8, 1000000)
+            var inset = (tabs[tabIndex][$ "textInset"] ?? 0) * tabH
+            var textWidth = inset + string_width(label) * textScale + tabPadding * 2
+
+  tabPadding * 2 — отступ с обеих сторон. У вкладок без спрайта (наборы) иначе
+  текст упирается в край. Вкладкам со спрайтом это не мешает: у них ширина —
+  max(ширина арта, ширина текста), и арт обычно шире.
+
+3.3. Одна функция рисования «таблетки»
+  Боковые вкладки уже рисуются скруглённым прямоугольником. Верхние вкладки без
+  спрайта рисуются простым draw_rectangle — на скриншоте они тоже «таблетки».
+  Чтобы не копировать код, вынеси рисование в метод:
+
+    static drawPill = function(pillX, pillY, pillW, pillH, color, isActive) {
+        var corner = 6 * uiScale
+        draw_set_color(color)
+        draw_set_alpha(isActive ? 1.0 : 0.55)
+        draw_roundrect_ext(pillX, pillY, pillX + pillW, pillY + pillH, corner, corner, false)
+        draw_set_alpha(1.0)
+        if (isActive) {
+            draw_set_color(c_white)
+            draw_roundrect_ext(pillX, pillY, pillX + pillW, pillY + pillH, corner, corner, true)
+        }
+    }
+
+3.4. Боковые вкладки — в draw(), блок «Боковые табы наборов»
+  Было (фон и подпись):
+
+            var corner = 6 * uiScale
+            draw_set_color(sideTab[$ "color"] ?? c_gray)
+            draw_set_alpha(sideActive ? 1.0 : 0.55)
+            draw_roundrect_ext(sideRect.tx, sideRect.ty, sideRect.tx + sideRect.tw, sideRect.ty + sideRect.th, corner, corner, false)
+            draw_set_alpha(1.0)
+            if (sideActive) {
+                draw_set_color(c_white)
+                draw_roundrect_ext(sideRect.tx, sideRect.ty, sideRect.tx + sideRect.tw, sideRect.ty + sideRect.th, corner, corner, true)
+            }
+            ...
+            var sideLabelScale = uiTextScale(sideTab.name, sideRect.th * 0.6, sideRect.tw - tabPadding * 2)
+            draw_text_transformed(sideRect.tx + sideRect.tw / 2, sideRect.ty + sideRect.th / 2,
+                sideTab.name, sideLabelScale, sideLabelScale, 0)
+
+  стало:
+
+            drawPill(sideRect.tx, sideRect.ty, sideRect.tw, sideRect.th, sideTab[$ "color"] ?? c_gray, sideActive)
+            ...
+            var sideLabel = tabLabel(sideTab)
+            var sideLabelScale = uiTextScale(sideLabel, sideRect.th * 0.6, sideRect.tw - tabPadding * 2)
+            draw_text_transformed(sideRect.tx + sideRect.tw / 2, sideRect.ty + sideRect.th / 2,
+                sideLabel, sideLabelScale, sideLabelScale, 0)
+
+  Комментарий над блоком («Боковые табы наборов») теперь врёт — там категории.
+
+3.5. Верхние вкладки — в draw(), блок «Табы»
+  Ветка «нет спрайта». Было:
+
+            } else {
+                draw_set_color(tab[$ "color"] ?? c_gray)
+                draw_set_alpha(isActive ? 1.0 : 0.6)
+                draw_rectangle(tabRow.tx, tabRow.ty, tabRow.tx + tabRow.tw - 1, tabRow.ty + tabRow.th - 1, false)
+                draw_set_alpha(1.0)
+            }
+
+  стало:
+
+            } else {
+                drawPill(tabRow.tx, tabRow.ty, tabRow.tw, tabRow.th, tab[$ "color"] ?? c_gray, isActive)
+            }
+
+  Подпись. Было:
+
+            var labelMaxW = tabRow.tw - labelInset - tabPadding
+            var labelScale = uiTextScale(tab.name, tabRow.th * 0.8, labelMaxW)
+            if (labelInset > 0) {
+                draw_set_halign(fa_left)
+                draw_text_transformed(tabRow.tx + labelInset, tabRow.ty + tabRow.th / 2,
+                    tab.name, labelScale, labelScale, 0)
+            } else {
+                draw_set_halign(fa_center)
+                draw_text_transformed(tabRow.tx + tabRow.tw / 2, tabRow.ty + tabRow.th / 2,
+                    tab.name, labelScale, labelScale, 0)
+            }
+
+  стало (tab.name -> label, три места):
+
+            var label = tabLabel(tab)
+            var labelMaxW = tabRow.tw - labelInset - tabPadding
+            var labelScale = uiTextScale(label, tabRow.th * 0.8, labelMaxW)
+            if (labelInset > 0) {
+                draw_set_halign(fa_left)
+                draw_text_transformed(tabRow.tx + labelInset, tabRow.ty + tabRow.th / 2,
+                    label, labelScale, labelScale, 0)
+            } else {
+                draw_set_halign(fa_center)
+                draw_text_transformed(tabRow.tx + tabRow.tw / 2, tabRow.ty + tabRow.th / 2,
+                    label, labelScale, labelScale, 0)
+            }
+
+  Для вкладок со спрайтом (Лана/Вив) uiTextScale(label, tabRow.th * 0.8, ...)
+  даёт текст высотой 80% вкладки. Для «таблетки» это крупно — если хочется
+  мельче, как у боковых, поставь 0.6 только для вкладок без спрайта:
+
+            var labelHeight = (tab[$ "sprite"] != undefined) ? 0.8 : 0.6
+            var labelScale = uiTextScale(label, tabRow.th * labelHeight, labelMaxW)
+
+Проверка: декбилдер, магазин и альбом выглядят и работают как раньше.
+
+
+================================================================================
+  ЧАСТЬ 4. ДАННЫЕ ВКЛАДОК КАТЕГОРИЙ И ЛОКАЛИЗАЦИЯ
+================================================================================
+
+4.1. Функция вкладки категории
+  Рядом с cardSetTab в scrCollectionDecks — по тому же образцу:
+
+    function cardCategoryTab(category) {
+        switch (category) {
+            case CardCategory.Magic: return { name: loc("deck.magicShort"), color: #9944CC }
+            case CardCategory.Attack: return { name: loc("deck.attackShort"), color: #CC4444 }
+            case CardCategory.Buff: return { name: loc("deck.buffShort"), color: #44AACC }
+            case CardCategory.Heal: return { name: loc("deck.healShort"), color: #44CC44 }
+            case CardCategory.Special: return { name: loc("deck.specialShort"), color: c_white, textColor: c_black }
+            default: return { name: loc("deck.all"), color: c_white, textColor: c_black }
+        }
+    }
+
+  «Все» — это category = undefined. Ни один case с undefined не совпадёт,
+  сработает default. Цвета взяты из старых вкладок, кроме баффа — на скриншоте
+  он голубой (было #CC44CC, почти как магия).
+
+  Функция каждый раз возвращает НОВУЮ структуру. Это важно: в части 7 в неё
+  будет дописываться counter, и общий объект на все вызовы перепутал бы
+  счётчики.
+
+4.2. Локализация
+  scrLocaleRu, рядом с deck.packForest:
+
+    translations[$ "deck.all"] = "ВСЕ"
+    translations[$ "deck.magicShort"] = "МАГ"
+    translations[$ "deck.attackShort"] = "АТК"
+    translations[$ "deck.buffShort"] = "БАФФ"
+    translations[$ "deck.healShort"] = "ЛЕЧ"
+    translations[$ "deck.specialShort"] = "ОСОБ"
+
+  scrLocaleEn:
+
+    translations[$ "deck.all"] = "ALL"
+    translations[$ "deck.magicShort"] = "MGC"
+    translations[$ "deck.attackShort"] = "ATK"
+    translations[$ "deck.buffShort"] = "BUFF"
+    translations[$ "deck.healShort"] = "HEAL"
+    translations[$ "deck.specialShort"] = "SPL"
+
+  Старые deck.magic, deck.buff и т.д. не удаляй — пусть живут, пока поиск по
+  проекту не покажет, что они нигде не нужны. Со спрайтами MagicBtn, BuffBtn,
+  HealBtn, AttackBtn, SpecialBtn — то же самое.
+
+
+================================================================================
+  ЧАСТЬ 5. МЕНЯЕМ МЕСТАМИ: oDeckBuilder
+================================================================================
+
+Всё — в objects/oDeckBuilder/Create_0.gml. Счётчиков пока нет, только перенос.
+Правило на всю часть: «набор» теперь читается из activeTab, «категория» — из
+activeSideTab. Найди поиском все activeTab / activeSideTab в файле и проверь
+каждое место (их немного: currentPack, refreshPackTabs, refreshCollection,
+openBuilder).
+
+5.1. Категории по индексу вкладки
+  Было:
+
+    categoryForTab = function(tab) { // Мап индекса таба фильтра в категорию карт
+        switch (tab) {
+            case 0: return CardCategory.Magic
+            case 1: return CardCategory.Buff
+            case 2: return CardCategory.Heal
+            case 3: return CardCategory.Attack
+            case 4: return CardCategory.Special
+            default: return undefined
+        }
+    }
+
+  стало:
+
+    categoryTabCategories = [undefined, CardCategory.Magic, CardCategory.Attack,
+                             CardCategory.Buff, CardCategory.Heal, CardCategory.Special]
+
+    categoryForTab = function(tab) {
+        return categoryTabCategories[clamp(tab, 0, array_length(categoryTabCategories) - 1)]
+    }
+
+  Порядок вкладок теперь задаётся одним массивом. Хочешь другой порядок —
+  переставь элементы, больше ничего менять не надо.
+
+5.2. Набор — из верхнего ряда
+  currentPack, было:
+
+    return packTabSets[clamp(collectionPanel.activeSideTab, 0, array_length(packTabSets) - 1)]
+
+  стало:
+
+    return packTabSets[clamp(collectionPanel.activeTab, 0, array_length(packTabSets) - 1)]
+
+  refreshPackTabs — пишет в tabs/activeTab вместо sideTabs/activeSideTab:
+
+    refreshPackTabs = function() {
+        var selectedPack = (array_length(collectionPanel.tabs) > 0) ? currentPack() : CardSet.Base
+        packTabSets = ownedCardSets()
+        var tabs = []
+        for (var packIndex = 0; packIndex < array_length(packTabSets); packIndex++) {
+            array_push(tabs, cardSetTab(packTabSets[packIndex]))
+        }
+        collectionPanel.tabs = tabs
+        collectionPanel.activeTab = max(0, array_get_index(packTabSets, selectedPack))
+    }
+
+5.3. Новая функция — вкладки категорий
+  Сразу после refreshPackTabs:
+
+    refreshCategoryTabs = function() {
+        var sideTabs = []
+        for (var categoryIndex = 0; categoryIndex < array_length(categoryTabCategories); categoryIndex++) {
+            array_push(sideTabs, cardCategoryTab(categoryTabCategories[categoryIndex]))
+        }
+        collectionPanel.sideTabs = sideTabs
+    }
+
+  Сейчас она каждый раз строит одно и то же. Смысл появится в части 7: туда
+  добавится счётчик, зависящий от выбранного набора.
+
+5.4. Конфиг collectionPanel
+  Поменяй четыре поля: tabs, sideTabs, slots и оба обработчика вкладок.
+  Было:
+
+    tabs: [
+        { name: loc("deck.magic"), sprite: MagicBtn, color: #9944CC },
+        { name: loc("deck.buff"), sprite: BuffBtn, color: #CC44CC },
+        { name: loc("deck.heal"), sprite: HealBtn, color: #44CC44 },
+        { name: loc("deck.attack"), sprite: AttackBtn, color: #CC4444 },
+        { name: loc("deck.special"), sprite: SpecialBtn, color: c_white, textColor: c_black }
+    ],
+    visibleRows: 3,
+    cols: 3,
+    sideTabs: [cardSetTab(CardSet.Base)],
+    slots: buildCollectionSlots(CardCategory.Magic, 3, Characters.Lana, CardSet.Base),
+    onTabClick: function(panel, tabIndex) {
+        with (oDeckBuilder) {
+            var category = categoryForTab(tabIndex)
+            panel.slots = buildCollectionSlots(category, panel.cols, editingCharacter, currentPack())
+            panel.scrollY = 0
+            panel.cursorRow = 0
+            panel.cursorCol = 0
+            panel.refreshScroll()
+            panel.selectAtCursor()
+        }
+    },
+
+  стало:
+
+    tabs: [cardSetTab(CardSet.Base)],
+    visibleRows: 3,
+    cols: 3,
+    sideTabs: [],
+    slots: buildCollectionSlots(undefined, 3, Characters.Lana, CardSet.Base),
+    onTabClick: function(panel, tabIndex) {
+        with (oDeckBuilder) {
+            refreshCategoryTabs()
+            refreshCollection()
+            panel.scrollY = 0
+            panel.cursorRow = 0
+            panel.cursorCol = 0
+            panel.refreshScroll()
+            panel.selectAtCursor()
+        }
+    },
+
+  onSideTabClick оставь как есть — он и так просто вызывает refreshCollection
+  и сбрасывает курсор. Раньше это была смена набора, теперь — смена категории,
+  а код тот же, потому что refreshCollection сам читает и набор, и категорию.
+
+  Почему внутри обработчиков не нужен tabIndex: Panel ставит
+  activeTab / activeSideTab ДО вызова обработчика (и в stepMouse, и в
+  stepKeyboard, и в selectSideTab). refreshCollection и currentPack читают уже
+  новое значение.
+
+  Сразу после строки collectionPanel.tag = Panels.Collection добавь:
+
+    refreshCategoryTabs()
+
+  Иначе до первого открытия колонка категорий пустая и ширина сетки другая.
+  Вызывать refreshCategoryTabs внутри конфига нельзя: collectionPanel в этот
+  момент ещё не существует.
+
+5.5. refreshCollection (стр. 244)
+  Было:
+
+    var category = categoryForTab(collectionPanel.activeTab)
+
+  стало:
+
+    var category = categoryForTab(collectionPanel.activeSideTab)
+
+5.6. openBuilder (стр. 300)
+  Было:
+
+    refreshDeckTabs()
+    refreshPackTabs()
+    collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab), collectionPanel.cols, editingCharacter, currentPack())
+
+  стало:
+
+    refreshDeckTabs()
+    refreshPackTabs()
+    refreshCategoryTabs()
+    collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeSideTab), collectionPanel.cols, editingCharacter, currentPack())
+
+  Порядок важен: сначала наборы (выбирают currentPack), потом категории (в
+  части 7 их счётчики считаются по currentPack).
+
+5.7. Ширина колонки и число столбцов
+  sideTabWidthFraction по умолчанию 0.22 от ширины панели, cols: 3. Со
+  счётчиками («БАФФ 3/12») это в самый раз. На скриншоте 4 столбца и колонка
+  уже — так можно, если счётчик в колонке рисовать второй строкой (8.2), тогда:
+
+    cols: 4,
+    sideTabWidthFraction: 0.16,
+
+Проверка:
+  - сверху «ЗВЁЗДНЫЙ» (и «ЛЕСНОЙ», если есть лесные карты), слева шесть категорий;
+  - по умолчанию открыта «ВСЕ», видно все карты набора;
+  - клик по категории фильтрует, клик по набору меняет карты, категория
+    при этом остаётся выбранной;
+  - клавиатура: вверх с первой строки — ряд наборов, влево/вправо — смена
+    набора, вниз — обратно в сетку; влево с первого столбца — колонка
+    категорий, вверх/вниз — смена, вправо — в сетку; Q/E листают наборы;
+  - перетаскивание в деку и обратно работает, вкладка не сбрасывается.
+
+
+================================================================================
+  ЧАСТЬ 6. СЧЁТЧИКИ: ЧТО СЧИТАЕМ И КАК
+================================================================================
+
+Функции кладём в существующий scrCollectionDecks, а не в новый скрипт:
+новый скрипт надо регистрировать в stellarpunk_rpg.yyp при ЗАКРЫТОЙ IDE,
+иначе он не подхватится.
+
+6.1. Список квестовых карт в zoneContent
+  Карта stealCard выдаётся только квестом Сафара (scrQuests), в списках наград
+  её нет. Чтобы все источники карт были в одном месте, добавь в zoneContent
+  (scrBalance) рядом с shopCards:
+
+                questCards: [
+                    cardIds.stealCard
+                ],
+
+  Правило на будущее: новая карта-награда за квест -> сюда тоже.
+  instantManaGainSingleTarget из квеста Фиры добавлять не нужно — она уже есть
+  в rewardAlways.
+
+6.2. Какие карты можно получить
+
+    function collectibleCardIds() {
+        var content = zoneContent()
+        var ids = []
+        appendRewardIds(ids, content.rewardAlways)
+        appendRewardIds(ids, content.rewardNightOnly)
+        appendRewardIds(ids, content.rewardAfterBoss)
+        appendRewardIds(ids, content.rewardForestSet)
+        appendRewardIds(ids, content.questCards)
+        for (var shopIndex = 0; shopIndex < array_length(content.shopCards); shopIndex++) {
+            appendRewardIds(ids, [content.shopCards[shopIndex].id])
+        }
+        return ids
+    }
+
+  appendRewardIds (sprSpawnerUtils) уже делает всё нужное: пропускает id,
+  которых нет в реестре, и не добавляет повторы (стартовые карты есть и в
+  rewardAlways — посчитаются один раз).
+  shopCards — массив структур { id, price }, поэтому из него берём .id.
+
+6.3. Какие карты у игрока есть
+
+    function ownedCardIds() {
+        var ids = []
+        var refs = getCollectionRefs()
+        for (var refIndex = 0; refIndex < array_length(refs); refIndex++) {
+            var cardRef = refs[refIndex]
+            if (cardRef.count > 0 && !array_contains(ids, cardRef.id)) { array_push(ids, cardRef.id) }
+        }
+        return ids
+    }
+
+  В коллекции ключ — «id@редкость», поэтому одна карта разных редкостей —
+  это несколько записей. array_contains склеивает их в один id (решение 0.4).
+  Копии в деках тоже лежат в коллекции (дека хранит только ссылки), поэтому
+  карта в деке считается собранной без отдельной проверки.
+
+6.4. Сам счётчик
+
+    function collectionProgress(category = undefined, cardSet = undefined) {
+        var collectible = collectibleCardIds()
+        var owned = ownedCardIds()
+        var progress = { owned: 0, total: 0 }
+        for (var idIndex = 0; idIndex < array_length(collectible); idIndex++) {
+            var cardDefinition = global.cardRegistry[$ collectible[idIndex]]
+            if (category != undefined && cardDefinition.category != category) { continue }
+            if (cardSet != undefined && cardDefinition.cardSet != cardSet) { continue }
+            progress.total++
+            if (array_contains(owned, cardDefinition.id)) { progress.owned++ }
+        }
+        return progress
+    }
+
+    function progressText(progress) {
+        return string(progress.owned) + "/" + string(progress.total)
+    }
+
+  Категорию и набор читаем прямо из записи реестра, карту НЕ строим. Через
+  cardFromRef было бы правильно, но медленно: каждая постройка — вызов
+  фабрики, cardBalance и т.д.
+  undefined в параметре = «не фильтровать». Значит:
+    collectionProgress()                         — всё вообще
+    collectionProgress(undefined, CardSet.Forest) — весь лесной набор
+    collectionProgress(CardCategory.Attack, CardSet.Base) — атаки звёздного
+
+  Цена: на одно открытие декбилдера ~9 вызовов по ~35 карт — это ничто. Но в
+  Draw (каждый кадр) не вызывай: считай при открытии и храни строку.
+
+6.5. Если когда-нибудь понадобятся редкости
+  Сейчас REWARD_DEFAULT_RARITY_ONLY = true, всё выпадает обычным, и считать
+  редкости бессмысленно. Если выключишь флаг и захочешь «собери все редкости»:
+    - в ownedCardIds хранить collectionKey(id, rarity) вместо id;
+    - в collectionProgress для карты с canVaryRarity перебирать редкости
+      из zoneContent().rewardRarities и каждую считать отдельной позицией;
+      для уникальной (canVaryRarity = false) — только CardsRarity.Default.
+  Счётчик тогда станет «13/52» вместо «13/26» — реши заранее, что хочешь
+  показывать игроку.
+
+Проверка: временно выведи в Output при открытии декбилдера
+
+    show_debug_message(progressText(collectionProgress()))
+
+  Новая игра — стартовые карты: 5 обычных + 4 лесные = 9 разных. Должно быть
+  «9/<сколько всего>». Купи карту в магазине — числитель +1.
+
+
+================================================================================
+  ЧАСТЬ 7. ПОДКЛЮЧАЕМ СЧЁТЧИКИ К ВКЛАДКАМ
+================================================================================
+
+Panel уже умеет рисовать counter (часть 3). Осталось его заполнить.
+
+7.1. Счётчик набора — в refreshPackTabs
+  Было:
+
+        for (var packIndex = 0; packIndex < array_length(packTabSets); packIndex++) {
+            array_push(tabs, cardSetTab(packTabSets[packIndex]))
+        }
+
+  стало:
+
+        for (var packIndex = 0; packIndex < array_length(packTabSets); packIndex++) {
+            var packTab = cardSetTab(packTabSets[packIndex])
+            packTab.counter = progressText(collectionProgress(undefined, packTabSets[packIndex]))
+            array_push(tabs, packTab)
+        }
+
+7.2. Счётчик категории — в refreshCategoryTabs
+
+    refreshCategoryTabs = function() {
+        var pack = currentPack()
+        var sideTabs = []
+        for (var categoryIndex = 0; categoryIndex < array_length(categoryTabCategories); categoryIndex++) {
+            var category = categoryTabCategories[categoryIndex]
+            var categoryTab = cardCategoryTab(category)
+            categoryTab.counter = progressText(collectionProgress(category, pack))
+            array_push(sideTabs, categoryTab)
+        }
+        collectionPanel.sideTabs = sideTabs
+    }
+
+  У «ВСЕ» category = undefined, и счётчик совпадёт со счётчиком набора — так и
+  должно быть.
+
+7.3. Когда пересчитывается
+  - openBuilder: refreshPackTabs + refreshCategoryTabs (уже стоят после
+    части 5) — коллекция могла поменяться в бою, сундуке, магазине, квесте;
+  - onTabClick (смена набора): refreshCategoryTabs (уже стоит);
+  - applyChanges (перетаскивание в деку): НЕ нужно, решение 0.6.
+
+Проверка:
+  - «ЗВЁЗДНЫЙ 5/…» и «ЛЕСНОЙ 4/5» в новой игре (Пустая колба, Сумка, Сбор,
+    Провокация есть, случайного зелья нет);
+  - сумма счётчиков категорий (без «ВСЕ») = счётчик набора;
+  - переключил набор — цифры категорий поменялись;
+  - карта в деке Ланы всё равно учитывается как собранная;
+  - вкладки Ланы/Вив без цифр.
+
+
+================================================================================
+  ЧАСТЬ 8. НЕОБЯЗАТЕЛЬНОЕ
+================================================================================
+
+8.1. Общий счётчик в шапке («Карты: 13/100» на скриншоте)
+  В Create_0 рядом с packTabSets:
+
+    collectionCounterText = ""
+
+  В openBuilder после refreshCategoryTabs():
+
+    collectionCounterText = loc("deck.cardsCounter") + " " + progressText(collectionProgress())
+
+  В Draw_64 после collectionPanel.draw():
+
+    draw_set_font(uiFont())
+    draw_set_color(c_white)
+    draw_set_halign(fa_right)
+    draw_set_valign(fa_middle)
+    var counterScale = uiTextScale(collectionCounterText, collectionPanel.tabH * 0.6, collectionPanel.w * 0.35)
+    draw_text_transformed(collectionPanel.x + collectionPanel.w - collectionPanel.padding,
+        collectionPanel.y - collectionPanel.tabH / 2,
+        collectionCounterText, counterScale, counterScale, 0)
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+
+  Локализация: deck.cardsCounter = "Карты:" / "Cards:".
+  Текст прижат к правому краю ряда наборов. Если наборов станет много и они
+  наедут на счётчик — уменьши collectionPanel.w * 0.35 или перенеси счётчик
+  на фон-плашку (draw_sprite_stretched, как у вкладок).
+
+8.2. Счётчик второй строкой в узкой колонке
+  Если хочешь 4 столбца и узкую колонку (5.7), одна строка «БАФФ 3/12» не
+  влезет крупно. Тогда в блоке боковых вкладок draw() вместо подписи из 3.4:
+
+            var sideCounter = sideTab[$ "counter"]
+            var textMaxW = sideRect.tw - tabPadding * 2
+            var textX = sideRect.tx + sideRect.tw / 2
+            if (sideCounter == undefined) {
+                var sideLabelScale = uiTextScale(sideTab.name, sideRect.th * 0.6, textMaxW)
+                draw_text_transformed(textX, sideRect.ty + sideRect.th / 2,
+                    sideTab.name, sideLabelScale, sideLabelScale, 0)
+            } else {
+                var nameScale = uiTextScale(sideTab.name, sideRect.th * 0.42, textMaxW)
+                var counterScale = uiTextScale(sideCounter, sideRect.th * 0.32, textMaxW)
+                draw_text_transformed(textX, sideRect.ty + sideRect.th * 0.33,
+                    sideTab.name, nameScale, nameScale, 0)
+                draw_text_transformed(textX, sideRect.ty + sideRect.th * 0.73,
+                    sideCounter, counterScale, counterScale, 0)
+            }
+
+  draw_set_halign(fa_center) / fa_middle там уже стоят — не убирай.
+
+8.3. Клавиатура: из колонки категорий вверх — в ряд наборов
+  Сейчас вверх на первой категории ничего не делает (selectSideTab зажимает
+  индекс). В stepKeyboard, блок if (onSideTabs), было:
+
+            if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) {
+                selectSideTab(activeSideTab - 1)
+            }
+
+  стало:
+
+            if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) {
+                if (activeSideTab == 0 && tabCount > 0) {
+                    onSideTabs = false
+                    onTabRow = true
+                    return
+                }
+                selectSideTab(activeSideTab - 1)
+            }
+
+  tabCount объявлен выше в той же функции. Из ряда наборов вниз Panel и так
+  уводит в сетку.
+
+8.4. Показывать ещё не открытые наборы («ЛЕСНОЙ 0/5»)
+  Замени в refreshPackTabs ownedCardSets() на функцию, которая берёт наборы
+  из collectibleCardIds():
+
+    function collectibleCardSets() {
+        var sets = [CardSet.Base]
+        var ids = collectibleCardIds()
+        for (var idIndex = 0; idIndex < array_length(ids); idIndex++) {
+            var set = cardSetById(ids[idIndex])
+            if (!array_contains(sets, set)) { array_push(sets, set) }
+        }
+        array_sort(sets, true)
+        return sets
+    }
+
+  Минус: игрок увидит лесной набор до встречи с Фирой. Можно оставить
+  ownedCardSets и добавлять Forest, только если global.foxJoined.
+
+8.5. Набор собран целиком
+  Когда owned == total — подсветить вкладку: в tab-структуру положить
+  textColor золотой или дописать к counter звёздочку. Мелочь, но игроку
+  приятно.
+
+
+================================================================================
+  ЧАСТЬ 9. ПОРЯДОК, ЧЕК-ЛИСТ, ЧАСТЫЕ ОШИБКИ
+================================================================================
+
+Перед началом: правь .gml при закрытой IDE GameMaker или потом сделай в ней
+Reload — открытая IDE перезаписывает внешние правки. После правок проверь
+grep'ом, что изменения на диске.
+
+Порядок (после каждого шага игра запускается и работает):
+  1. Часть 2 — функции уже разведены. Проверить фильтр по наборам.
+  2. Часть 3 — tabLabel, drawPill. Внешне ничего не меняется.
+  3. Часть 4 — cardCategoryTab и тексты.
+  4. Часть 5 — перенос вкладок. Главная визуальная правка.
+  5. Часть 6 — счётчики, проверка через Output.
+  6. Часть 7 — цифры на вкладках.
+  7. Часть 8 — по желанию.
+
+Чек-лист:
+  [ ] Наборы — ряд сверху, категории — колонка слева.
+  [ ] По умолчанию открыты первый набор и «ВСЕ».
+  [ ] Фильтр по набору и по категории работают вместе.
+  [ ] В «ЗВЁЗДНЫЙ» нет лесных карт (часть 2).
+  [ ] Мышь и клавиатура (стрелки, WASD, Q/E, Enter) ходят по обеим группам вкладок.
+  [ ] Счётчик набора = собрано / можно получить в наборе.
+  [ ] Счётчики категорий в сумме дают счётчик набора, «ВСЕ» = счётчик набора.
+  [ ] Карты в деках учитываются как собранные.
+  [ ] Числитель не больше знаменателя даже после unlockAllCards.
+  [ ] Цифры обновляются при открытии и при смене набора.
+  [ ] Вкладки Ланы/Вив, магазин и альбом не изменились.
+  [ ] Тексты на русском и английском.
+
+Частые ошибки:
+  * activeTab и activeSideTab перепутаны в одном из мест (currentPack,
+    refreshPackTabs, refreshCollection, openBuilder): при клике по категории
+    меняется набор или фильтр «отстаёт» на одно нажатие.
+  * refreshCategoryTabs вызван раньше refreshPackTabs: счётчики категорий
+    посчитаны для старого набора.
+  * В cardSetOfCard передали id (или в cardSetById — структуру): в лучшем
+    случае вернётся CardSet.Base и лесные карты окажутся в звёздном наборе,
+    в худшем — ошибка при открытии декбилдера.
+  * cardSetTab / cardCategoryTab возвращают одну и ту же структуру (например,
+    вынесенную в глобальную переменную): counter одной вкладки появляется на
+    всех.
+  * collectionProgress вызывается в Draw: лишняя работа каждый кадр. Считай
+    при открытии, рисуй готовую строку.
+  * stealCard не внесена в questCards: после квеста Сафара карта лежит в
+    коллекции, но ни один счётчик не растёт — её нет в «можно получить».
+  * Знаменатель считается по всему реестру: «5/60», и половину этих карт
+    получить невозможно.
+  * Подпись слишком длинная и становится мелкой: getTabWidths ужимает все
+    верхние вкладки пропорционально, если они не влезают по ширине. Помогают
+    короткие имена наборов или счётчик второй строкой (8.2).
+  * refreshCategoryTabs вызывается внутри конфига collectionPanel: панели ещё
+    нет, ошибка при создании объекта. Вызывай после new Panel(...).
+
+
+Совет: части 2–5 — это полчаса и сразу видимый результат. Счётчики (6–7)
+делай отдельным заходом: сначала убедись через show_debug_message, что числа
+верные, и только потом выводи их на вкладки — на экране ошибку в подсчёте
+заметить труднее, чем в Output.

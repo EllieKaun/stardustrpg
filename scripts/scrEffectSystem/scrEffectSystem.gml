@@ -599,7 +599,7 @@ function randomCardPool(cardSet, category) {
         var cardId = ids[idIndex]
         var definition = global.cardRegistry[$ cardId]
         if (definition.category != category) { continue }
-        if (cardSetOf(cardId) != cardSet) { continue }
+        if (cardSetById(cardId) != cardSet) { continue }
         if (array_contains(shopIds, cardId)) { continue }
         var sample = cardBuild(cardId, CardsRarity.Default)
         if (sample == undefined || cardSummonsPuppet(sample)) { continue }

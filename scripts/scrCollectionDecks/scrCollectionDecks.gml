@@ -253,7 +253,7 @@ function buildCollectionSlots(category = undefined, cols = 4, currentCharacter =
         var card = cardFromRef(cardRef)
         if (card == undefined) { continue }
         if (category != undefined && cardCategoryOf(card) != category) { continue }
-        if (cardSet != undefined && cardSetOf(card) != cardSet) { continue }
+        if (cardSet != undefined && cardSetOfCard(card) != cardSet) { continue }
 
         var total = cardRef.count
         var inCurrent = countCardInDeck(currentCharacter, cardRef.id, cardRef.rarity)
@@ -303,7 +303,7 @@ function buildCollectionSlots(category = undefined, cols = 4, currentCharacter =
     return slots
 }
 
-function cardSetOf(card) {
+function cardSetOfCard(card) {
     return variable_struct_exists(card, "cardSet") ? card.cardSet : CardSet.Base
 }
 
@@ -313,7 +313,7 @@ function ownedCardSets() {
     for (var refIndex = 0; refIndex < array_length(refs); refIndex++) {
         var card = cardFromRef(refs[refIndex])
         if (card == undefined) { continue }
-        var set = cardSetOf(card)
+        var set = cardSetOfCard(card)
         if (!array_contains(sets, set)) { array_push(sets, set) }
     }
     array_sort(sets, true)
