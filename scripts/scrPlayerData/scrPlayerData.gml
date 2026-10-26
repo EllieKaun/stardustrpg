@@ -187,6 +187,7 @@ function autosaveDrawIcon() {
     var fadeOutSeconds = 0.6
     var alpha = min(1, elapsedSeconds / fadeInSeconds, (AUTOSAVE_ICON_SECONDS - elapsedSeconds) / fadeOutSeconds)
 
+    if (window_get_height() <= 0) { return }
     var guiHeight = display_get_gui_height()
     var guiPerScreenPixel = guiHeight / window_get_height()
     var screenScale = max(1, round(window_get_height() * 0.09 / sprite_get_height(LanaIcon)))
