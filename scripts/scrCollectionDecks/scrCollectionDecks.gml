@@ -311,9 +311,7 @@ function ownedCardSets() {
     var sets = [CardSet.Base]
     var refs = getCollectionRefs()
     for (var refIndex = 0; refIndex < array_length(refs); refIndex++) {
-        var card = cardFromRef(refs[refIndex])
-        if (card == undefined) { continue }
-        var set = cardSetOfCard(card)
+        var set = cardSetById(refs[refIndex].id)
         if (!array_contains(sets, set)) { array_push(sets, set) }
     }
     array_sort(sets, true)
