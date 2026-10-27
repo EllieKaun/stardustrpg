@@ -325,6 +325,9 @@ function zoneContent(zoneId = undefined) {
                     cardIds.forestFlask,
                     cardIds.forestRandomPotion // случайное зелье
                 ],
+                questCards: [
+                    cardIds.stealCard
+                ],
                 // Карты, которые продаются только в магазине
                 shopCards: [
                     { id: cardIds.shuffleDeck, price: 600 }, // перемешивает колоду

@@ -320,9 +320,62 @@ function ownedCardSets() {
 
 function cardSetTab(cardSet) {
     switch (cardSet) {
-        case CardSet.Forest: return { name: loc("deck.packForest"), color: #3E8E41 }
-        default: return { name: loc("deck.packBase"), color: #5B4BA8 }
+        case CardSet.Forest: return { name: loc("deck.packForest"), sprite: TabFill, tint: #3E8E41 }
+        default: return { name: loc("deck.packBase"), sprite: TabFill, tint: #5B4BA8 }
     }
+}
+
+function cardCategoryTab(category) {
+    switch (category) {
+        case CardCategory.Magic: return { name: loc("deck.magic"), sprite: MagicBtn }
+        case CardCategory.Attack: return { name: loc("deck.attack"), sprite: AttackBtn }
+        case CardCategory.Buff: return { name: loc("deck.buff"), sprite: BuffBtn }
+        case CardCategory.Heal: return { name: loc("deck.heal"), sprite: HealBtn }
+        case CardCategory.Special: return { name: loc("deck.special"), sprite: SpecialBtn, textColor: c_black }
+        default: return { name: loc("deck.all"), sprite: TabFill, tint: #F0D58C, textColor: c_black }
+    }
+}
+
+function collectibleCardIds() {
+    var content = zoneContent()
+    var ids = []
+    appendRewardIds(ids, content.rewardAlways)
+    appendRewardIds(ids, content.rewardNightOnly)
+    appendRewardIds(ids, content.rewardAfterBoss)
+    appendRewardIds(ids, content.rewardForestSet)
+    appendRewardIds(ids, content.questCards)
+    for (var shopIndex = 0; shopIndex < array_length(content.shopCards); shopIndex++) {
+        appendRewardIds(ids, [content.shopCards[shopIndex].id])
+    }
+    return ids
+}
+
+function ownedCardIds() {
+    var ids = []
+    var refs = getCollectionRefs()
+    for (var refIndex = 0; refIndex < array_length(refs); refIndex++) {
+        var cardRef = refs[refIndex]
+        if (cardRef.count > 0 && !array_contains(ids, cardRef.id)) { array_push(ids, cardRef.id) }
+    }
+    return ids
+}
+
+function collectionProgress(category = undefined, cardSet = undefined) {
+    var collectible = collectibleCardIds()
+    var owned = ownedCardIds()
+    var progress = { owned: 0, total: 0 }
+    for (var idIndex = 0; idIndex < array_length(collectible); idIndex++) {
+        var cardDefinition = global.cardRegistry[$ collectible[idIndex]]
+        if (category != undefined && cardDefinition.category != category) { continue }
+        if (cardSet != undefined && cardDefinition.cardSet != cardSet) { continue }
+        progress.total++
+        if (array_contains(owned, cardDefinition.id)) { progress.owned++ }
+    }
+    return progress
+}
+
+function progressText(progress) {
+    return string(progress.owned) + "/" + string(progress.total)
 }
 
 // Построение слотов для панели деки персонажа, пустые, залоченные и заполненные картой

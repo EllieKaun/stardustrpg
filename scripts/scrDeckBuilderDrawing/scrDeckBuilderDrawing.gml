@@ -200,6 +200,18 @@ function Panel(config) constructor {
         return { sx: slotX, sy: slotY, sw: layout.cardWidth, sh: layout.cardHeight }
     }
 
+    static drawTabArt = function(tab, artX, artY, artW, artH, isActive) {
+        var alpha = isActive ? 1.0 : 0.6
+        var tint = tab[$ "tint"]
+        if (tint == undefined) {
+            var tabSubimage = min(isActive ? 1 : 0, sprite_get_number(tab.sprite) - 1)
+            draw_sprite_stretched_ext(tab.sprite, tabSubimage, artX, artY, artW, artH, c_white, alpha)
+            return
+        }
+        draw_sprite_stretched_ext(TabFill, 0, artX, artY, artW, artH, tint, alpha)
+        draw_sprite_stretched_ext(TabBorder, 0, artX, artY, artW, artH, c_white, alpha)
+    }
+
     static getTabWidths = function() {
         var tabsCount = array_length(tabs)
         var widths = array_create(tabsCount, 0)
@@ -585,19 +597,13 @@ function Panel(config) constructor {
         // конец клипа сетки
         guiClipEnd(clipSurface, clipX, clipY)
         
-        // Боковые табы наборов
+        // Боковые табы категорий
         for (var sideIndex = 0; sideIndex < array_length(sideTabs); sideIndex++) {
             var sideTab = sideTabs[sideIndex]
             var sideRect = getSideTabRect(sideIndex)
             var sideActive = (sideIndex == activeSideTab)
-            var corner = 6 * uiScale
-            draw_set_color(sideTab[$ "color"] ?? c_gray)
-            draw_set_alpha(sideActive ? 1.0 : 0.55)
-            draw_roundrect_ext(sideRect.tx, sideRect.ty, sideRect.tx + sideRect.tw, sideRect.ty + sideRect.th, corner, corner, false)
-            draw_set_alpha(1.0)
-            if (sideActive) {
-                draw_set_color(c_white)
-                draw_roundrect_ext(sideRect.tx, sideRect.ty, sideRect.tx + sideRect.tw, sideRect.ty + sideRect.th, corner, corner, true)
+            if (sideTab[$ "sprite"] != undefined) {
+                drawTabArt(sideTab, sideRect.tx, sideRect.ty, sideRect.tw, sideRect.th, sideActive)
             }
 
             draw_set_font(uiFont())
@@ -621,16 +627,12 @@ function Panel(config) constructor {
             var tabRow = getTabRect(tabIndex)
             var isActive = (tabIndex == activeTab)
             if (tab[$ "sprite"] != undefined) {
-                // таб 1 показывает активный таб
-                var tabSubimage = min(isActive ? 1 : 0, sprite_get_number(tab.sprite) - 1)
+                // кнопка может быть сдвинута вправо
+                var buttonOffsetX = (tab[$ "btnOffsetX"] ?? 0) * tabRow.th
+                drawTabArt(tab, tabRow.tx + buttonOffsetX, tabRow.ty, tabRow.tw - buttonOffsetX, tabRow.th, isActive)
                 draw_set_alpha(isActive ? 1.0 : 0.6)
 
-                // кнопка может быть сдвинута вправо 
-                var buttonOffsetX = (tab[$ "btnOffsetX"] ?? 0) * tabRow.th
-                draw_sprite_stretched(tab.sprite, tabSubimage,
-                    tabRow.tx + buttonOffsetX, tabRow.ty, tabRow.tw - buttonOffsetX, tabRow.th)
-
-                // иконка поверх кнопки 
+                // иконка поверх кнопки
                 var tabIcon = tab[$ "icon"]
                 if (tabIcon != undefined) {
                     var artScale = tabRow.th / sprite_get_height(tab.sprite)

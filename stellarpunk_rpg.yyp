@@ -620,6 +620,8 @@
     {"id":{"name":"sViv","path":"sprites/sViv/sViv.yy",},},
     {"id":{"name":"sVivWalk","path":"sprites/sVivWalk/sVivWalk.yy",},},
     {"id":{"name":"sWall","path":"sprites/sWall/sWall.yy",},},
+    {"id":{"name":"TabBorder","path":"sprites/TabBorder/TabBorder.yy",},},
+    {"id":{"name":"TabFill","path":"sprites/TabFill/TabFill.yy",},},
     {"id":{"name":"tree1","path":"sprites/tree1/tree1.yy",},},
     {"id":{"name":"tree1NoGrass","path":"sprites/tree1NoGrass/tree1NoGrass.yy",},},
     {"id":{"name":"tree2","path":"sprites/tree2/tree2.yy",},},

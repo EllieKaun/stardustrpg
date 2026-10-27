@@ -113,6 +113,8 @@ function locDefineRu() {
     translations[$ "deck.fox"] = "ФИРА"
     translations[$ "deck.packBase"] = "ЗВЁЗДНЫЙ"
     translations[$ "deck.packForest"] = "ЛЕСНОЙ"
+    translations[$ "deck.all"] = "ВСЕ"
+    translations[$ "deck.cardsCounter"] = "Карты:"
     translations[$ "companion.rejoinAsk"] = "Снова возьмёте меня с собой?"
     translations[$ "companion.rejoinYes"] = "Идём с нами"
     translations[$ "companion.rejoinNo"] = "Не сейчас"

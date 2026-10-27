@@ -63,32 +63,42 @@ refreshDeckTabs = function() {
     deckPanel.activeTab = editingIndex
 }
 
+categoryTabCategories = [undefined, CardCategory.Magic, CardCategory.Attack,
+                         CardCategory.Buff, CardCategory.Heal, CardCategory.Special]
+
 categoryForTab = function(tab) { // Мап индекса таба фильтра в категорию карт
-    switch (tab) {
-        case 0: return CardCategory.Magic
-        case 1: return CardCategory.Buff
-        case 2: return CardCategory.Heal
-        case 3: return CardCategory.Attack
-        case 4: return CardCategory.Special
-        default: return undefined
-    }
+    return categoryTabCategories[clamp(tab, 0, array_length(categoryTabCategories) - 1)]
 }
 
 packTabSets = [CardSet.Base]
+collectionCounterText = ""
 
 currentPack = function() {
-    return packTabSets[clamp(collectionPanel.activeSideTab, 0, array_length(packTabSets) - 1)]
+    return packTabSets[clamp(collectionPanel.activeTab, 0, array_length(packTabSets) - 1)]
 }
 
 refreshPackTabs = function() {
-    var selectedPack = (array_length(collectionPanel.sideTabs) > 0) ? currentPack() : CardSet.Base
+    var selectedPack = (array_length(collectionPanel.tabs) > 0) ? currentPack() : CardSet.Base
     packTabSets = ownedCardSets()
-    var sideTabs = []
+    var tabs = []
     for (var packIndex = 0; packIndex < array_length(packTabSets); packIndex++) {
-        array_push(sideTabs, cardSetTab(packTabSets[packIndex]))
+        array_push(tabs, cardSetTab(packTabSets[packIndex]))
+    }
+    collectionPanel.tabs = tabs
+    collectionPanel.activeTab = max(0, array_get_index(packTabSets, selectedPack))
+}
+
+refreshCategoryTabs = function() {
+    var sideTabs = []
+    for (var categoryIndex = 0; categoryIndex < array_length(categoryTabCategories); categoryIndex++) {
+        array_push(sideTabs, cardCategoryTab(categoryTabCategories[categoryIndex]))
     }
     collectionPanel.sideTabs = sideTabs
-    collectionPanel.activeSideTab = max(0, array_get_index(packTabSets, selectedPack))
+}
+
+refreshCollectionCounter = function() {
+    var progress = collectionProgress(categoryForTab(collectionPanel.activeSideTab), currentPack())
+    collectionCounterText = loc("deck.cardsCounter") + " " + progressText(progress)
 }
 
 applyChanges = function () {
@@ -109,21 +119,15 @@ collectionPanel = new Panel({
     selectSprite: sprCardSelected,
     pointerSprite: sPointer,
     tabFonts: tabFonts,
-    tabs: [
-        { name: loc("deck.magic"), sprite: MagicBtn, color: #9944CC },
-        { name: loc("deck.buff"), sprite: BuffBtn, color: #CC44CC },
-        { name: loc("deck.heal"), sprite: HealBtn, color: #44CC44 },
-        { name: loc("deck.attack"), sprite: AttackBtn, color: #CC4444 },
-        { name: loc("deck.special"), sprite: SpecialBtn, color: c_white, textColor: c_black }
-    ],
+    tabs: [cardSetTab(CardSet.Base)],
     visibleRows: 3,
     cols: 3,
-    sideTabs: [cardSetTab(CardSet.Base)],
-    slots: buildCollectionSlots(CardCategory.Magic, 3, Characters.Lana, CardSet.Base),
+    sideTabs: [],
+    slots: buildCollectionSlots(undefined, 3, Characters.Lana, CardSet.Base),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
-            var category = categoryForTab(tabIndex)
-            panel.slots = buildCollectionSlots(category, panel.cols, editingCharacter, currentPack())
+            refreshCollection()
+            refreshCollectionCounter()
             panel.scrollY = 0
             panel.cursorRow = 0
             panel.cursorCol = 0
@@ -156,6 +160,7 @@ collectionPanel = new Panel({
     onSideTabClick: function(panel, sideIndex) {
         with (oDeckBuilder) {
             refreshCollection()
+            refreshCollectionCounter()
             panel.scrollY = 0
             panel.cursorRow = 0
             panel.cursorCol = 0
@@ -165,6 +170,7 @@ collectionPanel = new Panel({
     onPanelSwitch: panelSwitchCallback
 })
 collectionPanel.tag = Panels.Collection
+refreshCategoryTabs()
 
 // Панель деки
 deckPanel = new Panel({
@@ -242,7 +248,7 @@ focusPanel = function(panel) {
 
 // Перестроить панель коллекции под текущую категорию и открытую деку
 refreshCollection = function() {
-    var category = categoryForTab(collectionPanel.activeTab)
+    var category = categoryForTab(collectionPanel.activeSideTab)
     collectionPanel.slots = buildCollectionSlots(category, collectionPanel.cols, editingCharacter, currentPack())
     collectionPanel.refreshScroll()
     if (collectionPanel.selectedSlot >= array_length(collectionPanel.slots)) {
@@ -304,7 +310,9 @@ openBuilder = function() {
     global.uiModal = true
     refreshDeckTabs()
     refreshPackTabs()
-    collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab), collectionPanel.cols, editingCharacter, currentPack())
+    refreshCategoryTabs()
+    refreshCollectionCounter()
+    collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeSideTab), collectionPanel.cols, editingCharacter, currentPack())
     collectionPanel.scrollY = 0
     collectionPanel.refreshScroll()
     deckPanel.slots = buildDeckSlots(editingCharacter)
