@@ -191,7 +191,7 @@ function clearDeck(character) {
 function characterIcon(character) {
     switch (character) {
         case Characters.Lana: return LanaIcon
-        case Characters.Viv:  return VivIcon
+        case Characters.Viv: return VivIcon
         case Characters.Safar: return sprCharacterPanelSafarHead
         case Characters.Fox: return sprCharacterPanelFoxHead
         default: return noone
