@@ -23,7 +23,7 @@ function modalSpec(overrides = {}) {
         background: box,
         spotlight: undefined,
         navAxis: "horizontal",
-        charsPetStep: 0.8,
+        charsPerStep: 0.8,
         inputGuard: 1,
         canCancel: false,
         pages: [],
@@ -38,7 +38,7 @@ function modalSpec(overrides = {}) {
 }
 
 function modalOpen(spec, overrides = undefined) {
-    if (!variable_global_exists("modalBlocks")) { modalBlocksInit() }
+    if (!variable_global_exists("modalBlocks")) { modalBlockInit() }
     if (overrides != undefined) { modalMerge(spec, overrides) }
     if (!instance_exists(oModal)) { instance_create_depth(0, 0, MODAL_DEPTH, oModal) }
     var modalWindow = new ModalWindow(spec)
@@ -73,7 +73,7 @@ function ModalWindow(spec) constructor {
     self.charProgress = 0
     self.cursor = 0 
     self.items = []
-    self.itemsRects = []
+    self.itemRects = []
     self.inputGuard = spec.inputGuard
     self.closed = false
     self.age = 0
@@ -85,7 +85,7 @@ function ModalWindow(spec) constructor {
 
     self.option = function(name) {
         var current = self.page()
-        return vaiable_struct_exists(current, name) ? current[$ name] : self.spec[$ name]
+        return variable_struct_exists(current, name) ? current[$ name] : self.spec[$ name]
     }
 
     self.enterPage = function(index) {
@@ -94,7 +94,7 @@ function ModalWindow(spec) constructor {
         self.cursor = 0
         self.itemRects = []
         var current = self.page()
-        self.items = modalCollectiItems(current.blocks, [])
+        self.items = modalCollectItems(current.blocks, [])
         var onEnter = current[$ "onEnter"]
         if (onEnter != undefined) { onEnter(self) }
     }
@@ -108,7 +108,7 @@ function ModalWindow(spec) constructor {
     }
 
     self.revealAll = function() {
-        self.charProgress = self.revelLength()
+        self.charProgress = self.revealLength()
     }
 
     self.next = function() {
@@ -123,7 +123,7 @@ function ModalWindow(spec) constructor {
         if (self.closed) { return }
         self.closed = true
         if (self.spec.onClose != undefined) {
-            self.spec.onClose(sself)
+            self.spec.onClose(self)
         }
     }
 
@@ -149,7 +149,7 @@ function ModalWindow(spec) constructor {
         if(self.closed) { return }
         self.age++
         if (!self.fullyRevealed()) {
-            self.charProgress += self.option("carsPerStep") 
+            self.charProgress += self.option("charsPerStep") 
         }
         if (self.inputGuard > 0) {
             self.inputGuard--
@@ -183,17 +183,17 @@ function ModalWindow(spec) constructor {
 
     self.stepCursor = function(input) {
         var count = array_length(self.items)
-        var vertical = (self.option("navAcis") == "vertical")
+        var vertical = (self.option("navAxis") == "vertical")
         if (vertical ? input.up : input.left) {
-            self.cursor = (self.cursir - 1 + count) mod count 
+            self.cursor = (self.cursor - 1 + count) mod count 
         }
-        if (vertical ? input.down : right) {
+        if (vertical ? input.down : input.right) {
             self.cursor = (self.cursor + 1) mod count
         }
         var confirm = input.confirm
         for (var rectIndex = 0; rectIndex < array_length(self.itemRects); rectIndex++) {
             var itemRect = self.itemRects[rectIndex]
-            if (pointInrect(input.guiX, input.guiY, itemRect.x, itemRect.y, itemRect.w, itemRect.h)) {
+            if (pointInRect(input.guiX, input.guiY, itemRect.x, itemRect.y, itemRect.w, itemRect.h)) {
                 if (input.moved || input.clicked) {
                     self.cursor = itemRect.index
                 }
@@ -209,11 +209,11 @@ function ModalWindow(spec) constructor {
     }
 
     self.draw = function () {
-        var sptlight = self.option("spotlight")
-        var focusRect = (sporlight != undefined) ? spotlight() : undefined
+        var spotlight = self.option("spotlight")
+        var focusRect = (spotlight != undefined) ? spotlight() : undefined
         if (focusRect != undefined) {
             drawTutorialSpotlight(focusRect)
-        } else if (self.option("dim") < 0) {
+        } else if (self.option("dim") > 0) {
             drawScreenDim(self.option("dim"))
         }
 
@@ -247,10 +247,10 @@ function ModalWindow(spec) constructor {
 }
 
 function modalPanelRect(modalWindow, avoidRect) {
-    var screenWidth = disaply_get_gui_width() 
+    var screenWidth = display_get_gui_width() 
     var screenHeight = display_get_gui_height()
-    var panelWidth = screenWidth * modalWindow.option("widthFrac")
-    var paneilHeight = screenHeight * modalWindow.option("heightFrac")
+    var panelW = screenWidth * modalWindow.option("widthFrac")
+    var panelH = screenHeight * modalWindow.option("heightFrac")
     switch (modalWindow.option("layout")) {
         case ModalLayout.Bottom:
             return { x: (screenWidth - panelW) * 0.5, 
@@ -281,7 +281,9 @@ function modalTopAvoiding(panelW, panelH, avoidRect) {
     var screenHeight = display_get_gui_height()
     var margin = (screenWidth - panelW) * 0.5
     var panel = { x: margin, y: screenHeight * 0.03, w: panelW, h: panelH }
-    if (avoidRect == undefined || !modalRectsOverlapY(panel, avoidRect)) { return panel }
+    if (avoidRect == undefined || !modalRectsOverlapY(panel, avoidRect)) { 
+        return panel 
+    }
     panel.y = screenHeight - screenHeight * 0.03 - panelH
     if (!modalRectsOverlapY(panel, avoidRect)) { return panel }
     var gapLeft = avoidRect.x
@@ -293,4 +295,83 @@ function modalTopAvoiding(panelW, panelH, avoidRect) {
     panel.w = clamp(sideGap - margin * 1.2, screenWidth * 0.22, screenWidth * 0.46)
     panel.x = onRight ? (avoidRect.x + avoidRect.w) + (sideGap - panel.w) * 0.5 : (sideGap - panel.w) * 0.5
     return panel
+}
+
+function modalBlockLength(size, total, cross, fillSize) {
+    if (is_string(size)) {
+        return (size == "square") ? cross : fillSize
+    }
+    return total * size
+}
+
+function modalLayoutBlocks(modalWindow, blocks, area, horizontal) {
+    var count = array_length(blocks)
+    if (count == 0) { return }
+    var total = horizontal ? area.w : area.h
+    var cross = horizontal ? area.h : area.w
+    var gap = modalWindow.panel.h * modalWindow.option("blockGap")
+    var fixedSize = 0
+    var fillCount = 0
+    for (var blockIndex = 0; blockIndex < count; blockIndex++) {
+        var size = horizontal ? blocks[blockIndex].w : blocks[blockIndex].h
+        if (is_string(size) && size == "fill") {
+            fillCount++
+        } else {
+            fixedSize += modalBlockLength(size, total, cross, 0)
+        }
+    }
+    var fillSize = max(0, (total - fixedSize - gap * (count - 1)) / max(1, fillCount))
+    var offset = 0
+    for (var blockIndex = 0; blockIndex < count; blockIndex++) {
+        var block = blocks[blockIndex]
+        var length = modalBlockLength(horizontal ? block.w : block.h, total, cross, fillSize)
+        var rect = horizontal ? { x: area.x + offset, y: area.y, w: length, h: area.h }
+                    : { x: area.x, y: area.y + offset, w: area.w, h: length }
+        modalDrawBlock(modalWindow, block, rect)
+        offset += length + gap
+    }
+}
+
+function modalDrawBlock(modalWindow, block, rect) {
+    var handler = global.modalBlocks[$ block.kind]
+    if (handler == undefined) {
+        show_debug_message("Модальное окно - неизвестный блок " + string(block.kind))
+        return
+    }
+    handler.draw(block, modalWindow, rect)
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+    draw_set_color(c_white)
+    draw_set_alpha(1)
+}
+
+function modalCollectItems(blocks, items) {
+    for (var blockIndex = 0; blockIndex < array_length(blocks); blockIndex++) {
+        var block = blocks[blockIndex]
+        if (variable_struct_exists(block, "children")) {
+            modalCollectItems(block.children, items)
+        }
+        if (variable_struct_exists(block, "items")) {
+            for (var itemIndex = 0; itemIndex < array_length(block.items); itemIndex++) {
+                var item = block.items[itemIndex]
+                item.index = array_length(items)
+                array_push(items, item)
+            }
+        }
+    }
+    return items
+}
+
+function modalRevealLength(blocks) {
+    var longest = 0
+    for (var blockIndex = 0; blockIndex < array_length(blocks); blockIndex++) {
+        var block = blocks[blockIndex]
+        if (variable_struct_exists(block, "children")) {
+            longest = max(longest, modalRevealLength(block.children))
+        }
+        if (block.kind == "text" && block.typewriter) {
+            longest = max(longest, block[$ "revealLength"] ?? string_length(block.text))
+        }
+    }
+    return longest
 }

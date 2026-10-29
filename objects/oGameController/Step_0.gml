@@ -19,14 +19,14 @@ if (battleEntryState != BattleEntryState.Idle) {
 }
 
 if (variable_global_exists("introPendingWalk") && global.introPendingWalk) {
-    if (!instance_exists(oDialogManager) || !oDialogManager.active) {
+    if (!modalIsOpen("dialog")) {
         global.introPendingWalk = false
         startTutorialIntro()
     }
 }
 
 if (global.deckTutorialStage == DeckTutorialStage.Dialog) {
-    if (!instance_exists(oDialogManager) || !oDialogManager.active) {
+    if (!modalIsOpen("dialog")) {
         global.deckTutorialStage = DeckTutorialStage.AwaitOpen
     }
 } else if (global.deckTutorialStage == DeckTutorialStage.AwaitOpen) {

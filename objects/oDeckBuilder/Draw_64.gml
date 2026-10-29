@@ -30,6 +30,3 @@ draw_text_transformed(counterBoxX + counterBoxW / 2, counterBoxY + counterBoxH /
 draw_set_halign(fa_left)
 draw_set_valign(fa_top)
 
-if (global.deckTutorialStage == DeckTutorialStage.Steps && deckTutorial.isActive()) {
-    deckTutorial.draw()
-}

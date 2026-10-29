@@ -1,6 +1,7 @@
 // Основной метод для вызова диалогов
 function say(lines, onComplete = undefined) {
-    with (oDialogManager) startDialog(lines, onComplete)
+    if (array_length(lines) == 0) { return }
+    modalOpen(modalDialog(lines, onComplete))
 }
 
 // Сторона портрета

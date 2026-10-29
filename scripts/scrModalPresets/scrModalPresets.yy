@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrModalPresets",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrModalPresets",
+  "parent":{
+    "name":"CommonUI",
+    "path":"folders/CommonUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

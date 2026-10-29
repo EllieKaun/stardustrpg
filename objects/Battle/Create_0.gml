@@ -25,9 +25,6 @@ copyNextCard = false
 // Хит-боксы для управления мышью
 cardHitRects = []
 menuHitRects = []
-rewardHitRects = [] // карты награды на экране победы
-gameOverHitRects = [] // кнопки RETRY и EXIT на экране поражения
-infoCloseRect = undefined
 cancelHitRect = undefined
 mouseLastX = -1 // для детекта движения мыши
 mouseLastY = -1
@@ -72,7 +69,7 @@ menuRectNamed = function(action) {
 
 // Туториал
 var lana = asset_get_index("portraitLana")
-tutorial = new TutorialRunner([
+tutorialSteps = [
     {
         speaker: "Lana",
         portrait: lana,
@@ -114,13 +111,10 @@ tutorial = new TutorialRunner([
         portrait: lana,
         text: loc("dlg.tut.battle4")
     }
-])
+]
 
 // ДЛЯ ХРАНЕНИЯ ДАННЫХ В КОНЦЕ ИГРЫ
 rewardChoices  = [] // Победные карты
-rewardCursor   = 0 // Выбранная победная карта
-rewardSelected = false // Выбрана ли награда
-gameOverCursor = 0 // 0 = Retry, 1 = Exit
 
 initBattleStates()
 

@@ -303,13 +303,13 @@ open = false
 
 deckTutStarted = false
 var lana = asset_get_index("portraitLana")
-deckTutorial = new TutorialRunner([
+deckTutorialSteps = [
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db1"),
       getRect: function() { var rect = undefined; with (oDeckBuilder) rect = { x: collectionPanel.x, y: collectionPanel.y, w: collectionPanel.w, h: collectionPanel.h }; return rect } },
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db2"),
       getRect: function() { var rect = undefined; with (oDeckBuilder) rect = { x: deckPanel.x, y: deckPanel.y, w: deckPanel.w, h: deckPanel.h }; return rect } },
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db3") }
-])
+]
 
 openBuilder = function() {
     guiSyncCrisp()

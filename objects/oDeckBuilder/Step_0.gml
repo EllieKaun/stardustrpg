@@ -4,15 +4,15 @@ layoutPanels()
 
 if (global.deckTutorialStage == DeckTutorialStage.Steps) {
     if (!deckTutStarted) {
-        deckTutorial.reset()
         deckTutStarted = true
-    }
-    if (deckTutorial.step()) {
-        markDeckTutorialDone()
-        global.deckTutorialStage = DeckTutorialStage.Done
+        modalOpen(modalTutorial(deckTutorialSteps, function() {
+            markDeckTutorialDone()
+            global.deckTutorialStage = DeckTutorialStage.Done
+        }))
     }
     exit
 }
+if (modalIsOpen()) { exit }
 
 // Мышь: наведение, а также клик по табам/слотам
 collectionPanel.stepMouse()
