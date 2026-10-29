@@ -20,3 +20,15 @@ function nightValue() {
 function isNight() {
     return nightValue() >= 0.5
 }
+
+#macro TIME_OF_DAY_MORNING 0.3
+#macro TIME_OF_DAY_NIGHT 0.85
+
+function campfireInteractIcon() {
+    var icon = asset_get_index(isNight() ? "sprCampfireSun" : "sprCampfireMoon")
+    return sprite_exists(icon) ? icon : noone
+}
+
+function skipTimeOfDay() {
+    global.timeOfDay = isNight() ? TIME_OF_DAY_MORNING : TIME_OF_DAY_NIGHT
+}

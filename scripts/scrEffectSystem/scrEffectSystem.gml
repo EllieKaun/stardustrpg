@@ -36,18 +36,44 @@ function initEffectRegistry() {
                 character.applyDamage(mitigateDamage(character, effect, rawValue))
             }
         },
+        aiValue: function(effect, ctx) {
+            var damage = estimateDamage(effect, ctx.actor, ctx.target)
+            var applied = min(damage, ctx.target.hp)
+            var lethal = (effect.timing == Timing.Instant && damage >= ctx.target.hp) ? ctx.weights.lethalBonus : 0
+            var lowHp = (1 - ctx.target.hp / ctx.target.maxHp) * ctx.weights.focusFire
+            return applied * ctx.weights.aggression + lethal + lowHp
+        }
     })
 
     // Лечение: мгновенное и по времени
     variable_struct_set(effectsRepository, "Heal", {
-        onInstant: function(effect, caster, targets) { executeHealing(effect, caster, targets) },
-        onEndOfTurn: function(effect, character) { character.applyHeal(effect.value) },
+        onInstant: function(effect, caster, targets) { 
+            executeHealing(effect, caster, targets) 
+        },
+        onEndOfTurn: function(effect, character) { 
+            character.applyHeal(effect.value) 
+        },
+        aiValue: function(effect, ctx) {
+            var heal = is_method(effect.value) ? effect.value() : effect.value
+            var need = ctx.target.maxHp - ctx.target.hp
+            return min(heal, need) * ctx.weights.support
+        }
     })
 
     // Восстановление маны: мгновенное и по времени 
     variable_struct_set(effectsRepository, "ManaGain", {
-        onInstant: function(effect, caster, targets) { executeManaGain(effect, caster, targets) },
-        onEndOfTurn: function(effect, character) { character.applyMana(effect.value) },
+        onInstant: function(effect, caster, targets) {
+            executeManaGain(effect, caster, targets) 
+        },
+        onEndOfTurn: function(effect, character) { 
+            character.applyMana(effect.value) 
+        },
+        aiValue: function(effect, ctx) {
+            if (ctx.target.maxMana <= 0) return 0
+            var v = is_method(effect.value) ? effect.value() : effect.value
+            var need = ctx.target.maxMana - ctx.target.mana
+            return min(v, need) * ctx.weights.support
+        }
     })
 
     // Снятие статуса 
@@ -93,6 +119,9 @@ function initEffectRegistry() {
         onPlay: function(effect, caster, targets) {
             with (Battle) { spawnPuppet(effect.puppetCategory, caster) }
         },
+        aiValue: function(effect, ctx) {
+            return AI_PUPPET_VALUE * ctx.weights.support
+        }
     })
 
     // Клоинирование
@@ -137,8 +166,34 @@ function initEffectRegistry() {
     })
 
     // Модификаторы
-    variable_struct_set(effectsRepository, "Buff", { iconFor: function(effect) { return buffIcon(effect, true) } })
-    variable_struct_set(effectsRepository, "Debuff", { iconFor: function(effect) { return buffIcon(effect, false) } })
+    variable_struct_set(
+        effectsRepository, 
+        "Buff", 
+        {  
+            iconFor: function(effect) { return buffIcon(effect, true) },
+            aiValue: function(effect, ctx) {
+                if (checkIfHasBuff(ctx.target, EffectTypes.Buff, effect.buffType) != undefined) {
+                    return 0
+                }
+                var value = is_method(effect.value) ? effect.value() : effect.value
+                return value * ctx.weights.support
+            }
+        }
+    )
+    variable_struct_set(
+        effectsRepository, 
+        "Debuff", 
+        {  
+            iconFor: function(effect) { return buffIcon(effect, false) },
+            aiValue: function(effect, ctx) {
+                if (checkIfHasBuff(ctx.target, EffectTypes.Debuff, effect.buffType) != undefined) {
+                    return 0
+                }
+                var value = is_method(effect.value) ? effect.value() : effect.value
+                return value * effectChanceForCaster(ctx.actor, ctx.target, effect) * ctx.weights.control
+            }
+        }
+    )
     variable_struct_set(effectsRepository, "Stun", { icon: noone })
     variable_struct_set(effectsRepository, "Weakening", { icon: noone })
     variable_struct_set(effectsRepository, "IgnoreWeakness", { icon: noone })
@@ -544,7 +599,7 @@ function randomCardPool(cardSet, category) {
         var cardId = ids[idIndex]
         var definition = global.cardRegistry[$ cardId]
         if (definition.category != category) { continue }
-        if (cardSetOf(cardId) != cardSet) { continue }
+        if (cardSetById(cardId) != cardSet) { continue }
         if (array_contains(shopIds, cardId)) { continue }
         var sample = cardBuild(cardId, CardsRarity.Default)
         if (sample == undefined || cardSummonsPuppet(sample)) { continue }

@@ -1,22 +1,24 @@
-if (global.foxJoined) {
+if (companionIsActive(Characters.Fox)) {
     if (mask_index != sLana) { joinParty() }
+    returningHome = false
     event_inherited()
     exit
 }
 
+if (global.foxJoined && !isAtHome()) {
+    returningHome = true
+    event_inherited()
+    exit
+}
+if (returningHome) { leaveParty() }
+
 depth = -bbox_bottom
 if (global.gamePaused || global.uiModal) { exit }
 
-var leader = oGameController.selected_character
-if (!instance_exists(leader)) { exit }
+if (!leaderApproached(FIRA_REARM_DIST)) { exit }
 
-if (place_meeting(x, y, leader)) {
-    if (!spoke) {
-        spoke = true
-        foxTalk()
-    }
-} else if (point_distance(x, y, leader.x, leader.y) > 24) { 
-    spoke = false 
+if (global.foxJoined) {
+    companionOfferRejoin(Characters.Fox)
+    exit
 }
-
-
+foxTalk()

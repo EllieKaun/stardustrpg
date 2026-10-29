@@ -14,6 +14,19 @@ layoutPanels()
 collectionPanel.draw()
 deckPanel.draw()
 
-if (global.deckTutorialStage == DeckTutorialStage.Steps && deckTutorial.isActive()) {
-    deckTutorial.draw()
-}
+draw_set_font(uiFont())
+var counterBoxH = collectionPanel.tabH * 0.8
+var counterScale = uiTextScale(collectionCounterText, counterBoxH * 0.65, collectionPanel.w * 0.35)
+var counterBoxW = string_width(collectionCounterText) * counterScale + collectionPanel.tabPadding * 4
+var counterBoxX = collectionPanel.x + collectionPanel.w - collectionPanel.padding * 0.5 - counterBoxW
+var counterBoxY = collectionPanel.y - collectionPanel.tabH + (collectionPanel.tabH - counterBoxH) * 0.5
+draw_sprite_stretched_ext(TabFill, 0, counterBoxX, counterBoxY, counterBoxW, counterBoxH, #8E3B31, 1)
+draw_sprite_stretched(TabBorder, 0, counterBoxX, counterBoxY, counterBoxW, counterBoxH)
+draw_set_color(c_white)
+draw_set_halign(fa_center)
+draw_set_valign(fa_middle)
+draw_text_transformed(counterBoxX + counterBoxW / 2, counterBoxY + counterBoxH / 2,
+    collectionCounterText, counterScale, counterScale, 0)
+draw_set_halign(fa_left)
+draw_set_valign(fa_top)
+

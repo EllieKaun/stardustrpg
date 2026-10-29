@@ -105,7 +105,5 @@ function grantBattleRewards() {
         built.cardRef = choices[choiceIndex] // {id, rarity} 
         array_push(rewardChoices, built)
     }
-    rewardCursor = 0
-    rewardSelected = false
     changeBattleState(BattleStates.Victory)
 }

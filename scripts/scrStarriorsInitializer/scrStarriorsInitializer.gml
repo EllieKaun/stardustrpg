@@ -24,17 +24,6 @@ function createLana(){
 }
 
 
-function safarFixedDeck() {
-    return [
-        createPhysicalDamageSingleTargetCard(),
-        createPhysicalDamageSingleTargetCard(),
-        createMagicalDamageSingleTargetCard(),
-        createInstantHealSingleTargetCard(),
-        createCardBuffPhysicalDamageSingleTarget(),
-        createPhysicalDamageStunChanseSingleTargetCard()
-    ]
-}
-
 function createSafar(){
     var starrior = createStarrior(
         "Safar",
@@ -54,7 +43,7 @@ function createSafar(){
         8,
         2,
         2,
-        safarFixedDeck()
+        playerDeckFor(Characters.Safar)
     )
     starrior.themeColor = make_color_rgb(60, 145, 174)
     starrior.portrait = sprCharacterPanelSafarHead
@@ -65,17 +54,6 @@ function createSafar(){
 function foxBattleSprite(name, fallback) {
     var spr = asset_get_index(name)
     return sprite_exists(spr) ? spr : fallback
-}
-
-function foxFixedDeck() {
-    return [
-        createInstantManaGainSingleTargetCard(),
-        createInstantMultipleTargetsManaGainCard(),
-        createOvertimeManaGainSingleTargetCard(),
-        createMagicalDamageSingleTargetCard(),
-        createInstantHealSingleTargetCard(),
-        createCardBuffMagicalDamageSingleTarget()
-    ]
 }
 
 function createFox(){
@@ -97,7 +75,7 @@ function createFox(){
         10,
         2,
         2,
-        foxFixedDeck()
+        playerDeckFor(Characters.Fox)
     )
     starrior.themeColor = make_color_rgb(214, 126, 60)
     var portrait = asset_get_index("sprCharacterPanelFoxHead")

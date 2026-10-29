@@ -1,9 +1,10 @@
-enum Characters { Lana, Viv }
+enum Characters { Lana, Viv, Safar, Fox }
 
 #macro PLAYER_SAVE_FILE "player_data.json"
 #macro DECK_DEFAULT_UNLOCKED 4 // слотов деки открыто с начала игры
 #macro DECK_CAPACITY 12 // максимум слотов деки
 #macro ZONE_DECK_SLOT_LIMITS [6] // сколько слотов деки можно открыть максимум в зоне
+#macro COMPANION_NONE -1
 
 // Инициализация пользователя (каждый раз на старте)
 function playerDataInit() {
@@ -75,6 +76,7 @@ function playerDataDefault() {
         deckTutorialDone: false,
         quests: {},
         wins: 0,
+        activeCompanion: COMPANION_NONE,
         collection: {}, // key "id@rarity" -> { id, rarity, count }
         decks: {
             lana: { unlocked: DECK_DEFAULT_UNLOCKED, cards: [] },  // cards: [{slot,id,rarity}]
@@ -185,6 +187,7 @@ function autosaveDrawIcon() {
     var fadeOutSeconds = 0.6
     var alpha = min(1, elapsedSeconds / fadeInSeconds, (AUTOSAVE_ICON_SECONDS - elapsedSeconds) / fadeOutSeconds)
 
+    if (window_get_height() <= 0) { return }
     var guiHeight = display_get_gui_height()
     var guiPerScreenPixel = guiHeight / window_get_height()
     var screenScale = max(1, round(window_get_height() * 0.09 / sprite_get_height(LanaIcon)))

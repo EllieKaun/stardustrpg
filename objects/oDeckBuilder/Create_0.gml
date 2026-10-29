@@ -29,16 +29,76 @@ panelSwitchCallback = function(panel, direction) {
 }
 
 editingCharacter = Characters.Lana // Персонаж, чья дека отображается/редактируется
+deckTabCharacters = [Characters.Lana, Characters.Viv]
+
+deckTabFor = function(character) {
+    switch (character) {
+        case Characters.Viv:
+            return { name: loc("deck.viv"), sprite: VivBtn, icon: VivIcon, iconOffsetX: 0, btnOffsetX: 0.5,
+                     color: #44CC88, textInset: 1.3 }
+        case Characters.Safar:
+            return { name: loc("deck.safar"), sprite: LanaBtn, icon: characterIcon(character), iconOffsetX: 0, btnOffsetX: 0.5,
+                     color: #3C91AE, textInset: 1.3 }
+        case Characters.Fox:
+            return { name: loc("deck.fox"), sprite: VivBtn, icon: characterIcon(character), iconOffsetX: 0, btnOffsetX: 0.5,
+                     color: #D67E3C, textInset: 1.3 }
+        default:
+            return { name: loc("deck.lana"), sprite: LanaBtn, icon: LanaIcon, iconOffsetX: 0, btnOffsetX: 0.5,
+                     color: #4488CC, textInset: 1.3 }
+    }
+}
+
+refreshDeckTabs = function() {
+    deckTabCharacters = deckCharacters()
+    var tabs = []
+    for (var tabIndex = 0; tabIndex < array_length(deckTabCharacters); tabIndex++) {
+        array_push(tabs, deckTabFor(deckTabCharacters[tabIndex]))
+    }
+    deckPanel.tabs = tabs
+    var editingIndex = array_get_index(deckTabCharacters, editingCharacter)
+    if (editingIndex < 0) {
+        editingCharacter = Characters.Lana
+        editingIndex = 0
+    }
+    deckPanel.activeTab = editingIndex
+}
+
+categoryTabCategories = [undefined, CardCategory.Magic, CardCategory.Attack,
+                         CardCategory.Buff, CardCategory.Heal, CardCategory.Special]
 
 categoryForTab = function(tab) { // Мап индекса таба фильтра в категорию карт
-    switch (tab) {
-        case 0: return CardCategory.Magic
-        case 1: return CardCategory.Buff
-        case 2: return CardCategory.Heal
-        case 3: return CardCategory.Attack
-        case 4: return CardCategory.Special
-        default: return undefined
+    return categoryTabCategories[clamp(tab, 0, array_length(categoryTabCategories) - 1)]
+}
+
+packTabSets = [CardSet.Base]
+collectionCounterText = ""
+
+currentPack = function() {
+    return packTabSets[clamp(collectionPanel.activeTab, 0, array_length(packTabSets) - 1)]
+}
+
+refreshPackTabs = function() {
+    var selectedPack = (array_length(collectionPanel.tabs) > 0) ? currentPack() : CardSet.Base
+    packTabSets = ownedCardSets()
+    var tabs = []
+    for (var packIndex = 0; packIndex < array_length(packTabSets); packIndex++) {
+        array_push(tabs, cardSetTab(packTabSets[packIndex]))
     }
+    collectionPanel.tabs = tabs
+    collectionPanel.activeTab = max(0, array_get_index(packTabSets, selectedPack))
+}
+
+refreshCategoryTabs = function() {
+    var sideTabs = []
+    for (var categoryIndex = 0; categoryIndex < array_length(categoryTabCategories); categoryIndex++) {
+        array_push(sideTabs, cardCategoryTab(categoryTabCategories[categoryIndex]))
+    }
+    collectionPanel.sideTabs = sideTabs
+}
+
+refreshCollectionCounter = function() {
+    var progress = collectionProgress(categoryForTab(collectionPanel.activeSideTab), currentPack())
+    collectionCounterText = loc("deck.cardsCounter") + " " + progressText(progress)
 }
 
 applyChanges = function () {
@@ -59,19 +119,15 @@ collectionPanel = new Panel({
     selectSprite: sprCardSelected,
     pointerSprite: sPointer,
     tabFonts: tabFonts,
-    tabs: [
-        { name: loc("deck.magic"), sprite: MagicBtn, color: #9944CC },
-        { name: loc("deck.buff"), sprite: BuffBtn, color: #CC44CC },
-        { name: loc("deck.heal"), sprite: HealBtn, color: #44CC44 },
-        { name: loc("deck.attack"), sprite: AttackBtn, color: #CC4444 },
-        { name: loc("deck.special"), sprite: SpecialBtn, color: c_white, textColor: c_black }
-    ],
+    tabs: [cardSetTab(CardSet.Base)],
     visibleRows: 3,
-    slots: buildCollectionSlots(CardCategory.Magic),
+    cols: 3,
+    sideTabs: [],
+    slots: buildCollectionSlots(undefined, 3, Characters.Lana, CardSet.Base),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
-            var category = categoryForTab(tabIndex)
-            panel.slots = buildCollectionSlots(category, 4, editingCharacter)
+            refreshCollection()
+            refreshCollectionCounter()
             panel.scrollY = 0
             panel.cursorRow = 0
             panel.cursorCol = 0
@@ -101,9 +157,20 @@ collectionPanel = new Panel({
             }
         }
     },
+    onSideTabClick: function(panel, sideIndex) {
+        with (oDeckBuilder) {
+            refreshCollection()
+            refreshCollectionCounter()
+            panel.scrollY = 0
+            panel.cursorRow = 0
+            panel.cursorCol = 0
+            panel.refreshScroll()
+        }
+    },
     onPanelSwitch: panelSwitchCallback
 })
 collectionPanel.tag = Panels.Collection
+refreshCategoryTabs()
 
 // Панель деки
 deckPanel = new Panel({
@@ -116,21 +183,16 @@ deckPanel = new Panel({
     selectSprite: sprCardSelected,
     pointerSprite: sPointer,
     tabFonts: tabFonts,
-    tabs: [
-        // icon — портрет поверх кнопки
-        // iconOffsetX — сдвиг иконки
-        // btnOffsetX — сдвиг кнопки вправо 
-        // textInset — сдвиг текста вправо
-        { name: loc("deck.lana"), sprite: LanaBtn, icon: LanaIcon, iconOffsetX: 0, btnOffsetX: 0.5,
-          color: #4488CC, textInset: 1.3 },
-        { name: loc("deck.viv"), sprite: VivBtn, icon: VivIcon, iconOffsetX: 0, btnOffsetX: 0.5,
-          color: #44CC88, textInset: 1.3 }
-    ],
+    // icon — портрет поверх кнопки
+    // iconOffsetX — сдвиг иконки
+    // btnOffsetX — сдвиг кнопки вправо 
+    // textInset — сдвиг текста вправо
+    tabs: [deckTabFor(Characters.Lana), deckTabFor(Characters.Viv)],
     scrollable: false, 
     slots: buildDeckSlots(Characters.Lana),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
-            editingCharacter = (tabIndex == 0) ? Characters.Lana : Characters.Viv
+            editingCharacter = deckTabCharacters[tabIndex]
             panel.slots = buildDeckSlots(editingCharacter)
             panel.scrollY = 0
             panel.cursorRow = 0
@@ -150,7 +212,7 @@ deckPanel = new Panel({
             }
             var slot = panel.slots[slotIndex]
             // Если карты нет в слоте, ничего не делаем
-            if (slot.state != "filled") {
+            if (slot.state != "filled" || slot.fixed) {
                  return 
             }
             deckRemoveCard(editingCharacter, slotIndex)
@@ -186,8 +248,8 @@ focusPanel = function(panel) {
 
 // Перестроить панель коллекции под текущую категорию и открытую деку
 refreshCollection = function() {
-    var category = categoryForTab(collectionPanel.activeTab)
-    collectionPanel.slots = buildCollectionSlots(category, 4, editingCharacter)
+    var category = categoryForTab(collectionPanel.activeSideTab)
+    collectionPanel.slots = buildCollectionSlots(category, collectionPanel.cols, editingCharacter, currentPack())
     collectionPanel.refreshScroll()
     if (collectionPanel.selectedSlot >= array_length(collectionPanel.slots)) {
         collectionPanel.selectedSlot = -1
@@ -217,8 +279,16 @@ layoutPanels = function() {
         panel.tabPadding = 4 * scaleUI
         panel.uiScale = scaleUI 
     }
-    // отступ вкладок слева от края панели 
-    collectionPanel.tabOffsetX = 0
+    var sideTabWidth = panelWidth * 0.22 - collectionPanel.padding * 0.5
+    var sideTabOverhang = sideTabWidth * 0.3
+    collectionPanel.x += sideTabOverhang
+    collectionPanel.w -= sideTabOverhang
+    collectionPanel.sideTabW = sideTabWidth
+    collectionPanel.sideTabOffsetX = -(collectionPanel.padding + sideTabOverhang)
+    collectionPanel.cardGapFactor = 0.3
+
+    // отступ вкладок слева от края панели
+    collectionPanel.tabOffsetX = collectionPanel.padding * 0.5
     deckPanel.tabOffsetX = 0
 }
 layoutPanels()
@@ -233,20 +303,24 @@ open = false
 
 deckTutStarted = false
 var lana = asset_get_index("portraitLana")
-deckTutorial = new TutorialRunner([
+deckTutorialSteps = [
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db1"),
       getRect: function() { var rect = undefined; with (oDeckBuilder) rect = { x: collectionPanel.x, y: collectionPanel.y, w: collectionPanel.w, h: collectionPanel.h }; return rect } },
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db2"),
       getRect: function() { var rect = undefined; with (oDeckBuilder) rect = { x: deckPanel.x, y: deckPanel.y, w: deckPanel.w, h: deckPanel.h }; return rect } },
     { speaker: "Lana", portrait: lana, text: loc("dlg.tut.db3") }
-])
+]
 
 openBuilder = function() {
     guiSyncCrisp()
     layoutPanels()
     open = true
     global.uiModal = true
-    collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeTab), 4, editingCharacter)
+    refreshDeckTabs()
+    refreshPackTabs()
+    refreshCategoryTabs()
+    refreshCollectionCounter()
+    collectionPanel.slots = buildCollectionSlots(categoryForTab(collectionPanel.activeSideTab), collectionPanel.cols, editingCharacter, currentPack())
     collectionPanel.scrollY = 0
     collectionPanel.refreshScroll()
     deckPanel.slots = buildDeckSlots(editingCharacter)
@@ -313,7 +387,7 @@ deckSource = {
             }
                 
             var slot = deckPanel.slots[index]
-            if (slot.state == "filled") {
+            if (slot.state == "filled" && !slot.fixed) {
                 return {
                     kind: "card",
                     card: slot.card, 
@@ -383,7 +457,7 @@ deckSlotTarget = {
     accepts: function(payload, ctx) {
         with (oDeckBuilder) {
             var targetSlot = deckPanel.slots[ctx.slotIndex]
-            if (targetSlot.state == "locked") { return false }
+            if (targetSlot.state == "locked" || targetSlot.fixed) { return false }
             if (payload.data.panel == "collection") { return true }
             if (payload.data.panel == "deck" && ctx.slotIndex != payload.data.slotIndex) { return true }
             return false

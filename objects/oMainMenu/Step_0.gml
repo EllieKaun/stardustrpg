@@ -1,3 +1,4 @@
+displayRecoverOnFocus()
 if (!visible) { exit }
 
 if (menuCooldown > 0) {

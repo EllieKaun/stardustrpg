@@ -1,3 +1,4 @@
+displayRecoverOnFocus()
 // Пауза по Esc 
 var transitioning = instance_exists(oTransition) && oTransition.state != "idle"
 if (keyboard_check_pressed(vk_escape) && !transitioning) {
@@ -39,14 +40,15 @@ if (tutorialActive) {
     if (battleState == BattleStates.Victory || battleState == BattleStates.GameOver) {
         tutorialActive = false
         markTutorialDone()
-    } else if (battleState == BattleStates.CharacterPlay) {
-        if (tutorial.step()) {
+    } else if (battleState == BattleStates.CharacterPlay && !modalIsOpen("tutorial")) {
+        modalOpen(modalTutorial(tutorialSteps, method(self, function() {
             tutorialActive = false
             markTutorialDone()
-        }
-        exit
+        })))
     }
 }
+
+if (modalIsOpen()) { exit }
 
 var currentState = stateAt(battleState)
 var stepHook = (currentState != undefined) ? currentState[StateHook.Step] : undefined

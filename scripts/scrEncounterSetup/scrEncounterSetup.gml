@@ -32,11 +32,9 @@ function initStarriorsFromEncounter(encounter) {
         }
     } else {
         heroes = [createLana(), createViv()]
-        if (variable_global_exists("safarJoined") && global.safarJoined) {
-            array_push(heroes, createSafar())
-        }
-        if (variable_global_exists("foxJoined") && global.foxJoined) {
-            array_push(heroes, createFox())
+        var companion = createCompanionStarrior(activeCompanion())
+        if (companion != noone) {
+            array_push(heroes, companion)
         }
     }
     enemies = []
@@ -69,6 +67,7 @@ function initStarriorsFromEncounter(encounter) {
     for (var i = 0; i < array_length(enemies); i++) {
         var enemy = enemies[i]
         enemy.isEnemy = true
+        if (!variable_instance_exists(enemy, "brain")) { enemy.brain = brainPreset(AiBrainType.Default) }
         enemy.carryItem = noone
         if (isRaw) {
             continue

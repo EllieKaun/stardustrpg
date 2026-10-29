@@ -56,6 +56,10 @@ function playerDeckFor(character) {
     array_sort(sorted, function(a, b) { return a.slot - b.slot; })
 
     var deck = []
+    var fixedRefs = companionFixedRefs(character)
+    for (var i = 0; i < array_length(fixedRefs); i++) {
+        array_push(deck, cardFromRef(fixedRefs[i]))
+    }
     for (var i = 0; i < array_length(sorted); i++) {
         array_push(deck, cardFromRef(sorted[i]))
     }

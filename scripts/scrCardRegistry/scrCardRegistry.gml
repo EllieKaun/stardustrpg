@@ -214,7 +214,7 @@ function cardCanVaryRarity(cardIdentifier) {
 }
 
 // Вытащить информацию из какого набора карта
-function cardSetOf(cardId) {
+function cardSetById(cardId) {
     if (!cardExists(cardId)) { return CardSet.Base }
     var def = global.cardRegistry[$ cardId]
     return variable_struct_exists(def, "cardSet") ? def.cardSet : CardSet.Base

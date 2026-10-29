@@ -8,12 +8,14 @@ function ShopItem(_kind, _price) constructor {
     card = undefined // для карт
     ref = undefined // { id, rarity } для карт
     label = "" // подпись (для слотов)
+    character = undefined
+    descLines = []
     state = "filled"
 }
 
 // Цена следующего расширения слота деки x1.5
-function deckSlotUpgradePrice() {
-    var purchased = deckOf(Characters.Lana).unlocked - DECK_DEFAULT_UNLOCKED
+function deckSlotUpgradePrice(character = Characters.Lana) {
+    var purchased = deckOf(character).unlocked - deckDefaultUnlocked(character)
     return floor(SHOP_SLOT_BASE * power(SHOP_SLOT_GROWTH, max(0, purchased)))
 }
 
@@ -66,7 +68,19 @@ function buildShopItems(category) {
         if (deckOf(Characters.Lana).unlocked < deckSlotLimit()) {
             var shopItem = new ShopItem(ShopItemKind.Slot, deckSlotUpgradePrice())
             shopItem.label = loc("shop.newSlot")
+            shopItem.descLines = [loc("shop.slotDesc1"), loc("shop.slotDesc2")]
             array_push(items, shopItem)
+        }
+        var companions = [Characters.Safar, Characters.Fox]
+        for (var companionIndex = 0; companionIndex < array_length(companions); companionIndex++) {
+            var companion = companions[companionIndex]
+            if (!companionUnlocked(companion)) { continue }
+            if (deckOf(companion).unlocked >= deckSlotLimitFor(companion)) { continue }
+            var companionItem = new ShopItem(ShopItemKind.Slot, deckSlotUpgradePrice(companion))
+            companionItem.character = companion
+            companionItem.label = loc("shop.newSlot")
+            companionItem.descLines = [loc("shop.slotDesc1"), loc(companion == Characters.Safar ? "shop.slotDescSafar" : "shop.slotDescFox")]
+            array_push(items, companionItem)
         }
     }
     return items
@@ -78,8 +92,9 @@ function shopItemLines(item) {
 
     if (item.kind == ShopItemKind.Slot) {
         array_push(lines, item.label)
-        array_push(lines, loc("shop.slotDesc1"))
-        array_push(lines, loc("shop.slotDesc2"))
+        for (var descIndex = 0; descIndex < array_length(item.descLines); descIndex++) {
+            array_push(lines, item.descLines[descIndex])
+        }
         return lines
     }
 

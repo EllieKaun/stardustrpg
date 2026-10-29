@@ -9,6 +9,7 @@ function createCrackerNut() {
         ],
         [ StatusNames.Stun ]); // слабость: Оглушение
     starrior.kind = EnemyKind.CrackerNut
+    starrior.brain = brainPreset(AiBrainType.Brute)
     return starrior
 }
 
@@ -23,6 +24,7 @@ function createLeaf() {
         ],
         [ StatusNames.Burn ]) // слабость: Огонь
     starrior.kind = EnemyKind.Leaf
+    starrior.brain = brainPreset(AiBrainType.Healer)
     return starrior
 }
 
@@ -37,6 +39,7 @@ function createMushroom() {
         ],
         [ StatusNames.Bomb ]) // слабость: Взрыв
     starrior.kind = EnemyKind.Mushroom
+    starrior.brain = brainPreset(AiBrainType.Brute)
     return starrior
 }
 
@@ -51,6 +54,7 @@ function createFlower() {
         ],
         [ StatusNames.Freeze ]) // слабость: Лёд
     starrior.kind = EnemyKind.Flower
+    starrior.brain = brainPreset(AiBrainType.Skirmisher)
     return starrior
 }
 
@@ -69,5 +73,6 @@ function createPuppetMaster() {
             createSummonHealPuppetCard(),
         ])
     starrior.kind = EnemyKind.PuppetMaster
+    starrior.brain = brainPreset(AiBrainType.Boss)
     return starrior
 }

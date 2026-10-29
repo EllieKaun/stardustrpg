@@ -6,3 +6,6 @@ light = oLighting.addLight({
     intensity: 1,
     flicker: 0.08
 })
+
+canInteract = false
+wasModal = false

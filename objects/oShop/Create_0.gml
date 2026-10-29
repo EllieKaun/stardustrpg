@@ -47,9 +47,11 @@ shopPanel = new Shop({
                 }
             } else if (item.kind == ShopItemKind.Slot) {
                 if (spendGold(item.price)) {
-                    // расширяем деку обоим героям, держим в синхроне
-                    unlockDeckSlot(Characters.Lana, 1)
-                    unlockDeckSlot(Characters.Viv, 1)
+                    if (item.character == undefined) {
+                        unlockDeckSlotForHeroes(1)
+                    } else {
+                        unlockDeckSlot(item.character, 1)
+                    }
                     analyticsPurchase("deck_slot", item.price) // аналитика: покупка слота колоды
                     playerDataSave()
                     // цена выросла / могли достичь максимума — пересобираем вкладку

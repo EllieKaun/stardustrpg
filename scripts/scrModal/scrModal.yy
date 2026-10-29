@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrModal",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrModal",
+  "parent":{
+    "name":"CommonUI",
+    "path":"folders/CommonUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -79,6 +79,7 @@ function spawnPuppet(category, caster) {
     puppet.isPuppet = true
     puppet.isEnemy = enemySide
     puppet.puppetCategory = category
+    puppet.brain = brainPreset((category == CardCategory.Heal || category == CardCategory.Buff) ? AiBrainType.Healer : AiBrainType.Skirmisher)
     puppet.justSummoned   = true
     puppet.image_xscale   = enemySide ? 1 : -1 // спрайты марионеток нарисованы лицом влево - у героев зеркалим
     array_push(team, puppet)
@@ -96,20 +97,6 @@ function spawnPuppet(category, caster) {
 
 //// Логика ходов Марионеток
 
-function isSingleTargetCard(card) {
-    return card.target != TargetTypes.AllEnemies && card.target != TargetTypes.AllAllies
-}
-
-function puppetTargetsEnemies(category) {
-    return (category == CardCategory.Attack || category == CardCategory.Magic)
-}
-
-function aliveOf(members) {
-    var alive = []
-    for (var memberIndex = 0; memberIndex < array_length(members); memberIndex++) if (!members[memberIndex].isKO()) { array_push(alive, members[memberIndex]) }
-    return alive
-}
-
 function runPuppetTurn(puppet) {
     if (puppet.justSummoned) {
         puppet.justSummoned = false
@@ -121,85 +108,11 @@ function runPuppetTurn(puppet) {
         shuffleDeckAndTake4(puppet)
     }
 
-    var hand = puppet.getCardsInHand()
-    var playable = []
-    for (var index = 0; index < array_length(hand); index++) {
-        var candidateCard = hand[index]
-        if (isSingleTargetCard(candidateCard) && checkIfCanPlayCard(puppet, candidateCard)) { array_push(playable, candidateCard) }
-    }
-
-    if (array_length(playable) == 0) {
+    var move = chooseMove(puppet)
+    if (move == undefined) { 
         skipTurn()
-        return
+        return 
     }
 
-    var allies = aliveOf(puppet.isEnemy ? enemies : heroes)   // союзники марионетки
-    var foes   = aliveOf(puppet.isEnemy ? heroes : enemies)   // противники марионетки
-
-    // Категоризируем играбельные карты: первый хил / бафф / атака
-    var healChoice = noone, buffChoice = noone, attackChoice = noone
-    for (var index = 0; index < array_length(playable); index++) {
-        var candidateCard = playable[index]
-        switch (cardCategoryOf(candidateCard)) {
-            case CardCategory.Heal: if (healChoice == noone) { healChoice = candidateCard; } break
-            case CardCategory.Buff: if (buffChoice == noone) { buffChoice = candidateCard; } break
-            case CardCategory.Attack:
-            case CardCategory.Magic: if (attackChoice == noone) { attackChoice = candidateCard; } break
-        }
-    }
-
-    // Самый раненый союзник (для хила)
-    var woundedAlly = noone
-    var lowestHp = 999999
-    for (var index = 0; index < array_length(allies); index++) {
-        var ally = allies[index]
-        if (ally.hp < ally.maxHp && ally.hp < lowestHp) { lowestHp = ally.hp; woundedAlly = ally }
-    }
-
-    var card = noone
-    var target = noone
-
-    // Лечим самого раненого союзника
-    if (healChoice != noone && woundedAlly != noone) {
-        target = enemyResolveTarget(healChoice, puppet, foes, allies, woundedAlly, noone)
-        if (target != noone) { card = healChoice }
-    }
-
-    // Баффаем союзника, у которого ещё нет этого модификатора (сначала других, себя - в последнюю очередь)
-    if (card == noone && buffChoice != noone) {
-        var firstEffect = buffChoice.effects[0]
-        var buffTarget = noone
-        for (var index = 0; index < array_length(allies) && buffTarget == noone; index++) {
-            var ally = allies[index]
-            if (ally == puppet) { continue }
-            if (variable_struct_exists(firstEffect, "buffType") && !is_undefined(checkIfHasBuff(ally, EffectTypes.Buff, firstEffect.buffType))) { continue }
-            buffTarget = ally
-        }
-        if (buffTarget == noone) {
-            var selfBuffed = variable_struct_exists(firstEffect, "buffType") && !is_undefined(checkIfHasBuff(puppet, EffectTypes.Buff, firstEffect.buffType))
-            if (!selfBuffed) { buffTarget = puppet }
-        }
-        if (buffTarget != noone) {
-            target = enemyResolveTarget(buffChoice, puppet, foes, allies, buffTarget, noone)
-            if (target != noone) { card = buffChoice }
-        }
-    }
-
-    // Атакуем
-    if (card == noone && attackChoice != noone) {
-        target = enemyResolveTarget(attackChoice, puppet, foes, allies, noone, provokingFoe(foes))
-        if (target != noone) { card = attackChoice }
-    }
-
-    // Если не получилось, случайная играбельная карта
-    if (card == noone) {
-        card = playable[irandom(array_length(playable) - 1)]
-        target = enemyResolveTarget(card, puppet, foes, allies, woundedAlly, provokingFoe(foes))
-        if (target == noone) {
-            skipTurn()
-            return
-        }
-    }
-
-    playCard(card, puppet, target)
+    playCard(move.card, puppet, move.target)
 }

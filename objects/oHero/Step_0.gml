@@ -29,6 +29,8 @@ if (global.uiModal || !can_move) {
 if (selected) {
     if (global.introWalk) { stepScriptedApproach() }
     else { stepControlled() }
+} else if (returningHome) {
+    stepReturnHome()
 } else { 
     stepFollowing()
 } 
