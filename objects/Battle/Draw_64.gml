@@ -7,7 +7,6 @@ var scaleToGui = guiScale()
 // Хит-боксы для мыши
 cardHitRects = []
 menuHitRects = []
-infoCloseRect = undefined
 cancelHitRect = undefined
 
 var cardDeskHeight = screenHeight / 3
@@ -137,10 +136,6 @@ if (currentState != undefined) {
 // Летящие карты
 for (var i = 0; i < array_length(activeCardAnims); i++) {
     activeCardAnims[i].draw()
-}
-
-if (tutorialActive && battleState == BattleStates.CharacterPlay && tutorial.isActive()) {
-    tutorial.draw()
 }
 
 autosaveDrawIcon()

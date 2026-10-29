@@ -39,14 +39,15 @@ if (tutorialActive) {
     if (battleState == BattleStates.Victory || battleState == BattleStates.GameOver) {
         tutorialActive = false
         markTutorialDone()
-    } else if (battleState == BattleStates.CharacterPlay) {
-        if (tutorial.step()) {
+    } else if (battleState == BattleStates.CharacterPlay && !modalIsOpen("tutorial")) {
+        modalOpen(modalTutorial(tutorialSteps, method(self, function() {
             tutorialActive = false
             markTutorialDone()
-        }
-        exit
+        })))
     }
 }
+
+if (modalIsOpen()) { exit }
 
 var currentState = stateAt(battleState)
 var stepHook = (currentState != undefined) ? currentState[StateHook.Step] : undefined

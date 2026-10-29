@@ -263,6 +263,7 @@
     {"id":{"name":"scrMenuSystem","path":"scripts/scrMenuSystem/scrMenuSystem.yy",},},
     {"id":{"name":"scrModal","path":"scripts/scrModal/scrModal.yy",},},
     {"id":{"name":"scrModalBlocks","path":"scripts/scrModalBlocks/scrModalBlocks.yy",},},
+    {"id":{"name":"scrModalPresets","path":"scripts/scrModalPresets/scrModalPresets.yy",},},
     {"id":{"name":"scrPlayerData","path":"scripts/scrPlayerData/scrPlayerData.yy",},},
     {"id":{"name":"scrQuestMigration","path":"scripts/scrQuestMigration/scrQuestMigration.yy",},},
     {"id":{"name":"scrQuests","path":"scripts/scrQuests/scrQuests.yy",},},

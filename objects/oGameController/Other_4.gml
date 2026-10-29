@@ -47,16 +47,12 @@ if (global.isNewGame && !tutorialIsDone()) {
     global.isNewGame = false
     with (oSpawnerManager) tutorialSpawnDone = true
     global.introPendingWalk = true
-    if (instance_exists(oDialogManager)) {
-        say(tutorialOverworldLines())
-    }
+    say(tutorialOverworldLines())
 }
 
 if (tutorialIsDone() && !deckTutorialIsDone() && global.deckTutorialStage == DeckTutorialStage.Inactive) {
     global.deckTutorialStage = DeckTutorialStage.Dialog
-    if (instance_exists(oDialogManager)) {
-        say(deckTutorialIntroLines())
-    }
+    say(deckTutorialIntroLines())
 }
 
 if (!global.chestsGenerated) {
