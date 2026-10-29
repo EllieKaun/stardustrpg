@@ -310,6 +310,30 @@ function applyWindowMode(winW, winH, fullscreen) {
     window_set_position((displayWidth - winW) div 2, max(0, (displayHeight - winH) div 2))
 }
 
+function displayRecoverOnFocus() {
+    if (!variable_global_exists("windowHadFocus")) {
+        global.windowHadFocus = window_has_focus()
+        global.windowRefullscreenPending = false
+        global.windowRecoverBlockedUntil = 0
+    }
+    if (global.windowRefullscreenPending) {
+        global.windowRefullscreenPending = false
+        window_enable_borderless_fullscreen(true)
+        window_set_fullscreen(true)
+    }
+    var hasFocus = window_has_focus()
+    if (hasFocus && !global.windowHadFocus && current_time >= global.windowRecoverBlockedUntil) {
+        global.windowRecoverBlockedUntil = current_time + 1000
+        if (window_get_fullscreen()) {
+            window_set_fullscreen(false)
+            global.windowRefullscreenPending = true
+        } else {
+            display_reset(0, true)
+        }
+    }
+    global.windowHadFocus = hasFocus
+}
+
 // Применяет настройки дисплея при старте
 function initDisplaySettings() {
     if (variable_global_exists("displayModeReady")

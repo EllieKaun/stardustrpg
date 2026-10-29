@@ -2,6 +2,8 @@ enum Panels { Collection, Deck }
 
 // Индексы слотов что рисуются с паутиной
 #macro EMPTY_WEB_SLOT_INDICES [6, 9, 11]
+#macro TAB_INACTIVE_SHADE make_color_rgb(150, 150, 150)
+#macro SIDE_TAB_POINTER_SIZE 0.8
 
 // Конструктор слотов, который используется для отрисовки в дек билдере
 function Slot(initialState, initialCard = undefined) constructor {
@@ -57,6 +59,8 @@ function Panel(config) constructor {
 
     sideTabs = config[$ "sideTabs"] ?? []
     sideTabWidthFraction = config[$ "sideTabWidthFraction"] ?? 0.22
+    sideTabW = config[$ "sideTabW"]
+    sideTabOffsetX = config[$ "sideTabOffsetX"] ?? 0
     activeSideTab = 0
     onSideTabs = false
 
@@ -64,6 +68,7 @@ function Panel(config) constructor {
     cardRatio = 2 / 3
     slots = config[$ "slots"] ?? []
     padding = config[$ "padding"] ?? 8
+    cardGapFactor = config[$ "cardGapFactor"] ?? 0.5
     tabH = config[$ "tabH"] ?? 18
     tabGap = config[$ "tabGap"] ?? 2
     tabPadding = config[$ "tabPadding"] ?? 4
@@ -141,7 +146,7 @@ function Panel(config) constructor {
         var gridH = h - topPad - padding
 
         var ratio = 2 / 3
-        var minGap = padding * 0.5 
+        var minGap = padding * cardGapFactor
         var gapY = 6 * uiScale
 
         // Размер карты
@@ -174,13 +179,18 @@ function Panel(config) constructor {
         }
     }
     
+    static sideTabWidth = function() {
+        return sideTabW ?? (w * sideTabWidthFraction - padding * 0.5)
+    }
+
     static sideColumnWidth = function() {
-        return (array_length(sideTabs) > 0) ? w * sideTabWidthFraction : 0
+        if (array_length(sideTabs) == 0) { return 0 }
+        return sideTabWidth() + padding * 0.5 + sideTabOffsetX
     }
 
     static getSideTabRect = function(index) {
-        var tabX = x + padding
-        var tabW = sideColumnWidth() - padding * 0.5
+        var tabX = x + padding + sideTabOffsetX
+        var tabW = sideTabWidth()
         var tabY = y + padding * 0.75 + index * (tabH + tabGap * 2)
         return { tx: tabX, ty: tabY, tw: tabW, th: tabH }
     }
@@ -201,15 +211,16 @@ function Panel(config) constructor {
     }
 
     static drawTabArt = function(tab, artX, artY, artW, artH, isActive) {
-        var alpha = isActive ? 1.0 : 0.6
+        var shade = isActive ? c_white : TAB_INACTIVE_SHADE
         var tint = tab[$ "tint"]
         if (tint == undefined) {
             var tabSubimage = min(isActive ? 1 : 0, sprite_get_number(tab.sprite) - 1)
-            draw_sprite_stretched_ext(tab.sprite, tabSubimage, artX, artY, artW, artH, c_white, alpha)
+            draw_sprite_stretched_ext(tab.sprite, tabSubimage, artX, artY, artW, artH, shade, 1)
             return
         }
-        draw_sprite_stretched_ext(TabFill, 0, artX, artY, artW, artH, tint, alpha)
-        draw_sprite_stretched_ext(TabBorder, 0, artX, artY, artW, artH, c_white, alpha)
+        var fillColor = isActive ? tint : merge_color(tint, c_black, 1 - colour_get_value(TAB_INACTIVE_SHADE) / 255)
+        draw_sprite_stretched_ext(TabFill, 0, artX, artY, artW, artH, fillColor, 1)
+        draw_sprite_stretched_ext(TabBorder, 0, artX, artY, artW, artH, shade, 1)
     }
 
     static getTabWidths = function() {
@@ -450,7 +461,8 @@ function Panel(config) constructor {
         var mouseY = device_mouse_y_to_gui(0)
 
         // область панели вместе со строкой табов над ней
-        if (!pointInRect(mouseX, mouseY, x, y - tabH, w, h + tabH)) { return false }
+        var overhangLeft = (array_length(sideTabs) > 0) ? max(0, -(padding + sideTabOffsetX)) : 0
+        if (!pointInRect(mouseX, mouseY, x - overhangLeft, y - tabH, w + overhangLeft, h + tabH)) { return false }
 
         // Прокрутка колесом
         if (scrollable) {
@@ -617,7 +629,8 @@ function Panel(config) constructor {
             draw_set_valign(fa_top)
 
             if (sideActive && focused && onSideTabs && pointerSprite != undefined) {
-                draw_sprite_ext(pointerSprite, 0, sideRect.tx + tabPadding, sideRect.ty + sideRect.th / 2, uiScale, uiScale, 0, c_white, 1)
+                var sidePointerScale = sideRect.th * SIDE_TAB_POINTER_SIZE / sprite_get_height(pointerSprite)
+                draw_sprite_ext(pointerSprite, 0, sideRect.tx, sideRect.ty + sideRect.th / 2, sidePointerScale, sidePointerScale, 0, c_white, 1)
             }
         }
 
@@ -630,7 +643,6 @@ function Panel(config) constructor {
                 // кнопка может быть сдвинута вправо
                 var buttonOffsetX = (tab[$ "btnOffsetX"] ?? 0) * tabRow.th
                 drawTabArt(tab, tabRow.tx + buttonOffsetX, tabRow.ty, tabRow.tw - buttonOffsetX, tabRow.th, isActive)
-                draw_set_alpha(isActive ? 1.0 : 0.6)
 
                 // иконка поверх кнопки
                 var tabIcon = tab[$ "icon"]
@@ -640,7 +652,7 @@ function Panel(config) constructor {
                     var iconH = sprite_get_height(tabIcon) * artScale
                     var iconX = tabRow.tx + (tab[$ "iconOffsetX"] ?? 0) * tabRow.th
                     var iconY = tabRow.ty + (tabRow.th - iconH) * 0.5
-                    draw_sprite_stretched(tabIcon, 0, iconX, iconY, iconW, iconH)
+                    draw_sprite_stretched_ext(tabIcon, 0, iconX, iconY, iconW, iconH, isActive ? c_white : TAB_INACTIVE_SHADE, 1)
                 }
                 draw_set_alpha(1.0)
             } else {

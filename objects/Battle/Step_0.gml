@@ -1,3 +1,4 @@
+displayRecoverOnFocus()
 // Пауза по Esc 
 var transitioning = instance_exists(oTransition) && oTransition.state != "idle"
 if (keyboard_check_pressed(vk_escape) && !transitioning) {

@@ -352,6 +352,7 @@
     {"id":{"name":"FiraAttack","path":"sprites/FiraAttack/FiraAttack.yy",},},
     {"id":{"name":"FiraCast","path":"sprites/FiraCast/FiraCast.yy",},},
     {"id":{"name":"FiraDance","path":"sprites/FiraDance/FiraDance.yy",},},
+    {"id":{"name":"FiraIcon","path":"sprites/FiraIcon/FiraIcon.yy",},},
     {"id":{"name":"FiraIdle","path":"sprites/FiraIdle/FiraIdle.yy",},},
     {"id":{"name":"FiraKO","path":"sprites/FiraKO/FiraKO.yy",},},
     {"id":{"name":"FiraSpell","path":"sprites/FiraSpell/FiraSpell.yy",},},

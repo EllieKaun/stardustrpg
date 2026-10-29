@@ -3,6 +3,7 @@ guiSyncCrisp()
 // Вход из главного меню
 if (variable_global_exists("overworldNeedsReset") && global.overworldNeedsReset) {
     global.overworldNeedsReset = false
+    room_persistent = false
     room_restart()
     exit
 }

@@ -279,8 +279,16 @@ layoutPanels = function() {
         panel.tabPadding = 4 * scaleUI
         panel.uiScale = scaleUI 
     }
-    // отступ вкладок слева от края панели 
-    collectionPanel.tabOffsetX = 0
+    var sideTabWidth = panelWidth * 0.22 - collectionPanel.padding * 0.5
+    var sideTabOverhang = sideTabWidth * 0.3
+    collectionPanel.x += sideTabOverhang
+    collectionPanel.w -= sideTabOverhang
+    collectionPanel.sideTabW = sideTabWidth
+    collectionPanel.sideTabOffsetX = -(collectionPanel.padding + sideTabOverhang)
+    collectionPanel.cardGapFactor = 0.3
+
+    // отступ вкладок слева от края панели
+    collectionPanel.tabOffsetX = collectionPanel.padding * 0.5
     deckPanel.tabOffsetX = 0
 }
 layoutPanels()

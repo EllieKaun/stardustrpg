@@ -1,4 +1,5 @@
 randomize()
+room_persistent = true
 
 gpu_set_tex_filter(false)
 

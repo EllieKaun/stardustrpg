@@ -193,7 +193,7 @@ function characterIcon(character) {
         case Characters.Lana: return LanaIcon
         case Characters.Viv: return VivIcon
         case Characters.Safar: return sprCharacterPanelSafarHead
-        case Characters.Fox: return sprCharacterPanelFoxHead
+        case Characters.Fox: return FiraIcon
         default: return noone
     }
 }

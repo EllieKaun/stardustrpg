@@ -1,3 +1,4 @@
+displayRecoverOnFocus()
 autosaveUpdate()
 updateTimeOfDay()
 

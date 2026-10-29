@@ -12,7 +12,7 @@ function modalMerge(target, source) {
 
 function modalSpec(overrides = {}) {
     var spec = {
-        tag: ""
+        tag: "",
         layout: ModalLayout.Center,
         widthFrac: 0.5,
         heightFrac: 0.34,
@@ -30,7 +30,7 @@ function modalSpec(overrides = {}) {
         drawUnderPanel: undefined,
         drawOverPanel: undefined, 
         advanceWhen: undefined,
-        onOpen: undefined
+        onOpen: undefined,
         onClose: undefined,
         onCancel: undefined
     }

@@ -9,7 +9,7 @@
   "canGenerateBitmap":true,
   "charset":0,
   "first":0,
-  "fontName":"Pixeloid Mono",
+  "fontName":"Open Sans Condensed",
   "glyphOperations":0,
   "glyphs":{
     "32":{"character":32,"h":15,"offset":0,"shift":3,"w":3,"x":2,"y":2,},
@@ -362,7 +362,7 @@
     "1277":{"character":1277,"h":15,"offset":0,"shift":6,"w":6,"x":174,"y":53,},
     "1278":{"character":1278,"h":15,"offset":0,"shift":6,"w":6,"x":166,"y":53,},
     "1279":{"character":1279,"h":15,"offset":0,"shift":6,"w":6,"x":185,"y":87,},
-    "9647":{"character":9647,"h":15,"offset":2,"shift":11,"w":6,"x":229,"y":172,},
+    "9647":{"character":9647,"h":15,"offset":2,"shift":7,"w":3,"x":229,"y":172,},
   },
   "hinting":0,
   "includeTTF":false,
@@ -381,7 +381,7 @@
   "name":"fnUI_8",
   "parent":{
     "name":"Fonts",
-    "path":"folders/Fonts.yy",
+    "path":"folders/CommonUI/Fonts.yy",
   },
   "pointRounding":0,
   "ranges":[
@@ -389,13 +389,13 @@
     {"lower":1024,"upper":1279,},
     {"lower":9647,"upper":9647,},
   ],
-  "regenerateBitmap":false,
+  "regenerateBitmap":true,
   "resourceType":"GMFont",
   "resourceVersion":"2.0",
   "sampleText":"abcdef ABCDEF\n0123456789 .,<>\"'&!?\nthe quick brown fox jumps over the lazy dog\nTHE QUICK BROWN FOX JUMPS OVER THE LAZY DOG\nDefault character: ▯ (9647)",
   "sdfSpread":8,
   "size":8.0,
-  "styleName":"Regular",
+  "styleName":"Medium",
   "textureGroupId":{
     "name":"Default",
     "path":"texturegroups/Default",
