@@ -16,7 +16,7 @@ hasSave = file_exists(PLAYER_SAVE_FILE)
 confirmPrompt = ""
 menuCooldown = 0
 
-menuConfig = { anchorX: 0.75, startY: 0.45, spacing: 0.11, textH: 0.055, halign: fa_center }
+menuConfig = { anchorX: 0.75, startY: 0.45, spacing: 0.11, textH: 0.055, halign: fa_center, outline: 2, outlineColor: c_black }
 
 startNewGameNow = function() {
     global.startNewGame = true

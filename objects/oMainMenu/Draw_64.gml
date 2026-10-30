@@ -8,11 +8,11 @@ menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, guiWidth, guiH
 draw_set_halign(fa_center)
 draw_set_valign(fa_middle)
 draw_set_color(c_white)
-drawUiText(guiWidth * 0.75, guiHeight * 0.22, loc("screen.mainMenu"), guiHeight * 0.09)
+drawUiTextOutline(guiWidth * 0.75, guiHeight * 0.22, loc("screen.mainMenu"), guiHeight * 0.09, c_black)
 
 if (confirmPrompt != "") {
     draw_set_color(merge_color(c_white, c_yellow, 0.35))
-    drawUiText(guiWidth * 0.75, guiHeight * 0.36, confirmPrompt, guiHeight * 0.05)
+    drawUiTextOutline(guiWidth * 0.75, guiHeight * 0.36, confirmPrompt, guiHeight * 0.05, c_black)
     draw_set_color(c_white)
 }
 

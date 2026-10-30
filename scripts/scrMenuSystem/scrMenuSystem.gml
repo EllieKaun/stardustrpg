@@ -119,6 +119,8 @@ function Menu(items, config = {}) constructor {
     self.colNormal = menuParam(config, "colNormal", c_white)
     self.colSelect = menuParam(config, "colSelect", c_yellow)
     self.colDisabled = menuParam(config, "colDisabled", make_color_rgb(120, 120, 130))
+    self.outline = menuParam(config, "outline", 0)
+    self.outlineColor = menuParam(config, "outlineColor", c_black)
 
     self.hitRects = []   // { x, y, w, h, index } в GUI-координатах, заполняется в draw
 
@@ -225,8 +227,13 @@ function Menu(items, config = {}) constructor {
 
             // текст
             var textColor = !item.enabled ? self.colDisabled : (isSel ? self.colSelect : self.colNormal)
+            var labelX = left + (hasIcon ? iconW + gapPx : 0)
             draw_set_color(textColor)
-            draw_text_transformed(left + (hasIcon ? iconW + gapPx : 0), itemY, item.label, tScale, tScale, 0)
+            if (self.outline > 0) {
+                drawTextTransformedOutline(labelX, itemY, item.label, tScale, 0, textColor, self.outlineColor, max(1, round(tScale * self.outline)))
+            } else {
+                draw_text_transformed(labelX, itemY, item.label, tScale, tScale, 0)
+            }
 
             array_push(self.hitRects, { x: left, y: itemY - stepPx / 2, w: groupW, h: stepPx, index: itemIndex })
         }
