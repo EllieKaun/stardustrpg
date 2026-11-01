@@ -202,10 +202,10 @@ function initBattleStates() {
         analyticsDefeat() // аналитика: поражение в бою
         var retry = method(self, function() { retryBattle() })
         var exitToWorld = method(self, function() { returnToOverworld() })
-        modalOpen(modalConfirm(loc("ui.gameover"), "", [
-            { label: loc("ui.retry"), onSelect: retry },
-            { label: loc("ui.exit"), onSelect: exitToWorld }
-        ], { tag: "gameOver", background: undefined, dim: 0.6, widthFrac: 1, heightFrac: 0.4 }))
+        modalOpen(modalConfirm(loc("ui.gameover"), loc("ui.gameoverText"), [
+            { label: loc("ui.exit"), onSelect: exitToWorld },
+            { label: loc("ui.retry"), onSelect: retry }
+        ], { tag: "gameOver", initialCursor: 1 }))
     })
     battleStates[BattleStates.GameOver] = stateDef
 
@@ -217,7 +217,7 @@ function initBattleStates() {
             loc("battle.fleeTitle"),
             loc("battle.fleeLose") + string(battleFleePenalty()),
             [{ label: loc("battle.fleeStay"), onSelect: backToPlay }, { label: loc("battle.run"), onSelect: flee }],
-            { canCancel: true, onCancel: backToPlay, textColor: merge_color(c_white, c_red, 0.5) }
+            { canCancel: true, onCancel: backToPlay }
         ))
     })
     battleStates[BattleStates.RunConfirm] = stateDef

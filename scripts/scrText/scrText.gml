@@ -89,7 +89,7 @@ function wrapTextToWidth(text, maxW) {
 }
 
 // Подбор шрифта под область
-function fitWrappedText(text, areaW, areaH) {
+function fitWrappedText(text, areaW, areaH, maxLineH = 1000000) {
     if (!variable_global_exists("uiFontLadder")) { uiFontInit() }
     var ladder = global.uiFontLadder
     var prevFont = draw_get_font()
@@ -97,6 +97,7 @@ function fitWrappedText(text, areaW, areaH) {
     var fallback = undefined
     var fallbackSize = -1
     for (var index = 0; index < array_length(ladder); index++) {
+        if (ladder[index].lineH > maxLineH && (best != undefined || fallback != undefined)) { break }
         draw_set_font(ladder[index].font)
         var wrapped = wrapTextToWidth(text, areaW)
         var textWidth = string_width(wrapped)

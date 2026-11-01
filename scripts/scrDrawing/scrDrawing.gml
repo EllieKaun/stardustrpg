@@ -58,6 +58,12 @@ function drawButtonFrame(btnX, btnY, btnW, btnH) {
     draw_sprite_stretched(ShopBtn, 0, btnX, btnY, btnW, btnH)
 }
 
+function drawStretchedOutline(sprite, boxX, boxY, boxW, boxH, outlineColor, thickness) {
+    gpu_set_fog(true, outlineColor, 0, 0)
+    draw_sprite_stretched(sprite, 0, boxX - thickness, boxY - thickness, boxW + thickness * 2, boxH + thickness * 2)
+    gpu_set_fog(false, outlineColor, 0, 0)
+}
+
 // Попадание точки в повёрнутый прямоугольник (центр centerX,centerY; размер rectWidth,rectHeight; угол angle)
 function pointInRotatedRect(pointX, pointY, centerX, centerY, rectWidth, rectHeight, angle) {
     var cosAngle = dcos(angle), sinAngle = dsin(angle)

@@ -1,6 +1,6 @@
 #macro MODAL_DEPTH -15000
 
-enum ModalLayout { Center, Bottom, Top, FullScreen }
+enum ModalLayout { Center, Bottom, Avoiding, FullScreen }
 
 function modalMerge(target, source) {
     var names = variable_struct_get_names(source)
@@ -16,11 +16,14 @@ function modalSpec(overrides = {}) {
         layout: ModalLayout.Center,
         widthFrac: 0.5,
         heightFrac: 0.34,
+        panelAspect: undefined,
         padding: 0.12,
         paddingXScale: 1,
         blockGap: 0.03,
         dim: 0.6,
-        background: box,
+        background: undefined,
+        contentArea: undefined,
+        initialCursor: 0,
         spotlight: undefined,
         navAxis: "horizontal",
         charsPerStep: 0.8,
@@ -91,7 +94,7 @@ function ModalWindow(spec) constructor {
     self.enterPage = function(index) {
         self.pageIndex = index
         self.charProgress = 0
-        self.cursor = 0
+        self.cursor = self.option("initialCursor")
         self.itemRects = []
         var current = self.page()
         self.items = modalCollectItems(current.blocks, [])
@@ -223,19 +226,22 @@ function ModalWindow(spec) constructor {
             drawUnder(self, self.panel)
         }
         var background = self.option("background")
+        if (is_callable(background)) { background = background(self) }
         if (background != undefined) {
             draw_sprite_stretched(background, 0, self.panel.x, self.panel.y, self.panel.w, self.panel.h)
         }
 
         var padY = self.panel.h * self.option("padding")
         var padX = padY * self.option("paddingXScale")
-        self.itemRects = []
-        modalLayoutBlocks(self, self.page().blocks, {
+        var contentArea = self.option("contentArea")
+        var area = (contentArea != undefined) ? contentArea(self, self.panel) : {
             x: self.panel.x + padX,
             y: self.panel.y + padY,
             w: self.panel.w - padX * 2,
             h: self.panel.h - padY * 2
-        }, false)
+        }
+        self.itemRects = []
+        modalLayoutBlocks(self, self.page().blocks, area, false)
 
         var drawOver = self.option("drawOverPanel")
         if (drawOver != undefined) { drawOver(self, self.panel) }
@@ -251,14 +257,16 @@ function modalPanelRect(modalWindow, avoidRect) {
     var screenHeight = display_get_gui_height()
     var panelW = screenWidth * modalWindow.option("widthFrac")
     var panelH = screenHeight * modalWindow.option("heightFrac")
+    var panelAspect = modalWindow.option("panelAspect")
+    if (panelAspect != undefined) { panelW = panelH * panelAspect }
     switch (modalWindow.option("layout")) {
         case ModalLayout.Bottom:
             return { x: (screenWidth - panelW) * 0.5, 
             y: screenHeight - panelH - round(screenWidth * 0.02), 
             w: panelW, 
             h: panelH }
-        case ModalLayout.Top:
-            return modalTopAvoiding(panelW, panelH, avoidRect)
+        case ModalLayout.Avoiding:
+            return modalPanelAvoiding(panelW, panelH, avoidRect, guiScale() * DIALOG_PORTRAIT_OVERHANG)
         case ModalLayout.FullScreen:
             return { x: 0,
             y: 0, 
@@ -272,20 +280,20 @@ function modalPanelRect(modalWindow, avoidRect) {
     }
 }
 
-function modalRectsOverlapY(panel, rect) {
-    return (panel.y < rect.y + rect.h) && (panel.y + panel.h > rect.y)
+function modalRectsOverlapY(panel, rect, overhang) {
+    return (panel.y - overhang < rect.y + rect.h) && (panel.y + panel.h > rect.y)
 }
 
-function modalTopAvoiding(panelW, panelH, avoidRect) {
+function modalPanelAvoiding(panelW, panelH, avoidRect, overhang) {
     var screenWidth = display_get_gui_width()
     var screenHeight = display_get_gui_height()
     var margin = (screenWidth - panelW) * 0.5
-    var panel = { x: margin, y: screenHeight * 0.03, w: panelW, h: panelH }
-    if (avoidRect == undefined || !modalRectsOverlapY(panel, avoidRect)) { 
-        return panel 
+    var panel = { x: margin, y: screenHeight - panelH - round(screenWidth * 0.02), w: panelW, h: panelH }
+    if (avoidRect == undefined || !modalRectsOverlapY(panel, avoidRect, overhang)) {
+        return panel
     }
-    panel.y = screenHeight - screenHeight * 0.03 - panelH
-    if (!modalRectsOverlapY(panel, avoidRect)) { return panel }
+    panel.y = overhang + screenHeight * 0.03
+    if (!modalRectsOverlapY(panel, avoidRect, overhang)) { return panel }
     var gapLeft = avoidRect.x
     var gapRight = screenWidth - (avoidRect.x + avoidRect.w)
     var onRight = (gapRight >= gapLeft)

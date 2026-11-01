@@ -1,32 +1,55 @@
-// Модалка подтверждения действия
-function modalConfirm(title, text, buttons, overrides = {}) {
-    var blocks = [ModalTitle(title, { h: 0.28 })]
-    if (text != "") {
-        array_push(blocks, ModalTitle(
-            text, { h: 0.2, color: overrides[$ "textColor"] ?? c_white }
-        ))
+#macro DIALOG_NAVY #3F3F74
+#macro DIALOG_PORTRAIT_SIZE 66
+#macro DIALOG_PORTRAIT_INSET 15
+#macro DIALOG_PORTRAIT_OVERHANG 33
+
+// Единый формат окна: заголовок с обводкой, панель со звёздами, кнопки под панелью
+function modalPopupBlocks(title, bodyBlocks, buttons, heightFrac) {
+    var edgeH = 0.08 / heightFrac
+    var blocks = []
+    if (title != "") { array_push(blocks, ModalTitle(title, { h: edgeH, size: 1, outline: true })) }
+    array_push(blocks, ModalBox(bodyBlocks))
+    if (array_length(buttons) > 0) { array_push(blocks, ModalButtons(buttons, { h: edgeH })) }
+    return blocks
+}
+
+function modalPopupOptions(heightFrac) {
+    return {
+        layout: ModalLayout.Center,
+        widthFrac: 0.46,
+        heightFrac: heightFrac,
+        panelAspect: undefined,
+        background: undefined,
+        contentArea: undefined,
+        padding: 0,
+        blockGap: 0.02
     }
-    array_push(blocks, ModalButtons( buttons, { h: 0.3 }))
+}
+
+function modalPopup(title, bodyBlocks, buttons, overrides = {}) {
+    var heightFrac = overrides[$ "heightFrac"] ?? 0.5
     return modalSpec(
-        modalMerge({
-            tag: "confirm",
-            widthFrac: 0.5,
-            heightFrac: 0.34,
-            dim: 0.5,
-            pages: [{ blocks: blocks }]
-        }, overrides)
+        modalMerge(
+            modalMerge(modalPopupOptions(heightFrac), {
+                tag: "popup",
+                pages: [{ blocks: modalPopupBlocks(title, bodyBlocks, buttons, heightFrac) }]
+            }),
+            overrides
+        )
     )
 }
 
-// Диалоги персонажей и открытие сундуков 
+// Модалка подтверждения действия: первая кнопка - отмена, вторая - подтверждение
+function modalConfirm(title, text, buttons, overrides = {}) {
+    var bodyBlocks = (text != "") ? [ModalText(text)] : []
+    return modalPopup(title, bodyBlocks, buttons, modalMerge({ tag: "confirm" }, overrides))
+}
+
+// Диалоги персонажей и открытие сундуков
 function modalDialogPage(line) {
     var hasPortrait = (line.portrait != undefined && sprite_exists(line.portrait))
     var options = line[$ "options"]
-    var textBlock = ModalText(line.text, {
-        typewriter: true,
-        align: hasPortrait ? fa_left : fa_center,
-        valign: (options == undefined) ? fa_middle : fa_top
-    })
+    var textBlock = ModalText(line.text, { typewriter: true })
     var blocks = [textBlock]
     if (options != undefined) {
         textBlock.h = (line.text == "") ? 0 : 0.45
@@ -36,40 +59,92 @@ function modalDialogPage(line) {
         }
         array_push(blocks, ModalOptions(items))
     }
-    var extraBlocks = line[$ "extraBlocks"]
-    if (extraBlocks != undefined) {
-        for (var extraIndex = 0; extraIndex < array_length(extraBlocks); extraIndex++) { 
-            array_push(blocks, extraBlocks[extraIndex]) 
-        }
+    var page = { portrait: line.portrait, side: line.side, speaker: line.speaker, onEnter: line.onEnter }
+    if (hasPortrait) {
+        page.blocks = blocks
+        return page
     }
-    var page = { blocks: blocks, portrait: line.portrait, side: line.side, onEnter: line.onEnter }
-    return modalMerge(page, line[$ "pageOverrides"] ?? {})
+    var heightFrac = 0.42
+    modalMerge(page, modalPopupOptions(heightFrac))
+    page.blocks = modalPopupBlocks(speakerDisplayName(line.speaker), blocks, [], heightFrac)
+    return page
+}
+
+function modalDialogContentArea(modalWindow, panel) {
+    var scaleToGui = guiScale()
+    var portraitSpace = (DIALOG_PORTRAIT_INSET + DIALOG_PORTRAIT_SIZE + 5) * scaleToGui
+    var padX = 10 * scaleToGui
+    var padY = 5 * scaleToGui
+    var line = modalWindow.page()
+    var onLeft = (line[$ "side"] != "right")
+    return {
+        x: panel.x + (onLeft ? portraitSpace : padX),
+        y: panel.y + padY,
+        w: panel.w - portraitSpace - padX,
+        h: panel.h - padY * 2
+    }
+}
+
+function modalDialogBackground(modalWindow) {
+    return (modalWindow.panel.w >= display_get_gui_width() * 0.99) ? sprBoxDialogBig : sprBoxBig
 }
 
 function modalDrawDialogPortrait(modalWindow, panel) {
     var line = modalWindow.page()
     var portrait = line[$ "portrait"]
     if (portrait == undefined || !sprite_exists(portrait)) { return }
-    var portraitScale = floor(display_get_gui_height() * 0.36) / sprite_get_height(portrait)
-    if (portraitScale >= 1) { portraitScale = floor(portraitScale) }
-    var portraitW = sprite_get_width(portrait) * portraitScale
-    var portraitH = sprite_get_height(portrait) * portraitScale
-    var inset = panel.h * modalWindow.option("padding") * 1.5
+    var scaleToGui = guiScale()
+    var boxSize = DIALOG_PORTRAIT_SIZE * scaleToGui
+    var inset = DIALOG_PORTRAIT_INSET * scaleToGui
     var onLeft = (line[$ "side"] != "right")
-    var portraitLeft = onLeft ? (panel.x + inset) : (panel.x + panel.w - inset - portraitW)
-    var portraitTop = panel.y + panel.h * 0.03 - portraitH
-    draw_sprite_ext(portrait, 0,
-        portraitLeft + sprite_get_xoffset(portrait) * portraitScale,
-        portraitTop + sprite_get_yoffset(portrait) * portraitScale,
-        portraitScale, portraitScale, 0, c_white, 1)
+    var boxX = floor(onLeft ? panel.x + inset : panel.x + panel.w - inset - boxSize)
+    var boxY = floor(panel.y - DIALOG_PORTRAIT_OVERHANG * scaleToGui)
+    draw_sprite_stretched(sprBoxPortrait, 0, boxX, boxY, boxSize, boxSize)
+    var innerSize = boxSize - scaleToGui * 2
+    draw_sprite_stretched(portrait, 0, boxX + scaleToGui, boxY + scaleToGui, innerSize, innerSize)
+
+    var area = modalDialogContentArea(modalWindow, panel)
+    draw_set_color(c_white)
+    draw_set_halign(onLeft ? fa_left : fa_right)
+    draw_set_valign(fa_bottom)
+    drawUiTextOutline(onLeft ? area.x : area.x + area.w, panel.y - scaleToGui * 2, speakerDisplayName(line[$ "speaker"]), 10 * scaleToGui, c_black, max(2, round(scaleToGui * 0.75)), area.w)
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
 }
 
 function modalDrawNextPointer(modalWindow, panel) {
     if (!modalWindow.fullyRevealed() || array_length(modalWindow.items) > 0) { return }
-    var pointerScale = max(1, floor(guiScale() * 0.5))
-    var padY = panel.h * modalWindow.option("padding")
-    var pointerY = panel.y + panel.h - padY - pointerScale * 2 + floor(pointerScale * 2 * sin(current_time / 200))
-    draw_sprite_ext(sPointer, 0, panel.x + panel.w - padY * 1.5, pointerY, pointerScale, pointerScale, 0, c_white, 1)
+    if (modalWindow.option("advanceWhen") != undefined) { return }
+    var scaleToGui = guiScale()
+    var pointerScale = max(1, floor(scaleToGui * 0.5))
+    var contentArea = modalWindow.option("contentArea")
+    var right = panel.x + panel.w - scaleToGui * 12
+    if (contentArea != undefined) {
+        var area = contentArea(modalWindow, panel)
+        right = area.x + area.w
+    }
+    var pointerY = panel.y + panel.h - scaleToGui * 10 + floor(pointerScale * 2 * sin(current_time / 200))
+    draw_sprite_ext(sPointer, 0, right, pointerY, pointerScale, pointerScale, 0, c_white, 1)
+}
+
+function modalDrawDialogOverlay(modalWindow, panel) {
+    modalDrawDialogPortrait(modalWindow, panel)
+    modalDrawNextPointer(modalWindow, panel)
+}
+
+function modalDialogSpec(pages, overrides) {
+    return modalSpec(modalMerge({
+        tag: "dialog",
+        layout: ModalLayout.Bottom,
+        widthFrac: 1,
+        heightFrac: 0.267,
+        background: modalDialogBackground,
+        contentArea: modalDialogContentArea,
+        navAxis: "vertical",
+        pages: pages,
+        drawOverPanel: modalDrawDialogOverlay,
+        onOpen: function() { guiSyncCrisp() }
+    }, overrides))
 }
 
 function modalDialog(lines, onComplete = undefined) {
@@ -77,83 +152,46 @@ function modalDialog(lines, onComplete = undefined) {
     for (var lineIndex = 0; lineIndex < array_length(lines); lineIndex++) {
         array_push(pages, modalDialogPage(lines[lineIndex]))
     }
-    return modalSpec({
-        tag: "dialog",
-        layout: ModalLayout.Bottom,
-        widthFrac: 0.96,
-        heightFrac: 0.30,
-        paddingXScale: 1.5,
-        navAxis: "vertical",
-        pages: pages,
-        drawUnderPanel: modalDrawDialogPortrait,
-        drawOverPanel: modalDrawNextPointer,
-        onOpen: function() { guiSyncCrisp() },
-        onClose: onComplete
-    })
+    return modalDialogSpec(pages, { onClose: onComplete })
 }
 
-// Обучение
+// Обучение: тот же формат диалога, но панель уходит от подсвеченной области
 function modalTutorial(steps, onComplete = undefined) {
     var pages = []
     for (var stepIndex = 0; stepIndex < array_length(steps); stepIndex++) {
         var tutorialStep = steps[stepIndex]
-        var page = {
-            blocks: [
-                ModalRow([
-                    ModalSprite(tutorialStep[$ "portrait"] ?? noone, { w: "square", stretch: true }),
-                    ModalColumn([
-                        ModalTitle(speakerDisplayName(tutorialStep.speaker), { h: 0.26, align: fa_left, color: merge_color(c_white, c_yellow, 0.5) }),
-                        ModalText(tutorialStep.text),
-                        ModalTitle(loc("ui.spaceNext"), { h: 0.2, align: fa_right, color: merge_color(c_white, c_black, 0.35) })
-                    ])
-                ])
-            ]
-        }
+        var page = modalDialogPage(
+            dialogLine(tutorialStep.speaker, tutorialStep[$ "portrait"] ?? noone, tutorialStep.text, tutorialStep[$ "onEnter"])
+        )
         if (variable_struct_exists(tutorialStep, "getRect")) {
-             page.spotlight = tutorialStep.getRect 
+             page.spotlight = tutorialStep.getRect
              }
-        if (variable_struct_exists(tutorialStep, "advanceWhen")) { 
-            page.advanceWhen = tutorialStep.advanceWhen 
-        }
-        if (variable_struct_exists(tutorialStep, "onEnter")) { 
-            page.onEnter = tutorialStep.onEnter 
+        if (variable_struct_exists(tutorialStep, "advanceWhen")) {
+            page.advanceWhen = tutorialStep.advanceWhen
         }
         array_push(pages, page)
     }
-    return modalSpec({
+    return modalDialogSpec(pages, {
         tag: "tutorial",
-        layout: ModalLayout.Top,
-        widthFrac: 0.9,
-        heightFrac: 0.17,
-        padding: 0.14,
+        layout: ModalLayout.Avoiding,
         dim: 0.55,
-        pages: pages,
         onClose: onComplete
     })
 }
 
 // Новая карта
 function modalNewCard(card, title = loc("ui.newCard")) {
-    return modalSpec({
+    return modalPopup(title, [ModalCard(card)], [], {
         tag: "newCard",
-        widthFrac: 0.42,
-        heightFrac: 0.7,
-        padding: 0.05,
-        inputGuard: 2,
-        pages: [{ blocks: [
-            ModalTitle(title, { h: 0.1, size: 0.9, color: merge_color(c_white, c_yellow, 0.4) }),
-            ModalCard(card),
-            ModalTitle(loc("ui.clickContinue"), { h: 0.06, color: merge_color(c_white, c_black, 0.3) })
-        ] }]
+        heightFrac: 0.78,
+        panelAspect: 0.6,
+        inputGuard: 2
     })
 }
 
 // Инфо о враге
 function modalEnemyInfoRows(target) {
-    var targetName = unitDisplayName(target.name)
-    if (variable_instance_exists(target, "isIgnited") && target.isIgnited) { targetName = loc("unit.ignitePrefix") + targetName }
     var rows = [
-        { text: loc("battle.name") + targetName },
         { text: loc("battle.hp") + string(target.hp) + "/" + string(target.maxHp) },
         { text: loc("battle.mp") + string(target.mana) + "/" + string(target.maxMana) }
     ]
@@ -179,43 +217,25 @@ function modalEnemyInfoRows(target) {
 }
 
 function modalEnemyInfo(target, onClose) {
-    return modalSpec({
-        tag: "enemyInfo",
-        widthFrac: 0.6,
-        heightFrac: 0.72,
-        padding: 0.05,
-        dim: 0,
-        canCancel: true,
-        onCancel: onClose,
-        pages: [{ blocks: [
-            ModalRow([
-                ModalSprite(target.sprite_index, { w: 0.2, frame: true }),
-                ModalLines(modalEnemyInfoRows(target))
-            ]),
-            ModalButtons([{ label: loc("ui.close"), onSelect: onClose }], { h: 0.1, buttonW: 48, buttonH: 16 })
-        ] }]
-    })
+    var targetName = unitDisplayName(target.name)
+    if (variable_instance_exists(target, "isIgnited") && target.isIgnited) { targetName = loc("unit.ignitePrefix") + targetName }
+    return modalPopup(
+        targetName,
+        [ModalLines(modalEnemyInfoRows(target))],
+        [{ label: loc("ui.close"), onSelect: onClose, cancel: true }],
+        { tag: "enemyInfo", heightFrac: 0.72, canCancel: true, onCancel: onClose }
+    )
 }
 
 // Выбор карты при победе
 function modalCardChoice(cards, onPick, onEmpty) {
     if (array_length(cards) == 0) {
-        return modalSpec({
-            tag: "cardChoice",
-            layout: ModalLayout.FullScreen,
-            background: undefined,
-            dim: 0.5,
-            onClose: onEmpty,
-            pages: [{ blocks: [
-                ModalTitle(loc("ui.victory"), { h: 0.12 }),
-                ModalTitle(loc("ui.noRewards"), { h: 0.08 })
-            ] }]
-        })
+        return modalPopup(loc("ui.victory"), [ModalText(loc("ui.noRewards"))], [], { tag: "cardChoice", onClose: onEmpty })
     }
     var items = []
     for (var cardIndex = 0; cardIndex < array_length(cards); cardIndex++) {
         var card = cards[cardIndex]
-        var owned = variable_struct_exists(card, "cardRef") 
+        var owned = variable_struct_exists(card, "cardRef")
             && getOwnedCount(card.cardRef.id, card.cardRef.rarity) > 0
         array_push(items, {
             card: card,
@@ -225,16 +245,15 @@ function modalCardChoice(cards, onPick, onEmpty) {
     }
     return modalSpec({
         tag: "cardChoice",
-        layout: ModalLayout.FullScreen,
-        background: undefined,
-        dim: 0.5,
-        padding: 0.04,
-        blockGap: 0.04,
+        layout: ModalLayout.Center,
+        widthFrac: 1,
+        heightFrac: 0.8,
+        padding: 0,
+        blockGap: 0.03,
+        dim: 0.8,
         pages: [{ blocks: [
-            ModalTitle(loc("ui.victory"), { h: 0.07 }),
-            ModalTitle(loc("ui.chooseReward"), { h: 0.04, color: merge_color(c_white, c_yellow, 0.4) }),
-            ModalCardChoice(items, { h: 0.45 }),
-            ModalCardDetails()
+            ModalTitle(loc("ui.victory"), { h: 0.16, size: 1, outline: true }),
+            ModalCardChoice(items)
         ] }]
     })
 }

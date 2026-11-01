@@ -4,6 +4,7 @@ function locDefineRu() {
     translations[$ "ui.victory"] = "ПОБЕДА"
     translations[$ "ui.chooseReward"] = "Выберите одну карту в награду"
     translations[$ "ui.gameover"] = "НЕПОВЕЗЛО"
+    translations[$ "ui.gameoverText"] = "Вы потеряли всё золото"
     translations[$ "ui.noRewards"] = "Нет наград — нажмите Enter"
     translations[$ "ui.retry"] = "ЗАНОВО"
     translations[$ "ui.exit"] = "ВЫЙТИ"

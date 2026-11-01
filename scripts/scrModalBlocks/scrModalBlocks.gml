@@ -33,13 +33,27 @@ function modalBlockInit() {
             draw_set_color(block.color)
             draw_set_halign(block.align)
             draw_set_valign(fa_middle)
-            drawUiText(
-                modalAlignX(rect, block.align),
-                rect.y + rect.h * 0.5,
-                block.text,
-                rect.h * block.size,
-                rect.w
-            )
+            var titleX = modalAlignX(rect, block.align)
+            var titleY = rect.y + rect.h * 0.5
+            if (block.outline) {
+                drawUiTextOutline(titleX, titleY, block.text, rect.h * block.size, c_black, max(2, round(guiScale())), rect.w)
+                return
+            }
+            drawUiText(titleX, titleY, block.text, rect.h * block.size, rect.w)
+        }
+    })
+
+    // панель со своими отступами, внутри столбик блоков
+    variable_struct_set(global.modalBlocks, "box", {
+        draw: function(block, modalWindow, rect) {
+            draw_sprite_stretched(block.sprite, 0, rect.x, rect.y, rect.w, rect.h)
+            var inset = block.inset * guiScale()
+            modalLayoutBlocks(modalWindow, block.children, {
+                x: rect.x + inset,
+                y: rect.y + inset,
+                w: rect.w - inset * 2,
+                h: rect.h - inset * 2
+            }, false)
         }
     })
 
@@ -47,7 +61,7 @@ function modalBlockInit() {
     variable_struct_set(global.modalBlocks, "text", {
         draw: function(block, modalWindow, rect) { 
             if (block.text == "" || rect.h <= 0) { return }
-            var fitted = fitWrappedText(block.text, rect.w, rect.h)
+            var fitted = fitWrappedText(block.text, rect.w, rect.h, block.maxLineH * guiScale())
             if (fitted == undefined) { return }
             block.revealLength = string_length(fitted.text)
             var shown = block.typewriter 
@@ -108,7 +122,8 @@ function modalBlockInit() {
             var count = array_length(block.items)
             var btnW = block.buttonW * scaleToGui
             var btnH = min(rect.h, block.buttonH * scaleToGui)
-            var buttonGap = 16 * scaleToGui
+            var buttonGap = 8 * scaleToGui
+            var outlineSize = max(2, round(scaleToGui * 0.5))
             var startX = rect.x + (rect.w - (btnW * count + buttonGap * (count - 1))) / 2
             var btnY = floor(rect.y + (rect.h - btnH) / 2)
             draw_set_halign(fa_center)
@@ -117,13 +132,13 @@ function modalBlockInit() {
                 var item = block.items[buttonIndex]
                 var buttonX = floor(startX + buttonIndex * (btnW + buttonGap))
                 var isSelected = (modalWindow.cursor == item.index)
+                var isCancel = item[$ "cancel"] ?? (count > 1 && buttonIndex == 0)
+                var buttonSprite = isCancel ? sprDialogButton : sprDialogConfirm
                 modalWindow.addItemRect(item, buttonX, btnY, btnW, btnH)
-                drawButtonFrame(buttonX, btnY, btnW, btnH)
-                draw_set_color(isSelected ? c_yellow : c_white)
-                drawUiText(buttonX + btnW / 2, btnY + btnH / 2, item.label, btnH * 0.55, btnW * 0.9)
-                if (isSelected) {
-                    draw_sprite_ext(sPointer, 0, floor(buttonX - 10 * scaleToGui), floor(btnY + btnH / 2), scaleToGui, scaleToGui, 0, c_white, 1)
-                }
+                if (isSelected) { drawStretchedOutline(buttonSprite, buttonX, btnY, btnW, btnH, c_yellow, outlineSize) }
+                draw_sprite_stretched(buttonSprite, 0, buttonX, btnY, btnW, btnH)
+                draw_set_color(isCancel ? DIALOG_NAVY : c_white)
+                drawUiText(buttonX + btnW / 2, btnY + btnH / 2, item.label, btnH * 0.55, btnW * 0.85)
             }
         }
     })
@@ -150,38 +165,33 @@ function modalBlockInit() {
         draw: function(block, modalWindow, rect) {
             var scaleToGui = guiScale()
             var count = array_length(block.items)
-            var cardH = rect.h
-            var cardW = floor(cardH * 2 / 3)
             var cardGap = 16 * scaleToGui
+            var noteH = 12 * scaleToGui
+            var noteGap = 5 * scaleToGui
+            var cardH = rect.h - noteH - noteGap
+            var cardW = floor(min(cardH * 2 / 3, (rect.w - (count - 1) * cardGap) / count))
+            cardH = floor(cardW * 3 / 2)
             var startX = rect.x + (rect.w - (count * cardW + (count - 1) * cardGap)) / 2
+            var startY = floor(rect.y + (rect.h - cardH - noteH - noteGap) / 2)
             for (var cardIndex = 0; cardIndex < count; cardIndex++) {
                 var item = block.items[cardIndex]
                 var cardX = floor(startX + cardIndex * (cardW + cardGap))
                 var isSelected = (modalWindow.cursor == item.index)
-                var cardY = isSelected ? rect.y - 3 * scaleToGui : rect.y
-                modalWindow.addItemRect(item, cardX, rect.y, cardW, cardH)
-                drawCard(item.card, cardX, cardY, cardW, cardH, false, 1)
+                var cardY = isSelected ? startY - 3 * scaleToGui : startY
+                modalWindow.addItemRect(item, cardX, startY, cardW, cardH)
+                drawCard(item.card, cardX, cardY, cardW, cardH, isSelected, 1)
                 if (item[$ "note"] != undefined) {
+                    var noteW = cardW * 0.8
+                    var noteX = cardX + (cardW - noteW) / 2
+                    var noteY = startY + cardH + noteGap
+                    draw_sprite_stretched(sprDialogButton, 0, noteX, noteY, noteW, noteH)
                     draw_set_halign(fa_center)
                     draw_set_valign(fa_middle)
-                    draw_set_color(merge_color(c_white, c_black, 0.3))
-                    drawUiText(cardX + cardW / 2, rect.y + cardH + 8 * scaleToGui, item.note, 10 * scaleToGui, cardW)
+                    draw_set_color(DIALOG_NAVY)
+                    drawUiText(noteX + noteW / 2, noteY + noteH / 2, item.note, noteH * 0.55, noteW * 0.85)
                     draw_set_color(c_white)
                 }
-                if (isSelected) {
-                    draw_sprite_ext(sPointer, 0, floor(cardX - 10 * scaleToGui), floor(cardY + cardH / 2), scaleToGui, scaleToGui, 0, c_white, 1)
-                }
             }
-        }
-    })
-
-    // описание карты
-    variable_struct_set(global.modalBlocks, "cardDetails", {
-        draw: function(block, modalWindow, rect) {
-            if (array_length(modalWindow.items) == 0) { return }
-            var item = modalWindow.items[modalWindow.cursor]
-            if (item[$ "card"] == undefined) { return }
-            drawRewardDescription(item.card, rect.x, rect.y, rect.w, rect.h)
         }
     })
 
@@ -253,15 +263,20 @@ function ModalTitle(text, params = {}) {
             h: 0.2,
             size: 0.8,
             align: fa_center,
-            color: c_white
+            color: c_white,
+            outline: false
         },
         params)
     )
 }
 
+function ModalBox(children, params = {}) {
+    return modalBlock("box", modalMerge({ children: children, sprite: sprDialogBig, inset: 10 }, params))
+}
+
 function ModalText(text, params = {}) {
-    return modalBlock("text", modalMerge({ 
-        text: text, align: fa_left, valign: fa_top, color: c_white, typewriter: false }, params))
+    return modalBlock("text", modalMerge({
+        text: text, align: fa_left, valign: fa_top, color: c_white, typewriter: false, maxLineH: 11 }, params))
 }
 
 function ModalSprite(sprite, params = {}) {
@@ -273,7 +288,7 @@ function ModalCard(card, params = {}) {
 }
 
 function ModalButtons(items, params = {}) {
-    return modalBlock("buttons", modalMerge({ items: items, buttonW: 72, buttonH: 18 }, params))
+    return modalBlock("buttons", modalMerge({ items: items, buttonW: 40, buttonH: 12 }, params))
 }
 
 function ModalOptions(items, params = {}) {
@@ -282,10 +297,6 @@ function ModalOptions(items, params = {}) {
 
 function ModalCardChoice(items, params = {}) {
     return modalBlock("cardChoice", modalMerge({ items: items }, params))
-}
-
-function ModalCardDetails(params = {}) {
-    return modalBlock("cardDetails", params)
 }
 
 function ModalLines(rows, params = {}) {
