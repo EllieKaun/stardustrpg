@@ -10,8 +10,16 @@ if (instance_exists(follow)) {
 }
 
 
-x += (xTo - x) / CAMERA_FOLLOW_SMOOTHING;
-y += (yTo - y) / CAMERA_FOLLOW_SMOOTHING;
+var followT = 1 - power(1 - 1/CAMERA_FOLLOW_SMOOTHING, delta_time / 1000000 * game_get_speed(gamespeed_fps));
+x += (xTo - x) * followT;
+y += (yTo - y) * followT;
+
+if (xTo == xToPrev && yTo == yToPrev && point_distance(x, y, xTo, yTo) < 2) {
+	x = xTo;
+	y = yTo;
+}
+xToPrev = xTo;
+yToPrev = yTo;
 
 
 x = clamp(x, viewWHalf, room_width-viewWHalf);

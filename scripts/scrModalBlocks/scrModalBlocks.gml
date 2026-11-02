@@ -168,7 +168,7 @@ function modalBlockInit() {
             var cardGap = 16 * scaleToGui
             var noteH = 12 * scaleToGui
             var noteGap = 5 * scaleToGui
-            var cardH = rect.h - noteH - noteGap
+            var cardH = (rect.h - noteH - noteGap) * 0.5
             var cardW = floor(min(cardH * 2 / 3, (rect.w - (count - 1) * cardGap) / count))
             cardH = floor(cardW * 3 / 2)
             var startX = rect.x + (rect.w - (count * cardW + (count - 1) * cardGap)) / 2

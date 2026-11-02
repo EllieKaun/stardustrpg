@@ -622,7 +622,7 @@ function Panel(config) constructor {
             draw_set_color(sideTab[$ "textColor"] ?? c_white)
             draw_set_halign(fa_center)
             draw_set_valign(fa_middle)
-            var sideLabelScale = uiTextScale(sideTab.name, sideRect.th * 0.6, sideRect.tw - tabPadding * 2)
+            var sideLabelScale = uiTextScale(sideTab.name, sideRect.th * 0.8, sideRect.tw - tabPadding * 2)
             draw_text_transformed(sideRect.tx + sideRect.tw / 2, sideRect.ty + sideRect.th / 2,
                 sideTab.name, sideLabelScale, sideLabelScale, 0)
             draw_set_halign(fa_left)

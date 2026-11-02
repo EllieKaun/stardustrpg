@@ -139,3 +139,5 @@ for (var i = 0; i < array_length(activeCardAnims); i++) {
 }
 
 autosaveDrawIcon()
+
+drawFpsDebug()

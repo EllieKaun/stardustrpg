@@ -18,7 +18,24 @@ function setCrispGui(baseW, baseH) {
 // GUI приводится к нужному размеру
 function guiSyncCrisp() {
     var camera = view_camera[0]
-    setCrispGui(camera_get_view_width(camera), camera_get_view_height(camera))
+    global.guiBaseW = camera_get_view_width(camera)
+    global.guiBaseH = camera_get_view_height(camera)
+    setCrispGui(global.guiBaseW, global.guiBaseH)
+}
+
+function drawFpsDebug() {
+    var pad = max(2, display_get_gui_height() * 0.01)
+    var textH = max(10, display_get_gui_height() * 0.03)
+    var label = "FPS " + string(fps) + "  real " + string(round(fps_real))
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+    draw_set_color(c_black)
+    drawUiText(pad + 2, pad + 2, label, textH)
+    draw_set_color(fps_real >= game_get_speed(gamespeed_fps) - 2 ? c_lime : c_red)
+    drawUiText(pad, pad, label, textH)
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+    draw_set_color(c_white)
 }
 
 // Видны ли HUD-элементы мира (монеты, прогресс квеста)

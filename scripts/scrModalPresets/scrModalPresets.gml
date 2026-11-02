@@ -3,7 +3,7 @@
 #macro DIALOG_PORTRAIT_INSET 15
 #macro DIALOG_PORTRAIT_OVERHANG 33
 
-// Единый формат окна: заголовок с обводкой, панель со звёздами, кнопки под панелью
+// общее содержимое диалогового окно с зголвком, звездами по углам, кнопками и тд
 function modalPopupBlocks(title, bodyBlocks, buttons, heightFrac) {
     var edgeH = 0.08 / heightFrac
     var blocks = []
@@ -13,6 +13,7 @@ function modalPopupBlocks(title, bodyBlocks, buttons, heightFrac) {
     return blocks
 }
 
+// настройки диалогового окна
 function modalPopupOptions(heightFrac) {
     return {
         layout: ModalLayout.Center,
@@ -26,6 +27,7 @@ function modalPopupOptions(heightFrac) {
     }
 }
 
+// диалоговое окно
 function modalPopup(title, bodyBlocks, buttons, overrides = {}) {
     var heightFrac = overrides[$ "heightFrac"] ?? 0.5
     return modalSpec(
@@ -39,13 +41,13 @@ function modalPopup(title, bodyBlocks, buttons, overrides = {}) {
     )
 }
 
-// Модалка подтверждения действия: первая кнопка - отмена, вторая - подтверждение
+// диалоговое окно с кнопками подтвердения и отмены
 function modalConfirm(title, text, buttons, overrides = {}) {
     var bodyBlocks = (text != "") ? [ModalText(text)] : []
     return modalPopup(title, bodyBlocks, buttons, modalMerge({ tag: "confirm" }, overrides))
 }
 
-// Диалоги персонажей и открытие сундуков
+// попап с диалогами персонажей или открытие сундука
 function modalDialogPage(line) {
     var hasPortrait = (line.portrait != undefined && sprite_exists(line.portrait))
     var options = line[$ "options"]
@@ -70,6 +72,7 @@ function modalDialogPage(line) {
     return page
 }
 
+// расчет размера контента диалога
 function modalDialogContentArea(modalWindow, panel) {
     var scaleToGui = guiScale()
     var portraitSpace = (DIALOG_PORTRAIT_INSET + DIALOG_PORTRAIT_SIZE + 5) * scaleToGui
@@ -85,10 +88,12 @@ function modalDialogContentArea(modalWindow, panel) {
     }
 }
 
+// бэк диалогового окна
 function modalDialogBackground(modalWindow) {
     return (modalWindow.panel.w >= display_get_gui_width() * 0.99) ? sprBoxDialogBig : sprBoxBig
 }
 
+// рисование портрета для диалогов в попапе
 function modalDrawDialogPortrait(modalWindow, panel) {
     var line = modalWindow.page()
     var portrait = line[$ "portrait"]
@@ -112,6 +117,7 @@ function modalDrawDialogPortrait(modalWindow, panel) {
     draw_set_valign(fa_top)
 }
 
+// иконка переключения на следующую страницу
 function modalDrawNextPointer(modalWindow, panel) {
     if (!modalWindow.fullyRevealed() || array_length(modalWindow.items) > 0) { return }
     if (modalWindow.option("advanceWhen") != undefined) { return }
@@ -127,11 +133,13 @@ function modalDrawNextPointer(modalWindow, panel) {
     draw_sprite_ext(sPointer, 0, right, pointerY, pointerScale, pointerScale, 0, c_white, 1)
 }
 
+// полное рисование разговора в диалоге
 function modalDrawDialogOverlay(modalWindow, panel) {
     modalDrawDialogPortrait(modalWindow, panel)
     modalDrawNextPointer(modalWindow, panel)
 }
 
+// полная настройка диалога
 function modalDialogSpec(pages, overrides) {
     return modalSpec(modalMerge({
         tag: "dialog",
@@ -147,6 +155,7 @@ function modalDialogSpec(pages, overrides) {
     }, overrides))
 }
 
+// конструтор диалога
 function modalDialog(lines, onComplete = undefined) {
     var pages = []
     for (var lineIndex = 0; lineIndex < array_length(lines); lineIndex++) {
@@ -155,7 +164,7 @@ function modalDialog(lines, onComplete = undefined) {
     return modalDialogSpec(pages, { onClose: onComplete })
 }
 
-// Обучение: тот же формат диалога, но панель уходит от подсвеченной области
+// обучение с подсвеченной областью
 function modalTutorial(steps, onComplete = undefined) {
     var pages = []
     for (var stepIndex = 0; stepIndex < array_length(steps); stepIndex++) {
@@ -165,7 +174,7 @@ function modalTutorial(steps, onComplete = undefined) {
         )
         if (variable_struct_exists(tutorialStep, "getRect")) {
              page.spotlight = tutorialStep.getRect
-             }
+        }
         if (variable_struct_exists(tutorialStep, "advanceWhen")) {
             page.advanceWhen = tutorialStep.advanceWhen
         }
@@ -179,7 +188,7 @@ function modalTutorial(steps, onComplete = undefined) {
     })
 }
 
-// Новая карта
+// новая карта
 function modalNewCard(card, title = loc("ui.newCard")) {
     return modalPopup(title, [ModalCard(card)], [], {
         tag: "newCard",
@@ -189,7 +198,7 @@ function modalNewCard(card, title = loc("ui.newCard")) {
     })
 }
 
-// Инфо о враге
+// инфо о враге
 function modalEnemyInfoRows(target) {
     var rows = [
         { text: loc("battle.hp") + string(target.hp) + "/" + string(target.maxHp) },
@@ -227,7 +236,7 @@ function modalEnemyInfo(target, onClose) {
     )
 }
 
-// Выбор карты при победе
+// выбор карты при победе
 function modalCardChoice(cards, onPick, onEmpty) {
     if (array_length(cards) == 0) {
         return modalPopup(loc("ui.victory"), [ModalText(loc("ui.noRewards"))], [], { tag: "cardChoice", onClose: onEmpty })
@@ -253,6 +262,7 @@ function modalCardChoice(cards, onPick, onEmpty) {
         dim: 0.8,
         pages: [{ blocks: [
             ModalTitle(loc("ui.victory"), { h: 0.16, size: 1, outline: true }),
+            ModalTitle(loc("ui.chooseReward"), { h: 0.06, color: merge_color(c_white, c_yellow, 0.4) }),
             ModalCardChoice(items)
         ] }]
     })
