@@ -155,6 +155,40 @@ function checkIfWeakStateActive(target) {
     return false
 }
 
+function weakSpotImpactPortrait(caster) {
+    if (caster == noone || !instance_exists(caster)) { return noone }
+    if (!variable_instance_exists(caster, "weakSpotImpactSprite")) { return noone }
+    var sprite = caster.weakSpotImpactSprite
+    if (sprite == noone || !sprite_exists(sprite)) { return noone }
+    return sprite
+}
+
+function isWeakSpotHit(target, effect) {
+    return checkIfHasWeaknesses(target, effect) || checkIfWeakStateActive(target)
+}
+
+function cardWeakSpotTarget(card, targets) {
+    var list = is_array(targets) ? targets : [targets]
+    var effects = card.effects
+    for (var e = 0; e < array_length(effects); e++) {
+        var effect = effects[e]
+        if (!variable_struct_exists(effect, "type") 
+            || !variable_struct_exists(effect, "timing")) { 
+                continue 
+        }
+        if (effect.type != EffectTypes.Damage 
+            || effect.timing != Timing.Instant) { 
+                continue 
+        }
+        for (var t = 0; t < array_length(list); t++) {
+            var target = list[t]
+            if (!instance_exists(target) || target.isKO()) { continue }
+            if (isWeakSpotHit(target, effect)) { return target }
+        }
+    }
+    return noone
+}
+
 function executeDamageEffect(
     effect,
     caster,
@@ -218,7 +252,7 @@ function executeDamageEffect(
         return
     }
     show_debug_message("damage " + string(damage) )
-    targets.applyDamage(damage)
+    targets.applyDamage(damage, isWeakSpotHit(targets, effect))
     targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
     // Колба цветок + гриб
     if (variable_struct_exists(effect, "lifesteal")) {

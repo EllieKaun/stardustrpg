@@ -161,6 +161,22 @@ function stepWait(frames) {
     }
 }
 
+// Плавно ведёт значение от 0 к 1 за N кадров, отдавая прогресс в onProgress(k).
+function stepTween(frames, onProgress) {
+    return {
+        frames: frames,
+        t: 0,
+        onProgress: onProgress,
+        start: function(ctx) { self.t = 0; self.onProgress(self.frames <= 0 ? 1 : 0) },
+        update: function(ctx) {
+            self.t += 1
+            var k = (self.frames <= 0) ? 1 : clamp(self.t / self.frames, 0, 1)
+            self.onProgress(k)
+            return self.t >= self.frames
+        }
+    }
+}
+
 // Сколько кадров играет спрайт один раз (при image_speed = 1)
 function spritePlayFrames(spr) {
     if (spr == noone || !sprite_exists(spr)) { return 0 }

@@ -36,6 +36,66 @@ animatingCard = noone // карта, которая сейчас летит
 // Очередь анимаций и действий, следующих за ними
 actionsQueue = []
 
+// Реакция на попадание в слабое место
+
+// спрайт проигрывания при попадании
+weakSpotImpactSprite = noone
+// альфа спрайта
+weakSpotImpactAlpha = 0
+// фрейм спрайта
+weakSpotImpactFrame = 0
+// блокировка на анимацию
+weakSpotImpactBlocking = false
+
+startWeakSpotImpact = function(sprite) {
+    if (sprite == noone || !sprite_exists(sprite)) { return }
+    weakSpotImpactSprite = sprite
+    weakSpotImpactAlpha = 0
+    weakSpotImpactFrame = 0
+    weakSpotImpactBlocking = true
+
+    var frameCount = sprite_get_number(sprite)
+    var playFrames = (frameCount > 1) ? spritePlayFrames(sprite) : WEAK_SPOT_IMPACT_HOLD
+
+    var runner = new SequenceRunner()
+    runner.play([
+        stepTween(WEAK_SPOT_IMPACT_FADE_IN, function(k) { with (Battle) { weakSpotImpactAlpha = k } }),
+        stepTween(playFrames, function(k) {
+            with (Battle) {
+                weakSpotImpactAlpha = 1
+                weakSpotImpactFrame = k * (sprite_get_number(weakSpotImpactSprite) - 1)
+            }
+        }),
+        stepDo(function() { with (Battle) { weakSpotImpactBlocking = false } }),
+        stepTween(WEAK_SPOT_IMPACT_FADE_OUT, function(k) { with (Battle) { weakSpotImpactAlpha = 1 - k } }),
+        stepDo(
+            function() { 
+                with (Battle) { 
+                    weakSpotImpactSprite = noone 
+                    weakSpotImpactAlpha = 0 
+                    weakSpotImpactFrame = 0 
+                } 
+            }
+        )
+    ])
+    array_push(actionsQueue, runner)
+}
+
+drawWeakSpotImpact = function(screenW, screenH) {
+    if (weakSpotImpactSprite == noone || weakSpotImpactAlpha <= 0 || !sprite_exists(weakSpotImpactSprite)) { return }
+
+    var alpha = clamp(weakSpotImpactAlpha, 0, 1)
+
+    drawScreenDim(alpha * WEAK_SPOT_IMPACT_DIM)
+
+    var spW = sprite_get_width(weakSpotImpactSprite)
+    var spH = sprite_get_height(weakSpotImpactSprite)
+    var coverScale = max(screenW / spW, screenH / spH)
+    var drawX = screenW / 2 - spW * coverScale / 2 + sprite_get_xoffset(weakSpotImpactSprite) * coverScale
+    var drawY = screenH / 2 - spH * coverScale / 2 + sprite_get_yoffset(weakSpotImpactSprite) * coverScale
+    draw_sprite_ext(weakSpotImpactSprite, floor(weakSpotImpactFrame), drawX, drawY, coverScale, coverScale, 0, c_white, alpha)
+}
+
 maxEnemiesCount = 6
 spacingBetweenStarriors = 16
 

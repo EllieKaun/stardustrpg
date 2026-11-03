@@ -9,5 +9,5 @@ if (maxWidth > 0) {
     var textWidth = string_width(textString)
     if (textWidth > maxWidth) { textScale = maxWidth / textWidth }
 }
-draw_text_transformed(x, y, textString, textScale, textScale, 0)
+draw_text_transformed(x, y, textString, textScale * scale, textScale * scale, 0)
 draw_set_alpha(1)

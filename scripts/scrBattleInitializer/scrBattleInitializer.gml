@@ -179,7 +179,7 @@ function initBattleStates() {
     stateDef[StateHook.Reentrant] = true
     stateDef[StateHook.OnEnter] = method(self, function() {
         alarm_set(STUN_TURN, game_get_speed(gamespeed_fps) * STUN_TURN_SECONDS)
-        with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow, bbox_right - bbox_left)
+        with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow, 0, STUN_LABEL_TEXT_SCALE)
     })
     battleStates[BattleStates.StunnedTurn] = stateDef
 

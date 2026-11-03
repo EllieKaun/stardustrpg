@@ -135,11 +135,11 @@ function hasWeakness(weaknessType) {
     return false
 }
 
-function applyDamage(value) {
+function applyDamage(value, big = false) {
     var absorbed = min(bonusHp, value) // урон по оверхелзу
     bonusHp -= absorbed
     value -= absorbed
-    
+
     hp -= value
     if hp <= 0 && actionState != StarriorStates.KnockOut {
         changeActionState(StarriorStates.KnockOut, undefined)
@@ -152,7 +152,7 @@ function applyDamage(value) {
     }
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
-    drawDamageNumber(spawnX, spawnY, value, c_red)
+    drawDamageNumber(spawnX, spawnY, value, c_red, 0, big ? WEAK_SPOT_DAMAGE_TEXT_SCALE : 1)
 }
 
 function applyHeal(value) {

@@ -226,11 +226,12 @@ function drawHealthBarMana(barX, barY, width, height, hp, maxHp, mana, maxMana, 
 }
 
 
-function drawDamageNumber(numberX, numberY, value, color, maxWidth = 0) {
+function drawDamageNumber(numberX, numberY, value, color, maxWidth = 0, scale = 1) {
     var instance = instance_create_depth(numberX, numberY, depth - 1, oDamageNumber)
     instance.value = value
     instance.color = color
     instance.maxWidth = maxWidth
+    instance.scale = scale
 }
 
 // Иконка статуса теперь берётся из реестра эффектов (scrEffectSystem).

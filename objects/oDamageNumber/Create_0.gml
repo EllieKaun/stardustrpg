@@ -4,3 +4,4 @@ life = 60
 vspd = -1
 image_alpha = 1
 maxWidth = 0
+scale = 1
