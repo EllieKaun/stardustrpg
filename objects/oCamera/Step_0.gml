@@ -10,11 +10,10 @@ if (instance_exists(follow)) {
 }
 
 
-var followT = 1 - power(1 - 1/CAMERA_FOLLOW_SMOOTHING, delta_time / 1000000 * game_get_speed(gamespeed_fps));
-x += (xTo - x) * followT;
-y += (yTo - y) * followT;
+x += (xTo - x) / CAMERA_FOLLOW_SMOOTHING;
+y += (yTo - y) / CAMERA_FOLLOW_SMOOTHING;
 
-if (xTo == xToPrev && yTo == yToPrev && point_distance(x, y, xTo, yTo) < 2) {
+if (xTo == xToPrev && yTo == yToPrev && point_distance(x, y, xTo, yTo) < 0.2) {
 	x = xTo;
 	y = yTo;
 }

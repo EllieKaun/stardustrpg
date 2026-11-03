@@ -317,26 +317,32 @@ function applyWindowMode(winW, winH, fullscreen) {
     window_set_position((displayWidth - winW) div 2, max(0, (displayHeight - winH) div 2))
 }
 
+function appSurfaceSyncToWindow() {
+    var drawRect = application_get_position()
+    var targetW = drawRect[2] - drawRect[0]
+    var targetH = drawRect[3] - drawRect[1]
+    if (targetW <= 0 || targetH <= 0) { return }
+    if (surface_get_width(application_surface) != targetW || surface_get_height(application_surface) != targetH) {
+        surface_resize(application_surface, targetW, targetH)
+    }
+}
+
+#macro VSYNC_RESTORE_DELAY_MS 300
+
+// После скриншота или alt-tab вывод застревает в режиме с задержкой, выключение и включение vsync его сбрасывает
 function displayRecoverOnFocus() {
     if (!variable_global_exists("windowHadFocus")) {
         global.windowHadFocus = window_has_focus()
-        global.windowRefullscreenPending = false
-        global.windowRecoverBlockedUntil = 0
+        global.vsyncRestoreAt = -1
     }
-    if (global.windowRefullscreenPending) {
-        global.windowRefullscreenPending = false
-        window_enable_borderless_fullscreen(true)
-        window_set_fullscreen(true)
+    if (global.vsyncRestoreAt >= 0 && current_time >= global.vsyncRestoreAt) {
+        global.vsyncRestoreAt = -1
+        display_reset(0, true)
     }
     var hasFocus = window_has_focus()
-    if (hasFocus && !global.windowHadFocus && current_time >= global.windowRecoverBlockedUntil) {
-        global.windowRecoverBlockedUntil = current_time + 1000
-        if (window_get_fullscreen()) {
-            window_set_fullscreen(false)
-            global.windowRefullscreenPending = true
-        } else {
-            display_reset(0, true)
-        }
+    if (hasFocus && !global.windowHadFocus) {
+        display_reset(0, false)
+        global.vsyncRestoreAt = current_time + VSYNC_RESTORE_DELAY_MS
     }
     global.windowHadFocus = hasFocus
 }
