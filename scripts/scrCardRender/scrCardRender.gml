@@ -96,22 +96,22 @@ function cardFaceLayout(card, faceW, faceH) {
 
 // Рисуем полностью карту (спрайты + описание + стоимость)
 // центр centerX,centerY, целевой размер cardWidth,cardHeight, поворот angle
-function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scale = 1, alpha = 1, isSelected = false) {
+function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scale = 1, alpha = 1, isSelected = false, tint = c_white) {
     var baseW = sprite_get_width(card.cardBaseSpr)
     var baseH = sprite_get_height(card.cardBaseSpr)
     var spriteScaleX = (cardWidth / baseW) * scale
     var spriteScaleY = (cardHeight / baseH) * scale
-    draw_sprite_ext(card.cardBaseSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
-    draw_sprite_ext(cardSetBackground(card), 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
-    draw_sprite_ext(card.cardIllustrationSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
-    draw_sprite_ext(card.cardBorderSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
-    draw_sprite_ext(card.cardTokenSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, c_white, alpha)
+    draw_sprite_ext(card.cardBaseSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, tint, alpha)
+    draw_sprite_ext(cardSetBackground(card), 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, tint, alpha)
+    draw_sprite_ext(card.cardIllustrationSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, tint, alpha)
+    draw_sprite_ext(card.cardBorderSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, tint, alpha)
+    draw_sprite_ext(card.cardTokenSpr, 0, centerX, centerY, spriteScaleX, spriteScaleY, angle, tint, alpha)
     // Токен стоимости энергии
     if (card.energy > 0) {
         var costToken = (card.energy >= 2) ? sprCostTwoEnergy : sprCostEnergy
         var tokenRaise = CARD_COST_TOKEN_RAISE_PX * spriteScaleY
         var tokenPoint = cardLocalToScreen(centerX, centerY, 0, -tokenRaise, angle)
-        draw_sprite_ext(costToken, 0, tokenPoint.x, tokenPoint.y, spriteScaleX, spriteScaleY, angle, c_white, alpha)
+        draw_sprite_ext(costToken, 0, tokenPoint.x, tokenPoint.y, spriteScaleX, spriteScaleY, angle, tint, alpha)
     }
     
     // Настройка текста
@@ -138,7 +138,7 @@ function drawCardFace(card, centerX, centerY, cardWidth, cardHeight, angle, scal
     // стоимость
     draw_set_font(layout.costFont)
     drawCardStatText(centerX, centerY, cardWidth * scale * 0.28, -cardHeight * scale * 0.36, angle,
-        layout.costTxt, c_white, layout.costScale * scale)
+        layout.costTxt, tint, layout.costScale * scale)
     gpu_set_texfilter(prevTexFilter)
 
     draw_set_halign(fa_left)

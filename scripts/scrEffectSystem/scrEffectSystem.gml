@@ -445,17 +445,22 @@ function HandScalingDamageEffect(damageType, baseValue, handScaling,
     return effect
 }
 
+// Дебаффы и негативные статусы держатся не меньше NEGATIVE_EFFECT_MIN_DURATION ходов
+function negativeDuration(duration) {
+    return max(duration, NEGATIVE_EFFECT_MIN_DURATION)
+}
+
 // Урон со временем времени со статусом (Burn, Bleeding)
 function DamageOverTimeEffect(damageType, value, duration, statusName, chance, sprite = noone, sound = noone) {
     var effect = { type: EffectTypes.Damage, damageType: damageType, value: value,
-              duration: duration, statusName: statusName, chance: chance,
+              duration: negativeDuration(duration), statusName: statusName, chance: chance,
               timing: Timing.EndOfTurn, sound: sound }
     if (sprite != noone) { effect.sprite = sprite }
     return effect
 }
 // Статус-эффект вторым эффектом карты (Stun/Weakening)
 function StatusEffect(effectType, statusName, duration, chance, timing) {
-    return { type: effectType, statusName: statusName, duration: duration,
+    return { type: effectType, statusName: statusName, duration: negativeDuration(duration),
              chance: chance, timing: timing }
 }
 
@@ -486,7 +491,7 @@ function BombEffect(damageType, value, chance, sprite = bombEffect, sound = noon
 function FreezeEffect(duration, chance) {
     return { type: EffectTypes.Debuff, buffType: ModifiersToBuff.PhysicalProtection,
              value: getBuffValueOnRarity(CardsRarity.Default), statusName: StatusNames.Freeze,
-             duration: duration, chance: chance, timing: Timing.Overtime }
+             duration: negativeDuration(duration), chance: chance, timing: Timing.Overtime }
 }
 // Вампиризм
 function VampirismEffect(damageType, value, chance, sprite = attackEffect, sound = SliceAtc) {
@@ -529,11 +534,11 @@ function BuffEffect(modifier, value, duration, sprite = buffEffect, sound = Magi
 }
 function DebuffEffect(modifier, value, duration, sprite = debuffEffect, sound = DebuffMagic) {
     return { type: EffectTypes.Debuff, buffType: modifier, value: value,
-             duration: duration, timing: Timing.Overtime, sprite: sprite, sound: sound }
+             duration: negativeDuration(duration), timing: Timing.Overtime, sprite: sprite, sound: sound }
 }
 function TemporaryWeaknessEffect(weakness, duration) {
     return { type: EffectTypes.CreateTemporaryWeakness, weakness: weakness,
-             duration: duration, timing: Timing.Overtime, sprite: debuffEffect }
+             duration: negativeDuration(duration), timing: Timing.Overtime, sprite: debuffEffect }
 }
 
 // Прочее

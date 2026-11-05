@@ -19,6 +19,7 @@
 // Награды
 #macro REWARD_DUPLICATE_FALLOFF 0.5 // падение шанса выпадения дубликата карты как награды
 #macro REWARD_DEFAULT_RARITY_ONLY true
+#macro SHOW_FPS_DEBUG false // счётчик FPS и лагов в углу экрана (F8 - vsync, F9 - sleep margin)
 
 // Сложность врагов
 #macro ENEMY_WIN_BONUS 2 // рост силы врагов
@@ -27,7 +28,7 @@
 
 // Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
 #macro WEAKNESS_DAMAGE_MODIFIER 0.1
-#macro WEAKNESS_STATUS_CHANCE_BONUS 0.1
+#macro NEGATIVE_EFFECT_MIN_DURATION 2 // дебаффы и негативные статусы держатся минимум столько ходов
 
 #macro WEAK_SPOT_IMPACT_FADE_IN 7
 #macro WEAK_SPOT_IMPACT_HOLD 22

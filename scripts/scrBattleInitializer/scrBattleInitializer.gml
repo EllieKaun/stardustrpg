@@ -205,7 +205,7 @@ function initBattleStates() {
         modalOpen(modalConfirm(loc("ui.gameover"), loc("ui.gameoverText"), [
             { label: loc("ui.exit"), onSelect: exitToWorld },
             { label: loc("ui.retry"), onSelect: retry }
-        ], { tag: "gameOver", initialCursor: 1 }))
+        ], { tag: "gameOver", initialCursor: 1, textMaxLineH: MODAL_RESULT_TEXT_LINE_H }))
     })
     battleStates[BattleStates.GameOver] = stateDef
 

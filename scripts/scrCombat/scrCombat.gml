@@ -47,7 +47,7 @@ function refreshOrPushEffect(target, effect) {
 function effectChanceFor(target, effect) {
     if (!variable_instance_exists(effect, "chance")) { return 1 } 
     var chance = effect.chance
-    if (checkIfHasWeaknesses(target, effect)) { chance += WEAKNESS_STATUS_CHANCE_BONUS }
+    if (checkIfHasWeaknesses(target, effect)) { chance *= 1 + weaknessProfile(effect[$ "statusName"]).chance }
     return clamp(chance, 0, 1)
 }
 
@@ -61,7 +61,7 @@ function effectChanceForCaster(caster, target, effect) {
     if (!variable_instance_exists(effect, "chance")) { return 1 }
     var base = casterIsIgnited(caster) ? caster.igniteEffectChance : effect.chance
     if (checkIfHasWeaknesses(target, effect)) { 
-        base += WEAKNESS_STATUS_CHANCE_BONUS 
+        base *= 1 + weaknessProfile(effect[$ "statusName"]).chance
     }
     if (caster.activeIngredient == Ingredient.Leaf) { 
         base += INGREDIENT_STATUS_CHANCE_BONUS 
@@ -142,6 +142,32 @@ function checkIfHasWeaknesses(target, effect) {
 }
 
 // Находится ли цель в состоянии, к которому она слаба
+// Насколько слабость к статусу усиливает: шанс наложения (доля от базового) и получаемый урон в этом состоянии
+function weaknessProfile(statusName) {
+    switch (statusName) {
+        case StatusNames.Stun: return { chance: 1, stateDamage: 0.1 }
+        case StatusNames.Bomb: return { chance: 1, stateDamage: 0 }
+        case StatusNames.Freeze: return { chance: 0.5, stateDamage: 0.5 }
+        case StatusNames.Burn: return { chance: 0.5, stateDamage: 0.5 }
+    }
+    return { chance: 1, stateDamage: WEAKNESS_DAMAGE_MODIFIER }
+}
+
+// Бонус к получаемому урону, пока цель в состоянии, к которому слаба
+function weakStateDamageBonus(target) {
+    if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) { return 0 }
+    var bonus = 0
+    var effects = target.effects
+    for (var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
+        var effect = effects[effectIndex]
+        if (variable_instance_exists(effect, "statusName")
+            && array_contains(target.weaknesses, effect.statusName)) {
+            bonus = max(bonus, weaknessProfile(effect.statusName).stateDamage)
+        }
+    }
+    return bonus
+}
+
 function checkIfWeakStateActive(target) {
     if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) { return false }
     var effects = target.effects
@@ -369,7 +395,7 @@ function mitigateDamage(target, effect, rawDamage) {
     // и доп. урон, пока цель В СОСТОЯНИИ, к которому слаба (+).
     if (checkIfHasStrengths(target, effect)) { modifier -= WEAKNESS_DAMAGE_MODIFIER }
     if (checkIfHasWeaknesses(target, effect)) { modifier += WEAKNESS_DAMAGE_MODIFIER }
-    if (checkIfWeakStateActive(target)) { modifier += WEAKNESS_DAMAGE_MODIFIER }
+    modifier += weakStateDamageBonus(target)
 
     damage += damage * modifier
     return max(round(damage), 1)

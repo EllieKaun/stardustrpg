@@ -1,3 +1,4 @@
+#macro MODAL_RESULT_TEXT_LINE_H 16
 #macro DIALOG_NAVY #3F3F74
 #macro DIALOG_PORTRAIT_SIZE 66
 #macro DIALOG_PORTRAIT_INSET 15
@@ -43,7 +44,7 @@ function modalPopup(title, bodyBlocks, buttons, overrides = {}) {
 
 // диалоговое окно с кнопками подтвердения и отмены
 function modalConfirm(title, text, buttons, overrides = {}) {
-    var bodyBlocks = (text != "") ? [ModalText(text)] : []
+    var bodyBlocks = (text != "") ? [ModalText(text, { maxLineH: overrides[$ "textMaxLineH"] ?? 11 })] : []
     return modalPopup(title, bodyBlocks, buttons, modalMerge({ tag: "confirm" }, overrides))
 }
 
@@ -193,7 +194,7 @@ function modalNewCard(card, title = loc("ui.newCard")) {
     return modalPopup(title, [ModalCard(card)], [], {
         tag: "newCard",
         heightFrac: 0.78,
-        panelAspect: 0.6,
+        panelAspect: 0.85,
         inputGuard: 2
     })
 }
@@ -239,7 +240,7 @@ function modalEnemyInfo(target, onClose) {
 // выбор карты при победе
 function modalCardChoice(cards, onPick, onEmpty) {
     if (array_length(cards) == 0) {
-        return modalPopup(loc("ui.victory"), [ModalText(loc("ui.noRewards"))], [], { tag: "cardChoice", onClose: onEmpty })
+        return modalPopup(loc("ui.victory"), [ModalText(loc("ui.noRewards"), { maxLineH: MODAL_RESULT_TEXT_LINE_H })], [], { tag: "cardChoice", onClose: onEmpty })
     }
     var items = []
     for (var cardIndex = 0; cardIndex < array_length(cards); cardIndex++) {
@@ -256,14 +257,14 @@ function modalCardChoice(cards, onPick, onEmpty) {
         tag: "cardChoice",
         layout: ModalLayout.Center,
         widthFrac: 1,
-        heightFrac: 0.8,
+        heightFrac: 0.96,
         padding: 0,
-        blockGap: 0.03,
+        blockGap: 0.02,
         dim: 0.8,
         pages: [{ blocks: [
-            ModalTitle(loc("ui.victory"), { h: 0.16, size: 1, outline: true }),
-            ModalTitle(loc("ui.chooseReward"), { h: 0.06, color: merge_color(c_white, c_yellow, 0.4) }),
-            ModalCardChoice(items)
+            ModalTitle(loc("ui.victory"), { h: 0.13, size: 1, outline: true }),
+            ModalTitle(loc("ui.chooseReward"), { h: 0.05, color: c_white, outline: false }),
+            ModalCardChoice(items, { h: 0.75 })
         ] }]
     })
 }

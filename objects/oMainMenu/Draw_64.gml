@@ -11,8 +11,8 @@ draw_set_color(c_white)
 drawUiTextOutline(guiWidth * 0.75, guiHeight * 0.22, loc("screen.mainMenu"), guiHeight * 0.09, c_black)
 
 if (confirmPrompt != "") {
-    draw_set_color(merge_color(c_white, c_yellow, 0.35))
-    drawUiTextOutline(guiWidth * 0.75, guiHeight * 0.36, confirmPrompt, guiHeight * 0.05, c_black)
+    draw_set_color(make_color_rgb(235, 70, 60))
+    drawUiTextOutline(guiWidth * 0.75, guiHeight * 0.36, confirmPrompt, guiHeight * 0.07, c_black, 2, guiWidth * 0.46)
     draw_set_color(c_white)
 }
 

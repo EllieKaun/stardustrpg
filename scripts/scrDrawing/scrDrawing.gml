@@ -49,6 +49,7 @@ function fpsDebugFrameStart() {
 }
 
 function drawFpsDebug() {
+    if (!SHOW_FPS_DEBUG) { return }
     fpsDebugEnsure()
     var debugData = global.fpsDebug
     var modeChanged = false

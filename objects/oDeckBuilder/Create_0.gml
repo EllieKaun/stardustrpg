@@ -104,6 +104,7 @@ refreshCollectionCounter = function() {
 applyChanges = function () {
     // Если добавился, обновляем коллекцию сотов текущего персонажа
     deckPanel.slots = buildDeckSlots(editingCharacter)
+    deckPanel.refreshScroll()
     refreshCollection() // Обновляем визуал
     playerDataSave() // Сохраняем все
 }
@@ -188,7 +189,7 @@ deckPanel = new Panel({
     // btnOffsetX — сдвиг кнопки вправо 
     // textInset — сдвиг текста вправо
     tabs: [deckTabFor(Characters.Lana), deckTabFor(Characters.Viv)],
-    scrollable: false, 
+    cols: 3,
     slots: buildDeckSlots(Characters.Lana),
     onTabClick: function(panel, tabIndex) {
         with (oDeckBuilder) {
@@ -257,6 +258,8 @@ refreshCollection = function() {
 }
 
 // Верстает обе панели
+#macro DECK_PANEL_WIDTH_SHARE 0.45
+
 layoutPanels = function() {
     var scaleUI = display_get_gui_width() / dbBaseW
     var margin  = 8  * scaleUI // внешний отступ
@@ -265,15 +268,18 @@ layoutPanels = function() {
     var panelWidth = (dbBaseW * scaleUI - margin * 2) / 2
     var topY = margin + tabHeight
     var panelHeight  = dbBaseH * scaleUI - topY - margin
+    var panelPadding = 8 * scaleUI
+    var deckWidth = panelWidth * 2 * DECK_PANEL_WIDTH_SHARE
+    var collectionWidth = panelWidth * 2 - deckWidth
 
     var panels = [collectionPanel, deckPanel]
     for (var i = 0; i < 2; i++) {
         var panel = panels[i]
-        panel.x = margin + i * panelWidth
+        panel.x = (i == 0) ? margin : margin + collectionWidth
         panel.y = topY
-        panel.w = panelWidth
+        panel.w = (i == 0) ? collectionWidth : deckWidth
         panel.h = panelHeight
-        panel.padding = 8 * scaleUI
+        panel.padding = panelPadding
         panel.tabH = tabHeight
         panel.tabGap = 2 * scaleUI
         panel.tabPadding = 4 * scaleUI
@@ -285,7 +291,10 @@ layoutPanels = function() {
     collectionPanel.w -= sideTabOverhang
     collectionPanel.sideTabW = sideTabWidth
     collectionPanel.sideTabOffsetX = -(collectionPanel.padding + sideTabOverhang)
-    collectionPanel.cardGapFactor = 0.3
+    collectionPanel.cardGapFactor = 1
+    collectionPanel.sideGapFactor = 0.3
+    deckPanel.cardGapFactor = collectionPanel.cardGapFactor
+    deckPanel.sideGapFactor = collectionPanel.sideGapFactor
 
     // отступ вкладок слева от края панели
     collectionPanel.tabOffsetX = collectionPanel.padding * 0.5

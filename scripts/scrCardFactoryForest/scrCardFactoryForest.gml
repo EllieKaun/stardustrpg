@@ -12,7 +12,7 @@ function createForestSupplyBagCard(rarity = CardsRarity.Default) {
         commonBorder,
         mpCostToken,
         "", // Локализовать
-        sprForestBagAlbum
+        noone
     )
     card.cardSet = CardSet.Forest
     card.spendsAllEnergy = true 
@@ -33,7 +33,7 @@ function createForestGatherCard(rarity = CardsRarity.Default) {
         commonBorder,
         mpCostToken,
         "",
-        sprForestGatherAlbum
+        noone
     )
     card.cardSet = CardSet.Forest
     return card
@@ -45,7 +45,7 @@ function createForestProvokeCard(rarity = CardsRarity.Default) {
     var card = new Card(
         "Provoke Potion", rarity, TargetTypes.Self, StarriorStates.Cast, 1,
         [ ProvokeEffect(dur) ],
-        healCard, sprForestProvokeArt, commonBorder, mpCostToken, "", sprForestProvokeAlbum
+        healCard, sprForestProvokeArt, commonBorder, mpCostToken, "", noone
     )
     card.cardSet = CardSet.Forest
     return card
@@ -145,7 +145,7 @@ function createForestFlaskCard(rarity = CardsRarity.Default) {
     var card = new Card(
         "Empty Flask", rarity, TargetTypes.SingleEnemyTarget, StarriorStates.Cast, 1,
         [ DamageEffect(DamageTypes.Physical, cardBalance().flaskEmptyMul[rarity]) ],
-        healCard, sprForestFlaskArt, commonBorder, mpCostToken, "", sprForestFlaskAlbum
+        healCard, sprForestFlaskArt, commonBorder, mpCostToken, "", noone
     )
     card.cardSet = CardSet.Forest
     card.isFlask = true

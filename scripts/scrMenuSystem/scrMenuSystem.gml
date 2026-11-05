@@ -9,6 +9,10 @@ function MenuItem(label, iconSpr = noone, iconSelectedSpr = noone, onSelect = un
     self.iconSelectedSpr = (iconSelectedSpr == noone) ? iconSpr : iconSelectedSpr
     self.onSelect = onSelect
     self.enabled = true
+    self.valueText = undefined
+    self.onChange = undefined
+    self.button = false
+    self.gapBefore = 0
 
     // Иконка с учётом состояния выделения.
     self.icon = function(isSelected) {
@@ -122,7 +126,12 @@ function Menu(items, config = {}) constructor {
     self.outline = menuParam(config, "outline", 0)
     self.outlineColor = menuParam(config, "outlineColor", c_black)
 
+    self.buttonW = menuParam(config, "buttonW", 0.3)
+    self.buttonH = menuParam(config, "buttonH", 0.065)
+    self.colButtonText = menuParam(config, "colButtonText", c_black)
+
     self.hitRects = []   // { x, y, w, h, index } в GUI-координатах, заполняется в draw
+    self.arrowRects = [] // { x, y, w, h, index, direction } стрелки пунктов со значением
 
     // навигация
     self.moveBy = function(direction) {
@@ -159,14 +168,36 @@ function Menu(items, config = {}) constructor {
         return true
     }
 
-    // Ввод: клавиатура (вверх/вниз/enter/space) + мышь (наведение/клик по hitRects) 
+    self.change = function(itemIndex, direction) {
+        var item = self.items[itemIndex]
+        if (!item.enabled || item.onChange == undefined) { return }
+        self.index = itemIndex
+        item.onChange(item, direction)
+    }
+
+    // Ввод: клавиатура (вверх/вниз/влево/вправо/enter/space) + мышь (наведение/клик по hitRects и стрелкам)
     // Возвращает true, если пункт подтверждён.
     self.handleInput = function(mouseX, mouseY, mouseMoved, mouseClicked) {
         if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) { self.movePrev() }
         if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { self.moveNext() }
+        if (array_length(self.items) > 0 && self.current().onChange != undefined) {
+            if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) { self.change(self.index, -1) }
+            if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { self.change(self.index, 1) }
+        }
 
         var confirmed = false
         if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) { confirmed = self.confirm() }
+
+        for (var arrowIndex = 0; arrowIndex < array_length(self.arrowRects); arrowIndex++) {
+            var arrowRect = self.arrowRects[arrowIndex]
+            if (pointInRect(mouseX, mouseY, arrowRect.x, arrowRect.y, arrowRect.w, arrowRect.h)) {
+                if (self.items[arrowRect.index].enabled) {
+                    if (mouseMoved) { self.index = arrowRect.index }
+                    if (mouseClicked) { self.change(arrowRect.index, arrowRect.direction) }
+                }
+                return confirmed
+            }
+        }
 
         for (var rectIndex = 0; rectIndex < array_length(self.hitRects); rectIndex++) {
             var hitRect = self.hitRects[rectIndex]
@@ -180,8 +211,19 @@ function Menu(items, config = {}) constructor {
         }
         return confirmed
     }
+
+    self.drawText = function(textX, textY, text, textScale, textColor) {
+        draw_set_color(textColor)
+        if (self.outline > 0) {
+            drawTextTransformedOutline(textX, textY, text, textScale, 0, textColor, self.outlineColor, max(1, round(textScale * self.outline)))
+        } else {
+            draw_text_transformed(textX, textY, text, textScale, textScale, 0)
+        }
+    }
+
     self.draw = function(guiWidth, guiHeight) {
         self.hitRects = []
+        self.arrowRects = []
 
         var textPx = guiHeight * self.textH
         var stepPx = guiHeight * self.spacing
@@ -189,6 +231,7 @@ function Menu(items, config = {}) constructor {
         var gapPx  = guiHeight * self.iconGap
         var anchorPixelX = guiWidth * self.anchorX
         var startPixelY = guiHeight * self.startY
+        var extraGapPx = 0
 
         draw_set_valign(fa_middle)
         draw_set_halign(fa_left)
@@ -197,7 +240,57 @@ function Menu(items, config = {}) constructor {
         for (var itemIndex = 0; itemIndex < array_length(self.items); itemIndex++) {
             var item = self.items[itemIndex]
             var isSel = (itemIndex == self.index)
-            var itemY = startPixelY + itemIndex * stepPx
+            extraGapPx += item.gapBefore * guiHeight
+            var itemY = startPixelY + itemIndex * stepPx + extraGapPx
+            var textColor = !item.enabled ? self.colDisabled : (isSel ? self.colSelect : self.colNormal)
+
+            if (item.button) {
+                var buttonW = guiHeight * self.buttonW
+                var buttonH = guiHeight * self.buttonH
+                var buttonX = anchorPixelX - buttonW / 2
+                var buttonY = itemY - buttonH / 2
+                if (isSel && item.enabled) {
+                    drawStretchedOutline(sprDialogButton, buttonX, buttonY, buttonW, buttonH, self.colSelect, max(2, round(guiHeight / 270)))
+                }
+                draw_sprite_stretched_ext(sprDialogButton, 0, buttonX, buttonY, buttonW, buttonH, c_white, item.enabled ? 1 : 0.5)
+                var buttonScale = uiTextScale(item.label, buttonH * 0.6, buttonW * 0.85)
+                draw_set_halign(fa_center)
+                draw_set_color(item.enabled ? self.colButtonText : self.colDisabled)
+                draw_text_transformed(anchorPixelX, itemY, item.label, buttonScale, buttonScale, 0)
+                draw_set_halign(fa_left)
+                array_push(self.hitRects, { x: buttonX, y: buttonY, w: buttonW, h: buttonH, index: itemIndex })
+                continue
+            }
+
+            if (item.onChange != undefined) {
+                var labelText = item.label + ": "
+                var valueText = " " + string(item.valueText ?? "") + " "
+                var rowScale = uiTextScale(labelText + "<" + valueText + ">", textPx, guiWidth)
+                var labelW = string_width(labelText) * rowScale
+                var arrowW = string_width("<") * rowScale
+                var valueW = string_width(valueText) * rowScale
+                var rowW = labelW + arrowW * 2 + valueW
+                var rowLeft
+                switch (self.halign) {
+                    case fa_center: rowLeft = anchorPixelX - rowW / 2; break
+                    case fa_right: rowLeft = anchorPixelX - rowW; break
+                    default: rowLeft = anchorPixelX; break
+                }
+                var leftArrowX = rowLeft + labelW
+                var rightArrowX = leftArrowX + arrowW + valueW
+                self.drawText(rowLeft, itemY, labelText, rowScale, textColor)
+                self.drawText(leftArrowX, itemY, "<", rowScale, textColor)
+                self.drawText(leftArrowX + arrowW, itemY, valueText, rowScale, textColor)
+                self.drawText(rightArrowX, itemY, ">", rowScale, textColor)
+
+                var arrowHitW = max(arrowW * 2, textPx)
+                array_push(self.arrowRects,
+                    { x: leftArrowX + arrowW / 2 - arrowHitW / 2, y: itemY - stepPx / 2, w: arrowHitW, h: stepPx, index: itemIndex, direction: -1 },
+                    { x: rightArrowX + arrowW / 2 - arrowHitW / 2, y: itemY - stepPx / 2, w: arrowHitW, h: stepPx, index: itemIndex, direction: 1 })
+                array_push(self.hitRects, { x: rowLeft, y: itemY - stepPx / 2, w: rowW, h: stepPx, index: itemIndex })
+                continue
+            }
+
             var icon = item.icon(isSel)
             var hasIcon = (icon != noone && sprite_exists(icon))
 
@@ -208,13 +301,13 @@ function Menu(items, config = {}) constructor {
 
             var left
             switch (self.halign) {
-                case fa_center: 
+                case fa_center:
                     left = anchorPixelX - groupW / 2
                     break
-                case fa_right: 
+                case fa_right:
                     left = anchorPixelX - groupW
                     break
-                default: 
+                default:
                     left = anchorPixelX
                     break
             }
@@ -226,14 +319,8 @@ function Menu(items, config = {}) constructor {
             }
 
             // текст
-            var textColor = !item.enabled ? self.colDisabled : (isSel ? self.colSelect : self.colNormal)
             var labelX = left + (hasIcon ? iconW + gapPx : 0)
-            draw_set_color(textColor)
-            if (self.outline > 0) {
-                drawTextTransformedOutline(labelX, itemY, item.label, tScale, 0, textColor, self.outlineColor, max(1, round(tScale * self.outline)))
-            } else {
-                draw_text_transformed(labelX, itemY, item.label, tScale, tScale, 0)
-            }
+            self.drawText(labelX, itemY, item.label, tScale, textColor)
 
             array_push(self.hitRects, { x: left, y: itemY - stepPx / 2, w: groupW, h: stepPx, index: itemIndex })
         }

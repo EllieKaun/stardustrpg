@@ -31,7 +31,8 @@ if (currentState != undefined) {
 // Рисуем карты.
 var opponentTurn = (selectedCharacter != noone
     && (selectedCharacter.isEnemy || selectedCharacter.isPuppet))
-if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn || battleState == BattleStates.StunnedTurn) {
+var battleLost = (battleState == BattleStates.GameOver)
+if (!battleLost && (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == BattleStates.PuppetTurn || battleState == BattleStates.StunnedTurn)) {
     draw_set_color(c_white)
     draw_set_halign(fa_center)
     draw_set_valign(fa_middle)
@@ -39,7 +40,7 @@ if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == Bat
     drawUiText(cardDeskStartX + cardDeskWidth / 2, cardDeskStartY + cardDeskHeight / 2, waitLabel, cardDeskHeight * 0.18)
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
-} else {
+} else if (!battleLost) {
     if (selectedCharacter != noone) {
         var hand = selectedCharacter.getCardsInHand()
         var handSize = min(array_length(hand), maxCardsOnDeskNumber)
@@ -56,6 +57,11 @@ if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == Bat
 
         var arcLift = 2 * scaleToGui
         var arcTilt = 5 // поворот
+
+        var handLeft = infinity
+        var handTop = infinity
+        var handRight = -infinity
+        var handBottom = -infinity
 
         // Рисуем карты в две фазы, невыбранные, затем выбранная, чтобы поверх рисовать выбранную
         for (var pass = 0; pass < 2; pass++) {
@@ -98,11 +104,21 @@ if (opponentTurn || battleState == BattleStates.EnemysTurn || battleState == Bat
                     angle: angle, index: i
                 })
 
+                var boundsHalfW = (drawCardW * abs(dcos(angle)) + drawCardH * abs(dsin(angle))) * scale * 0.5
+                var boundsHalfH = (drawCardW * abs(dsin(angle)) + drawCardH * abs(dcos(angle))) * scale * 0.5
+                handLeft = min(handLeft, cardCenterX - boundsHalfW)
+                handRight = max(handRight, cardCenterX + boundsHalfW)
+                handTop = min(handTop, cardCenterY - boundsHalfH)
+                handBottom = max(handBottom, cardCenterY + boundsHalfH)
+
                 if (isSelected && focusArea == FocusArea.Deck && battleState == BattleStates.CharacterPlay) {
                     var selectedCardWidth = drawCardW * scale
                     draw_sprite_ext(sPointer, 0, cardCenterX - selectedCardWidth / 2, cardCenterY, scaleToGui, scaleToGui, 0, c_white, 1)
                 }
             }
+        }
+        if (handRight > handLeft) {
+            tutorialCardsRect = { x: handLeft, y: handTop, w: handRight - handLeft, h: handBottom - handTop }
         }
 
         var deckCount = array_length(selectedCharacter.getShuffeledDeck())
