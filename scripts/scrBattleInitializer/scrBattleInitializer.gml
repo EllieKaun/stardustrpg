@@ -179,7 +179,7 @@ function initBattleStates() {
     stateDef[StateHook.Reentrant] = true
     stateDef[StateHook.OnEnter] = method(self, function() {
         alarm_set(STUN_TURN, game_get_speed(gamespeed_fps) * STUN_TURN_SECONDS)
-        with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow, bbox_right - bbox_left)
+        with (selectedCharacter) drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.stunned"), c_yellow, 0, STUN_LABEL_TEXT_SCALE)
     })
     battleStates[BattleStates.StunnedTurn] = stateDef
 
@@ -202,10 +202,10 @@ function initBattleStates() {
         analyticsDefeat() // аналитика: поражение в бою
         var retry = method(self, function() { retryBattle() })
         var exitToWorld = method(self, function() { returnToOverworld() })
-        modalOpen(modalConfirm(loc("ui.gameover"), "", [
-            { label: loc("ui.retry"), onSelect: retry },
-            { label: loc("ui.exit"), onSelect: exitToWorld }
-        ], { tag: "gameOver", background: undefined, dim: 0.6, widthFrac: 1, heightFrac: 0.4 }))
+        modalOpen(modalConfirm(loc("ui.gameover"), loc("ui.gameoverText"), [
+            { label: loc("ui.exit"), onSelect: exitToWorld },
+            { label: loc("ui.retry"), onSelect: retry }
+        ], { tag: "gameOver", initialCursor: 1, textMaxLineH: MODAL_RESULT_TEXT_LINE_H }))
     })
     battleStates[BattleStates.GameOver] = stateDef
 
@@ -217,7 +217,7 @@ function initBattleStates() {
             loc("battle.fleeTitle"),
             loc("battle.fleeLose") + string(battleFleePenalty()),
             [{ label: loc("battle.fleeStay"), onSelect: backToPlay }, { label: loc("battle.run"), onSelect: flee }],
-            { canCancel: true, onCancel: backToPlay, textColor: merge_color(c_white, c_red, 0.5) }
+            { canCancel: true, onCancel: backToPlay }
         ))
     })
     battleStates[BattleStates.RunConfirm] = stateDef

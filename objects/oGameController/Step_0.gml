@@ -1,4 +1,6 @@
+fpsDebugFrameStart()
 displayRecoverOnFocus()
+appSurfaceSyncToWindow()
 autosaveUpdate()
 updateTimeOfDay()
 

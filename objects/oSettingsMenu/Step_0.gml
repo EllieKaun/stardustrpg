@@ -6,53 +6,6 @@ var mouseClicked = mouse_check_button_pressed(mb_left)
 
 menu.handleInput(mouseX, mouseY, mouseMoved, mouseClicked)
 
-var langKeyPressed = keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A")) || keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))
-if (menu.index == 5 && langKeyPressed) { // язык переключается стрелками, как остальные пункты со "< >"
-    locCycleLanguage()
-    updateMenuLabels()
-}
-
-if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) {
-    if (menu.index == 0) {
-        selectedResIndex = (selectedResIndex - 1 + array_length(resolutions)) mod array_length(resolutions)
-        updateMenuLabels()
-    } else if (menu.index == 1) {
-        selectedFullscreen = !selectedFullscreen
-        updateMenuLabels()
-    } else if (menu.index == 2) {
-        selectedVolMaster = clamp(selectedVolMaster - 0.1, 0, 1.0)
-        updateMenuLabels()
-    } else if (menu.index == 3) {
-        selectedVolMusic = clamp(selectedVolMusic - 0.1, 0, 1.0)
-        updateMenuLabels()
-    } else if (menu.index == 4) {
-        selectedVolSounds = clamp(selectedVolSounds - 0.1, 0, 1.0)
-        updateMenuLabels()
-        var sound = audio_play_sound(SND_CARD_SELECT, 8, false)
-        audio_sound_gain(sound, selectedVolSounds, 0)
-    }
-}
-if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) {
-    if (menu.index == 0) {
-        selectedResIndex = (selectedResIndex + 1) mod array_length(resolutions)
-        updateMenuLabels()
-    } else if (menu.index == 1) {
-        selectedFullscreen = !selectedFullscreen
-        updateMenuLabels()
-    } else if (menu.index == 2) {
-        selectedVolMaster = clamp(selectedVolMaster + 0.1, 0, 1.0)
-        updateMenuLabels()
-    } else if (menu.index == 3) {
-        selectedVolMusic = clamp(selectedVolMusic + 0.1, 0, 1.0)
-        updateMenuLabels()
-    } else if (menu.index == 4) {
-        selectedVolSounds = clamp(selectedVolSounds + 0.1, 0, 1.0)
-        updateMenuLabels()
-        var sound = audio_play_sound(SND_CARD_SELECT, 8, false)
-        audio_sound_gain(sound, selectedVolSounds, 0)
-    }
-}
-
 if (keyboard_check_pressed(vk_escape)) {
     selectedVolMaster = global.volMaster
     selectedVolMusic = global.volMusic

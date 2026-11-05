@@ -45,6 +45,7 @@ function createStarrior(
     starrior.mask_index = spriteIdle
     starrior.isPuppet = false
     starrior.isEnemy  = false
+    starrior.weakSpotImpactSprite = noone
     return starrior
 }
 

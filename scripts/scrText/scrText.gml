@@ -89,7 +89,7 @@ function wrapTextToWidth(text, maxW) {
 }
 
 // Подбор шрифта под область
-function fitWrappedText(text, areaW, areaH) {
+function fitWrappedText(text, areaW, areaH, maxLineH = 1000000) {
     if (!variable_global_exists("uiFontLadder")) { uiFontInit() }
     var ladder = global.uiFontLadder
     var prevFont = draw_get_font()
@@ -97,6 +97,7 @@ function fitWrappedText(text, areaW, areaH) {
     var fallback = undefined
     var fallbackSize = -1
     for (var index = 0; index < array_length(ladder); index++) {
+        if (ladder[index].lineH > maxLineH && (best != undefined || fallback != undefined)) { break }
         draw_set_font(ladder[index].font)
         var wrapped = wrapTextToWidth(text, areaW)
         var textWidth = string_width(wrapped)
@@ -132,6 +133,23 @@ function drawTextBold(textX, textY, text, scale, angle, color, alpha) {
     if (lineHeightOnScreen < 16) { return }
     var boldOffset = max(1, round(scale * 0.4))
     draw_text_transformed_colour(textX + dcos(angle) * boldOffset, textY - dsin(angle) * boldOffset, text, scale, scale, angle, color, color, color, color, alpha)
+}
+
+function drawTextTransformedOutline(textX, textY, text, scale, angle, mainColor, outlineColor, outlineSize, alpha = 1) {
+    textX = floor(textX)
+    textY = floor(textY)
+    var px = max(1, round(outlineSize))
+    for (var i = 0; i < 8; i++) {
+        draw_text_transformed_colour(textX + dcos(i * 45) * px, textY - dsin(i * 45) * px, text, scale, scale, angle, outlineColor, outlineColor, outlineColor, outlineColor, alpha)
+    }
+    draw_text_transformed_colour(textX, textY, text, scale, scale, angle, mainColor, mainColor, mainColor, mainColor, alpha)
+}
+
+function drawUiTextOutline(textX, textY, text, targetHeight, outlineColor = c_black, outlineSize = 2, maxWidth = 1000000) {
+    var textScale = uiTextScale(text, targetHeight, maxWidth)
+    var mainColor = draw_get_colour()
+    drawTextTransformedOutline(textX, textY, text, textScale, 0, mainColor, outlineColor, max(1, round(textScale * outlineSize)))
+    return textScale
 }
 
 function drawFitTextInArea(

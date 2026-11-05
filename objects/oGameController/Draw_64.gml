@@ -108,3 +108,5 @@ if (battleEntryState != BattleEntryState.Idle && sprite_exists(entryAnimSprite))
 }
 
 autosaveDrawIcon()
+
+drawFpsDebug()

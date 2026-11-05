@@ -13,6 +13,13 @@ if (instance_exists(follow)) {
 x += (xTo - x) / CAMERA_FOLLOW_SMOOTHING;
 y += (yTo - y) / CAMERA_FOLLOW_SMOOTHING;
 
+if (xTo == xToPrev && yTo == yToPrev && point_distance(x, y, xTo, yTo) < 0.2) {
+	x = xTo;
+	y = yTo;
+}
+xToPrev = xTo;
+yToPrev = yTo;
+
 
 x = clamp(x, viewWHalf, room_width-viewWHalf);
 y = clamp(y, viewHHalf, room_height-viewHHalf);

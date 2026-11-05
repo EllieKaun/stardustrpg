@@ -4,6 +4,7 @@ function locDefineEn() {
     translations[$ "ui.victory"] = "VICTORY"
     translations[$ "ui.chooseReward"] = "Choose one card as your reward"
     translations[$ "ui.gameover"] = "UNLUCKY"
+    translations[$ "ui.gameoverText"] = "You lost all your gold"
     translations[$ "ui.noRewards"] = "No rewards — press Enter"
     translations[$ "ui.retry"] = "RETRY"
     translations[$ "ui.exit"] = "EXIT"

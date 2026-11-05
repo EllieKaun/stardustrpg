@@ -48,12 +48,18 @@ previewAudioVolumes = function() {
 }
 
 updateMenuLabels = function() {
-    menu.items[0].label = loc("menu.resolution") + ": < " + string(resolutions[selectedResIndex][0]) + "x" + string(resolutions[selectedResIndex][1]) + " >"
-    menu.items[1].label = loc("menu.fullscreen") + ": < " + (selectedFullscreen ? loc("menu.on") : loc("menu.off")) + " >"
-    menu.items[2].label = loc("menu.masterVol") + ": < " + string(round(selectedVolMaster * 100)) + "% >"
-    menu.items[3].label = loc("menu.musicVol") + ": < " + string(round(selectedVolMusic * 100)) + "% >"
-    menu.items[4].label = loc("menu.soundsVol") + ": < " + string(round(selectedVolSounds * 100)) + "% >"
-    menu.items[5].label = loc("menu.language") + ": < " + languageNativeName(global.language) + " >"
+    menu.items[0].label = loc("menu.resolution")
+    menu.items[0].valueText = string(resolutions[selectedResIndex][0]) + "x" + string(resolutions[selectedResIndex][1])
+    menu.items[1].label = loc("menu.fullscreen")
+    menu.items[1].valueText = selectedFullscreen ? loc("menu.on") : loc("menu.off")
+    menu.items[2].label = loc("menu.masterVol")
+    menu.items[2].valueText = string(round(selectedVolMaster * 100)) + "%"
+    menu.items[3].label = loc("menu.musicVol")
+    menu.items[3].valueText = string(round(selectedVolMusic * 100)) + "%"
+    menu.items[4].label = loc("menu.soundsVol")
+    menu.items[4].valueText = string(round(selectedVolSounds * 100)) + "%"
+    menu.items[5].label = loc("menu.language")
+    menu.items[5].valueText = languageNativeName(global.language)
     menu.items[6].label = loc("menu.apply")
     menu.items[7].label = loc("menu.cancel")
     menu.items[8].label = loc("menu.back")
@@ -68,33 +74,41 @@ updateMenuLabels = function() {
     previewAudioVolumes()
 }
 
+changeResolution = function(item, direction) {
+    var count = array_length(resolutions)
+    selectedResIndex = (selectedResIndex + direction + count) mod count
+    updateMenuLabels()
+}
+changeFullscreen = function(item, direction) {
+    selectedFullscreen = !selectedFullscreen
+    updateMenuLabels()
+}
+changeMasterVol = function(item, direction) {
+    selectedVolMaster = clamp(selectedVolMaster + 0.1 * direction, 0, 1.0)
+    updateMenuLabels()
+}
+changeMusicVol = function(item, direction) {
+    selectedVolMusic = clamp(selectedVolMusic + 0.1 * direction, 0, 1.0)
+    updateMenuLabels()
+}
+changeSoundsVol = function(item, direction) {
+    selectedVolSounds = clamp(selectedVolSounds + 0.1 * direction, 0, 1.0)
+    updateMenuLabels()
+    var sound = audio_play_sound(SND_CARD_SELECT, 8, false)
+    audio_sound_gain(sound, selectedVolSounds, 0)
+}
+changeLanguage = function(item, direction) {
+    locCycleLanguage()
+    updateMenuLabels()
+}
+
 menu = new Menu([
-    new MenuItem("Resolution", noone, noone, function(it) {
-        selectedResIndex = (selectedResIndex + 1) mod array_length(resolutions)
-        updateMenuLabels()
-    }),
-    new MenuItem("Fullscreen", noone, noone, function(it) {
-        selectedFullscreen = !selectedFullscreen
-        updateMenuLabels()
-    }),
-    new MenuItem("Master Vol", noone, noone, function(it) {
-        selectedVolMaster = clamp(selectedVolMaster + 0.1, 0, 1.0)
-        updateMenuLabels()
-    }),
-    new MenuItem("Music Vol", noone, noone, function(it) {
-        selectedVolMusic = clamp(selectedVolMusic + 0.1, 0, 1.0)
-        updateMenuLabels()
-    }),
-    new MenuItem("Sounds Vol", noone, noone, function(it) {
-        selectedVolSounds = clamp(selectedVolSounds + 0.1, 0, 1.0)
-        updateMenuLabels()
-        var sound = audio_play_sound(SND_CARD_SELECT, 8, false)
-        audio_sound_gain(sound, selectedVolSounds, 0)
-    }),
-    new MenuItem("Language", noone, noone, function(it) {
-        locCycleLanguage()
-        updateMenuLabels()
-    }),
+    new MenuItem("Resolution", noone, noone, function(it) { changeResolution(it, 1) }),
+    new MenuItem("Fullscreen", noone, noone, function(it) { changeFullscreen(it, 1) }),
+    new MenuItem("Master Vol", noone, noone, function(it) { changeMasterVol(it, 1) }),
+    new MenuItem("Music Vol", noone, noone, function(it) { changeMusicVol(it, 1) }),
+    new MenuItem("Sounds Vol", noone, noone, function(it) { changeSoundsVol(it, 1) }),
+    new MenuItem("Language", noone, noone, function(it) { changeLanguage(it, 1) }),
     new MenuItem("Apply", noone, noone, function(it) {
         currentResIndex = selectedResIndex
         currentFullscreen = selectedFullscreen
@@ -160,8 +174,17 @@ menu = new Menu([
         instance_destroy()
     })
 ], {
-    anchorX: 0.5, startY: 0.18, spacing: 0.10, textH: 0.045, halign: fa_center
+    anchorX: 0.5, startY: 0.2, spacing: 0.075, textH: 0.045, halign: fa_center, buttonW: 0.32, buttonH: 0.065
 })
+
+var changeHandlers = [changeResolution, changeFullscreen, changeMasterVol, changeMusicVol, changeSoundsVol, changeLanguage]
+for (var handlerIndex = 0; handlerIndex < array_length(changeHandlers); handlerIndex++) {
+    menu.items[handlerIndex].onChange = changeHandlers[handlerIndex]
+}
+for (var buttonIndex = 6; buttonIndex < array_length(menu.items); buttonIndex++) {
+    menu.items[buttonIndex].button = true
+    menu.items[buttonIndex].gapBefore = (buttonIndex == 6) ? 0.05 : 0.02
+}
 
 updateMenuLabels()
 

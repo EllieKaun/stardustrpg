@@ -4,6 +4,7 @@ enum Panels { Collection, Deck }
 #macro EMPTY_WEB_SLOT_INDICES [6, 9, 11]
 #macro TAB_INACTIVE_SHADE make_color_rgb(150, 150, 150)
 #macro SIDE_TAB_POINTER_SIZE 0.8
+#macro CARD_DIMMED_TINT make_color_rgb(115, 115, 115)
 
 // Конструктор слотов, который используется для отрисовки в дек билдере
 function Slot(initialState, initialCard = undefined) constructor {
@@ -69,6 +70,7 @@ function Panel(config) constructor {
     slots = config[$ "slots"] ?? []
     padding = config[$ "padding"] ?? 8
     cardGapFactor = config[$ "cardGapFactor"] ?? 0.5
+    sideGapFactor = config[$ "sideGapFactor"]
     tabH = config[$ "tabH"] ?? 18
     tabGap = config[$ "tabGap"] ?? 2
     tabPadding = config[$ "tabPadding"] ?? 4
@@ -147,10 +149,11 @@ function Panel(config) constructor {
 
         var ratio = 2 / 3
         var minGap = padding * cardGapFactor
+        var sideGap = padding * (sideGapFactor ?? cardGapFactor)
         var gapY = 6 * uiScale
 
         // Размер карты
-        var reservedW = minGap * (cols + 1)
+        var reservedW = minGap * (cols - 1) + sideGap * 2
         var cardWidth = (gridW - reservedW) / cols
         var cardHeight = cardWidth / ratio
 
@@ -167,7 +170,8 @@ function Panel(config) constructor {
 
         // Горизонтальные промежутки
         var freeW = gridW - (cardWidth * cols)
-        var gapX = max(minGap, freeW / (cols + 1))
+        var gapX = (sideGapFactor == undefined) ? max(minGap, freeW / (cols + 1)) : minGap
+        var sideX = (sideGapFactor == undefined) ? gapX : (freeW - gapX * (cols - 1)) / 2
 
         return {
             gridX : gridX,
@@ -175,6 +179,7 @@ function Panel(config) constructor {
             cardWidth: cardWidth,
             cardHeight : cardHeight,
             gapX : gapX,
+            sideX : sideX,
             gapY : gapY
         }
     }
@@ -205,7 +210,7 @@ function Panel(config) constructor {
         var layout = computeLayout()
         var column = index mod cols
         var row = index div cols
-        var slotX = layout.gridX + layout.gapX + column * (layout.cardWidth + layout.gapX)
+        var slotX = layout.gridX + layout.sideX + column * (layout.cardWidth + layout.gapX)
         var slotY = layout.gridY + row * (layout.cardHeight + layout.gapY) - scrollY
         return { sx: slotX, sy: slotY, sw: layout.cardWidth, sh: layout.cardHeight }
     }
@@ -588,7 +593,8 @@ function Panel(config) constructor {
                             slotRect.sw,
                             slotRect.sh,
                             selectedSlot == slotIndex,
-                            cardAlpha)
+                            cardAlpha,
+                            slot.dimmed ? CARD_DIMMED_TINT : c_white)
                     }
                     if (!slot.dragging) { drawSlotOverlays(slot, slotRect) }
                     break
@@ -622,7 +628,7 @@ function Panel(config) constructor {
             draw_set_color(sideTab[$ "textColor"] ?? c_white)
             draw_set_halign(fa_center)
             draw_set_valign(fa_middle)
-            var sideLabelScale = uiTextScale(sideTab.name, sideRect.th * 0.6, sideRect.tw - tabPadding * 2)
+            var sideLabelScale = uiTextScale(sideTab.name, sideRect.th * 0.8, sideRect.tw - tabPadding * 2)
             draw_text_transformed(sideRect.tx + sideRect.tw / 2, sideRect.ty + sideRect.th / 2,
                 sideTab.name, sideLabelScale, sideLabelScale, 0)
             draw_set_halign(fa_left)
@@ -688,24 +694,15 @@ function Panel(config) constructor {
 }
 
 // Отрисовка карты
-function drawCard(card, cardX, cardY, cardW, cardH, isSelected = false, alpha = 1) {
+function drawCard(card, cardX, cardY, cardW, cardH, isSelected = false, alpha = 1, tint = c_white) {
     if (card.cardBaseSpr == undefined) {
         return
     }
-    drawCardFace(card, cardX + cardW * 0.5, cardY + cardH * 0.5, cardW, cardH, 0, 1, alpha, isSelected)
+    drawCardFace(card, cardX + cardW * 0.5, cardY + cardH * 0.5, cardW, cardH, 0, 1, alpha, isSelected, tint)
 }
 
 // Оверлеи слота коллекции: затемнение, иконка владельца и число копий
 function drawSlotOverlays(slot, rect) {
-    // затемнение занятой чужой декой карты
-    if (slot.dimmed) {
-        draw_set_color(c_black)
-        draw_set_alpha(0.55)
-        draw_rectangle(rect.sx, rect.sy, rect.sx + rect.sw, rect.sy + rect.sh, false)
-        draw_set_alpha(1)
-        draw_set_color(c_white)
-    }
-
     // иконка владельца 
     if (slot.ownerIcon != noone && sprite_exists(slot.ownerIcon)) {
         var iconHeight = rect.sh * 0.2

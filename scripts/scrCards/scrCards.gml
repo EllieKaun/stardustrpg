@@ -206,6 +206,22 @@ function cardEffectAnimFrames(effects) {
     return frames
 }
 
+function stepWeakSpotImpact() {
+    return {
+        start: function(ctx) {
+            ctx.weakSpotTarget = cardWeakSpotTarget(ctx.card, ctx.targets)
+            if (ctx.weakSpotTarget != noone) {
+                var impactSprite = weakSpotImpactPortrait(ctx.caster)
+                with (Battle) { startWeakSpotImpact(impactSprite) }
+            }
+        },
+        update: function(ctx) {
+            if (!instance_exists(Battle)) { return true }
+            return !Battle.weakSpotImpactBlocking
+        }
+    }
+}
+
 function cardPlaySequence(card, caster, targets) {
     return [
         // 1) разыгрывание карты
@@ -228,6 +244,9 @@ function cardPlaySequence(card, caster, targets) {
             with (Battle) { showCardEffectVisuals(ctx.card.effects, ctx.targets) }
         }),
         stepWait(cardEffectAnimFrames(card.effects)),
+
+        // 3.5) импакт по слабому месту до нанесения урона
+        stepWeakSpotImpact(),
 
         // 4) применение значений
         stepDo(function(ctx) {

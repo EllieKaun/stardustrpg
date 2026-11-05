@@ -18,7 +18,97 @@ function setCrispGui(baseW, baseH) {
 // GUI приводится к нужному размеру
 function guiSyncCrisp() {
     var camera = view_camera[0]
-    setCrispGui(camera_get_view_width(camera), camera_get_view_height(camera))
+    global.guiBaseW = camera_get_view_width(camera)
+    global.guiBaseH = camera_get_view_height(camera)
+    setCrispGui(global.guiBaseW, global.guiBaseH)
+}
+
+function fpsDebugEnsure() {
+    if (variable_global_exists("fpsDebug")) { return }
+    global.fpsDebug = {
+        hitches: 0,
+        worstMs: 0,
+        worstUntil: 0,
+        frameStart: get_timer(),
+        frameEnd: get_timer(),
+        workMs: 0,
+        waitMs: 0,
+        vsync: true,
+        modeStart: current_time,
+        settleUntil: current_time + 3000,
+        log: []
+    }
+}
+
+// Вызывать первой строкой Step: время с конца прошлой отрисовки - это ожидание вывода на экран
+function fpsDebugFrameStart() {
+    fpsDebugEnsure()
+    var now = get_timer()
+    global.fpsDebug.waitMs = (now - global.fpsDebug.frameEnd) / 1000
+    global.fpsDebug.frameStart = now
+}
+
+function drawFpsDebug() {
+    if (!SHOW_FPS_DEBUG) { return }
+    fpsDebugEnsure()
+    var debugData = global.fpsDebug
+    var modeChanged = false
+    if (keyboard_check_pressed(vk_f8)) {
+        debugData.vsync = !debugData.vsync
+        display_reset(0, debugData.vsync)
+        modeChanged = true
+    }
+    if (keyboard_check_pressed(vk_f9)) {
+        display_set_sleep_margin((display_get_sleep_margin() >= 30) ? 10 : 30)
+        modeChanged = true
+    }
+    if (modeChanged) {
+        debugData.hitches = 0
+        debugData.modeStart = current_time
+        debugData.settleUntil = current_time + 1000
+        debugData.log = []
+    }
+    var frameMs = delta_time / 1000
+    if (frameMs > 25 && current_time >= debugData.settleUntil) {
+        debugData.hitches++
+        var gcStats = gc_get_stats()
+        var gcMs = ((gcStats[$ "traversal_time"] ?? 0) + (gcStats[$ "collection_time"] ?? 0)) / 1000
+        array_push(debugData.log, string(round(current_time / 1000)) + "s  frame " + string(round(frameMs))
+            + "  work " + string(round(debugData.workMs)) + "  wait " + string(round(debugData.waitMs))
+            + "  gc " + string_format(gcMs, 1, 1))
+        if (array_length(debugData.log) > 6) { array_delete(debugData.log, 0, 1) }
+    }
+    if (current_time > debugData.worstUntil) {
+        debugData.worstMs = 0
+        debugData.worstUntil = current_time + 3000
+    }
+    debugData.worstMs = max(debugData.worstMs, frameMs)
+
+    var pad = max(2, display_get_gui_height() * 0.01)
+    var textH = max(10, display_get_gui_height() * 0.03)
+    var lineH = textH * 1.1
+    var label = "FPS " + string(fps) + "  real " + string(round(fps_real))
+        + "  max " + string(round(debugData.worstMs)) + "ms  hitches " + string(debugData.hitches)
+        + " за " + string(round((current_time - debugData.modeStart) / 1000)) + "s  vsync " + (debugData.vsync ? "on" : "off") + " (F8)"
+        + "  margin " + string(display_get_sleep_margin()) + " (F9)"
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+    draw_set_color(c_black)
+    drawUiText(pad + 2, pad + 2, label, textH)
+    draw_set_color(fps_real >= game_get_speed(gamespeed_fps) - 2 ? c_lime : c_red)
+    drawUiText(pad, pad, label, textH)
+    for (var logIndex = 0; logIndex < array_length(debugData.log); logIndex++) {
+        var logY = pad + lineH * (logIndex + 1)
+        draw_set_color(c_black)
+        drawUiText(pad + 2, logY + 2, debugData.log[logIndex], textH * 0.85)
+        draw_set_color(c_yellow)
+        drawUiText(pad, logY, debugData.log[logIndex], textH * 0.85)
+    }
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+    draw_set_color(c_white)
+    debugData.workMs = (get_timer() - debugData.frameStart) / 1000
+    debugData.frameEnd = get_timer()
 }
 
 // Видны ли HUD-элементы мира (монеты, прогресс квеста)
@@ -56,6 +146,12 @@ function guiClipEnd(surf, clipX, clipY) {
 
 function drawButtonFrame(btnX, btnY, btnW, btnH) {
     draw_sprite_stretched(ShopBtn, 0, btnX, btnY, btnW, btnH)
+}
+
+function drawStretchedOutline(sprite, boxX, boxY, boxW, boxH, outlineColor, thickness) {
+    gpu_set_fog(true, outlineColor, 0, 0)
+    draw_sprite_stretched(sprite, 0, boxX - thickness, boxY - thickness, boxW + thickness * 2, boxH + thickness * 2)
+    gpu_set_fog(false, outlineColor, 0, 0)
 }
 
 // Попадание точки в повёрнутый прямоугольник (центр centerX,centerY; размер rectWidth,rectHeight; угол angle)
@@ -131,11 +227,12 @@ function drawHealthBarMana(barX, barY, width, height, hp, maxHp, mana, maxMana, 
 }
 
 
-function drawDamageNumber(numberX, numberY, value, color, maxWidth = 0) {
+function drawDamageNumber(numberX, numberY, value, color, maxWidth = 0, scale = 1) {
     var instance = instance_create_depth(numberX, numberY, depth - 1, oDamageNumber)
     instance.value = value
     instance.color = color
     instance.maxWidth = maxWidth
+    instance.scale = scale
 }
 
 // Иконка статуса теперь берётся из реестра эффектов (scrEffectSystem).
