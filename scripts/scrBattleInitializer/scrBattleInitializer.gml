@@ -111,6 +111,16 @@ function initBattleStates() {
                     playCardAnimated(currentCard, selectedCharacter, heroes)
                 } else if (currentCard.target == TargetTypes.Self) {
                     playCardAnimated(currentCard, selectedCharacter, selectedCharacter)
+                } else if (currentCard.target == TargetTypes.RandomEnemy) {
+                    var randomFoe = randomAliveFrom(enemies)
+                    if (randomFoe != noone) { 
+                        playCardAnimated(currentCard, selectedCharacter, randomFoe)
+                    }
+                } else if (currentCard.target == TargetTypes.RandomAlly) {
+                    var randomFriend = randomAliveFrom(heroes)
+                    if (randomFriend != noone) { 
+                        playCardAnimated(currentCard, selectedCharacter, randomFriend) 
+                    }
                 }
             } else {
                 skipTurn()

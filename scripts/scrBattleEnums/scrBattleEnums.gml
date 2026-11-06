@@ -10,7 +10,9 @@ enum TargetTypes {
     AllAllies,
     SingleAllyTarget,
     AllEnemies,
-    Self
+    Self,
+    RandomEnemy,
+    RandomAlly
 }
 
 enum DamageTypes {

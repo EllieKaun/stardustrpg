@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrEngineerParts",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrEngineerParts",
+  "parent":{
+    "name":"Cards",
+    "path":"folders/BattleDomain/Scripts/Cards.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

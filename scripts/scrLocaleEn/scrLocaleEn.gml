@@ -114,6 +114,7 @@ function locDefineEn() {
     translations[$ "deck.fox"] = "FIRA"
     translations[$ "deck.packBase"] = "STARRY"
     translations[$ "deck.packForest"] = "FOREST"
+    translations[$ "deck.packEngineer"] = "ENGINEER"
     translations[$ "deck.all"] = "ALL"
     translations[$ "deck.cardsCounter"] = "Cards:"
     translations[$ "companion.rejoinAsk"] = "Will you take me along again?"

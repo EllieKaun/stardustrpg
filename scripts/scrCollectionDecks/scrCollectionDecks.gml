@@ -321,6 +321,7 @@ function ownedCardSets() {
 function cardSetTab(cardSet) {
     switch (cardSet) {
         case CardSet.Forest: return { name: loc("deck.packForest"), sprite: TabFill, tint: #3E8E41 }
+        case CardSet.Engineer: return { name: loc("deck.packEngineer"), color: #8A6A3A }
         default: return { name: loc("deck.packBase"), sprite: TabFill, tint: #5B4BA8 }
     }
 }

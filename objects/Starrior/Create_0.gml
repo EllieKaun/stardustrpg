@@ -37,6 +37,7 @@ weaknesses = []
 strengths = []
 effectNotifications = []
 ingredients = [] // ингредиенты
+parts = 0
 activeIngredient = undefined // текущий ингредиент
 bonusHp = 0 // Избыточное хп
 deck = new Deck([])

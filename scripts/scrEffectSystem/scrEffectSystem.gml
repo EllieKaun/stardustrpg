@@ -236,32 +236,51 @@ function initEffectRegistry() {
 
     // Провокация
     variable_struct_set(effectsRepository, "Provoke", {
-        onEndOfTurn: function(effect, character) { ingredientAddRandom(character) },
+        onEndOfTurn: function(effect, character) { 
+            ingredientAddRandom(character) 
+        },
     })
 
     // Формы колбы
     variable_struct_set(effectsRepository, "BonusHp", {
         onInstant: function(effect, caster, targets) {
             if (is_array(targets)) {
-                for (var i = 0; i < array_length(targets); i++) { targets[i].applyBonusHp(effect.value) }
-            } else { targets.applyBonusHp(effect.value) }
+                for (var i = 0; i < array_length(targets); i++) { 
+                    targets[i].applyBonusHp(effect.value) 
+                }
+            } else { 
+                targets.applyBonusHp(effect.value) 
+            }
         },
     })
     variable_struct_set(effectsRepository, "ExtendNegative", {
         onInstant: function(effect, caster, targets) {
             if (is_array(targets)) {
-                for (var i = 0; i < array_length(targets); i++) { extendNegativeEffects(targets[i], effect.value) }
-            } else { extendNegativeEffects(targets, effect.value) }
+                for (var i = 0; i < array_length(targets); i++) { 
+                    extendNegativeEffects(targets[i], effect.value) 
+                }
+            } else { 
+                extendNegativeEffects(targets, effect.value) 
+            }
         },
     })
     variable_struct_set(effectsRepository, "RemoveNegative", {
         onInstant: function(effect, caster, targets) {
             if (is_array(targets)) {
-                for (var i = 0; i < array_length(targets); i++) { removeOneNegativeEffect(targets[i]) }
-            } else { removeOneNegativeEffect(targets) }
+                for (var i = 0; i < array_length(targets); i++) { 
+                    removeOneNegativeEffect(targets[i]) 
+                }
+            } else {
+                removeOneNegativeEffect(targets)
+            }
         },
     })
-
+    
+    variable_struct_set(effectsRepository, "GainParts", {
+        onPlay: function(effect, caster, targets) { 
+            partsAdd(caster, effect.value) 
+        }
+    })
     global.effectRegistry = effectsRepository
 }
 
@@ -634,6 +653,11 @@ function ExtendNegativeEffect(turns) {
 }
 function RemoveNegativeEffect() {
     return { type: EffectTypes.RemoveNegative, timing: Timing.Instant, sprite: hphealEffect }
+}
+
+// Инженерный пак 
+function GainPartsEffect(count = 1) {
+    return { type: EffectTypes.GainParts, value: count, timing: Timing.OnActions }
 }
 
 // Чарм

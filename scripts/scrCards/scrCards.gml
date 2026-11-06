@@ -10,7 +10,8 @@
 // Наборы карт
 enum CardSet {
     Base,
-    Forest
+    Forest,
+    Engineer
 }
 
 function Card(name,
@@ -49,12 +50,14 @@ function Card(name,
     self.costType  = function() { return self.costTypeCached }
     self.costValue = function() { return self.costValueCached }
     self.handCharms = []
+    self.partsCost = 0
 }
 
 function cardSetBackground(card) {
     var set = variable_struct_exists(card, "cardSet") ? card.cardSet : CardSet.Base
     switch (set) {
         case CardSet.Forest: return sprCardBgLeaf
+        case CardSet.Engineer: return sprCardBgGear
         default: return sprCardBgStar
     }
 }
@@ -145,6 +148,10 @@ function checkIfCanPlayCard(caster, card) {
         return false
     }
 
+    if (card.partsCost > 0 && !partsCanPay(caster, card.partsCost)) {
+        return false
+    }
+    
     if (caster.isEnemy){ 
         return true // враги играют бесплатно
     }

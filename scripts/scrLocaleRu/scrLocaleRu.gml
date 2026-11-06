@@ -114,6 +114,7 @@ function locDefineRu() {
     translations[$ "deck.fox"] = "ФИРА"
     translations[$ "deck.packBase"] = "ЗВЁЗДНЫЙ"
     translations[$ "deck.packForest"] = "ЛЕСНОЙ"
+    translations[$ "deck.packEngineer"] = "ИНЖЕНЕРНЫЙ"
     translations[$ "deck.all"] = "ВСЕ"
     translations[$ "deck.cardsCounter"] = "Карты:"
     translations[$ "companion.rejoinAsk"] = "Снова возьмёте меня с собой?"

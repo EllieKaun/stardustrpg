@@ -14,8 +14,7 @@ function effectField(effect, fieldName) {
         : undefined
 }
 
-// Считаем эффекты одинаковыми, если совпадает тип и уточнения:
-// статус (Burn/Freeze...), модификатор баффа/дебаффа, цель временной слабости
+// Считаем эффекты одинаковыми, если совпадает тип и какие-то детали
 function effectsMatch(effectA, effectB) {
     if (effectField(effectA, "type") != effectField(effectB, "type")) { return false }
     if (effectField(effectA, "statusName") != effectField(effectB, "statusName")) { return false }
@@ -24,8 +23,8 @@ function effectsMatch(effectA, effectB) {
     return true
 }
 
-// Если такой же эффект уже наложен — обновляем длительность
-// justApplied=true — эффект наложен в текущем ходу
+// Если такой же эффект уже наложен обновляем длительность
+// justApplied=true значит эффект наложен в текущем ходу
 function refreshOrPushEffect(target, effect) {
     var effects = target.effects
     for (var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
@@ -43,7 +42,7 @@ function refreshOrPushEffect(target, effect) {
     return applied
 }
 
-// шанс наложения статуса на цель: базовый + бонус, если цель слаба к этому статусу 
+// шанс наложения статуса на цель
 function effectChanceFor(target, effect) {
     if (!variable_instance_exists(effect, "chance")) { return 1 } 
     var chance = effect.chance
@@ -104,7 +103,7 @@ function effectApplyStatus(effect, caster, targets) {
     }
 }
 
-// Мгновенный эффект: вызываем onInstant обработчика и сбрасываем выбор цели
+// Мгновенный эффект, вызываем onInstant обработчика и сбрасываем выбор цели
 function executeEffect(effect, caster, targets) {
     runInstant(effect, caster, targets)
     selectedTargetNumber = -1
@@ -112,7 +111,7 @@ function executeEffect(effect, caster, targets) {
     changeBattleState(BattleStates.AfterPlayChecks)
 }
 
-// Сила к стихии/статусу входящего эффекта
+// Сила к данной стихии или статусу входящего эффекта
 function checkIfHasStrengths(target, effect) {
     if (variable_instance_exists(effect, "statusName")
         && array_contains(target.strengths, effect.statusName)) {
@@ -121,7 +120,7 @@ function checkIfHasStrengths(target, effect) {
     return false
 }
 
-// Слабость к стихии/статусу входящего эффекта
+// Слабость к стихии или статусу входящего эффекта
 function checkIfHasWeaknesses(target, effect) {
     if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) { return false }
     if (variable_instance_exists(effect, "statusName")
@@ -142,7 +141,7 @@ function checkIfHasWeaknesses(target, effect) {
 }
 
 // Находится ли цель в состоянии, к которому она слаба
-// Насколько слабость к статусу усиливает: шанс наложения (доля от базового) и получаемый урон в этом состоянии
+// Насколько слабость к статусу усиливает шанс наложения и получаемый урон в этом состоянии
 function weaknessProfile(statusName) {
     switch (statusName) {
         case StatusNames.Stun: return { chance: 1, stateDamage: 0.1 }
@@ -459,4 +458,15 @@ function removeOneNegativeEffect(target) {
             return
         }
     }
+}
+
+function randomAliveFrom(units) {
+    var alive = []
+    for (var unitIndex = 0; unitIndex < array_length(units); unitIndex++) {
+        if (instance_exists(units[unitIndex]) && !units[unitIndex].isKO()) { array_push(alive, units[unitIndex]) }
+    }
+    if (array_length(alive) == 0) { 
+        return noone 
+    }
+    return alive[irandom(array_length(alive) - 1)]
 }

@@ -69,14 +69,18 @@ function MenuLayer(spr = noone, params = {}) constructor {
 
         if (self.tiled) {
             var tileOffsetX = self.ox mod spriteWidth;
-            if (tileOffsetX > 0) { tileOffsetX -= spriteWidth }    
+            if (tileOffsetX > 0) { 
+                tileOffsetX -= spriteWidth 
+            }    
             var tileOffsetY = scrollOffsetY mod spriteHeight; 
             if (tileOffsetY > 0) {
                 tileOffsetY -= spriteHeight
             } 
-            for (var tileY = tileOffsetY; tileY < guiHeight; tileY += spriteHeight) 
-                for (var tileX = tileOffsetX; tileX < guiWidth; tileX += spriteWidth)
+            for (var tileY = tileOffsetY; tileY < guiHeight; tileY += spriteHeight) {
+                for (var tileX = tileOffsetX; tileX < guiWidth; tileX += spriteWidth) {
                     draw_sprite_ext(self.spr, 0, tileX, tileY, 1, 1, 0, c_white, self.alpha)
+                }
+            }
         } else {
             // Растянуть с оверсканом и центрированием, чтобы боб не оголял края.
             var scaledWidth = guiWidth * self.scale
@@ -102,14 +106,14 @@ function MenuLayer(spr = noone, params = {}) constructor {
 
 // Контроллер меню 
 // items — массив MenuItem. config (опц.): расположение/вид в ДОЛЯХ экрана:
-//   anchorX — точка привязки по X (0..1)
-//   startY — верх списка по Y (0..1)
-//   spacing — шаг между пунктами (доля высоты)
-//   textH — высота текста (доля высоты)
-//   iconGap — отступ иконка↔текст (доля высоты)
-//   halign — fa_left/fa_center/fa_right (выравнивание группы "иконка+текст")
-//   colNormal/colSelect/colDisabled — цвета
-//   wrap — зацикливать навигацию (true)
+// anchorX — точка привязки по X (0..1)
+// startY — верх списка по Y (0..1)
+// spacing — шаг между пунктами (доля высоты)
+// textH — высота текста (доля высоты)
+// iconGap — отступ иконка↔текст (доля высоты)
+// halign — fa_left/fa_center/fa_right (выравнивание группы "иконка+текст")
+// colNormal/colSelect/colDisabled — цвета
+// wrap — зацикливать навигацию (true)
 function Menu(items, config = {}) constructor {
     self.items = items
     self.index = 0
@@ -175,25 +179,38 @@ function Menu(items, config = {}) constructor {
         item.onChange(item, direction)
     }
 
-    // Ввод: клавиатура (вверх/вниз/влево/вправо/enter/space) + мышь (наведение/клик по hitRects и стрелкам)
     // Возвращает true, если пункт подтверждён.
     self.handleInput = function(mouseX, mouseY, mouseMoved, mouseClicked) {
-        if (keyboard_check_pressed(vk_up)   || keyboard_check_pressed(ord("W"))) { self.movePrev() }
-        if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { self.moveNext() }
+        if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) { 
+            self.movePrev() 
+        }
+        if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) { 
+            self.moveNext() 
+        }
         if (array_length(self.items) > 0 && self.current().onChange != undefined) {
-            if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) { self.change(self.index, -1) }
-            if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { self.change(self.index, 1) }
+            if (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A"))) { 
+                self.change(self.index, -1) 
+            }
+            if (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D"))) { 
+                self.change(self.index, 1) 
+            }
         }
 
         var confirmed = false
-        if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) { confirmed = self.confirm() }
+        if (keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) { 
+            confirmed = self.confirm() 
+        }
 
         for (var arrowIndex = 0; arrowIndex < array_length(self.arrowRects); arrowIndex++) {
             var arrowRect = self.arrowRects[arrowIndex]
             if (pointInRect(mouseX, mouseY, arrowRect.x, arrowRect.y, arrowRect.w, arrowRect.h)) {
                 if (self.items[arrowRect.index].enabled) {
-                    if (mouseMoved) { self.index = arrowRect.index }
-                    if (mouseClicked) { self.change(arrowRect.index, arrowRect.direction) }
+                    if (mouseMoved) { 
+                        self.index = arrowRect.index 
+                    }
+                    if (mouseClicked) { 
+                        self.change(arrowRect.index, arrowRect.direction) 
+                    }
                 }
                 return confirmed
             }
@@ -203,8 +220,13 @@ function Menu(items, config = {}) constructor {
             var hitRect = self.hitRects[rectIndex]
             if (pointInRect(mouseX, mouseY, hitRect.x, hitRect.y, hitRect.w, hitRect.h)) {
                 if (self.items[hitRect.index].enabled) {
-                    if (mouseMoved) {   self.index = hitRect.index }
-                    if (mouseClicked) { self.index = hitRect.index; confirmed = self.confirm() }
+                    if (mouseMoved) {
+                        self.index = hitRect.index 
+                    }
+                    if (mouseClicked) { 
+                        self.index = hitRect.index
+                        confirmed = self.confirm() 
+                    }
                 }
                 break
             }
@@ -215,7 +237,16 @@ function Menu(items, config = {}) constructor {
     self.drawText = function(textX, textY, text, textScale, textColor) {
         draw_set_color(textColor)
         if (self.outline > 0) {
-            drawTextTransformedOutline(textX, textY, text, textScale, 0, textColor, self.outlineColor, max(1, round(textScale * self.outline)))
+            drawTextTransformedOutline(
+                textX, 
+                textY, 
+                text, 
+                textScale, 
+                0, 
+                textColor, 
+                self.outlineColor, 
+                max(1, round(textScale * self.outline))
+            )
         } else {
             draw_text_transformed(textX, textY, text, textScale, textScale, 0)
         }
@@ -258,7 +289,12 @@ function Menu(items, config = {}) constructor {
                 draw_set_color(item.enabled ? self.colButtonText : self.colDisabled)
                 draw_text_transformed(anchorPixelX, itemY, item.label, buttonScale, buttonScale, 0)
                 draw_set_halign(fa_left)
-                array_push(self.hitRects, { x: buttonX, y: buttonY, w: buttonW, h: buttonH, index: itemIndex })
+                array_push(self.hitRects, { 
+                    x: buttonX,
+                    y: buttonY, 
+                    w: buttonW, 
+                    h: buttonH, 
+                    index: itemIndex })
                 continue
             }
 
@@ -285,9 +321,23 @@ function Menu(items, config = {}) constructor {
 
                 var arrowHitW = max(arrowW * 2, textPx)
                 array_push(self.arrowRects,
-                    { x: leftArrowX + arrowW / 2 - arrowHitW / 2, y: itemY - stepPx / 2, w: arrowHitW, h: stepPx, index: itemIndex, direction: -1 },
-                    { x: rightArrowX + arrowW / 2 - arrowHitW / 2, y: itemY - stepPx / 2, w: arrowHitW, h: stepPx, index: itemIndex, direction: 1 })
-                array_push(self.hitRects, { x: rowLeft, y: itemY - stepPx / 2, w: rowW, h: stepPx, index: itemIndex })
+                    { x: leftArrowX + arrowW / 2 - arrowHitW / 2, 
+                    y: itemY - stepPx / 2, 
+                    w: arrowHitW, h: stepPx, 
+                    index: itemIndex, 
+                    direction: -1 },
+                    { x: rightArrowX + arrowW / 2 - arrowHitW / 2, 
+                    y: itemY - stepPx / 2, 
+                    w: arrowHitW,
+                    h: stepPx, 
+                    index: itemIndex, 
+                    direction: 1 })
+                array_push(self.hitRects, { 
+                    x: rowLeft,
+                    y: itemY - stepPx / 2, 
+                    w: rowW, 
+                    h: stepPx, 
+                    index: itemIndex })
                 continue
             }
 

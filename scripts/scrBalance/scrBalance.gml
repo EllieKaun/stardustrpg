@@ -63,6 +63,8 @@
 
 // Максимальное количество игредиентов в лесном наборе
 #macro INGREDIENT_MAX 2 
+#macro PARTS_MAX 9
+#macro ENGINEER_COST_MULT 1.2
 
 // Баланс ингредиентов
 #macro INGREDIENT_HEAL_MULT 1.5

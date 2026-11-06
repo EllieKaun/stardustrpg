@@ -239,6 +239,7 @@
     {"id":{"name":"scrCardRender","path":"scripts/scrCardRender/scrCardRender.yy",},},
     {"id":{"name":"scrCards","path":"scripts/scrCards/scrCards.yy",},},
     {"id":{"name":"scrCollectionDecks","path":"scripts/scrCollectionDecks/scrCollectionDecks.yy",},},
+    {"id":{"name":"scrEngineerParts","path":"scripts/scrEngineerParts/scrEngineerParts.yy",},},
     {"id":{"name":"scrCombat","path":"scripts/scrCombat/scrCombat.yy",},},
     {"id":{"name":"scrCommon","path":"scripts/scrCommon/scrCommon.yy",},},
     {"id":{"name":"scrCompanions","path":"scripts/scrCompanions/scrCompanions.yy",},},
