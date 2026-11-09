@@ -5,12 +5,17 @@
 #macro DIALOG_PORTRAIT_OVERHANG 33
 
 // общее содержимое диалогового окно с зголвком, звездами по углам, кнопками и тд
-function modalPopupBlocks(title, bodyBlocks, buttons, heightFrac) {
+function modalPopupBlocks(title, bodyBlocks, buttons, heightFrac, params = {}) {
     var edgeH = 0.08 / heightFrac
     var blocks = []
-    if (title != "") { array_push(blocks, ModalTitle(title, { h: edgeH, size: 1, outline: true })) }
+    if (title != "") { array_push(blocks, ModalTitle(title, { h: edgeH, size: params[$ "titleSize"] ?? 1, outline: true })) }
     array_push(blocks, ModalBox(bodyBlocks))
-    if (array_length(buttons) > 0) { array_push(blocks, ModalButtons(buttons, { h: edgeH })) }
+    if (array_length(buttons) > 0) {
+        var buttonParams = { h: edgeH }
+        if (variable_struct_exists(params, "buttonW")) { buttonParams.buttonW = params.buttonW }
+        if (variable_struct_exists(params, "buttonH")) { buttonParams.buttonH = params.buttonH }
+        array_push(blocks, ModalButtons(buttons, buttonParams))
+    }
     return blocks
 }
 
@@ -35,7 +40,7 @@ function modalPopup(title, bodyBlocks, buttons, overrides = {}) {
         modalMerge(
             modalMerge(modalPopupOptions(heightFrac), {
                 tag: "popup",
-                pages: [{ blocks: modalPopupBlocks(title, bodyBlocks, buttons, heightFrac) }]
+                pages: [{ blocks: modalPopupBlocks(title, bodyBlocks, buttons, heightFrac, overrides) }]
             }),
             overrides
         )

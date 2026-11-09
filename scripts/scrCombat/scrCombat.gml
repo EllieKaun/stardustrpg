@@ -227,12 +227,12 @@ function executeDamageEffect(
         if (is_array(targets)) {
             for (var i = 0; i < array_length(targets); i++) {
                 if (!targets[i].isKO()) {
-                    targets[i].applyDamage(trueDamamge)
+                    if (!armorConsume(targets[i])) { targets[i].applyDamage(trueDamamge) }
                     targets[i].showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
                 }
             }
         } else if (!targets.isKO()) {
-            targets.applyDamage(trueDamamge)
+            if (!armorConsume(targets)) { targets.applyDamage(trueDamamge) }
             targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
         }
         return
@@ -269,13 +269,20 @@ function executeDamageEffect(
     // Ослабление кастера
     if (checkIfHasEffectType(caster, EffectTypes.Weakening)) { damage *= 0.9 }
 
-    // Модификация на стороне ЦЕЛИ: защита (+ баффы и дебаффы), слабости и сопротивления
+    // Модификация на стороне ЦЕЛИ - защита (+ баффы и дебаффы), слабости и сопротивления
     damage = mitigateDamage(targets, effect, damage)
+
+    if (armorConsume(targets)) {
+        targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
+        return
+    }
+
     if (checkIfHasEffectType(targets, EffectTypes.Deflect)) {
         reduceOrRemoveEffectType(targets, EffectTypes.Deflect)
         caster.applyDamage(damage * 2)
         return
     }
+
     show_debug_message("damage " + string(damage) )
     targets.applyDamage(damage, isWeakSpotHit(targets, effect))
     targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
@@ -463,10 +470,24 @@ function removeOneNegativeEffect(target) {
 function randomAliveFrom(units) {
     var alive = []
     for (var unitIndex = 0; unitIndex < array_length(units); unitIndex++) {
-        if (instance_exists(units[unitIndex]) && !units[unitIndex].isKO()) { array_push(alive, units[unitIndex]) }
+        if (instance_exists(units[unitIndex]) && !units[unitIndex].isKO()) { 
+            array_push(alive, units[unitIndex]) 
+        }
     }
     if (array_length(alive) == 0) { 
         return noone 
     }
     return alive[irandom(array_length(alive) - 1)]
+}
+
+function armorConsume(target) {
+    var effects = target.effects
+    for (var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
+        if (effects[effectIndex].type == EffectTypes.Armor) {
+            effects[effectIndex].charges -= 1
+            if (effects[effectIndex].charges <= 0) { array_delete(effects, effectIndex, 1) }
+            return true
+        }
+    }
+    return false
 }

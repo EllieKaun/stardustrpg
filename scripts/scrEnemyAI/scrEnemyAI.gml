@@ -26,7 +26,7 @@ function enumerateMoves(actor, allies, foes) {
         var card = hand[index]
         if (!is_struct(card)) { continue }
         if (variable_struct_exists(card, "cardSet")
-            && card.cardSet == CardSet.Forest) { continue }
+            && (card.cardSet == CardSet.Forest || card.cardSet == CardSet.Engineer)) { continue }
         if (variable_struct_exists(card, "handCharms")
             && array_length(card.handCharms) > 0) { continue }
         if (!variable_struct_exists(card, "effects")) { continue }

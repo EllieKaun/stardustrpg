@@ -77,6 +77,19 @@ function cardIdsInit() {
         forestFlask: "forestFlask",
         forestRandomPotion: "forestRandomPotion",
 
+        // Инженерные
+        engineerCog: "engineerCog",
+        engineerWrench: "engineerWrench",
+        engineerHammer: "engineerHammer",
+        engineerSaw: "engineerSaw",
+        engineerStarScrewdriver: "engineerStarScrewdriver",
+        engineerStarKey: "engineerStarKey",
+        engineerStarPliers: "engineerStarPliers",
+        engineerArmor: "engineerArmor",
+        engineerRepairKit: "engineerRepairKit",
+        engineerStarBattery: "engineerStarBattery",
+        engineerCatapult: "engineerCatapult",
+        engineerTorpedo: "engineerTorpedo"
     }
 }
 
@@ -176,6 +189,32 @@ function cardRegistryInit() {
     registerCard(cardIds.forestRandomPotion, true, CardCategory.Special,
                  function(rarity) { return createForestRandomPotionCard(rarity) },
                 CardSet.Forest)
+
+    // Инженерные
+    registerCard(cardIds.engineerCog, false, CardCategory.Special,
+                 function(rarity) { return createEngineerCogCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerWrench, true, CardCategory.Attack,
+                 function(rarity) { return createEngineerWrenchCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerHammer, true, CardCategory.Attack,
+                 function(rarity) { return createEngineerHammerCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerSaw, true, CardCategory.Attack,
+                 function(rarity) { return createEngineerSawCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerStarScrewdriver, true, CardCategory.Magic,
+                 function(rarity) { return createEngineerStarScrewdriverCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerStarKey, true, CardCategory.Magic,
+                 function(rarity) { return createEngineerStarKeyCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerStarPliers, true, CardCategory.Magic,
+                 function(rarity) { return createEngineerStarPliersCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerArmor, true, CardCategory.Buff,
+                 function(rarity) { return createEngineerArmorCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerRepairKit, true, CardCategory.Heal,
+                 function(rarity) { return createEngineerRepairKitCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerStarBattery, true, CardCategory.Heal,
+                 function(rarity) { return createEngineerStarBatteryCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerCatapult, true, CardCategory.Special,
+                 function(rarity) { return createEngineerCatapultCard(rarity) }, CardSet.Engineer)
+    registerCard(cardIds.engineerTorpedo, true, CardCategory.Special,
+                 function(rarity) { return createEngineerTorpedoCard(rarity) }, CardSet.Engineer)
 }
 
 // Проверка существования карты по ид (чекает регистратор)

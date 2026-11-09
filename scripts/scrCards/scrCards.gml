@@ -57,7 +57,7 @@ function cardSetBackground(card) {
     var set = variable_struct_exists(card, "cardSet") ? card.cardSet : CardSet.Base
     switch (set) {
         case CardSet.Forest: return sprCardBgLeaf
-        case CardSet.Engineer: return sprCardBgGear
+        case CardSet.Engineer: return sprCardBgStar
         default: return sprCardBgStar
     }
 }
@@ -151,7 +151,7 @@ function checkIfCanPlayCard(caster, card) {
     if (card.partsCost > 0 && !partsCanPay(caster, card.partsCost)) {
         return false
     }
-    
+
     if (caster.isEnemy){ 
         return true // враги играют бесплатно
     }
@@ -270,7 +270,11 @@ function cardPlaySequence(card, caster, targets) {
                         ctx.caster.activeIngredient = ingredientTake(ctx.caster)
                     }
                 }
-
+                //// Части инжереного набора
+                if (ctx.card.partsCost > 0) {
+                    partsSpend(ctx.caster, ctx.card.partsCost)
+                }
+                
                 for (var effectIndex = 0; 
                     effectIndex < array_length(effects); 
                     effectIndex++) {

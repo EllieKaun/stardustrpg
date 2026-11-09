@@ -35,6 +35,7 @@
 #macro WEAK_SPOT_IMPACT_FADE_OUT 16
 #macro WEAK_SPOT_IMPACT_DIM 0.55
 #macro WEAK_SPOT_DAMAGE_TEXT_SCALE 1.8
+#macro WEAK_SPOT_LABEL_TEXT_SCALE 0.8
 #macro STUN_LABEL_TEXT_SCALE 0.6
 
 #macro CARD_MANA_COST_MULTIPLIER 2
@@ -106,6 +107,10 @@ function cardBalance() {
         flaskPoisonValue: [4, 5, 6, 7], // колба: сила яда
         flaskPoisonDur: [2, 2, 3, 3], // колба: длительность яда
         flaskPoisonChance: [0.6, 0.7, 0.8, 0.9], // колба: шанс яда
+        engineerArmorDuration: [2, 2, 3, 3],
+        engineerArmorCharges: [1, 1, 2, 2],
+        engineerCatapultHit: [3, 4, 5, 6],
+        engineerTorpedoHit: [3, 4, 5, 6],
         cost: {
             physicalSingle: [2, 3, 4, 5],
             physicalMulti: [4, 5, 6, 7],

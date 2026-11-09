@@ -50,7 +50,10 @@ enum EffectTypes {
     BonusHp,
     ExtendNegative,
     RemoveNegative,
-    AddRandomCards
+    AddRandomCards,
+    GainParts,
+    RandomHits,
+    Armor
 }
 
 function effectTypeToString(type) {
@@ -71,6 +74,9 @@ function effectTypeToString(type) {
         case EffectTypes.Deflect: return loc("effect.Deflect")
         case EffectTypes.DrawCard: return loc("effect.DrawCard")
         case EffectTypes.GainIngredient: return loc("effect.GainIngredient")
+        case EffectTypes.GainParts: return loc("effect.GainParts")
+        case EffectTypes.RandomHits: return loc("effect.RandomHits")
+        case EffectTypes.Armor: return loc("effect.Armor")
         default: return loc("effect.Unknown")
     }
 }
@@ -86,7 +92,8 @@ enum StatusNames {
     Weakening,
     Deflect,
     Poison,
-    Provoke
+    Provoke,
+    Armor
 }
 
 enum ModifiersToBuff {

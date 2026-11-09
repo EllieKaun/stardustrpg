@@ -281,6 +281,20 @@ function initEffectRegistry() {
             partsAdd(caster, effect.value) 
         }
     })
+
+    variable_struct_set(effectsRepository, "RandomHits", {
+        onPlay: function(effect, caster, targets) {
+            var foes = caster.isEnemy ? Battle.heroes : Battle.enemies
+            repeat (effect.hits) {
+                var foe = randomAliveFrom(foes)
+                if (foe == noone) { return }
+                executeDamageEffect(DamageEffect(effect.damageType, effect.value), caster, foe)
+            }
+        }
+    })
+
+    variable_struct_set(effectsRepository, "Armor", { icon: stunned })
+
     global.effectRegistry = effectsRepository
 }
 
@@ -320,6 +334,9 @@ function effectKindFromType(type) {
         case EffectTypes.RemoveNegative: return "RemoveNegative"
         case EffectTypes.DiscardRandomCard: return "DiscardRandomCard"
         case EffectTypes.AddRandomCards: return "AddRandomCards"
+        case EffectTypes.GainParts: return "GainParts"
+        case EffectTypes.RandomHits: return "RandomHits"
+        case EffectTypes.Armor: return "Armor"
         default: return undefined
     }
 }
@@ -646,10 +663,20 @@ function ProvokeEffect(duration) {
 
 // Формы колбы
 function BonusHpEffect(value) {
-    return { type: EffectTypes.BonusHp, value: value, timing: Timing.Instant, sprite: buffEffect }
+    return { 
+        type: EffectTypes.BonusHp, 
+        value: value, 
+        timing: Timing.Instant, 
+        sprite: buffEffect 
+    }
 }
 function ExtendNegativeEffect(turns) {
-    return { type: EffectTypes.ExtendNegative, value: turns, timing: Timing.Instant, sprite: debuffEffect }
+    return { 
+        type: EffectTypes.ExtendNegative, 
+        value: turns, 
+        timing: Timing.Instant, 
+        sprite: debuffEffect 
+    }
 }
 function RemoveNegativeEffect() {
     return { type: EffectTypes.RemoveNegative, timing: Timing.Instant, sprite: hphealEffect }
@@ -658,6 +685,28 @@ function RemoveNegativeEffect() {
 // Инженерный пак 
 function GainPartsEffect(count = 1) {
     return { type: EffectTypes.GainParts, value: count, timing: Timing.OnActions }
+}
+
+function RandomHitsEffect(hits, value, damageType = DamageTypes.True) {
+    return { 
+        type: EffectTypes.RandomHits, 
+        hits: hits, 
+        value: value, 
+        damageType: damageType, 
+        timing: Timing.OnActions 
+    }
+}
+
+function ArmorEffect(duration, charges = 1, sprite = buffEffect, sound = MagicBuff) {
+    return {
+        type: EffectTypes.Armor,
+        statusName: StatusNames.Armor,
+        duration: duration,
+        charges: charges,
+        timing: Timing.Overtime,
+        sprite: sprite,
+        sound: sound
+    }
 }
 
 // Чарм

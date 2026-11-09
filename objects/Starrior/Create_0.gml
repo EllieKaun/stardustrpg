@@ -153,6 +153,9 @@ function applyDamage(value, big = false) {
     }
     var spawnX = irandom_range(bbox_left, bbox_right)
     var spawnY = irandom_range(bbox_top, bbox_bottom)
+    if (big) {
+        drawDamageNumber((bbox_left + bbox_right) * 0.5, bbox_top - 20, loc("battle.weak"), c_orange, 0, WEAK_SPOT_LABEL_TEXT_SCALE)
+    }
     drawDamageNumber(spawnX, spawnY, value, c_red, 0, big ? WEAK_SPOT_DAMAGE_TEXT_SCALE : 1)
 }
 

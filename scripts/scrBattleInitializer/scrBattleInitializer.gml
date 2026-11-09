@@ -226,8 +226,8 @@ function initBattleStates() {
         modalOpen(modalConfirm(
             loc("battle.fleeTitle"),
             loc("battle.fleeLose") + string(battleFleePenalty()),
-            [{ label: loc("battle.fleeStay"), onSelect: backToPlay }, { label: loc("battle.run"), onSelect: flee }],
-            { canCancel: true, onCancel: backToPlay }
+            [{ label: loc("ui.no"), onSelect: backToPlay }, { label: loc("ui.yes"), onSelect: flee }],
+            { canCancel: true, onCancel: backToPlay, titleSize: 1.2, buttonW: 52, buttonH: 18, textMaxLineH: 15 }
         ))
     })
     battleStates[BattleStates.RunConfirm] = stateDef

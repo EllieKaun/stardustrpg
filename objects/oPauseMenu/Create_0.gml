@@ -34,7 +34,7 @@ menu = new Menu([
     new MenuItem(loc("menu.mainMenu"), noone, noone, method(id, function(it) { toMainMenu() })),
     new MenuItem(loc("menu.quit"), noone, noone, function(it) { game_end() })
 ], {
-    anchorX: 0.6, startY: 0.5, spacing: 0.12, textH: 0.06, halign: fa_center
+    anchorX: 0.6, startY: 0.5, spacing: 0.13, textH: 0.08, halign: fa_center, outline: 2, outlineColor: c_black
 })
 
 rebuildMenu = function() {

@@ -229,6 +229,7 @@
     {"id":{"name":"scrBattleInitializer","path":"scripts/scrBattleInitializer/scrBattleInitializer.yy",},},
     {"id":{"name":"scrCardAnimation","path":"scripts/scrCardAnimation/scrCardAnimation.yy",},},
     {"id":{"name":"scrCardFactoryBuff","path":"scripts/scrCardFactoryBuff/scrCardFactoryBuff.yy",},},
+    {"id":{"name":"scrCardFactoryEngineer","path":"scripts/scrCardFactoryEngineer/scrCardFactoryEngineer.yy",},},
     {"id":{"name":"scrCardFactoryCharms","path":"scripts/scrCardFactoryCharms/scrCardFactoryCharms.yy",},},
     {"id":{"name":"scrCardFactoryForest","path":"scripts/scrCardFactoryForest/scrCardFactoryForest.yy",},},
     {"id":{"name":"scrCardFactoryHealing","path":"scripts/scrCardFactoryHealing/scrCardFactoryHealing.yy",},},
