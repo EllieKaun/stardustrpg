@@ -39,3 +39,32 @@ function foxLine(text) {
     var portrait = asset_get_index("portraitFira")
     return dialogLine("Fox", sprite_exists(portrait) ? portrait : noone, text)
 }
+
+//// Сюжетные диалоги
+
+// Первая покупка слота деки
+function storySlotUpgradeLines() {
+    return [
+        dialogLine("Viv", portraitViv, loc("dlg.story.slot1")),
+        dialogLine("Lana", portraitLana, loc("dlg.story.slot2")),
+        dialogLine("Lana", portraitLana, loc("dlg.story.slot3"))
+    ]
+}
+
+// Первая встреча с Мастером Марионеток, перед боем
+function storyBossMeetLines() {
+    return [
+        dialogLine("Viv", portraitViv, loc("dlg.story.boss1")),
+        dialogLine("PuppetMaster", noone, loc("dlg.story.boss2")),
+        dialogLine("Lana", portraitLana, loc("dlg.story.boss3")),
+        dialogLine("Viv", portraitViv, loc("dlg.story.boss4"))
+    ]
+}
+
+// Первая победа над Мастером Марионеток, по возвращении в мир
+function storyBossVictoryLines() {
+    return [
+        dialogLine("Viv", portraitViv, loc("dlg.story.win1")),
+        dialogLine("Lana", portraitLana, loc("dlg.story.win2"))
+    ]
+}

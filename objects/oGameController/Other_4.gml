@@ -42,12 +42,15 @@ if (global.returningFromBattle) {
         instance_destroy(global.fightEnemy)
     }
     global.fightEnemy = noone
+    if (variable_global_exists("bossVictoryStoryPending") && global.bossVictoryStoryPending) {
+        global.bossVictoryStoryPending = false
+        say(storyBossVictoryLines())
+    }
 }
 
 if (global.isNewGame && !tutorialIsDone()) {
     global.isNewGame = false
     with (oSpawnerManager) tutorialSpawnDone = true
-    global.introPendingWalk = true
     say(tutorialOverworldLines())
 }
 

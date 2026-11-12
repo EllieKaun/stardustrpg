@@ -149,6 +149,7 @@ function modalBlockInit() {
             if (!modalWindow.fullyRevealed()) { return }
             var count = array_length(block.items)
             var lineH = rect.h / max(count, block.minLines)
+            if (block.maxLineH != undefined) { lineH = min(lineH, block.maxLineH * guiScale()) }
             for (var optionIndex = 0; optionIndex < count; optionIndex++) {
                 var item = block.items[optionIndex]
                 var isSelected = (modalWindow.cursor == item.index)
@@ -292,7 +293,7 @@ function ModalButtons(items, params = {}) {
 }
 
 function ModalOptions(items, params = {}) {
-    return modalBlock("options", modalMerge({ items: items, minLines: 3 }, params))
+    return modalBlock("options", modalMerge({ items: items, minLines: 3, maxLineH: undefined }, params))
 }
 
 function ModalCardChoice(items, params = {}) {

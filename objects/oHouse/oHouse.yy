@@ -31,8 +31,7 @@
   "properties":[
     {"$GMObjectProperty":"v2","%Name":"sprite_index","filters":[],"listItems":[],"multiselect":false,"name":"sprite_index","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"sprite_index","varType":4,},
     {"$GMObjectProperty":"v2","%Name":"shadowVisible","filters":[],"listItems":[],"multiselect":false,"name":"shadowVisible","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"True","varType":3,},
-    {"$GMObjectProperty":"v2","%Name":"shadowWidthScale","filters":[],"listItems":[],"multiselect":false,"name":"shadowWidthScale","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"1","varType":0,},
-    {"$GMObjectProperty":"v2","%Name":"shadowHeight","filters":[],"listItems":[],"multiselect":false,"name":"shadowHeight","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"3","varType":0,},
+    {"$GMObjectProperty":"v2","%Name":"shadowSprite","filters":[],"listItems":[],"multiselect":false,"name":"shadowSprite","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"noone","varType":4,},
     {"$GMObjectProperty":"v2","%Name":"shadowOffsetX","filters":[],"listItems":[],"multiselect":false,"name":"shadowOffsetX","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"0","varType":0,},
     {"$GMObjectProperty":"v2","%Name":"shadowOffsetY","filters":[],"listItems":[],"multiselect":false,"name":"shadowOffsetY","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"0","varType":0,},
   ],

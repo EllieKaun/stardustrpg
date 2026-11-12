@@ -1,14 +1,14 @@
-if (shadowVisible) {
-    var shadowWidth = (bbox_right - bbox_left + 2) * shadowWidthScale
-    var shadowCenterX = (bbox_left + bbox_right) * 0.5 + shadowOffsetX
-    draw_sprite_stretched(
-        shadow,
-        0,
-        shadowCenterX - shadowWidth * 0.5,
-        bbox_bottom - shadowHeight * 0.5 + shadowOffsetY,
-        shadowWidth,
-        shadowHeight
-    )
+var houseShadow = shadowSprite
+if (houseShadow == noone) {
+    switch (sprite_index) {
+        case sprLanaHouse: houseShadow = sprLanaHouseShadow; break
+        case sprFiraHouse: houseShadow = sprFiraHouseShadow; break
+    }
+}
+if (shadowVisible && houseShadow != noone && sprite_exists(houseShadow)) {
+    var artCenterX = x - sprite_xoffset + sprite_width * 0.5
+    var artBottomY = y - sprite_yoffset + sprite_height - 1
+    draw_sprite(houseShadow, 0, artCenterX + shadowOffsetX, artBottomY + shadowOffsetY)
 }
 
 draw_self()

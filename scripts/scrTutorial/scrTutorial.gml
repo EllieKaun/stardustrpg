@@ -3,9 +3,19 @@ function tutorialOverworldLines() {
     var vivPortrait = asset_get_index("portraitViv")
     return [
         dialogLine("Lana", lana, loc("dlg.tut.ow1")),
-        dialogLine("Viv", vivPortrait, loc("dlg.tut.ow2")),
-        dialogLine("Lana", lana, loc("dlg.tut.ow3"))
+        dialogLine("Lana", lana, loc("dlg.tut.ow2")),
+        dialogLine("Viv", vivPortrait, loc("dlg.tut.ow3")),
+        dialogChoice("Lana", lana, loc("dlg.tut.ow4"), [
+            { text: loc("dlg.tut.yes"), onSelect: function() { global.introPendingWalk = true } },
+            { text: loc("dlg.tut.no"), onSelect: function() { skipTutorial() } }
+        ])
     ]
+}
+
+// Игрок отказался от обучения: бой и колода без подсказок
+function skipTutorial() {
+    markTutorialDone()
+    markDeckTutorialDone()
 }
 
 

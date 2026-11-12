@@ -149,6 +149,17 @@ function markDeckTutorialDone() {
     playerDataSave()
 }
 
+function storyFlagSeen(flagName) {
+    if (!variable_struct_exists(global.playerData, "storySeen")) { return false }
+    return global.playerData.storySeen[$ flagName] ?? false
+}
+
+function storyMarkSeen(flagName) {
+    if (!variable_struct_exists(global.playerData, "storySeen")) { global.playerData.storySeen = {} }
+    global.playerData.storySeen[$ flagName] = true
+    playerDataSave()
+}
+
 // Сохранить данные о пользователе на устройство
 function playerDataSave() {
     var stringPlayerData = json_stringify(global.playerData)
