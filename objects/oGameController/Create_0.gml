@@ -71,7 +71,8 @@ generateChests = function() {
          || collision_point(chestX, chestY, oTree3,  false, true) != noone
          || collision_point(chestX, chestY, oTree4,  false, true) != noone
          || collision_point(chestX, chestY, oTree5,  false, true) != noone
-         || collision_point(chestX, chestY, oStump,  false, true) != noone) { continue }
+         || collision_point(chestX, chestY, oStump,  false, true) != noone
+         || collision_point(chestX, chestY, oHouse,  false, true) != noone) { continue }
 
         var tooClose = false
         for (var chestIndex = 0; chestIndex < array_length(global.chests); chestIndex++) {

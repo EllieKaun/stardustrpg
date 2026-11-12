@@ -25,7 +25,7 @@
 
 // Препятсвия
 function worldObstacles() {
-    return [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump]
+    return [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oStump, oHouse]
 }
 
 // Затемнение всего GUI

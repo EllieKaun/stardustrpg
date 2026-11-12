@@ -105,13 +105,21 @@ if (place_meeting(x, y, leader)) {
 
         // Вход в бой
         var intro = variable_struct_exists(encounter, "introSprite") ? encounter.introSprite : noone
-        if (instance_exists(oGameController)) {
-            oGameController.beginBattleEntry(intro, BattleRoom)
-        } else {
-            with (oTransition) {
-                target_room = BattleRoom
-                state = "fade_out"
+        var enterBattle = method({ intro: intro }, function() {
+            if (instance_exists(oGameController)) {
+                oGameController.beginBattleEntry(intro, BattleRoom)
+            } else {
+                with (oTransition) {
+                    target_room = BattleRoom
+                    state = "fade_out"
+                }
             }
+        })
+        if ((encounter[$ "isBoss"] ?? false) && !storyFlagSeen("bossMeet")) {
+            storyMarkSeen("bossMeet")
+            say(storyBossMeetLines(), enterBattle)
+        } else {
+            enterBattle()
         }
     }
 } else {

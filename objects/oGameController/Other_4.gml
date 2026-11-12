@@ -17,7 +17,7 @@ if (global.mpGrid != -1) {
     mp_grid_destroy(global.mpGrid)
 }
 global.mpGrid = mp_grid_create(0, 0, cols, rows, cell, cell)
-var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oBush, oStump]
+var obstacles = [oWall, oTree1, oTree2, oTree3, oTree4, oTree5, oBush, oStump, oHouse]
 for (var i = 0; i < array_length(obstacles); i++) {
     mp_grid_add_instances(global.mpGrid, obstacles[i], false)
 }
@@ -42,12 +42,15 @@ if (global.returningFromBattle) {
         instance_destroy(global.fightEnemy)
     }
     global.fightEnemy = noone
+    if (variable_global_exists("bossVictoryStoryPending") && global.bossVictoryStoryPending) {
+        global.bossVictoryStoryPending = false
+        say(storyBossVictoryLines())
+    }
 }
 
 if (global.isNewGame && !tutorialIsDone()) {
     global.isNewGame = false
     with (oSpawnerManager) tutorialSpawnDone = true
-    global.introPendingWalk = true
     say(tutorialOverworldLines())
 }
 

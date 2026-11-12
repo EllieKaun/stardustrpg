@@ -55,12 +55,12 @@ function modalDialogPage(line) {
     var textBlock = ModalText(line.text, { typewriter: true })
     var blocks = [textBlock]
     if (options != undefined) {
-        textBlock.h = (line.text == "") ? 0 : 0.45
+        textBlock.h = (line.text == "") ? 0 : 0.4
         var items = []
         for (var optionIndex = 0; optionIndex < array_length(options); optionIndex++) {
             array_push(items, { label: options[optionIndex].text, onSelect: options[optionIndex].onSelect })
         }
-        array_push(blocks, ModalOptions(items))
+        array_push(blocks, ModalOptions(items, { minLines: 2, maxLineH: 10 }))
     }
     var page = { portrait: line.portrait, side: line.side, speaker: line.speaker, onEnter: line.onEnter }
     if (hasPortrait) {
@@ -105,9 +105,10 @@ function modalDrawDialogPortrait(modalWindow, panel) {
     var onLeft = (line[$ "side"] != "right")
     var boxX = floor(onLeft ? panel.x + inset : panel.x + panel.w - inset - boxSize)
     var boxY = floor(panel.y - DIALOG_PORTRAIT_OVERHANG * scaleToGui)
-    draw_sprite_stretched(sprBoxPortrait, 0, boxX, boxY, boxSize, boxSize)
-    var innerSize = boxSize - scaleToGui * 2
-    draw_sprite_stretched(portrait, 0, boxX + scaleToGui, boxY + scaleToGui, innerSize, innerSize)
+    draw_sprite_stretched(sprBoxPortraitBig, 0, boxX, boxY, boxSize, boxSize)
+    var frameSize = ceil(boxSize / sprite_get_width(sprBoxPortraitBig))
+    var innerSize = boxSize - frameSize * 2
+    draw_sprite_stretched(portrait, 0, boxX + frameSize, boxY + frameSize, innerSize, innerSize)
 
     var area = modalDialogContentArea(modalWindow, panel)
     draw_set_color(c_white)

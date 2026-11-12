@@ -85,7 +85,10 @@ function grantBattleRewards() {
     analyticsWin() // аналитика: победа в бою
 
     var wonEncounter = global.battleEncounter
-    if (variable_struct_exists(wonEncounter, "isBoss") && wonEncounter.isBoss) { markBossDefeated() }
+    if (variable_struct_exists(wonEncounter, "isBoss") && wonEncounter.isBoss) {
+        if (!isBossDefeated()) { global.bossVictoryStoryPending = true }
+        markBossDefeated()
+    }
 
     if (variable_global_exists("battleCauldronStolen") && global.battleCauldronStolen) {
         global.battleCauldronStolen = false

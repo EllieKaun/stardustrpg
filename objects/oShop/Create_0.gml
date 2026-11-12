@@ -2,6 +2,7 @@ dbBaseW = camera_get_view_width(view_camera[0])
 dbBaseH = camera_get_view_height(view_camera[0])
 
 open = false
+slotStoryPending = false
 coins = getGold() // баланс
 
 var tabFonts = UI_TAB_FONT_STACK
@@ -53,6 +54,7 @@ shopPanel = new Shop({
                         unlockDeckSlot(item.character, 1)
                     }
                     analyticsPurchase("deck_slot", item.price) // аналитика: покупка слота колоды
+                    if (!storyFlagSeen("slotUpgrade")) { slotStoryPending = true }
                     playerDataSave()
                     // цена выросла / могли достичь максимума — пересобираем вкладку
                     panel.slots = buildShopItems(ShopCategory.OtherItems)
@@ -131,4 +133,9 @@ openShop = function() {
 closeShop = function() {
     open = false
     global.uiModal = false
+    if (slotStoryPending) {
+        slotStoryPending = false
+        storyMarkSeen("slotUpgrade")
+        say(storySlotUpgradeLines())
+    }
 }
