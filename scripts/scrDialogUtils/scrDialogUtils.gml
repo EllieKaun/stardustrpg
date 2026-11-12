@@ -4,6 +4,10 @@ function say(lines, onComplete = undefined) {
     modalOpen(modalDialog(lines, onComplete))
 }
 
+function endingLines() {
+    return [ dialogLine("", noone, loc("dlg.ending")) ]
+}
+
 // Сторона портрета
 function dialogSideFor(speaker) {
     return (speaker == "Lana" || speaker == "Viv") ? "left" : "right"

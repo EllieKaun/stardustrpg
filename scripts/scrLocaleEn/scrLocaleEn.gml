@@ -237,6 +237,8 @@ function locDefineEn() {
     translations[$ "campfire.waitNight"] = "Wait until night"
     translations[$ "campfire.leave"] = "Move on"
 
+    translations[$ "dlg.ending"] = "Thanks for playing! We're working on a sequel. :)"
+
     translations[$ "dlg.tut.ow1"] = "Wait - a wild Starrior! A good chance to learn how to fight."
     translations[$ "dlg.tut.ow2"] = "Don't worry, it's easy once you get the hang of the cards."
     translations[$ "dlg.tut.ow3"] = "Let's go. I'll walk you through it once the battle starts."

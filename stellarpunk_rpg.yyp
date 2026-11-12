@@ -222,6 +222,7 @@
     {"id":{"name":"scrAlbum","path":"scripts/scrAlbum/scrAlbum.yy",},},
     {"id":{"name":"scrAnalytics","path":"scripts/scrAnalytics/scrAnalytics.yy",},},
     {"id":{"name":"scrAudio","path":"scripts/scrAudio/scrAudio.yy",},},
+    {"id":{"name":"scrAutoDeck","path":"scripts/scrAutoDeck/scrAutoDeck.yy",},},
     {"id":{"name":"scrBalance","path":"scripts/scrBalance/scrBalance.yy",},},
     {"id":{"name":"scrBattleConstants","path":"scripts/scrBattleConstants/scrBattleConstants.yy",},},
     {"id":{"name":"scrBattleEnums","path":"scripts/scrBattleEnums/scrBattleEnums.yy",},},

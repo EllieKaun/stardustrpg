@@ -432,3 +432,13 @@ function markBossDefeated() {
     global.playerData.bossDefeated = true
     playerDataSave()
 }
+
+function isEndingShown() {
+    if (!variable_struct_exists(global.playerData, "endingShown")) { global.playerData.endingShown = false }
+    return global.playerData.endingShown
+}
+
+function markEndingShown() {
+    global.playerData.endingShown = true
+    playerDataSave()
+}

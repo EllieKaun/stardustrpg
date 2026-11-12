@@ -42,6 +42,11 @@ if (global.returningFromBattle) {
         instance_destroy(global.fightEnemy)
     }
     global.fightEnemy = noone
+
+    if (isBossDefeated() && !isEndingShown()) {
+        markEndingShown()
+        say(endingLines())
+    }
 }
 
 if (global.isNewGame && !tutorialIsDone()) {

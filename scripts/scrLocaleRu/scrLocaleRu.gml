@@ -235,6 +235,8 @@ function locDefineRu() {
     translations[$ "campfire.waitNight"] = "Переждать до ночи"
     translations[$ "campfire.leave"] = "Идти дальше"
 
+    translations[$ "dlg.ending"] = "Спасибо за игру! Мы работаем над продолжением. :)"
+
     translations[$ "dlg.tut.ow1"] = "Стой, Боец!  Давай научимся сражаться."
     translations[$ "dlg.tut.ow2"] = "Не переживай, с картами всё просто, нужно только освоиться."
     translations[$ "dlg.tut.ow3"] = "Идём. Я всё объясню, как только начнётся бой."
