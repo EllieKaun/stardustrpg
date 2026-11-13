@@ -131,7 +131,7 @@ function cardIsResurrection(card) {
 function checkIfCanPlayCard(caster, card) {
     // Воскрешение: нужен хотя бы один павший (не-кукла) союзник
     if (cardIsResurrection(card)) {
-        var team = caster.isEnemy ? enemies : heroes
+        var team = caster.isEnemy ? Battle.enemies : Battle.heroes
         var hasKO = false
         for (var memberIndex = 0; memberIndex < array_length(team); memberIndex++)
             if (!team[memberIndex].isPuppet && team[memberIndex].isKO()) { hasKO = true; break }

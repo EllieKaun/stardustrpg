@@ -33,9 +33,11 @@ if (disappearing) {
     exit
 }
 
+draw_sprite_stretched(shadow, 0, bbox_left - 1, bbox_bottom - 1, bbox_right - bbox_left + 2, 3)
+
 if (isActive) {
     drawSpriteOutline(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, c_yellow)
-} 
+}
 draw_self()
 // Стрелка над активным врагом
 if (isActive && isEnemy) {
