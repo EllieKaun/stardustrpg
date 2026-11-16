@@ -1,9 +1,9 @@
 {
   "$GMSprite":"v2",
   "%Name":"sprVivBattleDance",
-  "bboxMode":0,
+  "bboxMode":2,
   "bbox_bottom":47,
-  "bbox_left":19,
+  "bbox_left":23,
   "bbox_right":44,
   "bbox_top":18,
   "collisionKind":1,

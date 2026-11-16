@@ -33,11 +33,11 @@ function deckSlotsPurchased() {
 }
 
 function stageCapFrac(prog) {
-    var frac = prog.base
-    frac += deckSlotsPurchased() * prog.perSlot
-    if (questState(QuestId.Fox) == QuestState.Completed) { frac += prog.quest }
-    if (isBossDefeated()) { frac += prog.boss }
-    return min(frac, 1)
+    var fract = prog.base
+    fract += deckSlotsPurchased() * prog.perSlot
+    if (questState(QuestId.Fox) == QuestState.Completed) { fract += prog.quest }
+    if (isBossDefeated()) { fract += prog.boss }
+    return min(fract, 1)
 }
 
 function stageFrac() {
@@ -49,12 +49,12 @@ function stageFrac() {
 
 function stageEnemyMult() {
     var ceiling = zoneProgression(currentZoneId()).ceiling
-    var frac = stageFrac()
+    var fract = stageFrac()
     var mult = {}
     var stats = variable_struct_get_names(ceiling)
     for (var i = 0; i < array_length(stats); i++) {
         var stat = stats[i]
-        mult[$ stat] = lerp(1, ceiling[$ stat], frac)
+        mult[$ stat] = lerp(1, ceiling[$ stat], fract)
     }
     return mult
 }

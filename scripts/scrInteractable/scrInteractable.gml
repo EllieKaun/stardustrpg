@@ -1,20 +1,23 @@
 #macro INTERACT_DEFAULT_DIST 24
 #macro INTERACT_DEFAULT_ICON_OFFSET 4
 #macro INTERACT_DEFAULT_CLICK_HEIGHT 24
+#macro INTERACT_DEFAULT_LABEL_SCALE 0.6
+#macro INTERACT_DEFAULT_LABEL_OFFSET_X 0.5
+#macro INTERACT_DEFAULT_LABEL_OFFSET_Y 0.6
 
 function interactKeyCode() {
-    if (!variable_global_exists("interactKeyCode")) { global.interactKeyCode = ord("E") }
-    return global.interactKeyCode
+    if (!variable_global_exists("interactKeyCodeValue")) { global.interactKeyCodeValue = ord("E") }
+    return global.interactKeyCodeValue
 }
 
 function interactKeyLabel() {
-    if (!variable_global_exists("interactKeyLabel")) { global.interactKeyLabel = "E" }
-    return global.interactKeyLabel
+    if (!variable_global_exists("interactKeyLabelValue")) { global.interactKeyLabelValue = "E" }
+    return global.interactKeyLabelValue
 }
 
 function setInteractKey(code, label = undefined) {
-    global.interactKeyCode = code
-    global.interactKeyLabel = label ?? chr(code)
+    global.interactKeyCodeValue = code
+    global.interactKeyLabelValue = label ?? chr(code)
 }
 
 function interactKeyPressed() {
@@ -27,6 +30,9 @@ function Interactable(_owner, _config = {}) constructor {
     iconSprite = _config[$ "icon"] ?? ActionButtonBadge
     labelSource = _config[$ "label"] ?? function() { return interactKeyLabel() }
     labelFont = _config[$ "labelFont"] ?? fnUI_7
+    labelScale = _config[$ "labelScale"] ?? INTERACT_DEFAULT_LABEL_SCALE
+    labelOffsetX = _config[$ "labelOffsetX"] ?? INTERACT_DEFAULT_LABEL_OFFSET_X
+    labelOffsetY = _config[$ "labelOffsetY"] ?? INTERACT_DEFAULT_LABEL_OFFSET_Y
     interactDist = _config[$ "interactDist"] ?? INTERACT_DEFAULT_DIST
     iconOffset = _config[$ "iconOffset"] ?? INTERACT_DEFAULT_ICON_OFFSET
     clickHeight = _config[$ "clickHeight"] ?? INTERACT_DEFAULT_CLICK_HEIGHT
@@ -95,7 +101,7 @@ function Interactable(_owner, _config = {}) constructor {
         draw_set_halign(fa_center)
         draw_set_valign(fa_middle)
         draw_set_color(c_white)
-        draw_text(bx, by, txt)
+        draw_text_transformed(bx + labelOffsetX, by + labelOffsetY, txt, labelScale, labelScale, 0)
         draw_set_halign(prevHalign)
         draw_set_valign(prevValign)
         draw_set_color(prevColor)
