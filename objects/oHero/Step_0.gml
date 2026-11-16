@@ -19,6 +19,8 @@ if (torchLight != undefined) {
 if (global.uiModal || !can_move) {
     path_end()
     speed = 0
+    moveVelX = 0
+    moveVelY = 0
     sprite_index = sprIdle
     xPrev = x
     yPrev = y
@@ -26,14 +28,15 @@ if (global.uiModal || !can_move) {
     exit
 }
 
-if (selected) {
-    if (global.introWalk) { stepScriptedApproach() }
-    else { stepControlled() }
-} else if (returningHome) {
-    stepReturnHome()
-} else { 
-    stepFollowing()
-} 
+if (selected && !global.introWalk) {
+    stepControlled()
+} else {
+    moveVelX = 0
+    moveVelY = 0
+    if (selected) { stepScriptedApproach() }
+    else if (returningHome) { stepReturnHome() }
+    else { stepFollowing() }
+}
 var movedX = x - xPrev, movedY = y - yPrev
 var moving = (movedX != 0 || movedY != 0)
 if (selected) { updateWalkSound(moving) }

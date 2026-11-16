@@ -271,6 +271,7 @@
     {"id":{"name":"scrQuests","path":"scripts/scrQuests/scrQuests.yy",},},
     {"id":{"name":"scrRewards","path":"scripts/scrRewards/scrRewards.yy",},},
     {"id":{"name":"scrShopDrawing","path":"scripts/scrShopDrawing/scrShopDrawing.yy",},},
+    {"id":{"name":"scrStageDifficulty","path":"scripts/scrStageDifficulty/scrStageDifficulty.yy",},},
     {"id":{"name":"scrStarrior","path":"scripts/scrStarrior/scrStarrior.yy",},},
     {"id":{"name":"scrStarriorsInitializer","path":"scripts/scrStarriorsInitializer/scrStarriorsInitializer.yy",},},
     {"id":{"name":"scrTestBattle","path":"scripts/scrTestBattle/scrTestBattle.yy",},},

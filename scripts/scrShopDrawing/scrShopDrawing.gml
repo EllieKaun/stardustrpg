@@ -10,7 +10,48 @@ function ShopItem(_kind, _price) constructor {
     label = "" // подпись (для слотов)
     character = undefined
     descLines = []
+    cardSet = undefined
     state = "filled"
+}
+
+function shopPackSets() {
+    return [CardSet.Base, CardSet.Forest]
+}
+
+function packUnlocked(cardSet) {
+    if (cardSet == CardSet.Forest) { return variable_global_exists("foxJoined") && global.foxJoined }
+    return true
+}
+
+function packShopInfo(cardSet) {
+    if (cardSet == CardSet.Forest) {
+        return { sprite: sprBoosterForest, title: loc("shop.packForest"), desc: loc("shop.packForestDesc") }
+    }
+    return { sprite: sprBoosterStars, title: loc("shop.packStar"), desc: loc("shop.packStarDesc") }
+}
+
+function packPoolSpec(cardSet) {
+    var content = zoneContent()
+    var ids = []
+    if (cardSet == CardSet.Forest) {
+        appendRewardIds(ids, content.rewardForestSet)
+    } else {
+        appendRewardIds(ids, content.rewardAlways)
+        appendRewardIds(ids, content.rewardNightOnly)
+        appendRewardIds(ids, content.rewardAfterBoss)
+    }
+    return { ids: ids, rarities: content.rewardRarities }
+}
+
+function openCardPack(cardSet) {
+    var spec = packPoolSpec(cardSet)
+    if (array_length(spec.ids) == 0) { return undefined }
+    var ref = rollOneReward(spec)
+    unlockCard(ref.id, ref.rarity, 1)
+    playerDataSave()
+    var card = cardFromRef(ref)
+    showCardReward(card, loc("ui.newCard") + " " + cardDisplayName(card))
+    return ref
 }
 
 // Цена следующего расширения слота деки x1.5
@@ -37,6 +78,18 @@ function buildShopItems(category) {
     var items = []
 
     if (category == ShopCategory.Cards) {
+        var packSets = shopPackSets()
+        for (var packIndex = 0; packIndex < array_length(packSets); packIndex++) {
+            var packSet = packSets[packIndex]
+            if (!packUnlocked(packSet)) { continue }
+            var packInfo = packShopInfo(packSet)
+            var packItem = new ShopItem(ShopItemKind.Pack, SHOP_PACK_PRICE)
+            packItem.cardSet = packSet
+            packItem.label = packInfo.title
+            packItem.descLines = [packInfo.desc]
+            array_push(items, packItem)
+        }
+
         // Карты которые только продаются и в наградах не выпадают
         var shopCards = zoneContent().shopCards
         var shopCardIds = []
@@ -90,7 +143,7 @@ function buildShopItems(category) {
 function shopItemLines(item) {
     var lines = []
 
-    if (item.kind == ShopItemKind.Slot) {
+    if (item.kind == ShopItemKind.Slot || item.kind == ShopItemKind.Pack) {
         array_push(lines, item.label)
         for (var descIndex = 0; descIndex < array_length(item.descLines); descIndex++) {
             array_push(lines, item.descLines[descIndex])
@@ -132,6 +185,16 @@ function drawShopItem(item, rect, uiScale, isSelected = false) {
         var cardW = cardH * 2 / 3
         drawCardFace(item.card, rect.left + padding + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0, 1, 1, isSelected)
         textX = rect.left + padding + cardW + padding
+    }
+
+    if (item.kind == ShopItemKind.Pack) {
+        var packInfo = packShopInfo(item.cardSet)
+        var packSpr = packInfo.sprite
+        var packH = contentH
+        var packScale = packH / sprite_get_height(packSpr)
+        var packW = sprite_get_width(packSpr) * packScale
+        draw_sprite_ext(packSpr, 0, rect.left + padding + packW * 0.5, textTop + packH * 0.5, packScale, packScale, 0, c_white, 1)
+        textX = rect.left + padding + packW + padding
     }
 
     // выделение строки поверх рамки товара

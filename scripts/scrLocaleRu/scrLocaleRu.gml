@@ -91,6 +91,10 @@ function locDefineRu() {
     translations[$ "shop.damageType"] = "Тип урона: "
     translations[$ "shop.magical"] = "магический"
     translations[$ "shop.physical"] = "физический"
+    translations[$ "shop.packStar"] = "Звёздный бустер"
+    translations[$ "shop.packForest"] = "Лесной бустер"
+    translations[$ "shop.packStarDesc"] = "Случайная звёздная карта"
+    translations[$ "shop.packForestDesc"] = "Случайная лесная карта"
 
     translations[$ "reward.type"] = "Тип: "
     translations[$ "reward.attack"] = "Атака"

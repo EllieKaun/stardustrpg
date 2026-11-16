@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scrStageDifficulty",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scrStageDifficulty",
+  "parent":{
+    "name":"BattleLogic",
+    "path":"folders/BattleDomain/Scripts/BattleLogic.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

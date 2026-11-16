@@ -44,6 +44,11 @@ function stepTowardsPoint(fromX, fromY, toX, toY, maxStep) {
     return { x: (toX - fromX) / distance * stepLength, y: (toY - fromY) / distance * stepLength }
 }
 
+function approach(current, target, amount) {
+    if (current < target) { return min(current + amount, target) }
+    return max(current - amount, target)
+}
+
 // Проверка подтверждения enter space
 function uiConfirmPressed() {
     return keyboard_check_pressed(vk_enter)
@@ -79,6 +84,15 @@ function applyEnemyStatBonus(enemy, points, weights = undefined) {
     enemy.intelligence += points * w.intelligence
     enemy.hp += points * w.hp
     enemy.maxHp += points * w.maxHp
+}
+
+// Умножить статы врага на множитель этапа
+function applyEnemyStatScale(enemy, mult) {
+    var stats = variable_struct_get_names(mult)
+    for (var i = 0; i < array_length(stats); i++) {
+        var stat = stats[i]
+        variable_instance_set(enemy, stat, variable_instance_get(enemy, stat) * mult[$ stat])
+    }
 }
 
 // Раннер анимация и действий после их проигрывания

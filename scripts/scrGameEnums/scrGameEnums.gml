@@ -74,7 +74,8 @@ enum CarryItem {
 
 enum ShopItemKind { // Виды товаров в магазине
     Card,
-    Slot
+    Slot,
+    Pack
 }
 
 enum FireflyState { // Состояния светлячков

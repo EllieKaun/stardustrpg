@@ -121,6 +121,7 @@ function getWins() {
 
 function addWin() {
     global.playerData.wins = getWins() + 1
+    addZoneWin(currentZoneId())
     playerDataSave()
     return global.playerData.wins
 }

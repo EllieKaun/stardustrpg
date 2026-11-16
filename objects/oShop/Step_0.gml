@@ -1,5 +1,6 @@
 if (!open) { exit }
-guiSyncCrisp() 
+if (modalIsOpen()) { exit }
+guiSyncCrisp()
 layoutPanels()
 
 shopPanel.stepMouse()

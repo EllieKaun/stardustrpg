@@ -11,6 +11,7 @@
 #macro SHOP_CARD_PRICE 100 // цены карты
 #macro SHOP_SLOT_BASE 100 // цена слота декбилдера
 #macro SHOP_SLOT_GROWTH 1.5 // во сколько раз увеличивается цена слота
+#macro SHOP_PACK_PRICE 100
 
 // Сундуки
 #macro CHEST_GOLD_MIN 5 // минимальная награда золота из сундука
@@ -121,7 +122,7 @@ function currentZoneId() {
 
 function difficultyLevel(encounter = undefined) {
     var bonus = (encounter != undefined && variable_struct_exists(encounter, "difficultyBonus")) ? encounter.difficultyBonus : 0
-    return getWins() + bonus
+    return round(stageFrac() * zoneProgression(currentZoneId()).maxLevel) + bonus
 }
 
 function affixSpriteSlot(assetName) {
