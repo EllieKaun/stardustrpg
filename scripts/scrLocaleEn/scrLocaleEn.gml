@@ -91,6 +91,10 @@ function locDefineEn() {
     translations[$ "shop.damageType"] = "Damage Type: "
     translations[$ "shop.magical"] = "magical"
     translations[$ "shop.physical"] = "physical"
+    translations[$ "shop.packStar"] = "Star Booster"
+    translations[$ "shop.packForest"] = "Forest Booster"
+    translations[$ "shop.packStarDesc"] = "Get a random star card"
+    translations[$ "shop.packForestDesc"] = "Get a random forest card"
 
     translations[$ "reward.type"] = "Type: "
     translations[$ "reward.attack"] = "Attack"

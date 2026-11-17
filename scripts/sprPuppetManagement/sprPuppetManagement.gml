@@ -60,7 +60,7 @@ function cardSummonsPuppet(card) {
 }
 
 function canSpawnPuppetFor(caster) {
-    var team = caster.isEnemy ? enemies : heroes
+    var team = caster.isEnemy ? Battle.enemies : Battle.heroes
     return countAlivePuppetsIn(team) < MAX_PUPPETS
 }
 

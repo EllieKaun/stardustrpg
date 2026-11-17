@@ -7,5 +7,17 @@ light = oLighting.addLight({
     flicker: 0.08
 })
 
-canInteract = false
-wasModal = false
+interaction = new Interactable(id, {
+    interactDist: CAMPFIRE_INTERACT_DIST,
+    iconOffset: CAMPFIRE_ICON_OFFSET,
+    clickHeight: CAMPFIRE_ICON_CLICK_HEIGHT,
+    onInteract: function() {
+        var speaker = activeSpeaker()
+        say([
+            dialogChoice(speaker.id, speaker.portrait, loc("campfire.ask"), [
+                { text: isNight() ? loc("campfire.waitMorning") : loc("campfire.waitNight"), onSelect: function() { skipTimeOfDay() } },
+                { text: loc("campfire.leave"), onSelect: undefined }
+            ])
+        ])
+    }
+})

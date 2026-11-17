@@ -52,9 +52,10 @@ function initStarriorsFromEncounter(encounter) {
     var isRaw = variable_struct_exists(encounter, "raw") && encounter.raw
     var difficulty = battleDifficulty()
     var level = difficultyLevel(encounter)
-    var statPoints = difficulty.statPoints(level)
-    
-    var igniteBattle = (variable_global_exists("battleIsIgnited") && global.battleIsIgnited)
+    var stageMult = stageEnemyMult()
+
+    var noIgnite = variable_struct_exists(encounter, "noIgnite") && encounter.noIgnite
+    var igniteBattle = (variable_global_exists("battleIsIgnited") && global.battleIsIgnited) && !noIgnite
     var igniteAffix = igniteBattle ? findAffixById(difficulty, "ignite") : undefined
     var igniteFlags = array_create(array_length(enemies), false)
     if (igniteAffix != undefined && !isRaw && array_length(enemies) > 0) {
@@ -73,15 +74,16 @@ function initStarriorsFromEncounter(encounter) {
             continue
         }
         if (igniteFlags[i]) {
+            applyEnemyStatScale(enemy, stageMult)
             applyEnemyAffix(enemy, igniteAffix)
         } else if (igniteAffix != undefined) {
-            applyEnemyStatBonus(enemy, statPoints, difficulty.statWeights)
+            applyEnemyStatScale(enemy, stageMult)
         } else {
-            var affix = rollEnemyAffix(difficulty, level)
+            var affix = noIgnite ? undefined : rollEnemyAffix(difficulty, level)
             if (affix != undefined) {
                 applyEnemyAffix(enemy, affix)
             } else {
-                applyEnemyStatBonus(enemy, statPoints, difficulty.statWeights)
+                applyEnemyStatScale(enemy, stageMult)
             }
         }
     }

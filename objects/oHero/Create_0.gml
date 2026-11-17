@@ -4,6 +4,13 @@ xPrev = x
 yPrev = y
 can_move = true // false при входе в бой
 
+moveVelX = 0
+moveVelY = 0
+accelTime = 0.12
+decelTime = 0.05
+accelStep = spdWalk / (accelTime * game_get_speed(gamespeed_fps))
+decelStep = spdWalk / (decelTime * game_get_speed(gamespeed_fps))
+
 path = path_add()
 nSpeed = 0.8
 calcPathDelay = 8
@@ -44,17 +51,27 @@ stepControlled = function() {
     var verticalInput = (keyboard_check(ord("S")) 
         || keyboard_check(vk_down)) - (keyboard_check(ord("W")) 
         || keyboard_check(vk_up))
-    var moveSpeed = (horizontalInput != 0 && verticalInput != 0) ? spdWalk * 0.7071 : spdWalk
-    var moveX = horizontalInput * moveSpeed
-    var moveY = verticalInput * moveSpeed
+    var inputLen = point_distance(0, 0, horizontalInput, verticalInput)
+    var targetX = 0, targetY = 0
+    if (inputLen > 0) {
+        targetX = horizontalInput / inputLen * spdWalk
+        targetY = verticalInput / inputLen * spdWalk
+    }
+
+    moveVelX = approach(moveVelX, targetX, targetX == 0 ? decelStep : accelStep)
+    moveVelY = approach(moveVelY, targetY, targetY == 0 ? decelStep : accelStep)
 
     var obstacles = worldObstacles()
-    
-    if (!place_meeting(x + moveX, y, obstacles)) { 
-        x += moveX
+
+    if (!place_meeting(x + moveVelX, y, obstacles)) {
+        x += moveVelX
+    } else {
+        moveVelX = 0
     }
-    if (!place_meeting(x, y + moveY, obstacles)) { 
-        y += moveY
+    if (!place_meeting(x, y + moveVelY, obstacles)) {
+        y += moveVelY
+    } else {
+        moveVelY = 0
     }
 }
 

@@ -211,7 +211,7 @@ function modalBlockInit() {
                 }
                 draw_set_color(row[$ "color"] ?? c_white)
                 if (row[$ "wrap"] ?? false) {
-                    var fitted = fitWrappedText(row.text, rect.w, lineH * 2)
+                    var fitted = fitWrappedText(row.text, rect.w, lineH * 2, textH)
                     var prevFont = draw_get_font()
                     draw_set_font(fitted.font)
                     draw_text_transformed(floor(rect.x), floor(rowY), fitted.text, fitted.scale, fitted.scale, 0)

@@ -46,6 +46,11 @@ shopPanel = new Shop({
                     unlockCard(item.ref.id, item.ref.rarity, 1) // добавляем копию карты
                     analyticsPurchase(item.ref.id, item.price) // аналитика: покупка карты
                 }
+            } else if (item.kind == ShopItemKind.Pack) {
+                if (spendGold(item.price)) {
+                    openCardPack(item.cardSet)
+                    analyticsPurchase(item.cardSet == CardSet.Forest ? "pack_forest" : "pack_star", item.price)
+                }
             } else if (item.kind == ShopItemKind.Slot) {
                 if (spendGold(item.price)) {
                     if (item.character == undefined) {

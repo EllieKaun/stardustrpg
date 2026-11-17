@@ -1,10 +1,10 @@
 {
   "$GMSprite":"v2",
   "%Name":"sprVivBattleCast",
-  "bboxMode":0,
+  "bboxMode":2,
   "bbox_bottom":47,
   "bbox_left":23,
-  "bbox_right":54,
+  "bbox_right":42,
   "bbox_top":18,
   "collisionKind":1,
   "collisionTolerance":0,
