@@ -46,6 +46,7 @@ startChestBattle = function() {
     global.returningFromBattle = true
     global.battleSection = Section.TopLeft
     global.battleEncounter = makeEncounter(winScaledComposition(), forestRewardPool())
+    global.battleEncounter.noIgnite = true
     global.battleNoFlee = true
     global.battleIsIgnited = false
     global.battleEnemyFirst = true // враги нападают первыми

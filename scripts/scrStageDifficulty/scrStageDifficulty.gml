@@ -12,10 +12,10 @@ function zoneProgression(zoneId) {
         case ZoneId.Forest:
         default:
             return {
-                ceiling: { 
-                    strength: 10, 
-                    intelligence: 1, 
-                    hp: 6, 
+                ceiling: {
+                    strength: 10,
+                    intelligence: 10,
+                    hp: 6,
                     maxHp: 6
                 },
                 base: STAGE_FOREST_BASE,

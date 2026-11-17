@@ -223,7 +223,7 @@ function battleDifficulty(zoneId = undefined) {
                             var base = (level >= 50) ? 1 : ((level >= 25) ? 0.4 : 0)
                             return clamp(base + nightValue() * 0.2, 0, 1)
                         },
-                        statMult: { strength: 10, hp: 6, maxHp: 6 },
+                        statMult: { strength: 5, hp: 3, maxHp: 3 },
                         mark: "isIgnited",
                         chanceField: "igniteEffectChance",
                         effectChance: 0.1,
