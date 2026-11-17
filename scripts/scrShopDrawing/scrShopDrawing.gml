@@ -89,33 +89,6 @@ function buildShopItems(category) {
             packItem.descLines = [packInfo.desc]
             array_push(items, packItem)
         }
-
-        // Карты которые только продаются и в наградах не выпадают
-        var shopCards = zoneContent().shopCards
-        var shopCardIds = []
-        for (var shopIndex = 0; shopIndex < array_length(shopCards); shopIndex++) {
-            var shopEntry = shopCards[shopIndex]
-            array_push(shopCardIds, shopEntry.id)
-            var specialCard = cardFromRef({ id: shopEntry.id, rarity: CardsRarity.Default })
-            if (specialCard == undefined) { continue }
-            var specialItem = new ShopItem(ShopItemKind.Card, shopEntry.price)
-            specialItem.card = specialCard
-            specialItem.ref = { id: shopEntry.id, rarity: CardsRarity.Default }
-            array_push(items, specialItem)
-        }
-
-        // Карты, которые игрок уже открыл
-        var refs = getCollectionRefs()
-        for (var i = 0; i < array_length(refs); i++) {
-            if (!cardShopSellable(refs[i].id)) { continue }
-            if (array_contains(shopCardIds, refs[i].id)) { continue } // выставлена по особой цене
-            var card = cardFromRef(refs[i])
-            if (card == undefined) { continue }
-            var shopItem = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)
-            shopItem.card = card
-            shopItem.ref = { id: refs[i].id, rarity: refs[i].rarity }
-            array_push(items, shopItem)
-        }
     } else {
         // Расширение слотов деки 
         if (deckOf(Characters.Lana).unlocked < deckSlotLimit()) {
@@ -169,8 +142,88 @@ function shopItemLines(item) {
     return lines
 }
 
+// Картинка товара слева на карточке
+function shopItemImage(item) {
+    if (item.kind == ShopItemKind.Pack) { return packShopInfo(item.cardSet).sprite }
+    if (item.kind == ShopItemKind.Slot) { return CardBack }
+    return noone
+}
+
+// Карточка пака/слота в стиле бустера: коричневая рамка, картинка слева, текст справа
+function drawShopCard(item, rect, isSelected) {
+    var L = rect.left, T = rect.top, W = rect.width, H = rect.height
+    var bOuter = max(2, round(H * 0.06))
+    var bLine  = max(1, round(H * 0.03))
+
+    draw_set_color(make_color_rgb(135, 70, 55))
+    draw_rectangle(L, T, L + W - 1, T + H - 1, false)
+    draw_set_color(make_color_rgb(206, 218, 249))
+    draw_rectangle(L + bOuter, T + bOuter, L + W - 1 - bOuter, T + H - 1 - bOuter, false)
+    var inset = bOuter + bLine
+    draw_set_color(make_color_rgb(108, 50, 42))
+    draw_rectangle(L + inset, T + inset, L + W - 1 - inset, T + H - 1 - inset, false)
+    draw_set_color(c_white)
+
+    var panelL = L + inset, panelT = T + inset
+    var panelW = W - inset * 2, panelH = H - inset * 2
+    var pad = panelH * 0.1
+    var contentT = panelT + pad
+    var contentH = panelH - pad * 2
+
+    var spr = shopItemImage(item)
+    var rightL = panelL + pad
+    if (spr != noone) {
+        var scl = contentH / sprite_get_height(spr)
+        var maxImgW = panelW * 0.42
+        if (sprite_get_width(spr) * scl > maxImgW) { scl = maxImgW / sprite_get_width(spr) }
+        var imgW = sprite_get_width(spr) * scl
+        draw_sprite_ext(spr, 0, panelL + pad + imgW * 0.5, contentT + contentH * 0.5, scl, scl, 0, c_white, 1)
+        rightL = panelL + pad + imgW + pad
+    }
+
+    var rightW = (panelL + panelW - pad) - rightL
+    var prevFont = draw_get_font()
+    draw_set_color(c_white)
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+
+    var titleFit = fitWrappedText(item.label, rightW, contentH * 0.3, contentH * 0.18)
+    draw_set_font(titleFit.font)
+    draw_text_transformed(floor(rightL), floor(contentT), titleFit.text, titleFit.scale, titleFit.scale, 0)
+
+    var priceStr = string(item.price)
+    var coinH = contentH * 0.22
+    var coinScale = coinH / sprite_get_height(CoinIcon)
+    var coinW = sprite_get_width(CoinIcon) * coinScale
+    var priceCY = contentT + contentH * 0.5
+    draw_set_font(uiFont())
+    draw_set_valign(fa_middle)
+    var pScale = uiTextScale(priceStr, coinH, rightW * 0.5)
+    draw_text_transformed(floor(rightL), floor(priceCY), priceStr, pScale, pScale, 0)
+    draw_sprite_ext(CoinIcon, 0, rightL + string_width(priceStr) * pScale + coinW * 0.6, priceCY, coinScale, coinScale, 0, c_white, 1)
+    draw_set_valign(fa_top)
+
+    var descText = ""
+    for (var i = 0; i < array_length(item.descLines); i++) { descText += (i > 0 ? " " : "") + item.descLines[i] }
+    var descFit = fitWrappedText(descText, rightW, contentH * 0.34, contentH * 0.14)
+    draw_set_font(descFit.font)
+    draw_text_transformed(floor(rightL), floor(contentT + contentH * 0.64), descFit.text, descFit.scale, descFit.scale, 0)
+
+    draw_set_font(prevFont)
+    draw_set_color(c_white)
+
+    if (isSelected) {
+        draw_sprite_stretched(ItemSelected, 0, rect.left, rect.top, rect.width, rect.height)
+    }
+}
+
 // Отрисовка одной строки-товара в прямоугольнике rect {left,top,width,height}
 function drawShopItem(item, rect, uiScale, isSelected = false) {
+    if (item.kind == ShopItemKind.Pack || item.kind == ShopItemKind.Slot) {
+        drawShopCard(item, rect, isSelected)
+        return
+    }
+
     // рамка товара
     draw_sprite_stretched(ItemShadow, 0, rect.left, rect.top, rect.width, rect.height)
 

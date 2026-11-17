@@ -6,6 +6,7 @@ function afterPlayChecks() {
         updateOvertime(selectedCharacter)
     }
     removeDeadPuppets()
+    killBossPuppets()
     if (!instance_exists(selectedCharacter)) {
         selectNextCharacter()
         startTurnFor(selectedCharacter)
@@ -348,5 +349,29 @@ function removeDeadPuppets() {
             else { instance_destroy(puppet) }
         }
     }
-    initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)  
+    initStarriorsPositions(posZoneHeight, posScreenWidth, posSpacing)
+}
+
+// Когда Мастер марионеток побеждён его марионетки умирают
+function killBossPuppets() {
+    var hasMaster = false
+    var masterAlive = false
+    for (var i = 0; i < array_length(enemies); i++) {
+        if (enemies[i].kind == EnemyKind.PuppetMaster) {
+            hasMaster = true
+            if (enemies[i].hp > 0) { masterAlive = true }
+        }
+    }
+    if (!hasMaster || masterAlive) { return }
+
+    for (var i = 0; i < array_length(enemies); i++) {
+        var puppet = enemies[i]
+        if (puppet.isPuppet && puppet.hp > 0) {
+            with (puppet) {
+                hp = 0
+                if (actionState != StarriorStates.KnockOut) { changeActionState(StarriorStates.KnockOut, undefined) }
+                if (!disappearing && !gone) { disappearing = true; disappearTimer = 0 }
+            }
+        }
+    }
 }

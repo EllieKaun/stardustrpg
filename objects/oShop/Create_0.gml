@@ -113,7 +113,7 @@ layoutPanels = function() {
     shopPanel.tabH = tabHt
     shopPanel.tabPadding = guiW * 0.006
     shopPanel.uiScale = 1
-    shopPanel.rowHeight = guiH * 0.18
+    shopPanel.rowHeight = guiH * 0.26
 }
 layoutPanels()
 
