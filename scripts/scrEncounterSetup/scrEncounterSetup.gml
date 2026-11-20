@@ -88,7 +88,7 @@ function initStarriorsFromEncounter(encounter) {
         }
     }
 
-    // Носимый предмет попадает в бой только пока он доступен (квест активен)
+    // Проверка на то, нужно ли надеть предмет для квеста
     var carryItem = variable_struct_exists(encounter, "carryItem") ? encounter.carryItem : noone
     if (carryItem != noone && !carryItemDef(carryItem).available()) { carryItem = noone }
 
@@ -146,18 +146,29 @@ function applyEnemyAffix(enemy, affix) {
             enemy.sprite_index = affixSprites.idle
             enemy.mask_index = affixSprites.idle
         }
-        if (affixSprites[$ "attack"] != undefined) { enemy.spriteActionAttack = affixSprites.attack }
-        if (affixSprites[$ "cast"]   != undefined) { enemy.spriteActionCast   = affixSprites.cast }
-        if (affixSprites[$ "spell"]  != undefined) { enemy.spriteActionSpell  = affixSprites.spell }
-        if (affixSprites[$ "dance"]  != undefined) { enemy.spriteActionDance  = affixSprites.dance }
-        if (affixSprites[$ "ko"]     != undefined) { enemy.spriteActionKO     = affixSprites.ko }
+        if (affixSprites[$ "attack"] != undefined) { 
+            enemy.spriteActionAttack = affixSprites.attack 
+        }
+        if (affixSprites[$ "cast"] != undefined) { 
+            enemy.spriteActionCast = affixSprites.cast 
+        }
+        if (affixSprites[$ "spell"] != undefined) { 
+            enemy.spriteActionSpell = affixSprites.spell 
+        }
+        if (affixSprites[$ "dance"] != undefined) { 
+            enemy.spriteActionDance = affixSprites.dance 
+        }
+        if (affixSprites[$ "ko"] != undefined) { 
+            enemy.spriteActionKO = affixSprites.ko
+        }
     } else if (affix[$ "sprite"] != undefined) {
-     
         enemy.spriteActionIdle = affix.sprite
         enemy.sprite_index = affix.sprite
         enemy.mask_index = affix.sprite
     }
 
-    if (affix.blend != undefined) { enemy.image_blend = affix.blend }
+    if (affix.blend != undefined) { 
+        enemy.image_blend = affix.blend 
+    }
 }
 

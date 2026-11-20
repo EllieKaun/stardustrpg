@@ -6,8 +6,8 @@ can_move = true // false при входе в бой
 
 moveVelX = 0
 moveVelY = 0
-accelTime = 0.12
-decelTime = 0.05
+accelTime = 0.28
+decelTime = 0.16
 accelStep = spdWalk / (accelTime * game_get_speed(gamespeed_fps))
 decelStep = spdWalk / (decelTime * game_get_speed(gamespeed_fps))
 
