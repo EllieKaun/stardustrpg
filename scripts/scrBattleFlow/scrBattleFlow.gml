@@ -38,7 +38,7 @@ function afterPlayChecks() {
 function battleEndDelayed(outcome) {
     var runner = new SequenceRunner()
     runner.play([
-        stepWait(BATTLE_END_FRAMES),
+        stepWait((outcome == BattleOutcome.Win) ? BATTLE_WIN_END_FRAMES : BATTLE_END_FRAMES),
         stepDo(function(ctx) {
             var battleOutcome = ctx.outcome
             with (Battle) {

@@ -115,7 +115,7 @@ function modalDrawDialogPortrait(modalWindow, panel) {
     draw_set_halign(onLeft ? fa_left : fa_right)
     draw_set_valign(fa_bottom)
     drawUiTextOutline(onLeft ? area.x : area.x + area.w, panel.y - scaleToGui * 2, 
-                        peakerDisplayName(line[$ "speaker"]), 
+                        speakerDisplayName(line[$ "speaker"]),
                         15 * scaleToGui, c_black,
                          max(2, round(scaleToGui * 0.75)), 
                          area.w)
