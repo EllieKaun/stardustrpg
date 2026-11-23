@@ -456,3 +456,26 @@ function initDisplaySettings() {
     }
     global.displayFullscreen = fullscreen
 }
+
+//// Логотип в главном меню: надписи LANA и VIV на общем холсте, каждая качается и наклоняется в своём ритме
+
+#macro MENU_TITLE_HEIGHT 0.26 // высота логотипа (доля высоты экрана)
+#macro MENU_TITLE_BOB 1.5 // размах покачивания вверх-вниз, в пикселях арта
+#macro MENU_TITLE_TILT 3 // наибольший наклон, градусы
+
+function drawMenuTitlePart(sprite, canvasLeft, canvasTop, titleScale, bobPeriod, tiltPeriod, phase) {
+    var time = current_time / 1000
+    var bob = sin(time * 2 * pi / bobPeriod + phase) * MENU_TITLE_BOB * titleScale
+    var tilt = sin(time * 2 * pi / tiltPeriod + phase * 1.7) * MENU_TITLE_TILT
+    var partX = canvasLeft + sprite_get_xoffset(sprite) * titleScale
+    var partY = canvasTop + sprite_get_yoffset(sprite) * titleScale + bob
+    draw_sprite_ext(sprite, 0, round(partX), round(partY), titleScale, titleScale, tilt, c_white, 1)
+}
+
+function drawMenuTitleLogo(centerX, centerY, height) {
+    var titleScale = height / sprite_get_height(sprTitleLana)
+    var canvasLeft = centerX - sprite_get_width(sprTitleLana) * titleScale * 0.5
+    var canvasTop = centerY - height * 0.5
+    drawMenuTitlePart(sprTitleLana, canvasLeft, canvasTop, titleScale, 2.4, 3.1, 0)
+    drawMenuTitlePart(sprTitleViv, canvasLeft, canvasTop, titleScale, 2.9, 2.6, 1.9)
+}

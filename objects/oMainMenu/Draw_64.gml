@@ -8,7 +8,7 @@ menuDrawScene(backLayers, foreLayers, menu, itemsAboveForeground, guiWidth, guiH
 draw_set_halign(fa_center)
 draw_set_valign(fa_middle)
 draw_set_color(c_white)
-drawUiTextOutline(guiWidth * 0.75, guiHeight * 0.22, loc("screen.mainMenu"), guiHeight * 0.09, c_black)
+drawMenuTitleLogo(guiWidth * 0.75, guiHeight * 0.22, guiHeight * MENU_TITLE_HEIGHT)
 
 if (confirmPrompt != "") {
     draw_set_color(make_color_rgb(235, 70, 60))
