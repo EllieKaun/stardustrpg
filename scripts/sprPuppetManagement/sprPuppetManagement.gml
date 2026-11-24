@@ -73,7 +73,7 @@ function spawnPuppet(category, caster) {
     var puppet = createStarrior(
         "Puppet",
         sprites.idle, sprites.attack, sprites.spell, sprites.cast, sprites.ko, sprites.dance,
-        8, 8,  0, 0,  1, 1,  /*str*/2, /*int*/2, /*aura*/0, /*guts*/0,
+        20, 20,  0, 0,  1, 1,  /*str*/6, /*int*/6, /*aura*/0, /*guts*/2,
         puppetDeckForCategory(category)
     );
     puppet.isPuppet = true

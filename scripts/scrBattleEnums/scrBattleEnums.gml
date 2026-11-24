@@ -48,7 +48,8 @@ enum EffectTypes {
     BonusHp,
     ExtendNegative,
     RemoveNegative,
-    AddRandomCards
+    AddRandomCards,
+    DiscoverWeakness
 }
 
 function effectTypeToString(type) {

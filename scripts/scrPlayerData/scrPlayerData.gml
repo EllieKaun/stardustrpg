@@ -71,6 +71,7 @@ function playerDataDefault() {
         deckTutorialDone: false,
         quests: {},
         wins: 0,
+        discoveredWeaknesses: {}, // ключ string(EnemyKind) -> { string(StatusNames): true }
         activeCompanion: COMPANION_NONE,
         collection: {}, // key "id@rarity" -> { id, rarity, count }
         decks: {
@@ -123,6 +124,31 @@ function addWin() {
 
 function chestGoldAmount() {
     return CHEST_GOLD_MIN + irandom(CHEST_GOLD_RANGE)
+}
+
+//// Найденные слабости врагов — по типу врага, сохраняются между боями
+
+function discoveredWeaknessStore() {
+    if (!variable_struct_exists(global.playerData, "discoveredWeaknesses")) { global.playerData.discoveredWeaknesses = {} }
+    return global.playerData.discoveredWeaknesses
+}
+
+function weaknessIsDiscovered(kind, statusName) {
+    var store = discoveredWeaknessStore()
+    var kindKey = string(kind)
+    if (!variable_struct_exists(store, kindKey)) { return false }
+    return store[$ kindKey][$ string(statusName)] ?? false
+}
+
+function markWeaknessDiscovered(kind, statusName) {
+    if (kind == EnemyKind.None) { return }
+    var store = discoveredWeaknessStore()
+    var kindKey = string(kind)
+    if (!variable_struct_exists(store, kindKey)) { store[$ kindKey] = {} }
+    var statusKey = string(statusName)
+    if (store[$ kindKey][$ statusKey] ?? false) { return }
+    store[$ kindKey][$ statusKey] = true
+    playerDataSave()
 }
 
 function tutorialIsDone() {

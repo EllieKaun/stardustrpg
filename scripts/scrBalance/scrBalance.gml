@@ -28,7 +28,7 @@
 #macro SPEAR_BATTLE_BONUS 15  // сложность врагов с капьем
 
 // Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
-#macro WEAKNESS_DAMAGE_MODIFIER 0.1
+#macro WEAKNESS_DAMAGE_MODIFIER 1.0
 #macro NEGATIVE_EFFECT_MIN_DURATION 2 // дебаффы и негативные статусы держатся минимум столько ходов
 
 #macro WEAK_SPOT_IMPACT_FADE_IN 7
@@ -87,7 +87,7 @@ function cardBalance() {
         instantMana: [10, 20, 30, MANA_FULL],
         overtimeMana: [6, 8, 12, 16],
         overtimeManaDur: [2, 2, 3, 3],
-        buff: [2, 4, 6, 8],
+        buff: [4, 6, 8, 10],
         handCharmStat: [1, 2, 3, 4],
         damageMulSingle: [1, 2, 3, 4],
         damageMulGroup: [1, 1, 2, 3],
@@ -233,10 +233,10 @@ function battleDifficulty(zoneId = undefined) {
                     }
                 ],
                 enemyCount: [
-                    { maxLevel: 10, mn: 1, mx: 2 },
-                    { maxLevel: 25, mn: 2, mx: 4 },
-                    { maxLevel: 50, mn: 3, mx: 5 },
-                    { maxLevel: 1000000, mn: 4, mx: 5 }
+                    { maxLevel: 10, mn: 2, mx: 3 },
+                    { maxLevel: 25, mn: 3, mx: 4 },
+                    { maxLevel: 50, mn: 4, mx: 5 },
+                    { maxLevel: 1000000, mn: 5, mx: 5 }
                 ],
                 enemyPool: [createCrackerNut, createMushroom, createFlower, createLeaf],
                 limitedEnemy: undefined,
@@ -305,6 +305,7 @@ function zoneContent(zoneId = undefined) {
                     cardIds.buffMagicalDamageSingleTarget, // усиление маг урона
                     cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
                     cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
+                    cardIds.findWeakness, // поиск слабости врага
                     cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
                     cardIds.magicalDamageSingleTarget // атака звёздной энергией
                 ],

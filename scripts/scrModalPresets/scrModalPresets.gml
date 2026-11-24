@@ -213,6 +213,17 @@ function modalEnemyInfoRows(target) {
     if (variable_instance_exists(target, "bonusHp") && target.bonusHp > 0) {
         array_push(rows, { text: loc("battle.bonusHp") + string(target.bonusHp) })
     }
+    if (variable_instance_exists(target, "kind") && array_length(target.weaknesses) > 0) {
+        array_push(rows, { gap: true }, { text: loc("battle.weakness") })
+        for (var weaknessIndex = 0; weaknessIndex < array_length(target.weaknesses); weaknessIndex++) {
+            var weakness = target.weaknesses[weaknessIndex]
+            if (weaknessIsDiscovered(target.kind, weakness)) {
+                array_push(rows, { text: weaknessLabel(weakness), icon: weaknessIcon(weakness) })
+            } else {
+                array_push(rows, { text: loc("weakness.Unknown") })
+            }
+        }
+    }
     array_push(rows, { gap: true }, { text: loc("battle.statuses") })
     var targetEffects = target.effects
     if (array_length(targetEffects) == 0) { array_push(rows, { text: loc("ui.none") }) }
