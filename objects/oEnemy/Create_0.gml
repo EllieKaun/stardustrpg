@@ -1,7 +1,16 @@
 triggered = false
 isIgnited = false
+nightIgniteRolled = false
 kind = worldEnemyKind(object_index)
 igniteSprite = worldIgniteSprite(kind)
+
+becomeIgnited = function() {
+    isIgnited = true
+    if (igniteSprite != noone) {
+        sprite_index = igniteSprite
+        mask_index = igniteSprite
+    }
+}
 my_spawner = noone
 spawnedDynamically = false
 carriedItem = noone

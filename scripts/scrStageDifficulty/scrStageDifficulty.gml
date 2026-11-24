@@ -1,10 +1,11 @@
 enum ForestStage { Start, SlotsBought, FiraQuestDone, BossBeaten }
 
-#macro STAGE_FOREST_BASE 0.10
+#macro STAGE_FOREST_BASE 0.35
 #macro STAGE_FOREST_PER_SLOT 0.18
 #macro STAGE_FOREST_QUEST 0.25
 #macro STAGE_FOREST_BOSS 0.30
-#macro STAGE_FOREST_GROWTH_PER_WIN 0.05
+#macro STAGE_FOREST_GROWTH_PER_WIN 0.02
+#macro STAGE_FOREST_MIN_FRAC 0.25
 #macro STAGE_FOREST_MAX_LEVEL 50
 
 function zoneProgression(zoneId) {
@@ -42,9 +43,8 @@ function stageCapFrac(prog) {
 
 function stageFrac() {
     var prog = zoneProgression(currentZoneId())
-    var cap = stageCapFrac(prog) // определение потолка
-    var ramp = zoneWins(currentZoneId()) * prog.growthPerWin // доля роста
-    return clamp(min(ramp, cap), 0, 1)
+    var ramp = zoneWins(currentZoneId()) * prog.growthPerWin // рост от 0 до 1.00
+    return clamp(ramp, 0, 1)
 }
 
 function stageEnemyMult() {

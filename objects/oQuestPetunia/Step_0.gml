@@ -1,5 +1,5 @@
 var questActive = (questState(QuestId.Fox) == QuestState.Active)
-image_index = (nightValue() >= 0.6) ? 1 : 0
+sprite_index = (nightValue() >= 0.6) ? sprNightPetunia : sprDayPetunia
 
 if (myLight != noone && instance_exists(oLighting)) { myLight.intensity = questActive ? nightValue() : 0 }
 

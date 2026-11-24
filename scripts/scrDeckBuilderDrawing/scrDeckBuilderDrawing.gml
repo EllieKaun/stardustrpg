@@ -139,7 +139,7 @@ function Panel(config) constructor {
 
     // Адаптивный лэайут
    static computeLayout = function() {
-        var topPad = padding * 0.75 // верхний отступ меньше бокового
+        var topPad = padding * 1.1 // место над первым рядом под значки количества и владельца
         var sideW = sideColumnWidth()
         var gridX = x + padding + sideW
         var gridY = y + topPad

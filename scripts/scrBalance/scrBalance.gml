@@ -305,7 +305,6 @@ function zoneContent(zoneId = undefined) {
                     cardIds.buffMagicalDamageSingleTarget, // усиление маг урона
                     cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
                     cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
-                    cardIds.handCharmStrength, // пассивный чарм силы
                     cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
                     cardIds.magicalDamageSingleTarget // атака звёздной энергией
                 ],
@@ -325,7 +324,10 @@ function zoneContent(zoneId = undefined) {
                     cardIds.summonAttackPuppet,
                     cardIds.summonMagicPuppet,
                     cardIds.summonHealPuppet,
-                    cardIds.summonBuffPuppet
+                    cardIds.summonBuffPuppet,
+                    cardIds.shuffleDeck,
+                    cardIds.resurrection,
+                    cardIds.copyNextPlayedCard
                 ],
                 rewardForestSet: [
                     cardIds.forestSupplyBag,

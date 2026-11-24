@@ -52,7 +52,7 @@ function modalConfirm(title, text, buttons, overrides = {}) {
 function modalDialogPage(line) {
     var hasPortrait = (line.portrait != undefined && sprite_exists(line.portrait))
     var options = line[$ "options"]
-    var textBlock = ModalText(line.text, { typewriter: true })
+    var textBlock = ModalText(line.text, { typewriter: true, maxLineH: 16 })
     var blocks = [textBlock]
     if (options != undefined) {
         textBlock.h = (line.text == "") ? 0 : 0.4
@@ -114,7 +114,11 @@ function modalDrawDialogPortrait(modalWindow, panel) {
     draw_set_color(c_white)
     draw_set_halign(onLeft ? fa_left : fa_right)
     draw_set_valign(fa_bottom)
-    drawUiTextOutline(onLeft ? area.x : area.x + area.w, panel.y - scaleToGui * 2, speakerDisplayName(line[$ "speaker"]), 10 * scaleToGui, c_black, max(2, round(scaleToGui * 0.75)), area.w)
+    drawUiTextOutline(onLeft ? area.x : area.x + area.w, panel.y - scaleToGui * 2, 
+                        speakerDisplayName(line[$ "speaker"]),
+                        15 * scaleToGui, c_black,
+                         max(2, round(scaleToGui * 0.75)), 
+                         area.w)
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
 }

@@ -21,6 +21,7 @@ if (global.uiModal || !can_move) {
     speed = 0
     moveVelX = 0
     moveVelY = 0
+    followSpeed = 0
     sprite_index = sprIdle
     xPrev = x
     yPrev = y

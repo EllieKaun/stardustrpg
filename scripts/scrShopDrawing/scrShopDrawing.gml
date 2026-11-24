@@ -89,33 +89,6 @@ function buildShopItems(category) {
             packItem.descLines = [packInfo.desc]
             array_push(items, packItem)
         }
-
-        // Карты которые только продаются и в наградах не выпадают
-        var shopCards = zoneContent().shopCards
-        var shopCardIds = []
-        for (var shopIndex = 0; shopIndex < array_length(shopCards); shopIndex++) {
-            var shopEntry = shopCards[shopIndex]
-            array_push(shopCardIds, shopEntry.id)
-            var specialCard = cardFromRef({ id: shopEntry.id, rarity: CardsRarity.Default })
-            if (specialCard == undefined) { continue }
-            var specialItem = new ShopItem(ShopItemKind.Card, shopEntry.price)
-            specialItem.card = specialCard
-            specialItem.ref = { id: shopEntry.id, rarity: CardsRarity.Default }
-            array_push(items, specialItem)
-        }
-
-        // Карты, которые игрок уже открыл
-        var refs = getCollectionRefs()
-        for (var i = 0; i < array_length(refs); i++) {
-            if (!cardShopSellable(refs[i].id)) { continue }
-            if (array_contains(shopCardIds, refs[i].id)) { continue } // выставлена по особой цене
-            var card = cardFromRef(refs[i])
-            if (card == undefined) { continue }
-            var shopItem = new ShopItem(ShopItemKind.Card, SHOP_CARD_PRICE)
-            shopItem.card = card
-            shopItem.ref = { id: refs[i].id, rarity: refs[i].rarity }
-            array_push(items, shopItem)
-        }
     } else {
         // Расширение слотов деки 
         if (deckOf(Characters.Lana).unlocked < deckSlotLimit()) {
@@ -169,8 +142,82 @@ function shopItemLines(item) {
     return lines
 }
 
+#macro SHOP_ITEM_FRAME_INSET 6 // ширина рамки ItemShadow в пикселях GUI
+#macro SHOP_TITLE_LINE_H 0.22 // высота строки названия пака/слота (доля высоты содержимого)
+#macro SHOP_PRICE_H 0.26 // высота цены и монеты
+#macro SHOP_DESC_LINE_H 0.17 // высота строки описания пака/слота
+#macro SHOP_POINTER_SIZE 0.28 // размер пальца у выбранного товара (доля высоты товара)
+#macro SHOP_CARD_MIN_LINES 4 // на сколько строк делится высота у карты; меньше - крупнее текст
+
+// Картинка товара слева на карточке
+function shopItemImage(item) {
+    if (item.kind == ShopItemKind.Pack) { return packShopInfo(item.cardSet).sprite }
+    if (item.kind == ShopItemKind.Slot) { return CardBack }
+    return noone
+}
+
+// Карточка пака/слота в стиле бустера: рамка товара, картинка слева, текст справа
+function drawShopCard(item, rect, isSelected) {
+    var L = rect.left, T = rect.top, W = rect.width, H = rect.height
+    draw_sprite_stretched(ItemShadow, 0, L, T, W, H)
+
+    var inset = SHOP_ITEM_FRAME_INSET
+    var panelL = L + inset, panelT = T + inset
+    var panelW = W - inset * 2, panelH = H - inset * 2
+    var pad = panelH * 0.08
+    var contentT = panelT + pad
+    var contentH = panelH - pad * 2
+
+    var spr = shopItemImage(item)
+    var rightL = panelL + pad
+    if (spr != noone) {
+        var scl = contentH / sprite_get_height(spr)
+        var maxImgW = panelW * 0.42
+        if (sprite_get_width(spr) * scl > maxImgW) { scl = maxImgW / sprite_get_width(spr) }
+        var imgW = sprite_get_width(spr) * scl
+        draw_sprite_ext(spr, 0, panelL + pad + imgW * 0.5, contentT + contentH * 0.5, scl, scl, 0, c_white, 1)
+        rightL = panelL + pad + imgW + pad
+    }
+
+    var rightW = (panelL + panelW - pad) - rightL
+    var prevFont = draw_get_font()
+    draw_set_color(c_white)
+    draw_set_halign(fa_left)
+    draw_set_valign(fa_top)
+
+    var titleFit = fitWrappedText(item.label, rightW, contentH * 0.32, contentH * SHOP_TITLE_LINE_H)
+    draw_set_font(titleFit.font)
+    draw_text_transformed(floor(rightL), floor(contentT), titleFit.text, titleFit.scale, titleFit.scale, 0)
+
+    var priceStr = string(item.price)
+    var coinH = contentH * SHOP_PRICE_H
+    var coinScale = coinH / sprite_get_height(CoinIcon)
+    var coinW = sprite_get_width(CoinIcon) * coinScale
+    var priceCY = contentT + contentH * 0.5
+    draw_set_font(uiFont())
+    draw_set_valign(fa_middle)
+    var pScale = uiTextScale(priceStr, coinH, rightW * 0.5)
+    draw_text_transformed(floor(rightL), floor(priceCY), priceStr, pScale, pScale, 0)
+    draw_sprite_ext(CoinIcon, 0, rightL + string_width(priceStr) * pScale + coinW * 0.6, priceCY, coinScale, coinScale, 0, c_white, 1)
+    draw_set_valign(fa_top)
+
+    var descText = ""
+    for (var i = 0; i < array_length(item.descLines); i++) { descText += (i > 0 ? " " : "") + item.descLines[i] }
+    var descFit = fitWrappedText(descText, rightW, contentH * 0.36, contentH * SHOP_DESC_LINE_H)
+    draw_set_font(descFit.font)
+    draw_text_transformed(floor(rightL), floor(contentT + contentH * 0.64), descFit.text, descFit.scale, descFit.scale, 0)
+
+    draw_set_font(prevFont)
+    draw_set_color(c_white)
+}
+
 // Отрисовка одной строки-товара в прямоугольнике rect {left,top,width,height}
 function drawShopItem(item, rect, uiScale, isSelected = false) {
+    if (item.kind == ShopItemKind.Pack || item.kind == ShopItemKind.Slot) {
+        drawShopCard(item, rect, isSelected)
+        return
+    }
+
     // рамка товара
     draw_sprite_stretched(ItemShadow, 0, rect.left, rect.top, rect.width, rect.height)
 
@@ -183,7 +230,7 @@ function drawShopItem(item, rect, uiScale, isSelected = false) {
     if (item.kind == ShopItemKind.Card && item.card != undefined) {
         var cardH = contentH
         var cardW = cardH * 2 / 3
-        drawCardFace(item.card, rect.left + padding + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0, 1, 1, isSelected)
+        drawCardFace(item.card, rect.left + padding + cardW * 0.5, textTop + cardH * 0.5, cardW, cardH, 0, 1, 1, false)
         textX = rect.left + padding + cardW + padding
     }
 
@@ -197,20 +244,16 @@ function drawShopItem(item, rect, uiScale, isSelected = false) {
         textX = rect.left + padding + packW + padding
     }
 
-    // выделение строки поверх рамки товара
-    if (isSelected) {
-        draw_sprite_stretched(ItemSelected, 0, rect.left, rect.top, rect.width, rect.height)
-    }
-
     // описание
     var lines = shopItemLines(item)
-    var lineH = contentH / max(5, array_length(lines))
+    var lineH = contentH / max(SHOP_CARD_MIN_LINES, array_length(lines))
+    var textMaxW = rect.left + rect.width * 0.7 - textX
     draw_set_font(uiFont())
     draw_set_color(c_white)
     draw_set_halign(fa_left)
     draw_set_valign(fa_top)
     for (var i = 0; i < array_length(lines); i++) {
-        drawUiText(textX, textTop + i * lineH, lines[i], lineH * 0.8)
+        drawUiText(textX, textTop + i * lineH, lines[i], lineH * 0.85, textMaxW)
     }
 
     // цена
@@ -245,7 +288,7 @@ function Shop(_config) constructor {
     tabFonts = _config[$ "tabFonts"] ?? undefined
     activeTab = 0
 
-    cols = 1
+    cols = _config[$ "cols"] ?? 1
     slots = _config[$ "slots"] ?? []
     padding = _config[$ "padding"] ?? 8
     tabH = _config[$ "tabH"] ?? 18
@@ -259,7 +302,7 @@ function Shop(_config) constructor {
 
     scrollY = 0
     scrollable = _config[$ "scrollable"] ?? true
-    totalRows = array_length(slots)
+    totalRows = ceil(array_length(slots) / cols)
 
     // прямоугольники вкладок 
     tabRects = _config[$ "tabRects"] ?? undefined
@@ -282,7 +325,9 @@ function Shop(_config) constructor {
         var gridW = w - padding * 2
         var rowH = rowHeight * uiScale
         var gapY = padding * 0.6
-        return { gridX: gridX, gridY: gridY, rowW: gridW, rowH: rowH, gapY: gapY }
+        var gapX = padding * 0.6
+        var colW = (gridW - gapX * (cols - 1)) / cols
+        return { gridX: gridX, gridY: gridY, rowW: gridW, colW: colW, rowH: rowH, gapX: gapX, gapY: gapY }
     }
 
     static rowPitch = function() {
@@ -292,13 +337,14 @@ function Shop(_config) constructor {
 
     static scrollMax = function() {
         var layout = computeLayout()
-        var contentBottom = layout.gridY + (array_length(slots) - 1) * (layout.rowH + layout.gapY) + layout.rowH
+        var rowCount = ceil(array_length(slots) / cols)
+        var contentBottom = layout.gridY + (rowCount - 1) * (layout.rowH + layout.gapY) + layout.rowH
         var visibleBottom = y + h - padding
         return max(0, contentBottom - visibleBottom)
     }
 
     static refreshScroll = function() {
-        totalRows = array_length(slots)
+        totalRows = ceil(array_length(slots) / cols)
         if (!scrollable) { scrollY = 0; return }
         scrollY = clamp(scrollY, 0, scrollMax())
     }
@@ -318,8 +364,11 @@ function Shop(_config) constructor {
 
     static getSlotRect = function(index) {
         var layout = computeLayout()
-        var slotY = layout.gridY + index * (layout.rowH + layout.gapY) - scrollY
-        return { left: layout.gridX, top: slotY, width: layout.rowW, height: layout.rowH }
+        var column = index mod cols
+        var row = index div cols
+        var slotX = layout.gridX + column * (layout.colW + layout.gapX)
+        var slotY = layout.gridY + row * (layout.rowH + layout.gapY) - scrollY
+        return { left: slotX, top: slotY, width: layout.colW, height: layout.rowH }
     }
 
     // Вкладки
@@ -359,7 +408,7 @@ function Shop(_config) constructor {
     static selectAtCursor = function() {
         cursorRow = clamp(cursorRow, 0, max(0, array_length(slots) - 1))
         selectedSlot = cursorRow
-        scrollToRow(cursorRow)
+        scrollToRow(cursorRow div cols)
     }
 
     static enterFromLeft = function(row) {
@@ -390,19 +439,28 @@ function Shop(_config) constructor {
             if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S")) ||
                 keyboard_check_pressed(vk_enter) || keyboard_check_pressed(vk_space)) {
                 onTabRow = false
-                cursorRow = max(0, floor(scrollY / rowPitch()))
+                cursorRow = max(0, floor(scrollY / rowPitch())) * cols
                 selectAtCursor()
             }
             return
         }
 
         var moved = false
+        var lastIndex = array_length(slots) - 1
         if (keyboard_check_pressed(vk_up) || keyboard_check_pressed(ord("W"))) {
-            if (cursorRow == 0 && nTabs > 0) { onTabRow = true; return }
-            cursorRow = max(0, cursorRow - 1); moved = true
+            if (cursorRow < cols && nTabs > 0) { onTabRow = true; return }
+            cursorRow = max(0, cursorRow - cols); moved = true
         }
         if (keyboard_check_pressed(vk_down) || keyboard_check_pressed(ord("S"))) {
-            cursorRow = min(array_length(slots) - 1, cursorRow + 1); moved = true
+            if (cursorRow + cols <= lastIndex) { cursorRow += cols }
+            else if ((cursorRow div cols) < (lastIndex div cols)) { cursorRow = lastIndex }
+            moved = true
+        }
+        if (cols > 1 && (keyboard_check_pressed(vk_left) || keyboard_check_pressed(ord("A")))) {
+            if ((cursorRow mod cols) > 0) { cursorRow -= 1; moved = true }
+        }
+        if (cols > 1 && (keyboard_check_pressed(vk_right) || keyboard_check_pressed(ord("D")))) {
+            if ((cursorRow mod cols) < cols - 1 && cursorRow < lastIndex) { cursorRow += 1; moved = true }
         }
         if (moved) { selectAtCursor() }
 
@@ -492,6 +550,16 @@ function Shop(_config) constructor {
         }
 
         guiClipEnd(clipSurface, clipX, clipY)
+
+        // Палец у выбранного товара, поверх клипа, чтобы не срезался у левой колонки
+        if (showSelection && selectedSlot >= 0 && selectedSlot < array_length(slots)) {
+            var selectedRect = getSlotRect(selectedSlot)
+            var pointerCenterY = selectedRect.top + selectedRect.height * 0.5
+            if (pointerCenterY > clipY && pointerCenterY < clipY + clipH) {
+                var pointerScale = selectedRect.height * SHOP_POINTER_SIZE / sprite_get_height(sPointer)
+                draw_sprite_ext(sPointer, 0, selectedRect.left, pointerCenterY, pointerScale, pointerScale, 0, c_white, 1)
+            }
+        }
 
         // Вкладки 
         for (var tabIndex = 0; tabIndex < array_length(tabs); tabIndex++) {

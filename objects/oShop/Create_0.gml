@@ -20,6 +20,7 @@ shopPanel = new Shop({
     x: 0, y: 0, w: 0, h: 0,
     tabFonts: tabFonts,
     rowHeight: 62, // высота строки товара
+    cols: 2, // товаров в ряду
     tabs: [
         { name: loc("shop.tabCards"), sprite: ShopBtn, color: #CC8844 },
         { name: loc("shop.tabOther"), sprite: ShopBtn, color: #CC8844 }
@@ -113,7 +114,7 @@ layoutPanels = function() {
     shopPanel.tabH = tabHt
     shopPanel.tabPadding = guiW * 0.006
     shopPanel.uiScale = 1
-    shopPanel.rowHeight = guiH * 0.18
+    shopPanel.rowHeight = guiH * 0.26
 }
 layoutPanels()
 

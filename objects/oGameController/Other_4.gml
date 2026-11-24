@@ -44,7 +44,7 @@ if (global.returningFromBattle) {
     global.fightEnemy = noone
     if (variable_global_exists("bossVictoryStoryPending") && global.bossVictoryStoryPending) {
         global.bossVictoryStoryPending = false
-        say(storyBossVictoryLines())
+        say(storyBossVictoryLines(), function() { showThanksForPlaying() })
     }
 }
 
@@ -57,6 +57,11 @@ if (global.isNewGame && !tutorialIsDone()) {
 if (tutorialIsDone() && !deckTutorialIsDone() && global.deckTutorialStage == DeckTutorialStage.Inactive) {
     global.deckTutorialStage = DeckTutorialStage.Dialog
     say(deckTutorialIntroLines())
+}
+
+// Побеждённый Мастер марионеток исчезает из мира
+if (isBossDefeated()) {
+    with (oPuppetMaster) { instance_destroy() }
 }
 
 if (!global.chestsGenerated) {

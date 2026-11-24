@@ -6,13 +6,15 @@ can_move = true // false при входе в бой
 
 moveVelX = 0
 moveVelY = 0
-accelTime = 0.12
-decelTime = 0.05
+accelTime = 0.42
+decelTime = 0.24
 accelStep = spdWalk / (accelTime * game_get_speed(gamespeed_fps))
 decelStep = spdWalk / (decelTime * game_get_speed(gamespeed_fps))
 
 path = path_add()
 nSpeed = 0.8
+followSpeed = 0 // текущая скорость спутника, разгоняется и тормозит как у лидера
+followGain = 0.2 // насколько быстрее идёт спутник на каждый пиксель отставания сверх distanceToStopFollowing
 calcPathDelay = 8
 calcPathTimer = 0
 distanceToStopFollowing = 24
@@ -93,35 +95,38 @@ stepFollowing = function() {
         return
     }
     
-    if (distance <= distanceToStopFollowing) {
+    var desiredSpeed = clamp((distance - distanceToStopFollowing) * followGain, 0, nSpeed)
+    followSpeed = approach(followSpeed, desiredSpeed, (desiredSpeed > followSpeed) ? accelStep : decelStep)
+    if (followSpeed <= 0) {
         path_end()
         speed = 0
         return
     }
 
-    stepWalkTowards(leader.x, leader.y)
+    stepWalkTowards(leader.x, leader.y, followSpeed)
 }
 
-stepWalkTowards = function(targetX, targetY) {
+stepWalkTowards = function(targetX, targetY, walkSpeed = nSpeed) {
     var obstacles = worldObstacles()
 
     // Прямая линия до цели 
     if (collision_line(x, y, targetX, targetY, obstacles, true, true) == noone) {
         path_end()
-        move_towards_point(targetX, targetY, nSpeed)
+        move_towards_point(targetX, targetY, walkSpeed)
         return
     }
 
     // Иначе обходим препятствия по MP
+    if (path_index != -1) { path_speed = walkSpeed }
     if (calcPathTimer-- <= 0) {
         calcPathTimer = calcPathDelay
         var found = mp_grid_path(global.mpGrid, path, x, y, targetX, targetY, true)
         if (found) {
             speed = 0 
-            path_start(path, nSpeed, path_action_stop, false)
+            path_start(path, walkSpeed, path_action_stop, false)
         } else {
             path_end()
-            move_towards_point(targetX, targetY, nSpeed)
+            move_towards_point(targetX, targetY, walkSpeed)
         }
     }
 }

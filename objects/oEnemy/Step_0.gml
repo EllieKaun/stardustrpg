@@ -30,6 +30,20 @@ if (carriedItem == noone) {
 var leader = oGameController.selected_character
 if (!instance_exists(leader)) { exit }
 
+// Код для превращения врага в игнайт когда наступает ночь
+if (!triggered && !isIgnited) {
+    if (isNight()) {
+        if (!nightIgniteRolled) {
+            nightIgniteRolled = true
+            if (random(1) < worldIgniteChance()) { 
+                becomeIgnited() 
+            }
+        }
+    } else {
+        nightIgniteRolled = false
+    }
+}
+
 // Ночью ignite-враг гонится за игроком
 var isChasing = false
 if (!triggered && isIgnited && isNight()

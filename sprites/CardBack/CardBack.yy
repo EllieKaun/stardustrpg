@@ -23,7 +23,7 @@
   ],
   "name":"CardBack",
   "nineSlice":null,
-  "origin":7,
+  "origin":4,
   "parent":{
     "name":"Cards",
     "path":"folders/BattleDomain/Sprites/Cards.yy",
@@ -76,7 +76,7 @@
     "visibleRange":null,
     "volume":1.0,
     "xorigin":19,
-    "yorigin":54,
+    "yorigin":27,
   },
   "swatchColours":null,
   "swfPrecision":0.5,

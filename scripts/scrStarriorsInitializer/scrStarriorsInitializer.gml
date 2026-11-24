@@ -19,6 +19,7 @@ function createLana(){
             playerDeckFor(Characters.Lana)
     )
     starrior.themeColor = make_color_rgb(105, 93, 164)
+    starrior.weakSpotImpactSprite = sprWeakSpotLana
     starrior.portrait = sprCharacterPanelLanaHead
     return starrior
 }
@@ -106,6 +107,7 @@ function createViv(){
         playerDeckFor(Characters.Viv)
     )
     starrior.themeColor = make_color_rgb(199, 9, 151)
+    starrior.weakSpotImpactSprite = sprWeakSpotViv
     starrior.portrait = sprCharacterPanelVivHead
     return starrior
 }

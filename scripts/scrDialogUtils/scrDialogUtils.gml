@@ -68,3 +68,10 @@ function storyBossVictoryLines() {
         dialogLine("Lana", portraitLana, loc("dlg.story.win2"))
     ]
 }
+
+// Финальная заставка с благодарностью за игру
+function showThanksForPlaying() {
+    modalOpen(modalConfirm(loc("ui.thanksTitle"), loc("ui.thanksBody"), [
+        { label: loc("ui.thanksOk"), onSelect: undefined }
+    ], { tag: "thanks", heightFrac: 0.55, textMaxLineH: 16 }))
+}
