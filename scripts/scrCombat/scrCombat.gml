@@ -261,25 +261,32 @@ function cardWeakSpotTarget(card, targets) {
     return noone
 }
 
+function capEnemyDamageToHero(caster, target, damage) {
+    if (isBossDefeated()) { return damage }
+    if (caster == undefined || caster == noone || !caster.isEnemy) { return damage }
+    if (target == undefined || target == noone || target.isEnemy) { return damage }
+    return min(damage, ENEMY_DAMAGE_CAP)
+}
+
 function executeDamageEffect(
     effect,
     caster,
     targets
 ) {
     var damageType = effect.damageType
-    
+
     //// Чистый урон
     if (damageType == DamageTypes.True) {
         var trueDamamge = is_method(effect.value) ? effect.value() : effect.value
         if (is_array(targets)) {
             for (var i = 0; i < array_length(targets); i++) {
                 if (!targets[i].isKO()) {
-                    targets[i].applyDamage(trueDamamge)
+                    targets[i].applyDamage(capEnemyDamageToHero(caster, targets[i], trueDamamge))
                     targets[i].showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
                 }
             }
         } else if (!targets.isKO()) {
-            targets.applyDamage(trueDamamge)
+            targets.applyDamage(capEnemyDamageToHero(caster, targets, trueDamamge))
             targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
         }
         return
@@ -326,7 +333,7 @@ function executeDamageEffect(
     show_debug_message("damage " + string(damage) )
     var weakSpotHit = isWeakSpotHit(targets, effect)
     if (weakSpotHit) { discoverWeaknessesOnHit(targets, effect) }
-    targets.applyDamage(damage, weakSpotHit)
+    targets.applyDamage(capEnemyDamageToHero(caster, targets, damage), weakSpotHit)
     targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
     // Колба цветок + гриб
     if (variable_struct_exists(effect, "lifesteal")) {

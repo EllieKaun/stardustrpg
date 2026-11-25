@@ -58,12 +58,10 @@ function initStarriorsFromEncounter(encounter) {
     var igniteBattle = (variable_global_exists("battleIsIgnited") && global.battleIsIgnited) && !noIgnite
     var igniteAffix = igniteBattle ? findAffixById(difficulty, "ignite") : undefined
     var igniteFlags = array_create(array_length(enemies), false)
+    var igniteUsed = false
     if (igniteAffix != undefined && !isRaw && array_length(enemies) > 0) {
-        var anyIgnited = false
-        for (var i = 0; i < array_length(enemies); i++) {
-            if (random(1) < igniteAffix.roll(level)) { igniteFlags[i] = true; anyIgnited = true }
-        }
-        if (!anyIgnited) { igniteFlags[irandom(array_length(enemies) - 1)] = true } // хотя бы один
+        igniteFlags[irandom(array_length(enemies) - 1)] = true
+        igniteUsed = true
     }
     for (var i = 0; i < array_length(enemies); i++) {
         var enemy = enemies[i]
@@ -80,7 +78,9 @@ function initStarriorsFromEncounter(encounter) {
             applyEnemyStatScale(enemy, stageMult)
         } else {
             var affix = noIgnite ? undefined : rollEnemyAffix(difficulty, level)
+            if (affix != undefined && affix.id == "ignite" && igniteUsed) { affix = undefined }
             if (affix != undefined) {
+                if (affix.id == "ignite") { igniteUsed = true }
                 applyEnemyAffix(enemy, affix)
             } else {
                 applyEnemyStatScale(enemy, stageMult)

@@ -30,11 +30,13 @@ function initEffectRegistry() {
         },
         onEndOfTurn: function(effect, character) {
             var rawValue = is_method(effect.value) ? effect.value() : effect.value
-            if (effect.damageType == DamageTypes.True) {
-                character.applyDamage(rawValue)
-            } else {
-                character.applyDamage(mitigateDamage(character, effect, rawValue))
+            var dotDamage = (effect.damageType == DamageTypes.True)
+                ? rawValue
+                : mitigateDamage(character, effect, rawValue)
+            if (!isBossDefeated() && !character.isEnemy) {
+                dotDamage = min(dotDamage, ENEMY_DAMAGE_CAP)
             }
+            character.applyDamage(dotDamage)
         },
         aiValue: function(effect, ctx) {
             var damage = estimateDamage(effect, ctx.actor, ctx.target)

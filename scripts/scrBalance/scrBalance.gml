@@ -26,6 +26,7 @@
 #macro ENEMY_WIN_BONUS 2 // рост силы врагов
 #macro ENEMY_WIN_INTERVAL 5 // сколько побед нужно чтобы сложность выросла
 #macro SPEAR_BATTLE_BONUS 15  // сложность врагов с капьем
+#macro ENEMY_DAMAGE_CAP 20 // максимальный урон врага по герою до победы над марионеткой
 
 // Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
 #macro WEAKNESS_DAMAGE_MODIFIER 1.0
@@ -81,8 +82,8 @@
 
 function cardBalance() {
     return {
-        instantHeal: [10, 20, 30, HEAL_FULL],
-        overtimeHeal: [6, 8, 12, 16],
+        instantHeal: [15, 25, 35, HEAL_FULL],
+        overtimeHeal: [8, 10, 14, 18],
         overtimeHealDur: [2, 2, 3, 3],
         instantMana: [10, 20, 30, MANA_FULL],
         overtimeMana: [6, 8, 12, 16],
@@ -220,7 +221,7 @@ function battleDifficulty(zoneId = undefined) {
                     {
                         id: "ignite",
                         roll: function(level) {
-                            var base = (level >= 50) ? 1 : ((level >= 25) ? 0.4 : 0)
+                            var base = (level >= 50) ? 0.4 : ((level >= 25) ? 0.2 : 0)
                             return clamp(base + nightValue() * 0.2, 0, 1)
                         },
                         statMult: { strength: 5, hp: 3, maxHp: 3 },
