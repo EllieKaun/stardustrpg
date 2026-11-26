@@ -60,7 +60,7 @@ function modalDialogPage(line) {
         for (var optionIndex = 0; optionIndex < array_length(options); optionIndex++) {
             array_push(items, { label: options[optionIndex].text, onSelect: options[optionIndex].onSelect })
         }
-        array_push(blocks, ModalOptions(items, { minLines: 2, maxLineH: 10 }))
+        array_push(blocks, ModalOptions(items, { minLines: 2, maxLineH: 20 }))
     }
     var page = { portrait: line.portrait, side: line.side, speaker: line.speaker, onEnter: line.onEnter }
     if (hasPortrait) {
