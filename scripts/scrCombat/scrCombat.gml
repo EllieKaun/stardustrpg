@@ -255,10 +255,19 @@ function cardWeakSpotTarget(card, targets) {
         for (var t = 0; t < array_length(list); t++) {
             var target = list[t]
             if (!instance_exists(target) || target.isKO()) { continue }
-            if (isWeakSpotHit(target, effect)) { return target }
+            if (isWeakSpotHit(target, effect) || cardCarriesWeakStatus(card, target)) { return target }
         }
     }
     return noone
+}
+
+// Карта накладывает статус, к которому цель слаба (огонь по Листку, оглушение по Кракеру)
+function cardCarriesWeakStatus(card, target) {
+    var effects = card.effects
+    for (var e = 0; e < array_length(effects); e++) {
+        if (checkIfHasWeaknesses(target, effects[e])) { return true }
+    }
+    return false
 }
 
 function capEnemyDamageToHero(caster, target, damage) {
@@ -356,7 +365,7 @@ function executeDamageEffect(
 function executeRemoveStatus(target, status) {
     var effects = target.effects
     for(var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
-        if effects[effectIndex].statusName == status {
+        if (effects[effectIndex][$ "statusName"] == status) {
             target.showEffectNotification(effects[effectIndex], EffectVisualizerType.TimeBased, 1)
             array_delete(effects, effectIndex, 1)
             return
