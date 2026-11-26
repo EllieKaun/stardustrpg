@@ -58,10 +58,8 @@ function initStarriorsFromEncounter(encounter) {
     var igniteBattle = (variable_global_exists("battleIsIgnited") && global.battleIsIgnited) && !noIgnite
     var igniteAffix = igniteBattle ? findAffixById(difficulty, "ignite") : undefined
     var igniteFlags = array_create(array_length(enemies), false)
-    var igniteUsed = false
     if (igniteAffix != undefined && !isRaw && array_length(enemies) > 0) {
         igniteFlags[irandom(array_length(enemies) - 1)] = true
-        igniteUsed = true
     }
     for (var i = 0; i < array_length(enemies); i++) {
         var enemy = enemies[i]
@@ -74,13 +72,9 @@ function initStarriorsFromEncounter(encounter) {
         if (igniteFlags[i]) {
             applyEnemyStatScale(enemy, stageMult)
             applyEnemyAffix(enemy, igniteAffix)
-        } else if (igniteAffix != undefined) {
-            applyEnemyStatScale(enemy, stageMult)
         } else {
-            var affix = noIgnite ? undefined : rollEnemyAffix(difficulty, level)
-            if (affix != undefined && affix.id == "ignite" && igniteUsed) { affix = undefined }
+            var affix = rollEnemyAffix(difficulty, level)
             if (affix != undefined) {
-                if (affix.id == "ignite") { igniteUsed = true }
                 applyEnemyAffix(enemy, affix)
             } else {
                 applyEnemyStatScale(enemy, stageMult)
@@ -141,6 +135,8 @@ function rollEnemyAffix(difficulty, level) {
     var affixes = difficulty.affixes
     for (var i = 0; i < array_length(affixes); i++) {
         var affix = affixes[i]
+        // ignite в бою только от ignite-врага на карте
+        if (affix.id == "ignite") { continue }
         if (random(1) < affix.roll(level)) { return affix }
     }
     return undefined

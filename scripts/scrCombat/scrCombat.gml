@@ -240,25 +240,23 @@ function revealRandomWeakness(target) {
 }
 
 function cardWeakSpotTarget(card, targets) {
+    if (!cardDealsInstantDamage(card)) { return noone }
     var list = is_array(targets) ? targets : [targets]
+    for (var t = 0; t < array_length(list); t++) {
+        var target = list[t]
+        if (!instance_exists(target) || target.isKO()) { continue }
+        if (cardCarriesWeakStatus(card, target)) { return target }
+    }
+    return noone
+}
+
+function cardDealsInstantDamage(card) {
     var effects = card.effects
     for (var e = 0; e < array_length(effects); e++) {
         var effect = effects[e]
-        if (!variable_struct_exists(effect, "type") 
-            || !variable_struct_exists(effect, "timing")) { 
-                continue 
-        }
-        if (effect.type != EffectTypes.Damage 
-            || effect.timing != Timing.Instant) { 
-                continue 
-        }
-        for (var t = 0; t < array_length(list); t++) {
-            var target = list[t]
-            if (!instance_exists(target) || target.isKO()) { continue }
-            if (isWeakSpotHit(target, effect) || cardCarriesWeakStatus(card, target)) { return target }
-        }
+        if (effect[$ "type"] == EffectTypes.Damage && effect[$ "timing"] == Timing.Instant) { return true }
     }
-    return noone
+    return false
 }
 
 // Карта накладывает статус, к которому цель слаба (огонь по Листку, оглушение по Кракеру)
