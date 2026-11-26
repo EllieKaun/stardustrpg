@@ -105,6 +105,36 @@ function initStarriorsFromEncounter(encounter) {
             }
         }
     }
+
+    logBattleEnemies(enemies, level, igniteBattle)
+}
+
+function logBattleEnemies(enemies, level, igniteBattle) {
+    show_debug_message("=== BATTLE SETUP: level=" + string(level)
+        + " night=" + string(nightValue())
+        + " igniteBattle=" + string(igniteBattle)
+        + " enemies=" + string(array_length(enemies)) + " ===")
+    for (var i = 0; i < array_length(enemies); i++) {
+        var enemy = enemies[i]
+        var ignited = variable_instance_exists(enemy, "isIgnited") && enemy.isIgnited
+        var carry = (variable_instance_exists(enemy, "carryItem") && enemy.carryItem != noone)
+        var deckNames = ""
+        var orig = enemy.deck.originalDeck
+        for (var c = 0; c < array_length(orig); c++) {
+            deckNames += (c > 0 ? ", " : "") + string(orig[c].name)
+        }
+        var kind = variable_instance_exists(enemy, "kind") ? enemy.kind : -1
+        show_debug_message("  [" + string(i) + "] " + enemy.name
+            + " kind=" + string(kind)
+            + " hp=" + string(enemy.hp) + "/" + string(enemy.maxHp)
+            + " str=" + string(enemy.strength)
+            + " int=" + string(enemy.intelligence)
+            + " aura=" + string(enemy.aura)
+            + " guts=" + string(enemy.guts)
+            + " ignited=" + string(ignited)
+            + " carry=" + string(carry)
+            + " deck=[" + deckNames + "]")
+    }
 }
 
 function rollEnemyAffix(difficulty, level) {
