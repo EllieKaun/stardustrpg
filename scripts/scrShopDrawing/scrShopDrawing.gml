@@ -83,7 +83,8 @@ function buildShopItems(category) {
             var packSet = packSets[packIndex]
             if (!packUnlocked(packSet)) { continue }
             var packInfo = packShopInfo(packSet)
-            var packItem = new ShopItem(ShopItemKind.Pack, SHOP_PACK_PRICE)
+            var packPrice = (packSet == CardSet.Base) ? SHOP_STAR_PACK_PRICE : SHOP_PACK_PRICE
+            var packItem = new ShopItem(ShopItemKind.Pack, packPrice)
             packItem.cardSet = packSet
             packItem.label = packInfo.title
             packItem.descLines = [packInfo.desc]

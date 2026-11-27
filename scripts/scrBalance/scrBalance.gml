@@ -12,6 +12,7 @@
 #macro SHOP_SLOT_BASE 100 // цена слота декбилдера
 #macro SHOP_SLOT_GROWTH 1.5 // во сколько раз увеличивается цена слота
 #macro SHOP_PACK_PRICE 100
+#macro SHOP_STAR_PACK_PRICE 50 // бустер пак со звёздными картами
 
 // Сундуки
 #macro CHEST_GOLD_MIN 5 // минимальная награда золота из сундука

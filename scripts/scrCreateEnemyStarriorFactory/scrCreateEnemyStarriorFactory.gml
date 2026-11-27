@@ -211,7 +211,8 @@ function createPuppetMaster() {
             createSummonBuffPuppetCard(),
             createSummonAttackPuppetCard(),
             createSummonHealPuppetCard(),
-        ])
+        ],
+        [ StatusNames.Freeze ]) // слабость: Лёд
     starrior.kind = EnemyKind.PuppetMaster
     starrior.brain = brainPreset(AiBrainType.Boss)
     return starrior

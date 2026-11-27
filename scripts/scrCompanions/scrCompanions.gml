@@ -64,10 +64,10 @@ function companionFixedRefs(character) {
             { id: cardIds.instantHealSingleTarget, rarity: CardsRarity.Default }
         ]
         case Characters.Fox: return [
-            { id: cardIds.forestGather, rarity: CardsRarity.Default },
-            { id: cardIds.forestFlask, rarity: CardsRarity.Default },
             { id: cardIds.forestProvoke, rarity: CardsRarity.Default },
-            { id: cardIds.instantHealSingleTarget, rarity: CardsRarity.Default }
+            { id: cardIds.forestFlask, rarity: CardsRarity.Default },
+            { id: cardIds.physicalDamageSingleTarget, rarity: CardsRarity.Default },
+            { id: cardIds.instantHealMultiTarget, rarity: CardsRarity.Default }
         ]
         default: return []
     }

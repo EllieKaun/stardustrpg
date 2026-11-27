@@ -55,7 +55,7 @@ function modalDialogPage(line) {
     var textBlock = ModalText(line.text, { typewriter: true, maxLineH: 16 })
     var blocks = [textBlock]
     if (options != undefined) {
-        textBlock.h = (line.text == "") ? 0 : 0.4
+        textBlock.h = (line.text == "") ? 0 : 0.3
         var items = []
         for (var optionIndex = 0; optionIndex < array_length(options); optionIndex++) {
             array_push(items, { label: options[optionIndex].text, onSelect: options[optionIndex].onSelect })

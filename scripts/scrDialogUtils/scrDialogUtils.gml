@@ -75,3 +75,10 @@ function showThanksForPlaying() {
         { label: loc("ui.thanksOk"), onSelect: undefined }
     ], { tag: "thanks", heightFrac: 0.55, textMaxLineH: 16 }))
 }
+
+function showWeaknessRevealModal(target, weakness) {
+    var body = (weakness == undefined) ? loc("ui.weaknessNone") : weaknessLabel(weakness)
+    modalOpen(modalConfirm(loc("ui.weaknessFoundTitle"), body, [
+        { label: loc("ui.close"), onSelect: undefined }
+    ], { tag: "weaknessReveal", heightFrac: 0.45, textMaxLineH: 16 }))
+}

@@ -30,6 +30,7 @@ function Card(name,
     self.rarity = rarity
     self.target = target
     self.effects = effects
+    linkInstantDamageToWeakness(self.effects)
     self.actionType = actionType
     self.cardBaseSpr = cardBaseSpr
     self.cardIllustrationSpr = cardIllustrationSpr
@@ -49,6 +50,25 @@ function Card(name,
     self.costType  = function() { return self.costTypeCached }
     self.costValue = function() { return self.costValueCached }
     self.handCharms = []
+}
+
+function linkInstantDamageToWeakness(effects) {
+    var statusName = undefined
+    for (var i = 0; i < array_length(effects); i++) {
+        if (variable_struct_exists(effects[i], "statusName")) {
+            statusName = effects[i].statusName
+            break
+        }
+    }
+    if (statusName == undefined) { return }
+    for (var i = 0; i < array_length(effects); i++) {
+        var effect = effects[i]
+        if (effect.type == EffectTypes.Damage
+            && effect.timing == Timing.Instant
+            && !variable_struct_exists(effect, "statusName")) {
+            effect.weaknessElement = statusName
+        }
+    }
 }
 
 function cardSetBackground(card) {

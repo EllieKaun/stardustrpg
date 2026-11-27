@@ -135,7 +135,7 @@ function cardRegistryInit() {
     registerCard(cardIds.debuffMagicalProtectionSingleTarget, true, CardCategory.Buff, function(rarity) { return createCardDebuffMagicalProtectionSingleTarget(rarity) })
     registerCard(cardIds.weaknessMagicalDamageSingleTarget, true, CardCategory.Buff, function(rarity) { return createCardCreateTemporaryWeaknessMagicalDamageSingleTarget(rarity) })
     registerCard(cardIds.weaknessPhysicalDamageSingleTarget, true, CardCategory.Buff, function(rarity) { return createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget(rarity) })
-    registerCard(cardIds.findWeakness, false, CardCategory.Buff, function(rarity) { return createCardFindWeaknessSingleTarget(rarity) })
+    registerCard(cardIds.findWeakness, false, CardCategory.Special, function(rarity) { return createCardFindWeaknessSingleTarget(rarity) })
     registerCard(cardIds.summonBuffPuppet, false, CardCategory.Buff, function(rarity){ return createSummonBuffPuppetCard() })
 
     // Лечебные (хил/мана/снятие статусов/воскрешение)

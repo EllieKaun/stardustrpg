@@ -12,6 +12,8 @@ function locDefineEn() {
     translations[$ "ui.thanksBody"] = "A continuation of the story is coming"
     translations[$ "ui.thanksOk"] = "OKAY"
     translations[$ "ui.close"] = "CLOSE"
+    translations[$ "ui.weaknessFoundTitle"] = "Weakness Revealed"
+    translations[$ "ui.weaknessNone"] = "No new weaknesses"
     translations[$ "ui.none"] = "None"
     translations[$ "turns.one"] = "turn"
     translations[$ "turns.few"] = "turns"

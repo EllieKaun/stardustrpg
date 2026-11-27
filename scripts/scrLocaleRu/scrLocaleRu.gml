@@ -12,6 +12,8 @@ function locDefineRu() {
     translations[$ "ui.thanksBody"] = "Грядет продолжение истории..."
     translations[$ "ui.thanksOk"] = "ОК"
     translations[$ "ui.close"] = "ЗАКРЫТЬ"
+    translations[$ "ui.weaknessFoundTitle"] = "Слабость раскрыта"
+    translations[$ "ui.weaknessNone"] = "Новых слабостей нет"
     translations[$ "ui.none"] = "Нет"
     translations[$ "turns.one"] = "ход"
     translations[$ "turns.few"] = "хода"

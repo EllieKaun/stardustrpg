@@ -127,18 +127,33 @@ function worldIgniteSprite(kind) {
     return (asset >= 0 && sprite_exists(asset)) ? asset : noone
 }
 
+function nonLeafFromPool(pool) {
+    var choices = []
+    for (var i = 0; i < array_length(pool); i++) {
+        if (pool[i] != createLeaf) { array_push(choices, pool[i]) }
+    }
+    if (array_length(choices) == 0) { return pool[irandom(array_length(pool) - 1)] }
+    return choices[irandom(array_length(choices) - 1)]
+}
+
 function winScaledComposition() {
     var difficulty = battleDifficulty()
     var range = enemyCountForLevel(difficulty, difficultyLevel())
     var enemyCount = range.mn + irandom(range.mx - range.mn)
     var composition = []
-    var leafUsed = false
+    var limitedUsed = false
+    var hasLeaf = false
     for (var enemyIndex = 0; enemyIndex < enemyCount; enemyIndex++) {
-        if (!leafUsed && difficulty.limitedEnemy != undefined && irandom(difficulty.limitedChance) == 0) {
+        if (!limitedUsed && difficulty.limitedEnemy != undefined && irandom(difficulty.limitedChance) == 0) {
             array_push(composition, difficulty.limitedEnemy)
-            leafUsed = true
+            limitedUsed = true
         } else {
-            array_push(composition, difficulty.enemyPool[irandom(array_length(difficulty.enemyPool) - 1)])
+            var creator = difficulty.enemyPool[irandom(array_length(difficulty.enemyPool) - 1)]
+            if (creator == createLeaf) {
+                if (hasLeaf) { creator = nonLeafFromPool(difficulty.enemyPool) }
+                else { hasLeaf = true }
+            }
+            array_push(composition, creator)
         }
     }
     return composition

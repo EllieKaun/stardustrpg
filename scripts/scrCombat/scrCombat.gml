@@ -136,6 +136,10 @@ function checkIfHasWeaknesses(target, effect) {
         && array_contains(target.weaknesses, effect.statusName)) {
         return true
     }
+    if (variable_instance_exists(effect, "weaknessElement")
+        && array_contains(target.weaknesses, effect.weaknessElement)) {
+        return true
+    }
     if (variable_instance_exists(effect, "damageType")) {
         var weaknessMod = damageTypeToWeaknessModifier(effect.damageType)
         if (weaknessMod != undefined) {
@@ -209,7 +213,8 @@ function discoverWeaknessesOnHit(target, effect) {
     if (!variable_instance_exists(target, "kind")) { return }
     for (var i = 0; i < array_length(target.weaknesses); i++) {
         var wakness = target.weaknesses[i]
-        var matched = variable_instance_exists(effect, "statusName") && effect.statusName == wakness
+        var matched = (variable_instance_exists(effect, "statusName") && effect.statusName == wakness)
+            || (variable_instance_exists(effect, "weaknessElement") && effect.weaknessElement == wakness)
         if (!matched) {
             var effects = target.effects
             for (var e = 0; e < array_length(effects); e++) {
@@ -227,16 +232,17 @@ function discoverWeaknessesOnHit(target, effect) {
 
 // Карта поиска
 function revealRandomWeakness(target) {
-    if (!variable_instance_exists(target, "kind")) { return false }
+    if (!variable_instance_exists(target, "kind")) { return undefined }
     var hidden = []
     for (var i = 0; i < array_length(target.weaknesses); i++) {
-        if (!weaknessIsDiscovered(target.kind, target.weaknesses[i])) { 
-            array_push(hidden, target.weaknesses[i]) 
+        if (!weaknessIsDiscovered(target.kind, target.weaknesses[i])) {
+            array_push(hidden, target.weaknesses[i])
         }
     }
-    if (array_length(hidden) == 0) { return false }
-    markWeaknessDiscovered(target.kind, hidden[irandom(array_length(hidden) - 1)])
-    return true
+    if (array_length(hidden) == 0) { return undefined }
+    var revealed = hidden[irandom(array_length(hidden) - 1)]
+    markWeaknessDiscovered(target.kind, revealed)
+    return revealed
 }
 
 function cardWeakSpotTarget(card, targets) {

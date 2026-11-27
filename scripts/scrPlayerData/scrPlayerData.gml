@@ -66,7 +66,7 @@ function playerGrantStarterCards() {
 function playerDataDefault() {
     return {
         version: 1,
-        gold: 0, // золото
+        gold: 50, // золото
         tutorialDone: false,
         deckTutorialDone: false,
         quests: {},

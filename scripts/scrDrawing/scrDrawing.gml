@@ -482,11 +482,16 @@ function drawPartyPanelBody(panelX, panelY, panelWidth, panelHeight, panelScale,
         }
     }
 
-    // оверхелз
+    // оверхелз — жёлтым за правой рамкой бара
     if (variable_instance_exists(member, "bonusHp") && member.bonusHp > 0 && member.maxHp > 0) {
-        var shieldFrac = clamp(member.bonusHp / member.maxHp, 0, 1)
-        draw_set_color(c_aqua)
-        draw_rectangle(barX, barY - 3 * panelScale, barX + barWidth * shieldFrac, barY - 1 * panelScale, false)
+        var overFrac = clamp(member.bonusHp / member.maxHp, 0, 1)
+        var hpRows = barHeight / barPixelScale - 4
+        var hpTop = floor(barY + barPixelScale)
+        var hpBottom = floor(barY + (1 + hpRows) * barPixelScale) - 1
+        var overStart = floor(barX + barWidth)
+        var overEnd = floor(overStart + barWidth * overFrac)
+        draw_set_color(c_yellow)
+        draw_rectangle(overStart, hpTop, overEnd, hpBottom, false)
         draw_set_color(c_white)
     }
 }

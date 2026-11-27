@@ -227,7 +227,7 @@ function createCardFindWeaknessSingleTarget(rarity = CardsRarity.Default) {
         rarity,
         TargetTypes.SingleEnemyTarget,
         StarriorStates.Cast,
-        1,
+        0,
         [ DiscoverWeaknessEffect() ],
         buffCard,
         weaknesFind,

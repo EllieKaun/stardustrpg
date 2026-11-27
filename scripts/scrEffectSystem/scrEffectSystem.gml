@@ -266,9 +266,16 @@ function initEffectRegistry() {
 
     variable_struct_set(effectsRepository, "DiscoverWeakness", {
         onInstant: function(effect, caster, targets) {
-            if (is_array(targets)) {
-                for (var i = 0; i < array_length(targets); i++) { revealRandomWeakness(targets[i]) }
-            } else { revealRandomWeakness(targets) }
+            var list = is_array(targets) ? targets : [targets]
+            var firstTarget = noone
+            var firstRevealed = undefined
+            for (var i = 0; i < array_length(list); i++) {
+                var revealed = revealRandomWeakness(list[i])
+                if (firstTarget == noone) { firstTarget = list[i]; firstRevealed = revealed }
+            }
+            if (caster != undefined && caster != noone && !caster.isEnemy) {
+                showWeaknessRevealModal(firstTarget, firstRevealed)
+            }
         },
     })
 
