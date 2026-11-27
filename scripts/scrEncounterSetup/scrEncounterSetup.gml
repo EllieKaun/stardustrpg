@@ -59,11 +59,7 @@ function initStarriorsFromEncounter(encounter) {
     var igniteAffix = igniteBattle ? findAffixById(difficulty, "ignite") : undefined
     var igniteFlags = array_create(array_length(enemies), false)
     if (igniteAffix != undefined && !isRaw && array_length(enemies) > 0) {
-        var anyIgnited = false
-        for (var i = 0; i < array_length(enemies); i++) {
-            if (random(1) < igniteAffix.roll(level)) { igniteFlags[i] = true; anyIgnited = true }
-        }
-        if (!anyIgnited) { igniteFlags[irandom(array_length(enemies) - 1)] = true } // хотя бы один
+        igniteFlags[irandom(array_length(enemies) - 1)] = true
     }
     for (var i = 0; i < array_length(enemies); i++) {
         var enemy = enemies[i]
@@ -76,10 +72,8 @@ function initStarriorsFromEncounter(encounter) {
         if (igniteFlags[i]) {
             applyEnemyStatScale(enemy, stageMult)
             applyEnemyAffix(enemy, igniteAffix)
-        } else if (igniteAffix != undefined) {
-            applyEnemyStatScale(enemy, stageMult)
         } else {
-            var affix = noIgnite ? undefined : rollEnemyAffix(difficulty, level)
+            var affix = rollEnemyAffix(difficulty, level)
             if (affix != undefined) {
                 applyEnemyAffix(enemy, affix)
             } else {
@@ -105,12 +99,44 @@ function initStarriorsFromEncounter(encounter) {
             }
         }
     }
+
+    logBattleEnemies(enemies, level, igniteBattle)
+}
+
+function logBattleEnemies(enemies, level, igniteBattle) {
+    show_debug_message("=== BATTLE SETUP: level=" + string(level)
+        + " night=" + string(nightValue())
+        + " igniteBattle=" + string(igniteBattle)
+        + " enemies=" + string(array_length(enemies)) + " ===")
+    for (var i = 0; i < array_length(enemies); i++) {
+        var enemy = enemies[i]
+        var ignited = variable_instance_exists(enemy, "isIgnited") && enemy.isIgnited
+        var carry = (variable_instance_exists(enemy, "carryItem") && enemy.carryItem != noone)
+        var deckNames = ""
+        var orig = enemy.deck.originalDeck
+        for (var c = 0; c < array_length(orig); c++) {
+            deckNames += (c > 0 ? ", " : "") + string(orig[c].name)
+        }
+        var kind = variable_instance_exists(enemy, "kind") ? enemy.kind : -1
+        show_debug_message("  [" + string(i) + "] " + enemy.name
+            + " kind=" + string(kind)
+            + " hp=" + string(enemy.hp) + "/" + string(enemy.maxHp)
+            + " str=" + string(enemy.strength)
+            + " int=" + string(enemy.intelligence)
+            + " aura=" + string(enemy.aura)
+            + " guts=" + string(enemy.guts)
+            + " ignited=" + string(ignited)
+            + " carry=" + string(carry)
+            + " deck=[" + deckNames + "]")
+    }
 }
 
 function rollEnemyAffix(difficulty, level) {
     var affixes = difficulty.affixes
     for (var i = 0; i < array_length(affixes); i++) {
         var affix = affixes[i]
+        // ignite в бою только от ignite-врага на карте
+        if (affix.id == "ignite") { continue }
         if (random(1) < affix.roll(level)) { return affix }
     }
     return undefined

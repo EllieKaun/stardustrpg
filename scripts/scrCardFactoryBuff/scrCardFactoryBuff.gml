@@ -220,6 +220,24 @@ function createCardCreateTemporaryWeaknessPhysicalDamageSingleTarget(rarity = Ca
     )
 }
 
+// Поиск слабости врага - раскрывает одну случайную слабость без урона
+function createCardFindWeaknessSingleTarget(rarity = CardsRarity.Default) {
+    return new Card(
+        "Find Weakness Card",
+        rarity,
+        TargetTypes.SingleEnemyTarget,
+        StarriorStates.Cast,
+        1,
+        [ DiscoverWeaknessEffect() ],
+        buffCard,
+        weaknesFind,
+        commonBorder,
+        hpCostToken,
+        "reveals one weakness of the enemy",
+        sprHighResCastWeakness
+    )
+}
+
 // Отражение урона
 function createCardDamageDeflectStatus(rarity = CardsRarity.Default) {
     return new Card(

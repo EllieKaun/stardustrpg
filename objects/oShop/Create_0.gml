@@ -42,15 +42,18 @@ shopPanel = new Shop({
             var item = panel.slots[slotIndex]
             if (getGold() < item.price) { return } // не хватает золота
 
+            var bought = false
             if (item.kind == ShopItemKind.Card) {
                 if (spendGold(item.price)) {
                     unlockCard(item.ref.id, item.ref.rarity, 1) // добавляем копию карты
                     analyticsPurchase(item.ref.id, item.price) // аналитика: покупка карты
+                    bought = true
                 }
             } else if (item.kind == ShopItemKind.Pack) {
                 if (spendGold(item.price)) {
                     openCardPack(item.cardSet)
                     analyticsPurchase(item.cardSet == CardSet.Forest ? "pack_forest" : "pack_star", item.price)
+                    bought = true
                 }
             } else if (item.kind == ShopItemKind.Slot) {
                 if (spendGold(item.price)) {
@@ -66,8 +69,10 @@ shopPanel = new Shop({
                     panel.slots = buildShopItems(ShopCategory.OtherItems)
                     panel.refreshScroll()
                     panel.selectedSlot = min(panel.selectedSlot, array_length(panel.slots) - 1)
+                    bought = true
                 }
             }
+            if (bought) { playChestOpenSound() }
             coins = getGold()
         }
     }

@@ -30,11 +30,13 @@ function initEffectRegistry() {
         },
         onEndOfTurn: function(effect, character) {
             var rawValue = is_method(effect.value) ? effect.value() : effect.value
-            if (effect.damageType == DamageTypes.True) {
-                character.applyDamage(rawValue)
-            } else {
-                character.applyDamage(mitigateDamage(character, effect, rawValue))
+            var dotDamage = (effect.damageType == DamageTypes.True)
+                ? rawValue
+                : mitigateDamage(character, effect, rawValue)
+            if (!isBossDefeated() && !character.isEnemy) {
+                dotDamage = min(dotDamage, ENEMY_DAMAGE_CAP)
             }
+            character.applyDamage(dotDamage)
         },
         aiValue: function(effect, ctx) {
             var damage = estimateDamage(effect, ctx.actor, ctx.target)
@@ -262,6 +264,14 @@ function initEffectRegistry() {
         },
     })
 
+    variable_struct_set(effectsRepository, "DiscoverWeakness", {
+        onInstant: function(effect, caster, targets) {
+            if (is_array(targets)) {
+                for (var i = 0; i < array_length(targets); i++) { revealRandomWeakness(targets[i]) }
+            } else { revealRandomWeakness(targets) }
+        },
+    })
+
     global.effectRegistry = effectsRepository
 }
 
@@ -301,6 +311,7 @@ function effectKindFromType(type) {
         case EffectTypes.RemoveNegative: return "RemoveNegative"
         case EffectTypes.DiscardRandomCard: return "DiscardRandomCard"
         case EffectTypes.AddRandomCards: return "AddRandomCards"
+        case EffectTypes.DiscoverWeakness: return "DiscoverWeakness"
         default: return undefined
     }
 }
@@ -539,6 +550,9 @@ function DebuffEffect(modifier, value, duration, sprite = debuffEffect, sound = 
 function TemporaryWeaknessEffect(weakness, duration) {
     return { type: EffectTypes.CreateTemporaryWeakness, weakness: weakness,
              duration: negativeDuration(duration), timing: Timing.Overtime, sprite: debuffEffect }
+}
+function DiscoverWeaknessEffect() {
+    return { type: EffectTypes.DiscoverWeakness, timing: Timing.Instant, sprite: debuffEffect }
 }
 
 // Прочее

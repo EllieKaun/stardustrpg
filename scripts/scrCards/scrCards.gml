@@ -236,7 +236,10 @@ function cardPlaySequence(card, caster, targets) {
             }
         }),
 
-        // 2) анимация кастера
+        // 2) импакт по слабому месту
+        stepWeakSpotImpact(),
+
+        // 3) анимация кастера
         stepActorAnim(caster, cardAnimState(card), cardCastSpriteOverride(card, caster)),
 
         // 3) анимация эффектов
@@ -244,9 +247,6 @@ function cardPlaySequence(card, caster, targets) {
             with (Battle) { showCardEffectVisuals(ctx.card.effects, ctx.targets) }
         }),
         stepWait(cardEffectAnimFrames(card.effects)),
-
-        // 3.5) импакт по слабому месту до нанесения урона
-        stepWeakSpotImpact(),
 
         // 4) применение значений
         stepDo(function(ctx) {

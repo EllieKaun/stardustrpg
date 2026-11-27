@@ -327,7 +327,7 @@ function carryItemsEnsure() {
         battleSprite: function() { return cauldronSprite() },
         battleAngle: 0,
         battleYOffset: -6,
-        battleNoFlee: true,
+        battleNoFlee: false,
         battleBonusAll: function() { return 0 },
         onSteal: function() { global.battleCauldronStolen = true }
     })

@@ -60,7 +60,7 @@ function modalDialogPage(line) {
         for (var optionIndex = 0; optionIndex < array_length(options); optionIndex++) {
             array_push(items, { label: options[optionIndex].text, onSelect: options[optionIndex].onSelect })
         }
-        array_push(blocks, ModalOptions(items, { minLines: 2, maxLineH: 10 }))
+        array_push(blocks, ModalOptions(items, { minLines: 2, maxLineH: 20 }))
     }
     var page = { portrait: line.portrait, side: line.side, speaker: line.speaker, onEnter: line.onEnter }
     if (hasPortrait) {
@@ -212,6 +212,17 @@ function modalEnemyInfoRows(target) {
     ]
     if (variable_instance_exists(target, "bonusHp") && target.bonusHp > 0) {
         array_push(rows, { text: loc("battle.bonusHp") + string(target.bonusHp) })
+    }
+    if (variable_instance_exists(target, "kind") && array_length(target.weaknesses) > 0) {
+        array_push(rows, { gap: true }, { text: loc("battle.weakness") })
+        for (var weaknessIndex = 0; weaknessIndex < array_length(target.weaknesses); weaknessIndex++) {
+            var weakness = target.weaknesses[weaknessIndex]
+            if (weaknessIsDiscovered(target.kind, weakness)) {
+                array_push(rows, { text: weaknessLabel(weakness), icon: weaknessIcon(weakness) })
+            } else {
+                array_push(rows, { text: loc("weakness.Unknown") })
+            }
+        }
     }
     array_push(rows, { gap: true }, { text: loc("battle.statuses") })
     var targetEffects = target.effects

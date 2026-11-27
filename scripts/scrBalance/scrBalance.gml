@@ -26,14 +26,15 @@
 #macro ENEMY_WIN_BONUS 2 // рост силы врагов
 #macro ENEMY_WIN_INTERVAL 5 // сколько побед нужно чтобы сложность выросла
 #macro SPEAR_BATTLE_BONUS 15  // сложность врагов с капьем
+#macro ENEMY_DAMAGE_CAP 20 // максимальный урон врага по герою до победы над марионеткой
 
 // Слабые места: модификатор урона (слабость +, сила −) и бонус к шансу статуса
-#macro WEAKNESS_DAMAGE_MODIFIER 0.1
+#macro WEAKNESS_DAMAGE_MODIFIER 1.0
 #macro NEGATIVE_EFFECT_MIN_DURATION 2 // дебаффы и негативные статусы держатся минимум столько ходов
 
-#macro WEAK_SPOT_IMPACT_FADE_IN 7
-#macro WEAK_SPOT_IMPACT_HOLD 22
-#macro WEAK_SPOT_IMPACT_FADE_OUT 16
+#macro WEAK_SPOT_IMPACT_FADE_IN 10
+#macro WEAK_SPOT_IMPACT_HOLD 60
+#macro WEAK_SPOT_IMPACT_FADE_OUT 20
 #macro WEAK_SPOT_IMPACT_DIM 0.55
 #macro WEAK_SPOT_DAMAGE_TEXT_SCALE 1.8
 #macro STUN_LABEL_TEXT_SCALE 0.6
@@ -81,13 +82,13 @@
 
 function cardBalance() {
     return {
-        instantHeal: [10, 20, 30, HEAL_FULL],
-        overtimeHeal: [6, 8, 12, 16],
+        instantHeal: [15, 25, 35, HEAL_FULL],
+        overtimeHeal: [8, 10, 14, 18],
         overtimeHealDur: [2, 2, 3, 3],
         instantMana: [10, 20, 30, MANA_FULL],
         overtimeMana: [6, 8, 12, 16],
         overtimeManaDur: [2, 2, 3, 3],
-        buff: [2, 4, 6, 8],
+        buff: [4, 6, 8, 10],
         handCharmStat: [1, 2, 3, 4],
         damageMulSingle: [1, 2, 3, 4],
         damageMulGroup: [1, 1, 2, 3],
@@ -220,7 +221,7 @@ function battleDifficulty(zoneId = undefined) {
                     {
                         id: "ignite",
                         roll: function(level) {
-                            var base = (level >= 50) ? 1 : ((level >= 25) ? 0.4 : 0)
+                            var base = (level >= 50) ? 0.4 : ((level >= 25) ? 0.2 : 0)
                             return clamp(base + nightValue() * 0.2, 0, 1)
                         },
                         statMult: { strength: 5, hp: 3, maxHp: 3 },
@@ -233,10 +234,10 @@ function battleDifficulty(zoneId = undefined) {
                     }
                 ],
                 enemyCount: [
-                    { maxLevel: 10, mn: 1, mx: 2 },
-                    { maxLevel: 25, mn: 2, mx: 4 },
-                    { maxLevel: 50, mn: 3, mx: 5 },
-                    { maxLevel: 1000000, mn: 4, mx: 5 }
+                    { maxLevel: 10, mn: 2, mx: 3 },
+                    { maxLevel: 25, mn: 3, mx: 4 },
+                    { maxLevel: 50, mn: 4, mx: 5 },
+                    { maxLevel: 1000000, mn: 5, mx: 5 }
                 ],
                 enemyPool: [createCrackerNut, createMushroom, createFlower, createLeaf],
                 limitedEnemy: undefined,
@@ -305,6 +306,7 @@ function zoneContent(zoneId = undefined) {
                     cardIds.buffMagicalDamageSingleTarget, // усиление маг урона
                     cardIds.buffPhysicalProtectionSingleTarget, // усиление физ защиты
                     cardIds.buffMagicalProtectionSingleTarget, // усиление маг защиты
+                    cardIds.findWeakness, // поиск слабости врага
                     cardIds.magicalDamageBurnChanceSingleTarget, // атака огнём
                     cardIds.magicalDamageSingleTarget // атака звёздной энергией
                 ],

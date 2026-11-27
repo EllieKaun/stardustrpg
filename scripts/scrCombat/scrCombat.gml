@@ -47,7 +47,7 @@ function refreshOrPushEffect(target, effect) {
 function effectChanceFor(target, effect) {
     if (!variable_instance_exists(effect, "chance")) { return 1 } 
     var chance = effect.chance
-    if (checkIfHasWeaknesses(target, effect)) { chance *= 1 + weaknessProfile(effect[$ "statusName"]).chance }
+    if (checkIfHasWeaknesses(target, effect)) { chance = 1 }
     return clamp(chance, 0, 1)
 }
 
@@ -60,11 +60,11 @@ function casterIsIgnited(caster) {
 function effectChanceForCaster(caster, target, effect) {
     if (!variable_instance_exists(effect, "chance")) { return 1 }
     var base = casterIsIgnited(caster) ? caster.igniteEffectChance : effect.chance
-    if (checkIfHasWeaknesses(target, effect)) { 
-        base *= 1 + weaknessProfile(effect[$ "statusName"]).chance
+    if (checkIfHasWeaknesses(target, effect)) {
+        base = 1
     }
-    if (caster.activeIngredient == Ingredient.Leaf) { 
-        base += INGREDIENT_STATUS_CHANCE_BONUS 
+    if (caster.activeIngredient == Ingredient.Leaf) {
+        base += INGREDIENT_STATUS_CHANCE_BONUS
     }
     return clamp(base, 0, 1)
 }
@@ -122,19 +122,30 @@ function checkIfHasStrengths(target, effect) {
 }
 
 // Слабость к стихии/статусу входящего эффекта
+function damageTypeToWeaknessModifier(damageType) {
+    switch (damageType) {
+        case DamageTypes.Physical: return ModifiersToBuff.PhysicalDamage
+        case DamageTypes.Magical:  return ModifiersToBuff.MagicalDamage
+    }
+    return undefined
+}
+
 function checkIfHasWeaknesses(target, effect) {
     if checkIfHasEffectType(target, EffectTypes.IgnoreWeakness) { return false }
     if (variable_instance_exists(effect, "statusName")
         && array_contains(target.weaknesses, effect.statusName)) {
         return true
     }
-    var effects = target.effects
-    for(var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
-        var currentEffect = effects[effectIndex]
-        if(currentEffect.type == EffectTypes.CreateTemporaryWeakness
-            && variable_instance_exists(effect, "weakness")) {
-            if currentEffect.weakness == effect.type {
-                return true
+    if (variable_instance_exists(effect, "damageType")) {
+        var weaknessMod = damageTypeToWeaknessModifier(effect.damageType)
+        if (weaknessMod != undefined) {
+            var effects = target.effects
+            for(var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
+                var currentEffect = effects[effectIndex]
+                if (currentEffect.type == EffectTypes.CreateTemporaryWeakness
+                    && currentEffect.weakness == weaknessMod) {
+                    return true
+                }
             }
         }
     }
@@ -193,26 +204,75 @@ function isWeakSpotHit(target, effect) {
     return checkIfHasWeaknesses(target, effect) || checkIfWeakStateActive(target)
 }
 
+// Запомнить слабости врага, совпавшие с текущим попаданием
+function discoverWeaknessesOnHit(target, effect) {
+    if (!variable_instance_exists(target, "kind")) { return }
+    for (var i = 0; i < array_length(target.weaknesses); i++) {
+        var wakness = target.weaknesses[i]
+        var matched = variable_instance_exists(effect, "statusName") && effect.statusName == wakness
+        if (!matched) {
+            var effects = target.effects
+            for (var e = 0; e < array_length(effects); e++) {
+                if (variable_instance_exists(effects[e], "statusName") && effects[e].statusName == wakness) {
+                    matched = true
+                    break
+                }
+            }
+        }
+        if (matched) { 
+            markWeaknessDiscovered(target.kind, wakness) 
+        }
+    }
+}
+
+// Карта поиска
+function revealRandomWeakness(target) {
+    if (!variable_instance_exists(target, "kind")) { return false }
+    var hidden = []
+    for (var i = 0; i < array_length(target.weaknesses); i++) {
+        if (!weaknessIsDiscovered(target.kind, target.weaknesses[i])) { 
+            array_push(hidden, target.weaknesses[i]) 
+        }
+    }
+    if (array_length(hidden) == 0) { return false }
+    markWeaknessDiscovered(target.kind, hidden[irandom(array_length(hidden) - 1)])
+    return true
+}
+
 function cardWeakSpotTarget(card, targets) {
+    if (!cardDealsInstantDamage(card)) { return noone }
     var list = is_array(targets) ? targets : [targets]
+    for (var t = 0; t < array_length(list); t++) {
+        var target = list[t]
+        if (!instance_exists(target) || target.isKO()) { continue }
+        if (cardCarriesWeakStatus(card, target)) { return target }
+    }
+    return noone
+}
+
+function cardDealsInstantDamage(card) {
     var effects = card.effects
     for (var e = 0; e < array_length(effects); e++) {
         var effect = effects[e]
-        if (!variable_struct_exists(effect, "type") 
-            || !variable_struct_exists(effect, "timing")) { 
-                continue 
-        }
-        if (effect.type != EffectTypes.Damage 
-            || effect.timing != Timing.Instant) { 
-                continue 
-        }
-        for (var t = 0; t < array_length(list); t++) {
-            var target = list[t]
-            if (!instance_exists(target) || target.isKO()) { continue }
-            if (isWeakSpotHit(target, effect)) { return target }
-        }
+        if (effect[$ "type"] == EffectTypes.Damage && effect[$ "timing"] == Timing.Instant) { return true }
     }
-    return noone
+    return false
+}
+
+// Карта накладывает статус, к которому цель слаба (огонь по Листку, оглушение по Кракеру)
+function cardCarriesWeakStatus(card, target) {
+    var effects = card.effects
+    for (var e = 0; e < array_length(effects); e++) {
+        if (checkIfHasWeaknesses(target, effects[e])) { return true }
+    }
+    return false
+}
+
+function capEnemyDamageToHero(caster, target, damage) {
+    if (isBossDefeated()) { return damage }
+    if (caster == undefined || caster == noone || !caster.isEnemy) { return damage }
+    if (target == undefined || target == noone || target.isEnemy) { return damage }
+    return min(damage, ENEMY_DAMAGE_CAP)
 }
 
 function executeDamageEffect(
@@ -221,19 +281,19 @@ function executeDamageEffect(
     targets
 ) {
     var damageType = effect.damageType
-    
+
     //// Чистый урон
     if (damageType == DamageTypes.True) {
         var trueDamamge = is_method(effect.value) ? effect.value() : effect.value
         if (is_array(targets)) {
             for (var i = 0; i < array_length(targets); i++) {
                 if (!targets[i].isKO()) {
-                    targets[i].applyDamage(trueDamamge)
+                    targets[i].applyDamage(capEnemyDamageToHero(caster, targets[i], trueDamamge))
                     targets[i].showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
                 }
             }
         } else if (!targets.isKO()) {
-            targets.applyDamage(trueDamamge)
+            targets.applyDamage(capEnemyDamageToHero(caster, targets, trueDamamge))
             targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
         }
         return
@@ -278,7 +338,9 @@ function executeDamageEffect(
         return
     }
     show_debug_message("damage " + string(damage) )
-    targets.applyDamage(damage, isWeakSpotHit(targets, effect))
+    var weakSpotHit = isWeakSpotHit(targets, effect)
+    if (weakSpotHit) { discoverWeaknessesOnHit(targets, effect) }
+    targets.applyDamage(capEnemyDamageToHero(caster, targets, damage), weakSpotHit)
     targets.showEffectNotification(effect, EffectVisualizerType.AnimationEnd, 1)
     // Колба цветок + гриб
     if (variable_struct_exists(effect, "lifesteal")) {
@@ -301,7 +363,7 @@ function executeDamageEffect(
 function executeRemoveStatus(target, status) {
     var effects = target.effects
     for(var effectIndex = 0; effectIndex < array_length(effects); effectIndex++) {
-        if effects[effectIndex].statusName == status {
+        if (effects[effectIndex][$ "statusName"] == status) {
             target.showEffectNotification(effects[effectIndex], EffectVisualizerType.TimeBased, 1)
             array_delete(effects, effectIndex, 1)
             return

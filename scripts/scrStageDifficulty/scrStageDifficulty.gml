@@ -4,7 +4,7 @@ enum ForestStage { Start, SlotsBought, FiraQuestDone, BossBeaten }
 #macro STAGE_FOREST_PER_SLOT 0.18
 #macro STAGE_FOREST_QUEST 0.25
 #macro STAGE_FOREST_BOSS 0.30
-#macro STAGE_FOREST_GROWTH_PER_WIN 0.02
+#macro STAGE_FOREST_GROWTH_PER_WIN 0.04
 #macro STAGE_FOREST_MIN_FRAC 0.25
 #macro STAGE_FOREST_MAX_LEVEL 50
 
