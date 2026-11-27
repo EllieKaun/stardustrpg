@@ -89,10 +89,12 @@ function getGold() {
     return global.playerData.gold
 }
 
-// Отнять все деньги
-function loseAllGold() {
-    global.playerData.gold = 0
+// Отнять долю денег при поражении, вернуть сколько потеряно
+function loseDefeatGold() {
+    var lost = ceil(getGold() * DEFEAT_GOLD_LOSS_SHARE)
+    global.playerData.gold = getGold() - lost
     playerDataSave()
+    return lost
 }
 
 // Изменить баланс на amount

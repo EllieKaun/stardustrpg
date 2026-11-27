@@ -198,11 +198,11 @@ function initBattleStates() {
 
     stateDef = array_create(StateHook.Count, undefined)
     stateDef[StateHook.OnEnter] = method(self, function() {
-        loseAllGold()
+        var lostGold = loseDefeatGold()
         analyticsDefeat() // аналитика: поражение в бою
         var retry = method(self, function() { retryBattle() })
         var exitToWorld = method(self, function() { returnToOverworld() })
-        modalOpen(modalConfirm(loc("ui.gameover"), loc("ui.gameoverText"), [
+        modalOpen(modalConfirm(loc("ui.gameover"), loc("ui.gameoverText") + string(lostGold), [
             { label: loc("ui.exit"), onSelect: exitToWorld },
             { label: loc("ui.retry"), onSelect: retry }
         ], { tag: "gameOver", initialCursor: 1, textMaxLineH: MODAL_RESULT_TEXT_LINE_H }))

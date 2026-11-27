@@ -559,7 +559,7 @@ function TemporaryWeaknessEffect(weakness, duration) {
              duration: negativeDuration(duration), timing: Timing.Overtime, sprite: debuffEffect }
 }
 function DiscoverWeaknessEffect() {
-    return { type: EffectTypes.DiscoverWeakness, timing: Timing.Instant, sprite: debuffEffect }
+    return { type: EffectTypes.DiscoverWeakness, timing: Timing.Instant, sprite: sprSearchEffect }
 }
 
 // Прочее

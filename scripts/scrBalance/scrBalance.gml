@@ -1,6 +1,7 @@
 // Золото
 #macro GOLD_PER_ENEMY 6 // награда за одного врага
 #macro GOLD_RUN_PENALTY 5 // штраф за побег
+#macro DEFEAT_GOLD_LOSS_SHARE 0.5 // доля золота, теряемая при поражении
 
 // Ночные бои / ignite 
 #macro NIGHT_GOLD_MULT 1.5 // ×золото за победу и ×штраф за побег в ночном бою
