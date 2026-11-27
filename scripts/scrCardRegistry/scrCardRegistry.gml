@@ -195,8 +195,11 @@ function cardBuild(cardIdentifier, rarity = CardsRarity.Default) {
     var cardDefinition = global.cardRegistry[$ cardIdentifier]
     var canVary = cardDefinition.canVaryRarity ? rarity : CardsRarity.Default
     var card = cardDefinition.build(canVary)
-    card.cardId = cardIdentifier      
-    return card;                 
+    card.cardId = cardIdentifier
+    if (card.cardSet != CardSet.Forest && variable_struct_exists(cardDefinition, "category")) {
+        card.cardBaseSpr = cardBaseForCategory(cardDefinition.category)
+    }
+    return card;
 }
 
 // Построение структуры типа идКарты + редкостьКарты

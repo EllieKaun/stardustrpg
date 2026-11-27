@@ -41,6 +41,7 @@ function Card(name,
     self.energy = energy
     self.cardSet = cardSet
     self.costTypeCached  = (actionType == StarriorStates.Attack) ? CostType.Health : CostType.Mana
+    if (cardHasManaGain(effects)) { self.costTypeCached = CostType.Health }
     self.spendsAllEnergy = false
     self.isFlask = false
     self.cardTokenSpr = (self.costTypeCached == CostType.Health) ? hpCostToken : mpCostToken
@@ -50,6 +51,26 @@ function Card(name,
     self.costType  = function() { return self.costTypeCached }
     self.costValue = function() { return self.costValueCached }
     self.handCharms = []
+}
+
+function cardHasManaGain(effects) {
+    for (var i = 0; i < array_length(effects); i++) {
+        if (variable_struct_exists(effects[i], "type") && effects[i].type == EffectTypes.ManaGain) {
+            return true
+        }
+    }
+    return false
+}
+
+function cardBaseForCategory(category) {
+    switch (category) {
+        case CardCategory.Attack: return atcCard
+        case CardCategory.Magic: return mgcCard
+        case CardCategory.Heal: return healCard
+        case CardCategory.Buff: return buffCard
+        case CardCategory.Special: return spCard
+    }
+    return mgcCard
 }
 
 function linkInstantDamageToWeakness(effects) {
